@@ -82,7 +82,7 @@ class FissionModel:
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
         for nuclide in isotope.CFPY[Ei]:
             if nuclide.y == 0: continue
-            FPZAI = int(nuclide.Z*10000+nuclide.A+nuclide.isomer)
+            FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
             nuclide.Contribute(fraction, d_frac)
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = nuclide
