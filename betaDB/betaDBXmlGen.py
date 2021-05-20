@@ -14,10 +14,12 @@ class XMLedit:
         self.isotope.setAttribute('isotope', (isotopeID))
         self.DB.appendChild(self.isotope)
 
-    def editBranch(self, fraction, end_point_E, forbideness):
+    def editBranch(self, fraction, end_point_E, forbideness, sigma_frac='0.0', sigma_E0='0.0'):
         branch = self.root.createElement('branch')
         branch.setAttribute('fraction', (fraction))
+        branch.setAttribute('sigma_frac', (sigma_frac))
         branch.setAttribute('end_point_E', (end_point_E))
+        branch.setAttribute('sigma_E0', (sigma_E0))
         branch.setAttribute('forbideness', (forbideness))
         self.isotope.appendChild(branch)
 
@@ -47,9 +49,9 @@ def betaDBReader(filename):
                 xmloutput.editBranch(fraction, end_point_E, forbideness)
                 prev_isotopeID = isotopeID
 
-            else:   
+            else:
                 xmloutput.editBranch(fraction, end_point_E, forbideness)
-	
+
 	xmloutput.saveXML("betaDB.xml")
 
     return 0
