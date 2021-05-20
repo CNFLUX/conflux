@@ -187,8 +187,11 @@ def neutrino(enu, params):
     thresh=(W0-1.0-V0(buf.Z))*(ELECTRON_MASS_MEV*1.0)
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
+
     if (enu<thresh):
+        #print('parameters', enu, S(buf.e0-enu, buf.Z), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
         return result*S(buf.e0-enu, buf.Z)
+    #print('parameters', enu, S(buf.e0-enu, buf.Z), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
     return result
 
 def electron(ebeta, params):
@@ -223,19 +226,21 @@ def integral(nu_spectrum, p, x_low, x_high):
         function = lambda x: electron(x, p)
 
     function(x_low)
-    if (x_low <= p.thresh and xh >= p.thresh):
+    if (x_low <= p.thresh and xh >= p.thresh): # wierd error because of integrater when difference is smaller than a value
 
-        ergl = 0.0
-        ergh = 0.0
+        ergl = [0.0, 0.0]
+        ergh = [0.0, 0.0]
         test = p.thresh
 
-        ergl = integrate.quad(function, max([x_low, 1e-6]), p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
-        ergh = integrate.quad(function, p.thresh, xh)
+        if (x_low <= p.thresh-5e-5): ergl = integrate.quad(function, max([x_low, 1e-6]), p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
+        if (xh >= p.thresh+5e-5): ergh = integrate.quad(function, p.thresh, xh)
         erg=ergl[0]+ergh[0]
+        #print(x_low, p.thresh, x_high, ergl[0], ergh[0])
 
         return erg
 
     erg = integrate.quad(function, x_low, xh)
+    #print(x_low, p.thresh, x_high, erg[0])
     return erg[0]
 
 class BetaIsotope:
@@ -267,21 +272,27 @@ class BetaEngine:
         self.isolist = isolist
         self.spectralist = {}
 
+
     def CalcBetaSpectra(self, DBname='betaDB/betaDB.xml', nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         print("Searching DB: "+DBname+"...")
+        print("Loading spectra of FPs:")
+
         tree = ET.parse(DBname)
         root = tree.getroot()
         for isotope in root:
             ZA = int(isotope.attrib['isotope'])
             if (ZA in self.isolist):
+                print(str(ZA)+"...")
                 Z = int(ZA/10000)
                 A = int(ZA%10000/10)
                 bins = int(erange/binwidths)
                 branchspectrum = np.zeros(bins)
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
+                    sigma_E0 = float(branch.attrib['sigma_E0'])
                     forbiddeness = int(branch.attrib['forbideness'])
                     fraction = float(branch.attrib['fraction'])
+                    sigma_frac = float(branch.attrib['sigma_frac'])
 
                     betaIstp = BetaIsotope(Z, A, E0, forbiddeness)
                     betaIstp.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
@@ -291,7 +302,7 @@ class BetaEngine:
 
 
 if __name__ == "__main__":
-    testlist = [551370, 551380]
+    testlist = [300770]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
     print(testEngine.spectralist)

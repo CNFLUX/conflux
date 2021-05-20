@@ -76,14 +76,15 @@ class FissionIstp:
         print('FPY list loaded.')
 
 class FissionModel:
-    def __init__(self):
+    def __init__(self, W = 1.0):
         self.FPYlist = {}
+        self.W = 1.0
 
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
         for nuclide in isotope.CFPY[Ei]:
             if nuclide.y == 0: continue
             FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
-            nuclide.Contribute(fraction, d_frac)
+            nuclide.Contribute(self.W*fraction, d_frac)
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = nuclide
             else:
