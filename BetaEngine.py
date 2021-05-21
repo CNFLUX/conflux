@@ -232,8 +232,8 @@ def integral(nu_spectrum, p, x_low, x_high):
         ergh = [0.0, 0.0]
         test = p.thresh
 
-        if (x_low <= p.thresh-5e-5): ergl = integrate.quad(function, max([x_low, 1e-6]), p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
-        if (xh >= p.thresh+5e-5): ergh = integrate.quad(function, p.thresh, xh)
+        if (x_low <= p.thresh-5e-4): ergl = integrate.quad(function, max([x_low, 1e-6]), p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
+        if (xh >= p.thresh+5e-4): ergh = integrate.quad(function, p.thresh, xh)
         erg=ergl[0]+ergh[0]
         #print(x_low, p.thresh, x_high, ergl[0], ergh[0])
 
@@ -244,16 +244,20 @@ def integral(nu_spectrum, p, x_low, x_high):
     return erg[0]
 
 class BetaIsotope:
-    def __init__(self, Z, A, E0, forbiddeness, WM=0.0047):
+    def __init__(self, Z, A, E0, sigma_E0, forbiddeness, WM=0.0047):
         self.Z = Z
         self.A = A
         self.E0 = E0
+        self.sigma_E0 = sigma_E0
+
         self.forbiddeness = forbiddeness
         self.WM = WM
 
     def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
         self.result = np.zeros(bins)
+        self.errorl = np.zeros(bins)
+        self.errorh = np.zeros(bins)
         if (lower > self.E0):
             return 1
         if (lower<0):
@@ -268,16 +272,16 @@ class BetaIsotope:
         return 0
 
 class BetaEngine:
-    def __init__(self, isolist):
+    def __init__(self, isolist, DBname ='betaDB/betaDB.xml'):
         self.isolist = isolist
         self.spectralist = {}
+        self.DBname = DBname
 
+    def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+        print("Searching DB: "+self.DBname+"...")
+        print("Loading spectra of beta branches:")
 
-    def CalcBetaSpectra(self, DBname='betaDB/betaDB.xml', nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
-        print("Searching DB: "+DBname+"...")
-        print("Loading spectra of FPs:")
-
-        tree = ET.parse(DBname)
+        tree = ET.parse(self.DBname)
         root = tree.getroot()
         for isotope in root:
             ZA = int(isotope.attrib['isotope'])
@@ -294,7 +298,7 @@ class BetaEngine:
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
 
-                    betaIstp = BetaIsotope(Z, A, E0, forbiddeness)
+                    betaIstp = BetaIsotope(Z, A, E0, sigma_E0, forbiddeness)
                     betaIstp.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
                     betaIstp.result *= fraction
                     branchspectrum += betaIstp.result
@@ -302,7 +306,7 @@ class BetaEngine:
 
 
 if __name__ == "__main__":
-    testlist = [300770]
+    testlist = [671640]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
     print(testEngine.spectralist)

@@ -34,17 +34,16 @@ class SumEngine:
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, DB='betaDB/betaDB.xml', binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def CalcReactorSpectrum(self, betaSpectraDB, DB='betaDB/betaDB.xml', binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
         self.reactorSpectrum = np.zeros(bins)
+        self.spectrumErr = np.zeros(bins)
         self.bins = np.arange(0, erange, binwidths)
 
-        self.betaSpectraDB = BetaEngine(self.FPYlist.keys())
-        self.betaSpectraDB.CalcBetaSpectra(DB, nu_spectrum=self.neutrino, binwidths=binwidths, lower=lower, thresh=thresh, erange = erange)
         for FPZAI in self.FPYlist:
-            if FPZAI in self.betaSpectraDB.spectralist:
+            if FPZAI in betaSpectraDB.spectralist:
                 #print(FPZAI, self.betaSpectraDB.spectralist[FPZAI])
-                self.betaSpectraList[FPZAI] = self.betaSpectraDB.spectralist[FPZAI]
+                self.betaSpectraList[FPZAI] = betaSpectraDB.spectralist[FPZAI]
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
 
     def Draw(self, figname, logy=True):
@@ -54,10 +53,12 @@ class SumEngine:
             ax.plot(self.bins, self.reactorSpectrum)
         else:
             ax.semilogy(self.bins, self.reactorSpectrum)
+            ax.set_xlim([0, 15])
+            ax.set_ylim([1e-7, 10])
+            for FPZAI in self.betaSpectraList:
+                ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
         ax.set(xlabel='E (MeV)', ylabel='I', title='reactor neutrino spectrum')
         fig.savefig(figname)
-
-
 
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
@@ -66,11 +67,15 @@ if __name__ == "__main__":
     Pu239.LoadDB()
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0, fraction=0.6, d_frac=0.05)
-    model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
+    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
 
     result = SumEngine()
     result.AddModel(model)
-    result.CalcReactorSpectrum()
+
+    betaSpectraDB = BetaEngine(result.FPYlist.keys())
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0)
+
+    result.CalcReactorSpectrum(betaSpectraDB)
     print(result.reactorSpectrum)
-    result.Draw("reactor_spectrum_test.png")
+    result.Draw("U235_spectrum_test.png")
