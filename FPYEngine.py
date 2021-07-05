@@ -8,6 +8,7 @@ import numpy as np
 from os import listdir
 import xml
 import xml.etree.ElementTree as ET
+import matplotlib.pyplot as plt
 
 class FPNuclide:
     def __init__(self, ZA, isomer, y, yerr):
@@ -18,7 +19,7 @@ class FPNuclide:
         self.y = y
         self.yerr = yerr
 
-    def Contribute(self, fraction, d_fraction):
+    def Contribute(self, fraction, d_fraction=0):
         self.y *= fraction
         self.yerr = self.y*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
 
@@ -91,8 +92,35 @@ class FissionModel:
                 self.FPYlist[FPZAI].y + nuclide.y
                 self.FPYlist[FPZAI].yerr + nuclide.yerr
 
+    def AddNFIstp(self, Z, A, fraction, isomer=0, d_frac = 0.0):
+        nuclide = FPNuclide(Z*1000+A, isomer, fraction, d_frac)
+        FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
+        if FPZAI not in self.FPYlist:
+            self.FPYlist[FPZAI] = nuclide
+        else:
+            self.FPYlist[FPZAI].y + nuclide.y
+            self.FPYlist[FPZAI].yerr + nuclide.yerr
+
     def GetNuclide(self, ZAI):
         return self.FPYlist[ZAI]
+
+    # Draw a histogram of branch fractions
+    def DrawBranches(self, figname):
+        print("Drawing branches...")
+        fig, ax = plt.subplots()
+        alist = np.arange(50, 180, 1)
+        branchlist = np.zeros(len(alist))
+        errlist = np.zeros(len(alist))
+
+        for FPZAI in self.FPYlist:
+            A = self.FPYlist[FPZAI].A
+            branchlist[A-50] += self.FPYlist[FPZAI].y
+            errlist[A-50] += self.FPYlist[FPZAI].yerr
+
+
+        ax.errorbar(alist, branchlist, yerr=errlist)
+        ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
+        fig.savefig(figname)
 
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
@@ -105,3 +133,4 @@ if __name__ == "__main__":
     model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
     for FPZAI in model.FPYlist:
         print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
+    model.DrawBranches("frac.png")

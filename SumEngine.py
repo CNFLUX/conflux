@@ -4,6 +4,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 # local modules
 from BetaEngine import BetaEngine
@@ -39,12 +40,19 @@ class SumEngine:
         self.reactorSpectrum = np.zeros(bins)
         self.spectrumErr = np.zeros(bins)
         self.bins = np.arange(0, erange, binwidths)
+        self.missingBranch = []
+        self.missingCont = 0.0
 
         for FPZAI in self.FPYlist:
             if FPZAI in betaSpectraDB.spectralist:
-                #print(FPZAI, self.betaSpectraDB.spectralist[FPZAI])
                 self.betaSpectraList[FPZAI] = betaSpectraDB.spectralist[FPZAI]
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
+                self.spectrumErr += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
+
+            # save the list of missing branches
+            else:
+                self.missingCont += self.FPYlist[FPZAI].y
+                self.missingBranch.append(FPZAI)
 
     def Draw(self, figname, logy=True):
         print("Drawing spectrum...")
@@ -57,6 +65,8 @@ class SumEngine:
             ax.set_ylim([1e-7, 10])
             for FPZAI in self.betaSpectraList:
                 ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
+                    print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
         ax.set(xlabel='E (MeV)', ylabel='I', title='reactor neutrino spectrum')
         fig.savefig(figname)
 
@@ -68,7 +78,7 @@ if __name__ == "__main__":
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
-    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
+    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=1, d_frac=0.05)
 
     result = SumEngine()
     result.AddModel(model)
@@ -79,3 +89,8 @@ if __name__ == "__main__":
     result.CalcReactorSpectrum(betaSpectraDB)
     print(result.reactorSpectrum)
     result.Draw("U235_spectrum_test.png")
+    with open("U235test.csv", "w") as output:
+        write = csv.writer(output)
+        write.writerow(result.reactorSpectrum)
+    print(result.missingCont)
+    print(len(result.missingBranch), len(model.FPYlist))

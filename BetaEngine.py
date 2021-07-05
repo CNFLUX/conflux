@@ -2,7 +2,6 @@ import sys
 import argparse
 import numpy as np
 from scipy import constants, special, interpolate, integrate
-import xml
 import xml.etree.ElementTree as ET
 
 ######################
@@ -37,15 +36,15 @@ def F(y, gamma, p, R):
     res = special.loggamma(complex(gamma, y))
     absgamma2= np.exp(2*res.real)
     g2g = special.gamma(2*gamma+1)
-    result = 4*absgamma2*np.exp(y*np.pi)/(pow(2*p*R,(2*(1-gamma)))*g2g**2);
+    result = 2*(gamma+1)*absgamma2*np.exp(y*np.pi)/(pow(2*p*R,(2*(1-gamma)))*g2g**2)
     return result
 
 ###############
 # Finite size
 
 l0dat = [[0.115, -1.8123, 8.2498, -11.223, -14.854, 32.086],
-		    [-0.00062,0.007165, 0.01841, -0.53736, 1.2691, -1.5467],
-		    [0.02482, -0.5975, 4.84199, -15.3374,23.9774, -12.6534],
+		    [-0.00062, 0.007165, 0.01841, -0.53736, 1.2691, -1.5467],
+		    [0.02482, -0.5975, 4.84199, -15.3374, 23.9774, -12.6534],
 		    [-0.14038, 3.64953,-38.8143,172.1368,-346.708, 288.7873],
 		    [0.008152,-1.15664,49.9663,-273.711,657.6292, -603.7033],
 		    [1.2145, -23.9931,149.9718,-471.2985, 662.1909,-305.6804],
@@ -208,10 +207,11 @@ def electron(ebeta, params):
         return result*S(ebeta,buf.Z)
     return result
 
-def integral(nu_spectrum, p, x_low, x_high):
+def integral(nu_spectrum, p, x_low, x_high, verb):
     erg = 0.0
     error = 0.0
     xh = 0.0
+    xlow = max([x_low, 1e-6])
 
     if (x_low >= p.e0-1e-6):
         return 0
@@ -232,17 +232,32 @@ def integral(nu_spectrum, p, x_low, x_high):
         ergh = [0.0, 0.0]
         test = p.thresh
 
-        if (x_low <= p.thresh-5e-4): ergl = integrate.quad(function, max([x_low, 1e-6]), p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
-        if (xh >= p.thresh+5e-4): ergh = integrate.quad(function, p.thresh, xh)
-        erg=ergl[0]+ergh[0]
+        # a quick integration mathod through trapezoid algorithm
+        if (verb == "quick"):
+            mid = (x_low+p.thresh)/2
+            ergl = abs(p.thresh-x_low)*function(mid)
+            mid = (xh+p.thresh)/2
+            ergh = abs(p.thresh-xh)*function(mid)
+            erg = ergl+ergh
+        else:
+            if (x_low <= p.thresh-5e-4 ): ergl = integrate.quad(function, x_low, p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
+            if (xh >= p.thresh+5e-4): ergh = integrate.quad(function, p.thresh, xh)
+            erg=ergl[0]+ergh[0]
         #print(x_low, p.thresh, x_high, ergl[0], ergh[0])
 
         return erg
 
-    erg = integrate.quad(function, x_low, xh)
+    if (verb == "quick"):
+        mid = (xh+x_low)/2
+        erg = abs(xh-x_low)*function(mid)
+        return erg
+    else:
+        erg = integrate.quad(function, x_low, xh)
+        return erg[0]
     #print(x_low, p.thresh, x_high, erg[0])
-    return erg[0]
 
+
+# BetaIsotope class to save the isotopic information
 class BetaIsotope:
     def __init__(self, Z, A, E0, sigma_E0, forbiddeness, WM=0.0047):
         self.Z = Z
@@ -256,19 +271,24 @@ class BetaIsotope:
     def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
         self.result = np.zeros(bins)
-        self.errorl = np.zeros(bins)
-        self.errorh = np.zeros(bins)
+
         if (lower > self.E0):
             return 1
         if (lower<0):
             lower=binwidths/2.0
 
         inter = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=thresh)
-        norm = integral(nu_spectrum, inter, 0, self.E0)
+        #norm = integral(nu_spectrum, inter, 0, self.E0, "slow")
 
         for k in range (0, bins):
-            self.result[k] = integral(nu_spectrum, inter, lower, lower+binwidths)/binwidths/norm
+            self.result[k] = integral(nu_spectrum, inter, lower, lower+binwidths, "quick")
             lower+=binwidths
+        norm = self.result.sum()
+        if norm <=0:
+            self.result =np.zeros(bins)
+        else:
+            self.result /= norm*binwidths
+
         return 0
 
 class BetaEngine:
@@ -306,7 +326,7 @@ class BetaEngine:
 
 
 if __name__ == "__main__":
-    testlist = [671640]
+    testlist = [300690]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
     print(testEngine.spectralist)
