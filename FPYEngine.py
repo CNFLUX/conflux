@@ -82,6 +82,10 @@ class FissionModel:
         self.W = 1.0
 
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
+        if Ei not in isotope.CFPY:
+            print('Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!')
+            return
+
         for nuclide in isotope.CFPY[Ei]:
             if nuclide.y == 0: continue
             FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
@@ -89,6 +93,7 @@ class FissionModel:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = nuclide
             else:
+                print (self.FPYlist[FPZAI].y, nuclide.y)
                 self.FPYlist[FPZAI].y + nuclide.y
                 self.FPYlist[FPZAI].yerr + nuclide.yerr
 

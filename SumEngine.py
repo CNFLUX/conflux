@@ -73,11 +73,14 @@ class SumEngine:
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadDB()
+    U238 = FissionIstp(92, 238)
+    U238.LoadDB()
     Pu239 = FissionIstp(94, 239)
     Pu239.LoadDB()
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    model.AddContribution(isotope=U235, Ei = 0, fraction=0.5)
+    model.AddContribution(isotope=U238, Ei = 0.5, fraction=0.5)
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=1, d_frac=0.05)
 
     result = SumEngine()
@@ -92,5 +95,5 @@ if __name__ == "__main__":
     with open("U235test.csv", "w") as output:
         write = csv.writer(output)
         write.writerow(result.reactorSpectrum)
-    print(result.missingCont)
-    print(len(result.missingBranch), len(model.FPYlist))
+    #print(result.missingCont)
+    #print(result.missingBranch)

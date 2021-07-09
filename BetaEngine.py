@@ -306,7 +306,7 @@ class BetaEngine:
         for isotope in root:
             ZA = int(isotope.attrib['isotope'])
             if (ZA in self.isolist):
-                print(str(ZA)+"...")
+                #print(str(ZA)+"...")
                 Z = int(ZA/10000)
                 A = int(ZA%10000/10)
                 bins = int(erange/binwidths)
