@@ -63,10 +63,10 @@ class SumEngine:
             ax.semilogy(self.bins, self.reactorSpectrum)
             ax.set_xlim([0, 15])
             ax.set_ylim([1e-7, 10])
-            for FPZAI in self.betaSpectraList:
-                ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
-                    print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
+            #for FPZAI in self.betaSpectraList:
+                #ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
+                    # print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
         ax.set(xlabel='E (MeV)', ylabel='I', title='reactor neutrino spectrum')
         fig.savefig(figname)
 
@@ -80,8 +80,8 @@ if __name__ == "__main__":
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=0.5)
-    model.AddContribution(isotope=U238, Ei = 0.5, fraction=0.5)
-    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=1, d_frac=0.05)
+    #model.AddContribution(isotope=U238, Ei = 0.5, fraction=0.5)
+    model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.5)
 
     result = SumEngine()
     result.AddModel(model)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     result.CalcReactorSpectrum(betaSpectraDB)
     print(result.reactorSpectrum)
-    result.Draw("U235_spectrum_test.png")
+    result.Draw("test_spectrum_test.png")
     with open("U235test.csv", "w") as output:
         write = csv.writer(output)
         write.writerow(result.reactorSpectrum)

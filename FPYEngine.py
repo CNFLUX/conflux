@@ -93,9 +93,8 @@ class FissionModel:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = nuclide
             else:
-                print (self.FPYlist[FPZAI].y, nuclide.y)
-                self.FPYlist[FPZAI].y + nuclide.y
-                self.FPYlist[FPZAI].yerr + nuclide.yerr
+                self.FPYlist[FPZAI].y += nuclide.y
+                self.FPYlist[FPZAI].yerr += nuclide.yerr
 
     def AddNFIstp(self, Z, A, fraction, isomer=0, d_frac = 0.0):
         nuclide = FPNuclide(Z*1000+A, isomer, fraction, d_frac)
