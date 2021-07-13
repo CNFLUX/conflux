@@ -9,7 +9,7 @@ class XMLedit:
         self.DB = self.root.createElement('betaDB')
         self.root.appendChild(self.DB)
 
-    def createIsotope(self, isotopeID):
+    def createIsotope(self, isotopeID, Q = '0.0', HL = '0.0'):
         self.isotope = self.root.createElement('isotope')
         self.isotope.setAttribute('isotope', (isotopeID))
         self.DB.appendChild(self.isotope)
