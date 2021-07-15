@@ -9,11 +9,13 @@ class XMLedit:
         self.DB = self.root.createElement('betaDB')
         self.root.appendChild(self.DB)
 
+    # beta-decay isotopes
     def createIsotope(self, isotopeID, Q = '0.0', HL = '0.0'):
         self.isotope = self.root.createElement('isotope')
         self.isotope.setAttribute('isotope', (isotopeID))
         self.DB.appendChild(self.isotope)
 
+    # decay branches of the isotope
     def editBranch(self, fraction, end_point_E, forbideness, sigma_frac='0.0', sigma_E0='0.0'):
         branch = self.root.createElement('branch')
         branch.setAttribute('fraction', (fraction))
