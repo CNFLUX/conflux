@@ -80,10 +80,10 @@ if __name__ == "__main__":
 
     model = FissionModel()
     #
-    #model.AddContribution(isotope=U235, Ei = 0, fraction=0.5)
+    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
     #model.AddContribution(isotope=U238, Ei = 0.5, fraction=0.5)
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.5)
-    model.AddIstp(39, 96, 1.0)
+    #model.AddIstp(39, 96, 1.0)
 
     result = SumEngine()
     result.AddModel(model)

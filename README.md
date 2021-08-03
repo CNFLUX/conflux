@@ -17,7 +17,7 @@ Data bases:
 cumulative fission yield, beta decay branch
 
 Summation calculation modules:
---------------------
+------------------------------
 fission yield tally, beta/neutrino spectral shape
 calculation, spectrum summation
 
@@ -27,7 +27,10 @@ Usage:
 Summation calculation:
 ----------------------
 Define fission isotope and beta decaying isotope
+
 Define reactor model with reactor power, isotope fractions and uncertainties of
 fractions
+
 Load beta decay database and calculate beta spectra.
+
 Sum beta spectra with respect to total isotope fractions.
