@@ -1,0 +1,17 @@
+
+
+Time dependent reactor model with fission fractions: 
+
+{“time_0”; “power_0”; {“235”, [frac, d_frac]}; {“238”, [frac, d_frac]}; {...}; ...} 
+{“time_1”; “power_1”; {“235”, [frac, d_frac]}; {“238”, [frac, d_frac]}; {...}; ...} 
+{“time_n”; “power_n”; {“235”, [frac, d_frac]}; {“238”, [frac, d_frac]}; {...}; ...} 
+
+
+
+
+Time dependent reactor model with simulated beta branches: 
+
+{“time_0”; {“beta_branch_0”; [frac, d_frac]}; {“beta_branch_1”; [frac, d_frac]}; …} 
+{“time_1”; {“beta_branch_0”; [frac, d_frac]}; {“beta_branch_1”; [frac, d_frac]}; …}
+...... 
+{“time_n”; {“beta_branch_0”, [frac, d_frac]}; {“beta_branch_1”, [frac, d_frac]}; …} 
