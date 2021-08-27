@@ -72,6 +72,7 @@ def L0b(W, Z, R):
 
 ######################
 # Screening Correction
+#TODO: build a screening effect database to replace
 
 Wb = lambda energy, V0: WO(energy)-V0
 

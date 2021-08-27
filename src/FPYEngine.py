@@ -23,7 +23,10 @@ class FPNuclide:
     # Method that add fission yield of this branch to total fission yield
     def Contribute(self, fraction, d_fraction=0):
         self.y *= fraction
-        self.yerr = self.y*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
+        if self.y == 0:
+            self.yerr = 0
+        else:
+            self.yerr = self.y*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
 
 # Class that counts fission products of a specified fission isotope
 class FissionIstp:

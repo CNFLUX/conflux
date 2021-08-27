@@ -54,20 +54,38 @@ class SumEngine:
                 self.missingCont += self.FPYlist[FPZAI].y
                 self.missingBranch.append(FPZAI)
 
-    def Draw(self, figname, logy=True):
+    def Draw(self, figname, summing = True, logy=True, frac=False):
         print("Drawing spectrum...")
         fig, ax = plt.subplots()
         if (not logy):
-            ax.plot(self.bins, self.reactorSpectrum)
+            ax.set_xlim([0, 10])
+            ax.set_ylim([0, 1])
+            if (summing == True):
+                ax.plot(self.bins, self.reactorSpectrum)
+            if (frac == True):
+                lines = []
+                labels = []
+                for FPZAI in self.betaSpectraList:
+                    lines += ax.plot(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                    labels.append(str(FPZAI))
+                    # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
+                    #     print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
+                plt.legend(lines, labels)
+                ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
         else:
-            ax.semilogy(self.bins, self.reactorSpectrum)
             ax.set_xlim([0, 15])
             ax.set_ylim([1e-7, 10])
-            #for FPZAI in self.betaSpectraList:
-                #ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
-                    # print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
-        ax.set(xlabel='E (MeV)', ylabel='I', title='reactor neutrino spectrum')
+            if (summing == True):
+                ax.semilogy(self.bins, self.reactorSpectrum)
+
+            if (frac == True):
+                for FPZAI in self.betaSpectraList:
+                    ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                    ax.legend(str(FPZAI))
+
+                    # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
+                    #     print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
+            ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
         fig.savefig(figname)
 
 if __name__ == "__main__":
