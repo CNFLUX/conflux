@@ -9,6 +9,10 @@ calculation:
 - Beta-conversion mode,
 - Experiment mode.
 
+Installation:
+=============
+Excute: pip install conflux
+
 Program structure:
 ==================
 

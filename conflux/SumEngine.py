@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import csv
 
 # local modules
-from BetaEngine import BetaEngine
-from FPYEngine import FissionModel, FissionIstp
+from conflux.BetaEngine import BetaEngine
+from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine:
     def __init__(self, neutrino=True):
