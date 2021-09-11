@@ -11,7 +11,7 @@ calculation:
 
 Installation:
 =============
-Excute: pip install conflux
+Execute: `pip install conflux`
 
 Program structure:
 ==================

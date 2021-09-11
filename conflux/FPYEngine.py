@@ -91,10 +91,8 @@ class FissionModel:
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
-        if Ei not in isotope.CFPY:
-            print('Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!')
-            return
-
+        assert Ei in isotope.CFPY, 'Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!'
+        
         for nuclide in isotope.CFPY[Ei]:
             if nuclide.y == 0: continue
             FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
@@ -138,7 +136,7 @@ class FissionModel:
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)
 
-# example of how to define fission isotopes and add them to the reactor model
+# test on how to define fission isotopes and add them to the reactor model
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadDB()
@@ -146,9 +144,9 @@ if __name__ == "__main__":
     Pu239.LoadDB()
 
     model = FissionModel()
-    #model.AddContribution(isotope=U235, Ei = 0, fraction=0.6, d_frac=0.05)
-    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
-    model.AddIstp(390960)
+    model.AddContribution(isotope=U235, Ei = 0, fraction=0.6, d_frac=0.05)
+    model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
+    #model.AddIstp(390960)
     for FPZAI in model.FPYlist:
         print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
     model.DrawBranches("frac.png")

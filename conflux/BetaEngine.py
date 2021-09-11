@@ -258,13 +258,15 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
     #print(x_low, p.thresh, x_high, erg[0])
 
 
-# BetaIsotope class to save the isotopic information
-class BetaIsotope:
-    def __init__(self, Z, A, E0, sigma_E0, forbiddeness, WM=0.0047):
+# BetaBranch class to save the isotopic information
+class BetaBranch:
+    def __init__(self, Z, A, frac, I, E0, sigma_E0, forbiddeness=0, WM=0.0047):
         self.Z = Z
         self.A = A
+        self.I = I
         self.E0 = E0
         self.sigma_E0 = sigma_E0
+        self.frac = frac
 
         self.forbiddeness = forbiddeness
         self.WM = WM
@@ -292,26 +294,29 @@ class BetaIsotope:
 
         return 0
 
+# BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
+# of all tallied branches
 class BetaEngine:
-    def __init__(self, isolist, DBname ='betaDB/betaDB.xml'):
-        self.isolist = isolist
+    def __init__(self, inputlist, DBname ='betaDB/betaDB.xml'):
+        self.inputlist = inputlist
+        self.istplist = {}
         self.spectralist = {}
         self.DBname = DBname
 
-    def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def LoadBetaDB(self):
         print("Searching DB: "+self.DBname+"...")
         print("Loading spectra of beta branches:")
 
         tree = ET.parse(self.DBname)
         root = tree.getroot()
         for isotope in root:
-            ZA = int(isotope.attrib['isotope'])
-            if (ZA in self.isolist):
+            ZAI = int(isotope.attrib['isotope'])
+            if (ZAI in self.inputlist):
                 #print(str(ZA)+"...")
-                Z = int(ZA/10000)
-                A = int(ZA%10000/10)
-                bins = int(erange/binwidths)
-                branchspectrum = np.zeros(bins)
+                Z = int(ZAI/10000)
+                A = int(ZAI%10000/10)
+                I = int(ZAI%10)
+                betaIstp = []
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
                     sigma_E0 = float(branch.attrib['sigma_E0'])
@@ -319,15 +324,24 @@ class BetaEngine:
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
 
-                    betaIstp = BetaIsotope(Z, A, E0, sigma_E0, forbiddeness)
-                    betaIstp.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
-                    betaIstp.result *= fraction
-                    branchspectrum += betaIstp.result
-                self.spectralist[ZA] = branchspectrum
+                    betaIstp.append(BetaBranch(Z, A, fraction, I, E0, sigma_E0, forbiddeness))
+                self.istplist[ZAI] = betaIstp
+
+    def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+        self.LoadBetaDB()
+        bins = int(erange/binwidths)
+        branchspectrum = np.zeros(bins)
+        for ZAI in self.istplist:
+            for branch in self.istplist[ZAI]:
+                branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+                branch.result *= branch.frac
+                branchspectrum += branch.result
+
+            self.spectralist[ZAI] = branchspectrum
 
 
 if __name__ == "__main__":
-    testlist = [300690]
+    testlist = [300690, 431021]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
     print(testEngine.spectralist)
