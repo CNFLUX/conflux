@@ -6,10 +6,11 @@
 import sys
 import csv
 import numpy as np
+from scipy.optimize import curve_fit
 
 # local modules
-from conflux.BetaEngine import BetaEngine
-from conflux.FPYEngine import FissionModel, FissionIstp
+from BetaEngine import BetaEngine, BetaBranch
+from FPYEngine import FissionModel, FissionIstp
 
 # Class that reads conversion DB and form reference spectra
 class BetaData:
@@ -33,7 +34,7 @@ class BetaData:
                    E /= 1000.
 
                 # convert relative uncertainty in percentage to absolute uncertainty
-                y = float(row["dNe"])
+                y = float(row["Ne"])
                 yerr = float(row["dNe"])
                 if rel_err:
                     yerr = y*yerr/100.
@@ -70,9 +71,7 @@ class VirtualBranch:
                 self.FPYlist[FPZAI].yerr += nuclide.yerr
 
     # function to precisely calculate average Z, A value of the virtual branch
-    def CalcZAavg(self, E0, dE0):
-        Elow = E0-dE0
-        Ehigh = E0+dE0
+    def CalcZAavg(self, Elow, Ehigh):
         frac_sum = 0
         Afrac_sum = 0
         Zfrac_sum = 0
@@ -85,24 +84,92 @@ class VirtualBranch:
         self.Aavg = Afrac_sum/frac_sum
         self.Zavg = Zfrac_sum/frac_sum
 
-    def BetaSpectrum(self, E0, forbiddeness = 0, WM = 0.0047):
-        return 0
+    # define the theoretical beta spectrum shape
+    def BetaSpectrum(self, x, contribute, E0, forbiddeness = 0, WM = 0.0047):
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        return virtualbata.BetaSpectrum(x)
 
+    # define the theoretical neutrino spectrum shape
+    def NueSpectrum(self, x, contribute, E0, forbiddeness = 0, WM = 0.0047):
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        return irtualbata.BetaSpectrum(x, nu_spectrum=True)
 
+    def FitData(self, betadata, slicesize):
+        self.contribute = {}
+        self.E0 = {}
+        self.Zlist = {}
+        self.Alist = {}
+        # fill the sub lists as slices
+        subx = []
+        suby = []
+        subyerr = []
+        xhigh = betadata.x[-1]
+        for it in range(len(betadata.x)-1, 0, -1):
+            x = betadata.x[it]
+
+            if x < xhigh - slicesize:
+                # when the sublist is filled in this slice, do fitting
+                if len(subx)>1 and len(suby) == len(subx) :
+                    self.CalcZAavg(xhigh-slicesize, xhigh)
+                    self.Zlist[xhigh] = self.Zavg
+                    self.Alist[xhigh] = self.Aavg
+                    print(self.Zavg, self.Aavg, subx, suby, subyerr)
+                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, sigma=subyerr, absolute_sigma=True)
+                    self.contribute[xhigh] = popt[0]
+                    self.E0[xhigh] = popt[1]
+                    print(popt[1])
+                    # subtract the best fit spectrum from beta data
+                    for i in range(len(betadata.x)):
+                        betadata.y[i] - self.BetaSpectrum(popt[0], popt[1])
+
+                    #TODO uncertainty process
+
+                    subx = []
+                    suby = []
+                    subyerr = []
+
+                xhigh -= slicesize
+            else:
+                subx.append(x)
+                suby.append(betadata.y[it])
+                subyerr.append(betadata.yerr[it])
+
+# class that search for best fit vertual branch and calculate total neutrino flux
 class ConversionEngine:
-    def __init__():
-        betadata
+    def __init__(self):
+        self.betadata = {}
+        self.fissionfrac = {}
+        self.fisIstp = {}
+        self.vblist = {}
+
+    def AddBetaData(self, betadata, fisIstp, name, frac):
+        self.betadata[name] = betadata
+        self.fissionfrac[name] = frac
+        self.fisIstp[name] = fisIstp
+
+    def VBfit(self, slicesize = 0.25):
+        for istp in self.betadata:
+            # define the virtual branches to be fit
+            vbnew = VirtualBranch(self.fisIstp[istp])
+            vbnew.FitData(self.betadata[istp], slicesize)
+            self.vblist[istp] = vbnew
+            print(self.vblist[istp].E0)
 
 # test
 if __name__ == "__main__":
     beta235 = BetaData("./conversionDB/U_235_e_2014.csv")
-    print(beta235.x)
-    print(beta235.y)
-    print(beta235.yerr)
+    #print(beta235.x)
+    #print(beta235.y)
+    #print(beta235.yerr)
 
     U235 = FissionIstp(92, 235)
     U235.LoadDB()
 
     vbtest = VirtualBranch(U235)
-    vbtest.CalcZAavg()
-    print(vbtest.Aavg, vbtest.Zavg)
+    vbtest.CalcZAavg(6,7)
+    print(vbtest.BetaSpectrum(8, 0.1, 9))
+    #print(vbtest.Aavg, vbtest.Zavg)
+
+    convertmodel = ConversionEngine()
+    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
+    convertmodel.VBfit()

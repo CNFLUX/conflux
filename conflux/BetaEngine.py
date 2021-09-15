@@ -114,6 +114,7 @@ def G(W, W0):
     result = 0.
     beta = p(W)/W
     result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(W0-W)))
+    print("result", np.log(2*(W0-W)))
     result += (4.0*special.spence(1-(2*beta)/(1+ beta)))/beta
     result += (np.arctanh(beta)*(2.0*(1.0+beta**2)+(W0-W)*(W0-W)/(6.0*W**2)-4.0*np.arctanh(beta)))/beta
     result = result*constants.fine_structure/(2.0*np.pi)+1.0
@@ -203,7 +204,7 @@ def electron(ebeta, params):
     thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-    #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
+    print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
     if(ebeta>=thresh):
         return result*S(ebeta,buf.Z)
     return result
@@ -270,6 +271,13 @@ class BetaBranch:
 
         self.forbiddeness = forbiddeness
         self.WM = WM
+
+    def BetaSpectrum(self, x, nu_spectrum=False):
+        p = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=0)
+        if (nu_spectrum == True):
+            return neutrino(x, p)
+        else:
+            return electron(x, p)
 
     def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
