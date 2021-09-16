@@ -113,11 +113,7 @@ def CC(R, Z, W, W0):
 def G(W, W0):
     result = 0.
     beta = p(W)/W
-    # prevent NAN in fitting
-    sense = W0-W <= 0
-    dW = (W0-W)+sense*1e-6
-
-    result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(dW)))
+    result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(W0-W)))
     result += (4.0*special.spence(1-(2*beta)/(1+ beta)))/beta
     result += (np.arctanh(beta)*(2.0*(1.0+beta**2)+(W0-W)*(W0-W)/(6.0*W**2)-4.0*np.arctanh(beta)))/beta
     result = result*constants.fine_structure/(2.0*np.pi)+1.0
@@ -248,7 +244,6 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
             if (x_low <= p.thresh-5e-4 ): ergl = integrate.quad(function, x_low, p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
             if (xh >= p.thresh+5e-4): ergh = integrate.quad(function, p.thresh, xh)
             erg=ergl[0]+ergh[0]
-        #print(x_low, p.thresh, x_high, ergl[0], ergh[0])
 
         return erg
 
@@ -275,9 +270,11 @@ class BetaBranch:
         self.forbiddeness = forbiddeness
         self.WM = WM
 
+    # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
         params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=0)
-        if (nu_spectrum == True):
+        rangecorrection = x <= self.E0 # prevent out-of-range variable to output insane results
+        if nu_spectrum:
             buf = params
             result = 0.
             R= 1.0*FERMI_to_W * nuclear_radius(buf.A)
@@ -287,7 +284,7 @@ class BetaBranch:
             buf.thresh = thresh
             result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
             result = np.nan_to_num(result, nan=0.0)
-            return result*self.frac
+            return result*self.frac*rangecorrection
         else:
             buf = params
             result = 0.
@@ -300,8 +297,9 @@ class BetaBranch:
             #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
             result *= S(x,buf.Z)
             result = np.nan_to_num(result, nan=0.0)
-            return result*self.frac
+            return result*self.frac*rangecorrection
 
+    # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
         self.result = np.zeros(bins)

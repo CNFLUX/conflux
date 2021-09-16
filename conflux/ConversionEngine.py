@@ -10,8 +10,8 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
 # local modules
-from BetaEngine import BetaEngine, BetaBranch
-from FPYEngine import FissionModel, FissionIstp
+from conflux.BetaEngine import BetaEngine, BetaBranch
+from conflux.FPYEngine import FissionModel, FissionIstp
 
 # Class that reads conversion DB and form reference spectra
 class BetaData:
@@ -90,7 +90,6 @@ class VirtualBranch:
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        #print(E0, contribute)
         virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
         return virtualbata.BetaSpectrum(x)
 
@@ -99,16 +98,18 @@ class VirtualBranch:
         virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
         return virtualbata.BetaSpectrum(x, nu_spectrum=True)
 
+    # function that fit the reference beta spectrum with virtual brances
     def FitData(self, betadata, slicesize):
         self.contribute = {}
         self.E0 = {}
         self.Zlist = {}
         self.Alist = {}
-        # fill the sub lists as slices
+        # fill the sub lists as cached slices
         subx = []
         suby = []
         subyerr = []
         xhigh = betadata.x[-1]
+        datacache = np.copy(betadata.y) # preserve the data
         for it in range(len(betadata.x)-1, 0, -1):
             x = betadata.x[it]
 
@@ -118,17 +119,25 @@ class VirtualBranch:
                     self.CalcZAavg(xhigh-slicesize, xhigh)
                     self.Zlist[xhigh] = self.Zavg
                     self.Alist[xhigh] = self.Aavg
-                    init_guess = [xhigh*1.01    , 1e-6]
-                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, p0 = init_guess, sigma=subyerr, absolute_sigma=True, bounds=(0, [xhigh*1.5, 1e-6]))
+
+                    # initial guess and boundary setting for parameters
+                    tempspec = self.BetaSpectrum(betadata.x, xhigh, 1)
+                    comparison = (datacache/tempspec)
+                    comparison[comparison < 0] = np.inf
+                    limit = min(comparison)
+                    init_guess = [xhigh, limit/2]
+
+                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, p0 = init_guess, sigma=subyerr, absolute_sigma=True, bounds=(0, [xhigh*1.5, limit]))
                     self.contribute[xhigh] = popt[1]
                     self.E0[xhigh] = popt[0]
-                    print(popt[0], popt[1])
+
                     # subtract the best fit spectrum from beta data
                     for i in range(len(betadata.x)):
-                        betadata.y[i] - self.BetaSpectrum(betadata.x[i], popt[0], popt[1])
+                        datacache[i] -= self.BetaSpectrum(betadata.x[i], popt[0], popt[1])
 
                     #TODO uncertainty process
 
+                    # reset cached slices
                     subx = []
                     suby = []
                     subyerr = []
@@ -136,15 +145,16 @@ class VirtualBranch:
                 xhigh -= slicesize
             else:
                 subx.append(x)
-                suby.append(betadata.y[it])
+                suby.append(datacache[it])
                 subyerr.append(betadata.yerr[it])
 
-    def SumBranches(self, x, nu_spectrum = True):
+    # function to calculate summed spectra of virtual branches
+    def SumBranches(self, x, thresh = 0, nu_spectrum = True):
         result = 0
         for s in self.E0:
-            vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, E0=self.E0[s], sigma_E0=0, forbiddeness=0, WM=0.0047)
-            result += vb.BetaSpectrum(x, nu_spectrum = nu_spectrum)
-            #print(x, result)
+            if s > thresh: # if thresh > 0, look at spectra in selected region
+                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, E0=self.E0[s], sigma_E0=0, forbiddeness=0, WM=0.0047)
+                result += vb.BetaSpectrum(x, nu_spectrum = nu_spectrum)
         return result
 
 # class that search for best fit vertual branch and calculate total neutrino flux
@@ -155,28 +165,34 @@ class ConversionEngine:
         self.fisIstp = {}
         self.vblist = {}
 
+    # load the beta spectrum measurement
     def AddBetaData(self, betadata, fisIstp, name, frac):
         self.betadata[name] = betadata
         self.fissionfrac[name] = frac
         self.fisIstp[name] = fisIstp
 
+    # Function that lets VB to fit against beta data with user chosen slice size
     def VBfit(self, slicesize = 0.5):
         for istp in self.betadata:
             # define the virtual branches to be fit
             vbnew = VirtualBranch(self.fisIstp[istp])
             vbnew.FitData(self.betadata[istp], slicesize)
             self.vblist[istp] = vbnew
-            print(self.vblist[istp].E0, self.vblist[istp].contribute)
 
-    def DrawVB(self, name, figname, summing = True):
+    # Draw plots to test output.
+    def DrawVB(self, name, figname, summing = True, setlog = True):
         print("Drawing spectrum...")
         fig = plt.figure()
+
+        xval = np.linspace(0., 10., 200)
+        #plt.errorbar(self.betadata[name].x, self.vblist[name].SumBranches(self.betadata[name].x, True))
+        for i in range(0, 20):
+            plt.errorbar(xval, self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
+        if setlog: plt.yscale('log')
         plt.errorbar(self.betadata[name].x, self.betadata[name].y, self.betadata[name].yerr, label='beta data')
-        plt.errorbar(self.betadata[name].x, self.vblist[name].SumBranches(self.betadata[name].x, True))
-        plt.errorbar(self.betadata[name].x, self.vblist[name].SumBranches(self.betadata[name].x, False))
+        plt.errorbar(xval, self.vblist[name].SumBranches(xval, True))
+
         fig.savefig(figname)
-
-
 
 
 # test
@@ -189,12 +205,11 @@ if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadDB()
 
-    vbtest = VirtualBranch(U235)
-    vbtest.CalcZAavg(6,7)
-    print(vbtest.BetaSpectrum(1,  9.999999999999991e-07, 2.7749999999934993))
-    print(vbtest.Aavg, vbtest.Zavg)
+    # vbtest = VirtualBranch(U235)
+    # vbtest.CalcZAavg(6,7)
+    # print(vbtest.Aavg, vbtest.Zavg)
 
     convertmodel = ConversionEngine()
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
-    convertmodel.VBfit()
+    convertmodel.VBfit(0.25)
     convertmodel.DrawVB("U235", "U235_convert_test.png")
