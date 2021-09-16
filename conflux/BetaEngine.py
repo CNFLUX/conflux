@@ -33,7 +33,7 @@ phasespace = lambda W, W0: p(W)*W*(W0-W)*(W0-W)
 
 def F(y, gamma, p, R):
     result = 0.
-    res = special.loggamma(complex(gamma, y))
+    res = special.loggamma(gamma+y*1j)
     absgamma2= np.exp(2*res.real)
     g2g = special.gamma(2*gamma+1)
     result = 2*(gamma+1)*absgamma2*np.exp(y*np.pi)/(pow(2*p*R,(2*(1-gamma)))*g2g**2)
@@ -89,9 +89,9 @@ def V0(Z):
 def S(energy, Z):
     result = 0.
     result = (Wb(energy,V0(Z))/WO(energy))*pow(p(Wb(energy,V0(Z)))/p(WO(energy)),2*gamma(Z)-1)*np.exp(-np.pi*(y(WO(energy),Z)-y(Wb(energy,V0(Z)),Z)))
-    res = special.loggamma(complex(gamma(Z), y(Wb(energy,V0(Z)),Z)))
+    res = special.loggamma((gamma(Z) + 1j*y(Wb(energy,V0(Z)),Z)))
     absgamma2b= np.exp(2*res.real)
-    res = special.loggamma(complex(gamma(Z), y(WO(energy),Z)))
+    res = special.loggamma((gamma(Z) + 1j*y(WO(energy),Z)))
     absgamma2= np.exp(2*res.real)
     result = result*absgamma2b/absgamma2
     return result
@@ -113,8 +113,11 @@ def CC(R, Z, W, W0):
 def G(W, W0):
     result = 0.
     beta = p(W)/W
-    result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(W0-W)))
-    print("result", np.log(2*(W0-W)))
+    # prevent NAN in fitting
+    sense = W0-W <= 0
+    dW = (W0-W)+sense*1e-6
+
+    result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(dW)))
     result += (4.0*special.spence(1-(2*beta)/(1+ beta)))/beta
     result += (np.arctanh(beta)*(2.0*(1.0+beta**2)+(W0-W)*(W0-W)/(6.0*W**2)-4.0*np.arctanh(beta)))/beta
     result = result*constants.fine_structure/(2.0*np.pi)+1.0
@@ -204,7 +207,7 @@ def electron(ebeta, params):
     thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-    print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
+    #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
     if(ebeta>=thresh):
         return result*S(ebeta,buf.Z)
     return result
@@ -273,11 +276,31 @@ class BetaBranch:
         self.WM = WM
 
     def BetaSpectrum(self, x, nu_spectrum=False):
-        p = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=0)
+        params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=0)
         if (nu_spectrum == True):
-            return neutrino(x, p)
+            buf = params
+            result = 0.
+            R= 1.0*FERMI_to_W * nuclear_radius(buf.A)
+            W0=WO(buf.e0)
+            W=W0-x/(ELECTRON_MASS_MEV*1.0)
+            thresh=(W0-1.0-V0(buf.Z))*(ELECTRON_MASS_MEV*1.0)
+            buf.thresh = thresh
+            result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
+            result = np.nan_to_num(result, nan=0.0)
+            return result*self.frac
         else:
-            return electron(x, p)
+            buf = params
+            result = 0.
+            R = 1.0*FERMI_to_W * nuclear_radius(buf.A)
+            W0=WO(buf.e0)
+            W=WO(x)
+            thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
+            buf.thresh = thresh
+            result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
+            #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
+            result *= S(x,buf.Z)
+            result = np.nan_to_num(result, nan=0.0)
+            return result*self.frac
 
     def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)

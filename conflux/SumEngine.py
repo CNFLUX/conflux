@@ -63,7 +63,7 @@ class SumEngine:
             if (summing == True):
                 ax.plot(self.bins, self.reactorSpectrum)
             if (frac == True):
-                lines = []
+                lines = [] 
                 labels = []
                 for FPZAI in self.betaSpectraList:
                     lines += ax.plot(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
