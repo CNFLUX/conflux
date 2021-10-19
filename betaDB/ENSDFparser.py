@@ -2,7 +2,6 @@
 import sys
 from xml.dom import minidom
 from os import listdir
-import fortranformat as ff
 import csv
 import numpy as np
 
@@ -37,25 +36,34 @@ def transUncert(mean, unc):
 
 # global method to convert spin to numerical veriable
 def convert_J(chars):
-    result = np.zeros(len(chars.split(',')))
 
     chars = chars.replace('(', '')
     chars = chars.replace(')', '')
-    if not any(c.isdigit() for c in chars): return result
+    J = 0
+    pi = 1
+    if not any(c.isdigit() for c in chars):
+        if '-' in chars:
+            pi = -1
+        return [pi, J]
 
     it = 0
     for Js in chars.split(','):
+        J = np.zeros(len(chars.split(',')))
+        pi = np.zeros(len(chars.split(',')))
         num, denom = Js.split('/')
         if '-' in denom:
             denom = denom.replace('-','')
-            result[it] = -float(num)/float(denom)
+            pi[it] = (-1)
         elif '+' in denom:
             denom = denom.replace('+','')
-            result[it] = float(num)/float(denom)
+            pi[it] = (1)
         else:
-            result[it] = -float(num)/float(denom) if '-' in chars else float(num)/float(denom)
-        it += 1
-    return result
+            if '-' in chars: pi[it] = -1
+            else: pi[it] = 1
+
+        J[it] = (float(num)/float(denom))
+        it +=1
+    return [pi, J]
 
 # prepare the xml data file structrue
 class XMLedit:
@@ -98,7 +106,7 @@ class ParentIstp:
         self.HL = line[39:49]
         self.Emax = float(line[64:74].strip())/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
-        self.J = convert_J(line[21:39])
+        self.pi, self.J = convert_J(line[21:39])
 
 # class to save information of the level before decay
 class DecayLevel:
@@ -106,8 +114,7 @@ class DecayLevel:
         self.level = float(line[9:19].strip())/1e3 if is_number(line[9:19]) else 0 #convert to MeV
         self.d_level = transUncert(line[9:19].strip(), line[19:21].strip())/1e3 if is_number(line[19:21]) else 0
         self.HL = line[39:49]
-        self.J = convert_J(line[21:39])
-
+        self.pi, self.J = convert_J(line[21:39])
 
 # class to save information of decay branches
 class DecayBranch:
@@ -130,7 +137,6 @@ def ENSDFbeta(inputfile):
             if (betabool == True): print("EMPTY LINE")
             lastline = ""
             betabool = False
-
 
         # find parent isotope of beta decay (ignore other types of decay)
         MT = line[5:8]      # Check datatype
@@ -163,18 +169,21 @@ def ENSDFbeta(inputfile):
                 if decaybranch.E0 == 0:
                     decaybranch.E0 = decayparent.Emax - decaydaughter.level
                     decaybranch.sigma_E0 = decayparent.d_Emax + decaydaughter.d_level
-                # calculate forbiddenness
-                decaybranch.forbidden = decayparent.J - decaydaughter.J
-                print(decaydaughter.J)
+                # calculate spin difference
+                decaybranch.forbidden = [decayparent.pi*decaydaughter.pi*(decaydaughter.J != 0), abs(decayparent.J - decaydaughter.J)*(decaydaughter.J != 0)]
+                print(decayparent.pi,decaydaughter.pi )
+                print(abs(decayparent.J - decaydaughter.J))
+                print(decaybranch.forbidden)
                 forbid_str = ""
-                for i in range(len(decaybranch.forbidden)):
+                for i in range(len(decaybranch.forbidden[1])):
+                    dspin_str = str(int(decaybranch.forbidden[1][i]))
+                    if decaybranch.forbidden[0][i] < 0:
+                        dspin_str = "-"+dspin_str
                     if i == 0:
-                        cache = int(decaybranch.forbidden[i] if decaybranch.forbidden[i] not in decayparent.J else 0)
-                        forbid_str = forbid_str+str(cache)
+                        forbid_str = forbid_str+dspin_str
                     else:
-                        cache = int(decaybranch.forbidden[i] if decaybranch.forbidden[i] not in decayparent.J else 0)
-                        forbid_str = forbid_str+","+str(decaybranch.forbidden[i])
-                print(forbid_str)
+                        forbid_str = forbid_str+","+dspin_str
+                # print(forbid_str)
                 # save the decay branch information
                 xmloutput.editBranch(str(decaybranch.fraction), str(decaybranch.E0), forbid_str, str(decaybranch.sigma_frac), str(decaybranch.sigma_E0))
                 lastline = line
@@ -186,5 +195,5 @@ def ENSDFbeta(inputfile):
 
 
 if __name__ == "__main__":
-    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.137", "r")
+    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.003", "r")
     ENSDFbeta(inputfile)

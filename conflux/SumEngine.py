@@ -16,6 +16,10 @@ class SumEngine:
         self.betaSpectraList = {}
         self.neutrino = neutrino # neutrino or electon spectrum
 
+    def Clear(self):
+        self.FPYlist = {}
+        self.betaSpectraList = {}
+
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
         for FPZAI in fissionModel.FPYlist:
@@ -63,29 +67,33 @@ class SumEngine:
             if (summing == True):
                 ax.plot(self.bins, self.reactorSpectrum)
             if (frac == True):
-                lines = [] 
+                lines = []
                 labels = []
                 for FPZAI in self.betaSpectraList:
-                    lines += ax.plot(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                    labels.append(str(FPZAI))
-                    # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
-                    #     print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
+                    if (self.betaSpectraList[FPZAI][90]>0):
+                        #print(FPZAI, self.FPYlist[FPZAI].y, self.betaSpectraList[FPZAI][90])
+                        lines += ax.plot(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                        labels.append(str(FPZAI))
                 plt.legend(lines, labels)
                 ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
         else:
-            ax.set_xlim([0, 15])
+            #ax.set_xlim([0, 15])
             ax.set_ylim([1e-7, 10])
+            ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
+
+            if (frac == True):
+                lines = []
+                labels = []
+                for FPZAI in self.betaSpectraList:
+                    if (self.betaSpectraList[FPZAI][10]>0):
+                        #print(FPZAI, self.FPYlist[FPZAI].y, self.betaSpectraList[FPZAI][90])
+                        lines += ax.plot(self.bins, \
+                        self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
+                        labels.append(str(FPZAI))
+
             if (summing == True):
                 ax.semilogy(self.bins, self.reactorSpectrum)
 
-            if (frac == True):
-                for FPZAI in self.betaSpectraList:
-                    ax.semilogy(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                    ax.legend(str(FPZAI))
-
-                    # if (self.betaSpectraList[FPZAI][60]>0 and np.max(self.betaSpectraList[FPZAI])> 5e-3):
-                    #     print(FPZAI, self.betaSpectraList[FPZAI][60], self.FPYlist[FPZAI].y)
-            ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
         fig.savefig(figname)
 
 if __name__ == "__main__":
@@ -93,27 +101,80 @@ if __name__ == "__main__":
     U235.LoadDB()
     U238 = FissionIstp(92, 238)
     U238.LoadDB()
+    U233 = FissionIstp(92, 233)
+    U233.LoadDB()
+    U234 = FissionIstp(92, 234)
+    U234.LoadDB()
     Pu239 = FissionIstp(94, 239)
     Pu239.LoadDB()
+    Pu241 = FissionIstp(94, 241)
+    Pu241.LoadDB()
 
     model = FissionModel()
-    #
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
-    #model.AddContribution(isotope=U238, Ei = 0.5, fraction=0.5)
-    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.5)
+    model.AddContribution(isotope=U234, Ei = 0.5, fraction=1)
+    model.AddContribution(isotope=U233, Ei = 0, fraction=1)
+    #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
     result = SumEngine()
     result.AddModel(model)
 
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 10.0)
 
-    result.CalcReactorSpectrum(betaSpectraDB)
-    print(result.reactorSpectrum)
-    result.Draw("test_spectrum_test.png")
-    with open("U235test.csv", "w") as output:
+
+    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    summed_spect = result.reactorSpectrum
+
+    result.Draw("Commercial.png", frac=False)
+    result.Clear()
+
+    model1 = FissionModel()
+    model1.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    result.AddModel(model1)
+    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    m1_spect = result.reactorSpectrum
+    result.Clear()
+
+    model2 = FissionModel()
+    model2.AddContribution(isotope=U234, Ei = 0.5, fraction=1)
+    result.AddModel(model2)
+    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    m2_spect = result.reactorSpectrum
+    result.Clear()
+
+    model3 = FissionModel()
+    model3.AddContribution(isotope=U233, Ei = 0, fraction=1)
+    result.AddModel(model3)
+    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    m3_spect = result.reactorSpectrum
+    result.Clear()
+
+    model4 = FissionModel()
+    model4.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    result.AddModel(model4)
+    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    m4_spect = result.reactorSpectrum
+    result.Clear()
+
+    fig, ax = plt.subplots()
+    ax.set_ylim([1e-6, 10])
+    ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='Non-standard Actinide')
+    # ax.semilogy(result.bins, summed_spect, label="Summed")
+    # ax.legend()
+    #ax.semilogy(result.bins, m4_spect, label="U235")
+    #ax.legend()
+    ax.semilogy(result.bins, m2_spect, label="U234")
+    ax.legend()
+    ax.semilogy(result.bins, m3_spect, label="U233")
+    ax.legend()
+    # ax.semilogy(result.bins, m4_spect, label="Pu241")
+    # ax.legend()
+    fig.savefig("drawtest.png")
+
+    with open("Commercial.csv", "w") as output:
         write = csv.writer(output)
-        write.writerow(result.reactorSpectrum)
+        #write.writerow(result.reactorSpectrum)
     #print(result.missingCont)
     #print(result.missingBranch)

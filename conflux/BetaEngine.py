@@ -345,7 +345,7 @@ class BetaEngine:
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
-                betaIstp = []
+                betaIstp = {}
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
                     sigma_E0 = float(branch.attrib['sigma_E0'])
@@ -353,15 +353,15 @@ class BetaEngine:
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
 
-                    betaIstp.append(BetaBranch(Z, A, fraction, I, E0, sigma_E0, forbiddeness))
+                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
     def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         self.LoadBetaDB()
         bins = int(erange/binwidths)
-        branchspectrum = np.zeros(bins)
         for ZAI in self.istplist:
-            for branch in self.istplist[ZAI]:
+            branchspectrum = np.zeros(bins)
+            for E0, branch in self.istplist[ZAI].items():
                 branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
                 branch.result *= branch.frac
                 branchspectrum += branch.result
@@ -370,7 +370,8 @@ class BetaEngine:
 
 
 if __name__ == "__main__":
-    testlist = [300690, 431021]
+    testlist = [521340, 531340, 350900]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
-    print(testEngine.spectralist)
+    print(testEngine.spectralist[521340])
+    print(testEngine.spectralist[350900])

@@ -173,6 +173,7 @@ class ConversionEngine:
 
     # Function that lets VB to fit against beta data with user chosen slice size
     def VBfit(self, slicesize = 0.5):
+        self.slicesize = slicesize
         for istp in self.betadata:
             # define the virtual branches to be fit
             vbnew = VirtualBranch(self.fisIstp[istp])
@@ -186,11 +187,12 @@ class ConversionEngine:
 
         xval = np.linspace(0., 10., 200)
         #plt.errorbar(self.betadata[name].x, self.vblist[name].SumBranches(self.betadata[name].x, True))
-        for i in range(0, 20):
-            plt.errorbar(xval, self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
+        # for i in range(0, 20):
+        #     print(self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))
+        #     plt.errorbar(xval, self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
         if setlog: plt.yscale('log')
         plt.errorbar(self.betadata[name].x, self.betadata[name].y, self.betadata[name].yerr, label='beta data')
-        plt.errorbar(xval, self.vblist[name].SumBranches(xval, True))
+        plt.errorbar(xval, self.vblist[name].SumBranches(xval, nu_spectrum = False))
 
         fig.savefig(figname)
 
@@ -198,18 +200,23 @@ class ConversionEngine:
 # test
 if __name__ == "__main__":
     beta235 = BetaData("./conversionDB/U_235_e_2014.csv")
-    #print(beta235.x)
+    beta239 = BetaData("./conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData("./conversionDB/Pu_241_e_2014.csv")
     #print(beta235.y)
     #print(beta235.yerr)
 
     U235 = FissionIstp(92, 235)
+    Pu239 = FissionIstp(94, 239)
+    Pu241 = FissionIstp(94, 241)
     U235.LoadDB()
+    Pu239.LoadDB()
+    Pu241.LoadDB()
 
     # vbtest = VirtualBranch(U235)
     # vbtest.CalcZAavg(6,7)
     # print(vbtest.Aavg, vbtest.Zavg)
 
     convertmodel = ConversionEngine()
-    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
-    convertmodel.VBfit(0.25)
-    convertmodel.DrawVB("U235", "U235_convert_test.png")
+    convertmodel.AddBetaData(beta235, Pu239, "Pu239", 1.0)
+    convertmodel.VBfit(0.5)
+    convertmodel.DrawVB("Pu239", "Pu239_convert_test_0.5.png")
