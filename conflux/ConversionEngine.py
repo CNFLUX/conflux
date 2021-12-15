@@ -90,13 +90,13 @@ class VirtualBranch:
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
-        return virtualbata.BetaSpectrum(x)
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        return virtualbata.BetaSpectrum(x)*contirbute
 
     # define the theoretical neutrino spectrum shape
     def NueSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, frac=contribute, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
-        return virtualbata.BetaSpectrum(x, nu_spectrum=True)
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        return virtualbata.BetaSpectrum(x, nu_spectrum=True)*contribute
 
     # function that fit the reference beta spectrum with virtual brances
     def FitData(self, betadata, slicesize):

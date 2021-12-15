@@ -3,6 +3,8 @@ import argparse
 import numpy as np
 from scipy import constants, special, interpolate, integrate
 import xml.etree.ElementTree as ET
+import matplotlib.pyplot as plt
+from copy import deepcopy
 
 ######################
 # Declaring constants
@@ -189,9 +191,7 @@ def neutrino(enu, params):
     result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
 
     if (enu<thresh):
-        #print('parameters', enu, S(buf.e0-enu, buf.Z), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
         return result*S(buf.e0-enu, buf.Z)
-    #print('parameters', enu, S(buf.e0-enu, buf.Z), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
     return result
 
 def electron(ebeta, params):
@@ -203,7 +203,6 @@ def electron(ebeta, params):
     thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-    #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
     if(ebeta>=thresh):
         return result*S(ebeta,buf.Z)
     return result
@@ -212,7 +211,7 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
     erg = 0.0
     error = 0.0
     xh = 0.0
-    xlow = max([x_low, 1e-6])
+    x_low = max([x_low, 1e-6])
 
     if (x_low >= p.e0-1e-6):
         return 0
@@ -226,7 +225,7 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
     else:
         function = lambda x: electron(x, p)
 
-    function(x_low)
+    #function(x_low)
     if (x_low <= p.thresh and xh >= p.thresh): # wierd error because of integrater when difference is smaller than a value
 
         ergl = [0.0, 0.0]
@@ -264,63 +263,78 @@ class BetaBranch:
         self.A = A
         self.I = I
         self.E0 = E0
-        self.sigma_E0 = sigma_E0
+        self.sigma_E0 = 0.05*E0 #sigma_E0
         self.frac = frac
 
         self.forbiddeness = forbiddeness
         self.WM = WM
 
+        self.params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
+
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
-        params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=0)
+        params = deepcopy(self.params)
         rangecorrection = x <= self.E0 # prevent out-of-range variable to output insane results
-        if nu_spectrum:
-            buf = params
-            result = 0.
-            R= 1.0*FERMI_to_W * nuclear_radius(buf.A)
-            W0=WO(buf.e0)
-            W=W0-x/(ELECTRON_MASS_MEV*1.0)
-            thresh=(W0-1.0-V0(buf.Z))*(ELECTRON_MASS_MEV*1.0)
-            buf.thresh = thresh
-            result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-            result = np.nan_to_num(result, nan=0.0)
-            return result*self.frac*rangecorrection
+
+        if (nu_spectrum == True):
+            function = lambda x: neutrino(x, params)
         else:
-            buf = params
-            result = 0.
-            R = 1.0*FERMI_to_W * nuclear_radius(buf.A)
-            W0=WO(buf.e0)
-            W=WO(x)
-            thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
-            buf.thresh = thresh
-            result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-            #print('parameters', ebeta, forbidden(W,W0,buf.WM,buf.ftype),G(W,W0),(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R)), F(y(W,buf.Z), gamma(buf.Z), p(W), R), result)
-            result *= S(x,buf.Z)
-            result = np.nan_to_num(result, nan=0.0)
-            return result*self.frac*rangecorrection
+            function = lambda x: electron(x, params)
+
+        result = function(x)
+        result = np.nan_to_num(result, nan=0.0)
+        return result
+
+    # calculate the spectrum uncertainty
+    def SpectUncert(self, x, nu_spectrum = False):
+        numbers = 5
+        E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
+        newparams = deepcopy(self.params)
+        newparams.e0 = E0range
+
+        if (nu_spectrum == True):
+            function = lambda x: neutrino(x, newparams)
+        else:
+            function = lambda x: electron(x, newparams)
+
+        fE0 = function(x)
+        fE0 = np.nan_to_num(fE0, nan=0.0)
+        if (fE0.all() < 1e-8):
+            return 0
+
+        grad_E0 = np.gradient(fE0)
+
+        return grad_E0[int(numbers/2)]*self.sigma_E0
 
     # bined beta spectrum
-    def BinnedSpectrum(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def BinnedSpectrum(self, nu_spectrum=False, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         bins = int(erange/binwidths)
         self.result = np.zeros(bins)
+        self.uncertainty = np.zeros(bins)
 
         if (lower > self.E0):
             return 1
         if (lower<0):
             lower=binwidths/2.0
 
-        inter = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness, thresh=thresh)
-        #norm = integral(nu_spectrum, inter, 0, self.E0, "slow")
+        self.params.thresh = thresh
 
-        for k in range (0, bins):
-            self.result[k] = integral(nu_spectrum, inter, lower, lower+binwidths, "quick")
+        # integrating each bin
+        for k in range(0, bins):
+            x_low = lower
+            x_high = lower+binwidths
+            if x_high > self.E0:
+                x_high = self.E0
+            self.result[k] = integral(True, self.params, x_low, x_high, "quick") #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
+            self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low)+self.SpectUncert(x_high))/2
             lower+=binwidths
+
         norm = self.result.sum()
         if norm <=0:
             self.result =np.zeros(bins)
         else:
             self.result /= norm*binwidths
-
+            self.uncertainty /= norm*binwidths
         return 0
 
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
@@ -330,6 +344,7 @@ class BetaEngine:
         self.inputlist = inputlist
         self.istplist = {}
         self.spectralist = {}
+        self.uncertaintylist = {}
         self.DBname = DBname
 
     def LoadBetaDB(self):
@@ -361,17 +376,31 @@ class BetaEngine:
         bins = int(erange/binwidths)
         for ZAI in self.istplist:
             branchspectrum = np.zeros(bins)
+            branchuncertainty = np.zeros(bins)
             for E0, branch in self.istplist[ZAI].items():
                 branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
                 branch.result *= branch.frac
+                branch.uncertainty *= branch.frac
+
                 branchspectrum += branch.result
+                branchuncertainty += branch.uncertainty
 
             self.spectralist[ZAI] = branchspectrum
+            self.uncertaintylist[ZAI] = branchuncertainty
 
 
 if __name__ == "__main__":
     testlist = [521340, 531340, 350900]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
-    print(testEngine.spectralist[521340])
+    #print(testEngine.spectralist[521340])
     print(testEngine.spectralist[350900])
+    print(testEngine.uncertaintylist[350900])
+
+    fig = plt.figure()
+    x = np.linspace(0, 20, 200)
+    plt.errorbar(x, testEngine.spectralist[350900], yerr=testEngine.uncertaintylist[350900])
+    #plt.draw()
+    fig.savefig("errorbartest.png")
+
+    #testbeta = BetaBranch(1, 3, 1.0, 0, )

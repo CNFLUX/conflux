@@ -4,6 +4,7 @@ from xml.dom import minidom
 from os import listdir
 import csv
 import numpy as np
+import re
 
 # global method to determine if string contains float
 def is_number(s):
@@ -39,29 +40,32 @@ def convert_J(chars):
 
     chars = chars.replace('(', '')
     chars = chars.replace(')', '')
-    J = 0
-    pi = 1
+    J = np.zeros(len(chars.split(',')))
+    pi = np.zeros(len(chars.split(',')))
     if not any(c.isdigit() for c in chars):
         if '-' in chars:
             pi = -1
-        return [pi, J]
+        return [[pi], [1e3]]
 
     it = 0
     for Js in chars.split(','):
-        J = np.zeros(len(chars.split(',')))
-        pi = np.zeros(len(chars.split(',')))
-        num, denom = Js.split('/')
-        if '-' in denom:
-            denom = denom.replace('-','')
-            pi[it] = (-1)
-        elif '+' in denom:
-            denom = denom.replace('+','')
-            pi[it] = (1)
+        # for n+1/2 spin angular momentum
+        if '/' in chars:
+            num, denom = Js.split('/')
+            if '-' in denom:
+                denom = denom.replace('-','')
+                pi[it] = (-1)
+            elif '+' in denom:
+                denom = denom.replace('+','')
+                pi[it] = (1)
+            else:
+                pi[it] = -1 if ('-' in Js) else 1
+            J[it] = (float(num)/float(denom))
+        # for n spin angular momentum
         else:
-            if '-' in chars: pi[it] = -1
-            else: pi[it] = 1
-
-        J[it] = (float(num)/float(denom))
+            pi[it] = -1 if ('-' in Js) else 1
+            num = Js.replace('-', '') if ('-' in Js) else Js.replace('+', '')
+            J[it] = num
         it +=1
     return [pi, J]
 
@@ -102,7 +106,7 @@ class ParentIstp:
         self.A = int(line[:3].strip())
         element = line[3:5].capitalize().strip()
         self.Z = int(elementdict[element])
-        self.level = float(line[9:19].strip())/1e3 #convert to MeV
+        self.level = float(line[9:19].strip().replace('+X', ''))/1e3 #convert to MeV
         self.HL = line[39:49]
         self.Emax = float(line[64:74].strip())/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
@@ -148,7 +152,10 @@ def ENSDFbeta(inputfile):
         if betabool == True:
             # save information of the parent isotope
             if MT == "  P":
+                print(line)
                 decayparent = ParentIstp(line)
+                if decayparent.J ==1e3:
+                    decayparent.J = 0
                 if decayparent.level > beginlevel:
                     beginlevel = decayparent.level
                     isomer+=1
@@ -169,8 +176,11 @@ def ENSDFbeta(inputfile):
                 if decaybranch.E0 == 0:
                     decaybranch.E0 = decayparent.Emax - decaydaughter.level
                     decaybranch.sigma_E0 = decayparent.d_Emax + decaydaughter.d_level
-                # calculate spin difference
-                decaybranch.forbidden = [decayparent.pi*decaydaughter.pi*(decaydaughter.J != 0), abs(decayparent.J - decaydaughter.J)*(decaydaughter.J != 0)]
+                # calculate angular momentum difference
+                #for j in decaydaughter.J:
+                for j in range(len(decaydaughter.J)):
+                    if decaydaughter.J[j] == 1e3: decaydaughter.J[j] = decayparent.J
+                decaybranch.forbidden = [decayparent.pi*decaydaughter.pi, abs(decayparent.J - decaydaughter.J)]
                 print(decayparent.pi,decaydaughter.pi )
                 print(abs(decayparent.J - decaydaughter.J))
                 print(decaybranch.forbidden)
@@ -178,14 +188,14 @@ def ENSDFbeta(inputfile):
                 for i in range(len(decaybranch.forbidden[1])):
                     dspin_str = str(int(decaybranch.forbidden[1][i]))
                     if decaybranch.forbidden[0][i] < 0:
-                        dspin_str = "-"+dspin_str
+                        dspin_str = dspin_str+'-'
                     if i == 0:
                         forbid_str = forbid_str+dspin_str
                     else:
                         forbid_str = forbid_str+","+dspin_str
                 # print(forbid_str)
                 # save the decay branch information
-                xmloutput.editBranch(str(decaybranch.fraction), str(decaybranch.E0), forbid_str, str(decaybranch.sigma_frac), str(decaybranch.sigma_E0))
+                xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), str("{:.3f}".format(decaybranch.E0)), forbid_str, str("{:.3f}".format(decaybranch.sigma_frac)), str("{:.3f}".format(decaybranch.sigma_E0)))
                 lastline = line
                 print(lastline)
 
@@ -195,5 +205,5 @@ def ENSDFbeta(inputfile):
 
 
 if __name__ == "__main__":
-    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.003", "r")
+    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.134", "r")
     ENSDFbeta(inputfile)
