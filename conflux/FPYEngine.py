@@ -36,6 +36,7 @@ class FPNuclide:
         for key in self.cov:
         #    testoutput += self.cov[key]
             if key == self.FPZAI:
+
                 self.cov[key] = self.y*fraction*np.sqrt((self.cov[key]/self.y)**2 + (d_fraction/fraction**2))
                 #print(key, self.cov[key])
             else:
@@ -53,7 +54,7 @@ class FPNuclide:
                 self.cov[key] = newNuclide[key]
             else:
                 self.cov[key] += newNuclide[key]
-            if key == self.FPZAI: print(key, self.cov[key])
+            #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
 class FissionIstp:
@@ -123,7 +124,7 @@ class FissionIstp:
             namecache = filename.split('.')
             if namecache[-1] != 'csv':
                 continue
-            if (str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+            if (str(self.Z) not in namecache[0] or str(self.A) not in namecache[0] or "normal" not in namecache[0]):
                 continue
             istpfound = True
 
@@ -227,6 +228,6 @@ if __name__ == "__main__":
     model.AddContribution(isotope=U235, Ei = 0, fraction=1, d_frac=0.0)
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
     #model.AddIstp(390960)
-    for FPZAI in model.FPYlist:
-        print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
+    # for FPZAI in model.FPYlist:
+    #     print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
     model.DrawBranches("frac.png")

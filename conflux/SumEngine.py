@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import csv
 
 # local modules
-from conflux.BetaEngine import BetaEngine
-from conflux.FPYEngine import FissionModel, FissionIstp
+from BetaEngine import BetaEngine
+from FPYEngine import FissionModel, FissionIstp
 
 class SumEngine:
     def __init__(self, neutrino=True):
@@ -27,6 +27,7 @@ class SumEngine:
         for FPZAI in fissionModel.FPYlist:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
+                print("FPYLIST_COV:", FPZAI, self.FPYlist[FPZAI].cov[FPZAI])
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
             else:
@@ -67,7 +68,7 @@ class SumEngine:
                 self.missingCont += self.FPYlist[FPZAI].y
                 self.missingBranch.append(FPZAI)
 
-
+        # Uncertainty calculation
         for i in self.FPYlist:
             sigmai = 0
             for j in self.FPYlist:
@@ -76,9 +77,9 @@ class SumEngine:
                     fi = self.betaSpectraList[i]
                     yj = self.FPYlist[j].y
                     fj = self.betaSpectraList[j]
-                    sigmay_ij = self.FPYlist[i].cov[j]
+                    sigmay_ij = self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
                     sigmai += self.FPYlist[i].cov[j]
-                    #if (i == j): print(yi, yerr, sigmay_ij, fi*sigmay_ij*fj)
+                    if (i == j): print(i, sigmai, sigmay_ij, self.FPYlist[i].cov[i])
                     self.spectrumUnc += fi*sigmay_ij*fj
             #print("cov sum", i, sigmai)
 
@@ -103,7 +104,7 @@ class SumEngine:
                 ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
         else:
             #ax.set_xlim([0, 15])
-            ax.set_ylim([1e-7, 10])
+            ax.set_xlim([1e-7, 10])
             ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
 
             if (frac == True):
@@ -188,8 +189,9 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.set_ylim([1e-6, 10])
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.errorbar(result.bins, summed_spect, yerr = summed_err, label="Summed")
-    ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
+    ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
+    ax.plot(result.bins, summed_spect, label="Summed")
+    # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
     #ax.semilogy(result.bins, m4_spect, label="U235")
     #ax.legend()
