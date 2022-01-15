@@ -74,13 +74,18 @@ class SumEngine:
             for j in self.FPYlist:
                 if i in betaSpectraDB.spectralist and j in betaSpectraDB.spectralist:
                     yi = self.FPYlist[i].y
+                    yerri = self.FPYlist[i].yerr
                     fi = self.betaSpectraList[i]
+
                     yj = self.FPYlist[j].y
+                    yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
-                    sigmay_ij = self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
-                    sigmai += self.FPYlist[i].cov[j]
-                    if (i == j): print(i, sigmai, sigmay_ij, self.FPYlist[i].cov[i])
+
+                    sigmay_ij = yerri*yerrj*self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
+                    #sigmai += self.FPYlist[i].cov[j]
+                    #if (i == j): print(i, sigmay_ij, self.FPYlist[i].cov[i])
                     self.spectrumUnc += fi*sigmay_ij*fj
+
             #print("cov sum", i, sigmai)
 
         self.spectrumUnc = np.sqrt(self.spectrumUnc)

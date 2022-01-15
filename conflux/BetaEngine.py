@@ -379,8 +379,9 @@ class BetaEngine:
             branchuncertainty = np.zeros(bins)
             for E0, branch in self.istplist[ZAI].items():
                 branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+                relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
+                branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
                 branch.result *= branch.frac
-                branch.uncertainty *= branch.frac
 
                 branchspectrum += branch.result
                 branchuncertainty += branch.uncertainty

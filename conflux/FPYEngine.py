@@ -21,30 +21,33 @@ class FPNuclide:
         self.FPZAI = FPZAI
         self.y = y
         self.cov = {}
+        self.corr = {}
         self.yerr = yerr
 
-    # Method that add fission yield of this branch to total fission yield
-    def Contribute(self, fraction, d_fraction=0):
-
-        self.yerr = self.y*fraction*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
-        self.yerr = np.nan_to_num(self.yerr, nan=0.0)
+    # Method that add fission yield of this branch to total fission yield.
+    # When use_corr == True, assume correlation matrix is loaded, calculate a
+    # new covariance matrix.
+    def Contribute(self, fraction, d_fraction=0, use_corr = False):
+        # 
+        # if use_corr:
+        #     assert self.corr, "Correlation matrix was not loaded!"
+        #     self.cov = {}
+        #     for element in self.corr:
+        #         self.cov
 
         # Adding the fission fraction uncertainty and fission yield uncertainty together
-        # Also normlize the covariance matrix.
-        #testoutput = 0
-        #print("INITIAL COV MAT")
-        for key in self.cov:
-        #    testoutput += self.cov[key]
-            if key == self.FPZAI:
+        self.yerr = self.y*fraction*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
+        # force yeild uncertainty to equal 0, when yeild is zero
+        self.yerr = np.nan_to_num(self.yerr, nan=0.0)
 
+        # Also normalize the covariance matrix.
+        for key in self.cov:
+            if key == self.FPZAI:
                 self.cov[key] = self.y*fraction*np.sqrt((self.cov[key]/self.y)**2 + (d_fraction/fraction**2))
-                #print(key, self.cov[key])
             else:
                 self.cov[key] *= fraction
 
-        #print(self.FPZAI, testoutput)
-
-        self.y *= fraction
+        self.y *= fraction  # multiply fission yield with fission fraction
 
     # Method to add covariance matrices together
     def AddCovariance(self, newNuclide):
@@ -124,7 +127,7 @@ class FissionIstp:
             namecache = filename.split('.')
             if namecache[-1] != 'csv':
                 continue
-            if (str(self.Z) not in namecache[0] or str(self.A) not in namecache[0] or "normal" not in namecache[0]):
+            if ("cov" not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
                 continue
             istpfound = True
 
@@ -138,10 +141,10 @@ class FissionIstp:
             with open(DBname) as inputfile:
                 reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
                 for row in reader:
-                    cov_id = int(row[''])
-                    z = int(cov_id/10000)
-                    i = int((cov_id-z*10000)/1000)
-                    a = int(cov_id-z*10000-i*1000)
+                    row_id = int(row[''])
+                    z = int(row_id/10000)
+                    i = int((row_id-z*10000)/1000)
+                    a = int(row_id-z*10000-i*1000)
                     fpzai = z*10000+a*10+i
                     if fpzai not in self.CFPY[Ei]:
                         continue
@@ -149,18 +152,68 @@ class FissionIstp:
                         if key == '':
                             continue
                         else:
-                            corr_id = int(key)
-                            z = int(corr_id/10000)
-                            i = int((corr_id-z*10000)/1000)
-                            a = int(corr_id-z*10000-i*1000)
+                            col_id = int(key)
+                            z = int(col_id/10000)
+                            i = int((col_id-z*10000)/1000)
+                            a = int(col_id-z*10000-i*1000)
                             corrzai = z*10000+a*10+i
                             self.CFPY[Ei][fpzai].cov[corrzai] = float(row[key])
 
-                # if no covariance elements, set diagonal element to 'yerr'
+                # if element not found, set diagonal element to 'yerr'
                 for nuclide in self.CFPY[Ei]:
                     if nuclide not in self.CFPY[Ei][nuclide].cov:
                         self.CFPY[Ei][nuclide].cov = {key: 0 for key in row}
                         self.CFPY[Ei][nuclide].cov[nuclide] = self.CFPY[Ei][nuclide].yerr
+
+        assert(istpfound) # assert error if isotope not found in DB
+
+    # Method to read the prepackaged correlation csv file
+    def LoadCorrelation(self, DBpath = './fissionDB/'):
+        print("Reading correlation matrix from: "+DBpath+"...")
+        fileList = listdir(DBpath)
+        istpfound = False
+        e_neutron = {'Thermal': 0, 'Fast': 0.5, 'High': 14}
+        for filename in fileList:
+            namecache = filename.split('.')
+            if namecache[-1] != 'csv':
+                continue
+            if ("corr" not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+                continue
+            istpfound = True
+
+            Ei = 0
+            for mode in e_neutron:
+                if mode in namecache[0]:
+                    Ei = e_neutron[mode]
+
+            DBname = DBpath+filename
+            print('Reading FPY DB: '+DBpath+filename+'...')
+            with open(DBname) as inputfile:
+                reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
+                for row in reader:
+                    row_id = int(row[''])
+                    z = int(row_id/10000)
+                    i = int((row_id-z*10000)/1000)
+                    a = int(row_id-z*10000-i*1000)
+                    fpzai = z*10000+a*10+i
+                    if fpzai not in self.CFPY[Ei]:
+                        continue
+                    for key in row:
+                        if key == '':
+                            continue
+                        else:
+                            col_id = int(key)
+                            z = int(col_id/10000)
+                            i = int((col_id-z*10000)/1000)
+                            a = int(col_id-z*10000-i*1000)
+                            colzai = z*10000+a*10+i
+                            self.CFPY[Ei][fpzai].corr[colzai] = float(row[key])
+
+                # if element not found, set diagonal element to 1.0
+                for nuclide in self.CFPY[Ei]:
+                    if nuclide not in self.CFPY[Ei][nuclide].cov:
+                        self.CFPY[Ei][nuclide].corr = {key: 0 for key in row}
+                        self.CFPY[Ei][nuclide].corr[nuclide] = self.CFPY[Ei][nuclide].yerr
 
         assert(istpfound) # assert error if isotope not found in DB
 
