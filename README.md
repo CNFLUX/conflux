@@ -16,7 +16,7 @@ Execute: `pip install conflux`
 Program structure:
 ==================
 
-Data bases:
+Databases:
 -----------
 cumulative fission yield, beta decay branch
 

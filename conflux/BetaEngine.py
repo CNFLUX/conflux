@@ -258,13 +258,14 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch:
-    def __init__(self, Z, A, frac, I, E0, sigma_E0, forbiddeness=0, WM=0.0047):
+    def __init__(self, Z, A, frac, I, E0, sigma_E0, sigma_frac, forbiddeness=0, WM=0.0047):
         self.Z = Z
         self.A = A
         self.I = I
         self.E0 = E0
         self.sigma_E0 = 0.05*E0 #sigma_E0
         self.frac = frac
+        self.sigma_frac = sigma_frac
 
         self.forbiddeness = forbiddeness
         self.WM = WM
@@ -368,7 +369,7 @@ class BetaEngine:
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
 
-                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, forbiddeness)
+                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
     def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
@@ -378,6 +379,8 @@ class BetaEngine:
             branchspectrum = np.zeros(bins)
             branchuncertainty = np.zeros(bins)
             for E0, branch in self.istplist[ZAI].items():
+                if branch.frac == 0:
+                    continue
                 branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
                 relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
                 branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
