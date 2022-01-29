@@ -20,9 +20,9 @@ class BetaData:
         self.y = []
         self.yerr = []
         self.inputDB = inputDB
-        self.LoadDB(inputDB)
+        self.LoadConversionDB(inputDB)
 
-    def LoadDB(self, inputDB, rel_err=True):
+    def LoadConversionDB(self, inputDB, rel_err=True):
         self.x = []
         self.y = []
         self.yerr = []

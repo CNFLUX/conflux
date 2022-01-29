@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="conflux",
-    version="0.0.4",
+    version="0.1.1",
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",
@@ -17,6 +17,9 @@ setup(
     },
 
     packages=find_packages(),
+    package_data={
+        "conflux": ["fissionDB/*", "betaDB/*", "conversionDB/*"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

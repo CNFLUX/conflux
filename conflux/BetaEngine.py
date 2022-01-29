@@ -5,6 +5,7 @@ from scipy import constants, special, interpolate, integrate
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
+import pkg_resources
 
 ######################
 # Declaring constants
@@ -341,18 +342,20 @@ class BetaBranch:
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
 # of all tallied branches
 class BetaEngine:
-    def __init__(self, inputlist, DBname ='betaDB/betaDB.xml'):
+    def __init__(self, inputlist):
         self.inputlist = inputlist
         self.istplist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
-        self.DBname = DBname
+        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
 
-    def LoadBetaDB(self):
-        print("Searching DB: "+self.DBname+"...")
+    def LoadBetaDB(self, targetDB = None):
+        if targetDB == None:
+            targetDB = self.defaultDB
+        print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches:")
 
-        tree = ET.parse(self.DBname)
+        tree = ET.parse(targetDB)
         root = tree.getroot()
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
@@ -372,8 +375,8 @@ class BetaEngine:
                     betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
-    def CalcBetaSpectra(self, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
-        self.LoadBetaDB()
+    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+        self.LoadBetaDB(targetDB)
         bins = int(erange/binwidths)
         for ZAI in self.istplist:
             branchspectrum = np.zeros(bins)

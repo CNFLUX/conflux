@@ -10,6 +10,7 @@ from os import listdir
 import xml
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
+import pkg_resources
 
 # this class saves nuclide info of fission products
 class FPNuclide:
@@ -28,7 +29,7 @@ class FPNuclide:
     # When use_corr == True, assume correlation matrix is loaded, calculate a
     # new covariance matrix.
     def Contribute(self, fraction, d_fraction=0, use_corr = False):
-        # 
+        #
         # if use_corr:
         #     assert self.corr, "Correlation matrix was not loaded!"
         #     self.cov = {}
@@ -68,23 +69,27 @@ class FissionIstp:
         self.IFPY = {}  # dictionary of independent fission yields {"FPZAI", FPNuclide}
 
     # method that load xml database of FPY and save nuclide info in dictionaries.
-    def LoadDB(self, DBpath = './fissionDB/'):
-        print('Reading FPY DB from folder: '+DBpath+'...')
-        fileList = listdir(DBpath)
+    def LoadFissionDB(self, DBname = None):
+        if DBname == None:
+            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            print('Reading FPY DB from folder: '+DBpath+'...')
+            fileList = listdir(DBpath)
 
-        istpfound = False
-        for filename in fileList:
-            namecache = filename.split('.')
-            if namecache[-1] != 'xml':
-                continue
-            if (str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
-                continue
-            istpfound = True
-            break
-        assert(istpfound) # assert error if isotope not found in DB
+            istpfound = False
+            for filename in fileList:
+                namecache = filename.split('.')
+                if namecache[-1] != 'xml':
+                    continue
+                if (str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+                    continue
+                istpfound = True
+                break
+            assert(istpfound) # assert error if isotope not found in DB
 
-        DBname = DBpath+filename
-        print('Reading FPY DB: '+DBpath+filename+'...')
+            DBname = DBpath+filename
+            assert(DBname)
+
+        print('Reading FPY DB: '+DBname+'...')
         tree = ET.parse(DBname)
         root = tree.getroot()
 
@@ -114,13 +119,17 @@ class FissionIstp:
                 if (MT == 'IFP'):
                     self.IFPY[Ei] = nuclidelist
 
-
-        print('FPY list loaded.')
+                print('FPY list loaded. '+ str(len(nuclidelist))+" fission products were found with Ei of "+str(Ei)+" MeV ")
 
     # Method to read the prepackaged covariance csv file
-    def LoadCovariance(self, DBpath = './fissionDB/'):
-        print("Reading covariance matrix: "+DBpath+"...")
+    # This function has to be called after loading the fission DB for neutrino
+    # flux calcuation.
+    def LoadCovariance(self, DBpath = None):
+        if DBpath == None:
+            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
+        assert(DBpath)
         istpfound = False
         e_neutron = {'Thermal': 0, 'Fast': 0.5, 'High': 14}
         for filename in fileList:
@@ -148,29 +157,37 @@ class FissionIstp:
                     fpzai = z*10000+a*10+i
                     if fpzai not in self.CFPY[Ei]:
                         continue
-                    for key in row:
-                        if key == '':
-                            continue
+                    for corrzai in self.CFPY[Ei]:
+                        col_id = int(corrzai)
+                        z = int(col_id/10000)
+                        a = int((col_id-z*10000)/10)
+                        i = int(col_id-z*10000-a*10)
+                        key = z*10000+a+i*1000
+                        keystr = ' '+str(key)
+                        # if key is not found in the covaraince matrix, set
+                        # value to zero
+                        if keystr in row:
+                            self.CFPY[Ei][fpzai].cov[corrzai] = float(row[keystr])
                         else:
-                            col_id = int(key)
-                            z = int(col_id/10000)
-                            i = int((col_id-z*10000)/1000)
-                            a = int(col_id-z*10000-i*1000)
-                            corrzai = z*10000+a*10+i
-                            self.CFPY[Ei][fpzai].cov[corrzai] = float(row[key])
+                            self.CFPY[Ei][fpzai].cov[corrzai] = 0.0
 
                 # if element not found, set diagonal element to 'yerr'
                 for nuclide in self.CFPY[Ei]:
                     if nuclide not in self.CFPY[Ei][nuclide].cov:
-                        self.CFPY[Ei][nuclide].cov = {key: 0 for key in row}
+                        self.CFPY[Ei][nuclide].cov = {nuclide: 0 for nuclide in self.CFPY[Ei]}
                         self.CFPY[Ei][nuclide].cov[nuclide] = self.CFPY[Ei][nuclide].yerr
 
         assert(istpfound) # assert error if isotope not found in DB
 
     # Method to read the prepackaged correlation csv file
-    def LoadCorrelation(self, DBpath = './fissionDB/'):
-        print("Reading correlation matrix from: "+DBpath+"...")
+    # This function has to be called after loading the fission DB for neutrino
+    # flux calcuation.
+    def LoadCorrelation(self, DBpath = None):
+        if DBpath == None:
+            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            print("Reading correlation matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
+        assert(DBpath)
         istpfound = False
         e_neutron = {'Thermal': 0, 'Fast': 0.5, 'High': 14}
         for filename in fileList:
@@ -198,30 +215,49 @@ class FissionIstp:
                     fpzai = z*10000+a*10+i
                     if fpzai not in self.CFPY[Ei]:
                         continue
-                    for key in row:
-                        if key == '':
-                            continue
+                    for corrzai in self.CFPY[Ei]:
+                        col_id = int(corrzai)
+                        z = int(col_id/10000)
+                        a = int((col_id-z*10000)/10)
+                        i = int(col_id-z*10000-a*10)
+                        key = z*10000+a+i*1000
+                        keystr = ' '+str(key)
+                        # if key is not found in the correlation matrix, set
+                        # value to zero
+                        if keystr in row:
+                            self.CFPY[Ei][fpzai].corr[corrzai] = float(row[keystr])
                         else:
-                            col_id = int(key)
-                            z = int(col_id/10000)
-                            i = int((col_id-z*10000)/1000)
-                            a = int(col_id-z*10000-i*1000)
-                            colzai = z*10000+a*10+i
-                            self.CFPY[Ei][fpzai].corr[colzai] = float(row[key])
+                            self.CFPY[Ei][fpzai].corr[corrzai] = 0.0
 
                 # if element not found, set diagonal element to 1.0
                 for nuclide in self.CFPY[Ei]:
-                    if nuclide not in self.CFPY[Ei][nuclide].cov:
-                        self.CFPY[Ei][nuclide].corr = {key: 0 for key in row}
-                        self.CFPY[Ei][nuclide].corr[nuclide] = self.CFPY[Ei][nuclide].yerr
+                    if nuclide not in self.CFPY[Ei][nuclide].corr:
+                        self.CFPY[Ei][nuclide].corr = {nuclide: 0 for nuclide in self.CFPY[Ei]}
+                        self.CFPY[Ei][nuclide].corr[nuclide] = 1.0
+
 
         assert(istpfound) # assert error if isotope not found in DB
 
-# class that builds a fission reactor model with dictionary of all FPYs from all reactor compositions.
+    # Method to calculate a covariance matrix from the correlation information
+    # of each fission product
+    def CalcCovariance(self, Ei):
+        for i in self.CFPY[Ei]:
+            yerri = self.CFPY[Ei][i].yerr
+            corr = self.CFPY[Ei][i].corr
+            for j in self.CFPY[Ei]:
+                yerrj = self.CFPY[Ei][j].yerr
+                self.CFPY[Ei][i].cov[j]=yerri*corr[j]*yerrj
+
+
+
+
+# class that builds a fission reactor model with dictionary of all FPYs from all
+# reactor compositions.
 class FissionModel:
     def __init__(self, W = 1.0):
         self.FPYlist = {}
         self.W = 1.0
+
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
@@ -272,10 +308,24 @@ class FissionModel:
 # test on how to define fission isotopes and add them to the reactor model
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
-    U235.LoadDB()
+    U235.LoadFissionDB()
     U235.LoadCovariance()
+    U235.LoadCorrelation()
+    U235.CalcCovariance(Ei =0)
+    with open('cov_235_U_processed.csv', 'w', newline='') as csvoutput:
+        fieldnames = ['']
+        for i in U235.CFPY[0]:
+            fieldnames.append(i)
+        writer = csv.DictWriter(csvoutput, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in U235.CFPY[0]:
+            rowcontent = U235.CFPY[0][i].cov
+            rowcontent[''] = i
+            writer.writerow(rowcontent)
+
+
     Pu239 = FissionIstp(94, 239)
-    Pu239.LoadDB()
+    Pu239.LoadFissionDB()
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1, d_frac=0.0)

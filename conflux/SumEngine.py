@@ -43,7 +43,7 @@ class SumEngine:
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, DB='betaDB/betaDB.xml', binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
         print("calculating beta spectra...")
         bins = int(erange/binwidths)
         self.reactorSpectrum = np.zeros(bins)
@@ -81,7 +81,7 @@ class SumEngine:
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
 
-                    sigmay_ij = yerri*yerrj*self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
+                    sigmay_ij = self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
                     #sigmai += self.FPYlist[i].cov[j]
                     #if (i == j): print(i, sigmay_ij, self.FPYlist[i].cov[i])
                     self.spectrumUnc += fi*sigmay_ij*fj
@@ -129,18 +129,9 @@ class SumEngine:
 
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
-    U235.LoadDB()
-    U235.LoadCovariance()
-    # U238 = FissionIstp(92, 238)
-    # U238.LoadDB()
-    # U233 = FissionIstp(92, 233)
-    # U233.LoadDB()
-    # U234 = FissionIstp(92, 234)
-    # U234.LoadDB()
-    # Pu239 = FissionIstp(94, 239)
-    # Pu239.LoadDB()
-    # Pu241 = FissionIstp(94, 241)
-    # Pu241.LoadDB()
+    U235.LoadFissionDB()
+    U235.LoadCorrelation()
+    U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
@@ -159,57 +150,23 @@ if __name__ == "__main__":
     summed_spect = result.reactorSpectrum
     summed_err = result.spectrumUnc
     summed_model_err = result.modelUnc
+    summed_yerr = result.yieldUnc
 
     result.Draw("Commercial.png", frac=False)
     result.Clear()
 
-    # model1 = FissionModel()
-    # model1.AddContribution(isotope=U235, Ei = 0, fraction=1)
-    # result.AddModel(model1)
-    # result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
-    # m1_spect = result.reactorSpectrum
-    # result.Clear()
-    #
-    # model2 = FissionModel()
-    # model2.AddContribution(isotope=U234, Ei = 0.5, fraction=1)
-    # result.AddModel(model2)
-    # result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
-    # m2_spect = result.reactorSpectrum
-    # result.Clear()
-    #
-    # model3 = FissionModel()
-    # model3.AddContribution(isotope=U233, Ei = 0, fraction=1)
-    # result.AddModel(model3)
-    # result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
-    # m3_spect = result.reactorSpectrum
-    # result.Clear()
-    #
-    # model4 = FissionModel()
-    # model4.AddContribution(isotope=U235, Ei = 0, fraction=1)
-    # result.AddModel(model4)
-    # result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
-    # m4_spect = result.reactorSpectrum
-    # result.Clear()
 
     fig, ax = plt.subplots()
-    ax.set_ylim([1e-6, 10])
+    ax.set_ylim([-1, 1])
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
-    ax.plot(result.bins, summed_spect, label="Summed")
+    #ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
+    #ax.plot(result.bins, summed_spect, label="Summed")
+    ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
+    ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
-    #ax.semilogy(result.bins, m4_spect, label="U235")
-    #ax.legend()
-    # ax.semilogy(result.bins, m2_spect, label="U234")
-    # ax.legend()
-    # ax.semilogy(result.bins, m3_spect, label="U233")
-    # ax.legend()
-    # ax.semilogy(result.bins, m4_spect, label="Pu241")
-    # ax.legend()
-    fig.savefig("drawtest1.png")
+
+    fig.savefig("uncertainty.png")
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)
-        #write.writerow(result.reactorSpectrum)
-    #print(result.missingCont)
-    #print(result.missingBranch)
