@@ -5,6 +5,7 @@ from os import listdir
 import csv
 import numpy as np
 import re
+import pkg_resources
 
 # global method to determine if string contains float
 def is_number(s):
@@ -17,7 +18,8 @@ def is_number(s):
 # global method to generate a dictionary of element and Z
 def element_to_Z():
     zdict = {}
-    with open("./Z_to_element.csv") as csvinput:
+    listname = pkg_resources.resource_filename('conflux', 'betaDB/Z_to_element.csv')
+    with open(listname) as csvinput:
         csvreader = csv.reader(csvinput, delimiter=',')
         for row in csvreader:
             if row[0].isdigit:
@@ -205,5 +207,5 @@ def ENSDFbeta(inputfile):
 
 
 if __name__ == "__main__":
-    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.134", "r")
+    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.101", "r")
     ENSDFbeta(inputfile)

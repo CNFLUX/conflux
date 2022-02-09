@@ -145,23 +145,23 @@ def forbidden(W, W0, WM, ftype):
     wm = 0.
     pe = np.sqrt(ee**2 - ELECTRON_MASS_MEV**2*1.0)
 
-    if ((ftype==1) or (ftype==-2)):
+    if ((ftype==1) or (ftype==-2)): # first unique, 2nd non-unique
         result = (pn*pn+p1*p1)*(1+W*ELECTRON_MASS_MEV*WM)
-    if ((ftype==2) or (ftype==-3)):
+    if ((ftype==2) or (ftype==-3)): # 2nd unique, 3rd non-unique
         result=(pow(pn,4)+10.0/3*pn*pn*p1*p1+pow(p1,4))*(1+W*ELECTRON_MASS_MEV*WM)
-    if ((ftype==3) or (ftype==-4)):
+    if ((ftype==3) or (ftype==-4)): # 3rd unique, 4th non-unique
         result=(pow(pn,6)+7.0*pow(pn,4)*p1*p1+7.0*pow(p1,4)*pn*pn+pow(p1,6))*(1+W*ELECTRON_MASS_MEV*WM)
-    if (ftype == -10):
+    if (ftype == -10):  #   first non-unique 0-
         shape=(pe*pe+enu*enu+2*beta*beta*enu*ee)
         wm=0
         wm=wm*WM
         result=(1+wm)*shape
-    if (ftype==-11):
+    if (ftype==-11):    #   first non-unique 1-
         shape= pe*pe + enu*enu - 4.0/3.0*beta*beta*enu*ee
         wm=((pe*pe + enu*enu)*(beta*beta*ee - enu) + 2.0*beta*beta*ee*enu*(enu - ee)/3.0)/((pe*pe + enu*enu - 4.0*beta*beta*enu*ee/3.0))
         wm=wm*WM
         result=(1+wm)*shape
-    if (ftype == 10):
+    if (ftype == 10):   #   first unique, 2-
         shape=pe**2 + enu**2
         wm=3.0/5.0*((pe*pe + enu*enu)*(beta*beta*ee - enu) + 2.0*beta*beta*ee*enu*(enu - ee)/3.0)/((pe*pe + enu*enu))
         wm=wm*WM
@@ -347,7 +347,7 @@ class BetaEngine:
         self.istplist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
-        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
+        self. = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
 
     def LoadBetaDB(self, targetDB = None):
         if targetDB == None:
