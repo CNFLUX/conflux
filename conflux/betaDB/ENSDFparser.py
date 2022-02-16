@@ -6,6 +6,7 @@ import csv
 import numpy as np
 import re
 import pkg_resources
+from tqdm import tqdm
 
 # global method to determine if string contains float
 def is_number(s):
@@ -31,6 +32,8 @@ elementdict = element_to_Z()
 
 # global method to quantify simplified uncertainty indication
 def transUncert(mean, unc):
+    if (not unc.isdigit()):
+        return 0
     decimal = mean.find(".")
     exponent = mean.find("E")
     magnitude = len(mean[decimal:(exponent-1)]) if exponent>0 else len(mean[decimal:(exponent)])
@@ -42,12 +45,87 @@ def convert_J(chars):
 
     chars = chars.replace('(', '')
     chars = chars.replace(')', '')
+    chars = chars.replace('[', '')
+    chars = chars.replace(']', '')
+
+    tags = ['LT', 'GT', 'LE', 'GE', 'AP', 'CA', 'SY', '|>', '<|', '< ', ' >']
+    tagged = False
+    whichtag = ''
+    for tag in tags:
+        if tag in chars:
+            tagged = True
+            whichtag += tag
+    if tagged:
+        pi = 1
+        if '-' in chars:
+            pi -= 1
+            chars = chars.replace('-','')
+            chars = chars.replace('+','')
+        else:
+            pi += 1
+            chars = chars.replace('+','')
+
+        chars = chars.replace(whichtag, "")
+        print(whichtag)
+        if '/' in chars:
+            num, denom = chars.split('/')
+            num = num.strip()
+            denom = denom.strip()
+            J = (float(num)/float(denom))
+        else:
+            chars = chars.strip()
+            J = (float(chars))
+
+        if whichtag in ['LT', '<']:
+            J -= 1
+        elif whichtag in ['GT', '>']:
+            J += 1
+        return [np.array([pi]),np.array([J]) ]
+
+    links = ['TO', 'AND', ':', "&"]
+    linked = False
+    whichlink = ''
+    for link in links:
+        if link in chars:
+            linked = True
+            whichlink += link
+    if linked:
+        pi = 1
+        if '-' in chars:
+            pi -= 1
+            chars = chars.replace('-','')
+            chars = chars.replace('+','')
+        else:
+            pi += 1
+            chars = chars.replace('+','')
+
+        Js = chars.split(whichlink)
+        Jlist = np.zeros(len(Js))
+        it = 0
+        for Jstr in Js:
+            if '/' in Jstr:
+                num, denom = Jstr.split('/')
+                num = num.strip()
+                denom = denom.strip()
+
+                Jlist[it] = (float(num)/float(denom))
+            else:
+                Jstr = Jstr.strip()
+                Jlist[it] = (float(Jstr))
+            it +=1
+
+        J = np.arange(float(Jlist[0]), float(Jlist[1]), 1)
+
+        pi = np.zeros(len(J))+pi
+
+        return [pi, J]
+
     J = np.zeros(len(chars.split(',')))
     pi = np.zeros(len(chars.split(',')))
     if not any(c.isdigit() for c in chars):
         if '-' in chars:
-            pi = -1
-        return [[pi], [1e3]]
+            pi += -1
+        return [pi, np.array([1e3])]
 
     it = 0
     for Js in chars.split(','):
@@ -108,7 +186,10 @@ class ParentIstp:
         self.A = int(line[:3].strip())
         element = line[3:5].capitalize().strip()
         self.Z = int(elementdict[element])
-        self.level = float(line[9:19].strip().replace('+X', ''))/1e3 #convert to MeV
+        leveltxt = line[9:19].strip().replace('+X', '')
+        if not line[9:19].strip().isdigit():
+            leveltxt = '0'
+        self.level = float(leveltxt)/1e3#convert to MeV
         self.HL = line[39:49]
         self.Emax = float(line[64:74].strip())/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
@@ -131,81 +212,85 @@ class DecayBranch:
         self.sigma_frac = transUncert(line[21:29].strip(), line[29:31].strip())/100 if is_number(line[29:31]) else 0
         self.forbidden = line[77:79].strip() if not line[77:79].isspace() else "0"
 
-def ENSDFbeta(inputfile):
+def ENSDFbeta(fileList):
+
     xmloutput = XMLedit()
-    lastline = ""
-    betabool = False
-    beginlevel = 0.
-    isomer = 0
-    for line in inputfile.readlines():
+    for filename in tqdm(fileList):
+        inputfile = open(dirName+filename, "r", errors='replace')
 
-        if line.isspace():
-            if (betabool == True): print("EMPTY LINE")
-            lastline = ""
-            betabool = False
 
-        # find parent isotope of beta decay (ignore other types of decay)
-        MT = line[5:8]      # Check datatype
-        betatag = "B- DECAY"
-        if MT == "   " and betatag in line:
-            lastline = line
-            betabool = True
+        lastline = ""
+        betabool = False
+        beginlevel = 0.
+        isomer = 0
+        for line in inputfile.readlines():
 
-        if betabool == True:
-            # save information of the parent isotope
-            if MT == "  P":
-                print(line)
-                decayparent = ParentIstp(line)
-                if decayparent.J ==1e3:
-                    decayparent.J = 0
-                if decayparent.level > beginlevel:
-                    beginlevel = decayparent.level
-                    isomer+=1
-                else:
-                    beginlevel = 0
-                    isomer = 0
-                ZAI = int(decayparent.Z*1e4 + decayparent.A*10 + isomer)
-                # save the parent isotope information
-                xmloutput.createIsotope(ZAI, decayparent.Emax, decayparent.HL)
+            if line.isspace():
+                if (betabool == True): print("EMPTY LINE")
+                lastline = ""
+                betabool = False
+
+            # find parent isotope of beta decay (ignore other types of decay)
+            MT = line[5:8]      # Check datatype
+            betatag = "B- DECAY"
+            if MT == "   " and betatag in line:
                 lastline = line
-                print(lastline)
-            elif MT == "  L":
-                lastline = line
-                print(lastline)
-            elif MT == "  B":
-                decaybranch = DecayBranch(line)
-                decaydaughter = DecayLevel(lastline)
-                if decaybranch.E0 == 0:
-                    decaybranch.E0 = decayparent.Emax - decaydaughter.level
-                    decaybranch.sigma_E0 = decayparent.d_Emax + decaydaughter.d_level
-                # calculate angular momentum difference
-                #for j in decaydaughter.J:
-                for j in range(len(decaydaughter.J)):
-                    if decaydaughter.J[j] == 1e3: decaydaughter.J[j] = decayparent.J
-                decaybranch.forbidden = [decayparent.pi*decaydaughter.pi, abs(decayparent.J - decaydaughter.J)]
-                print(decayparent.pi,decaydaughter.pi )
-                print(abs(decayparent.J - decaydaughter.J))
-                print(decaybranch.forbidden)
-                forbid_str = ""
-                for i in range(len(decaybranch.forbidden[1])):
-                    dspin_str = str(int(decaybranch.forbidden[1][i]))
-                    if decaybranch.forbidden[0][i] < 0:
-                        dspin_str = dspin_str+'-'
-                    if i == 0:
-                        forbid_str = forbid_str+dspin_str
+                betabool = True
+
+            if betabool == True:
+                # save information of the parent isotope
+                if MT == "  P":
+                    decayparent = ParentIstp(line)
+                    if 1e3 in decayparent.J:
+                        decayparent.J = np.array([decayparent.A/2 - int(decayparent.A/2)])
+                        print(line, decayparent.J)
+                    if decayparent.level > beginlevel:
+                        beginlevel = decayparent.level
+                        isomer+=1
                     else:
-                        forbid_str = forbid_str+","+dspin_str
-                # print(forbid_str)
-                # save the decay branch information
-                xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), str("{:.3f}".format(decaybranch.E0)), forbid_str, str("{:.3f}".format(decaybranch.sigma_frac)), str("{:.3f}".format(decaybranch.sigma_E0)))
-                lastline = line
-                print(lastline)
+                        beginlevel = 0
+                        isomer = 0
+                    ZAI = int(decayparent.Z*1e4 + decayparent.A*10 + isomer)
+                    # save the parent isotope information
+                    xmloutput.createIsotope(ZAI, decayparent.Emax, decayparent.HL)
+                    lastline = line
+                    print(lastline)
+                elif MT == "  L":
+                    lastline = line
+                elif MT == "  B" and "  B" not in lastline:
+                    decaybranch = DecayBranch(line)
+                    decaydaughter = DecayLevel(lastline)
+                    if decaybranch.E0 == 0:
+                        decaybranch.E0 = decayparent.Emax - decaydaughter.level
+                        decaybranch.sigma_E0 = decayparent.d_Emax + decaydaughter.d_level
+                    # calculate angular momentum difference
+                    #for j in decaydaughter.J:
+                    for j in range(len(decaydaughter.J)):
+                        if decaydaughter.J[j] == 1e3:
+                            decaydaughter.J[j] = decayparent.J.min()
+                    decaybranch.forbidden = [decayparent.pi.min()*decaydaughter.pi, abs(decayparent.J.min() - decaydaughter.J)]
+                    forbid_str = ""
+                    for i in range(len(decaybranch.forbidden[1])):
+                        dspin_str = str(int(decaybranch.forbidden[1][i]))
+                        if decaybranch.forbidden[0][i] < 0:
+                            dspin_str = dspin_str+'-'
+                        if i == 0:
+                            forbid_str = forbid_str+dspin_str
+                        else:
+                            forbid_str = forbid_str+","+dspin_str
+                    # print(forbid_str)
+                    # save the decay branch information
+                    xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), str("{:.3f}".format(decaybranch.E0)), forbid_str, str("{:.3f}".format(decaybranch.sigma_frac)), str("{:.3f}".format(decaybranch.sigma_E0)))
+                    lastline = line
+                    #print(lastline)
 
-    xmloutput.saveXML("ENSDFtest.xml")
+    xmloutput.saveXML("ENSDFbetaDB.xml")
 
     return 0
 
 
 if __name__ == "__main__":
-    inputfile = open("/Users/zhang39/Data/ENSDF/ensdf.101", "r")
-    ENSDFbeta(inputfile)
+    dirName = sys.argv[1]
+    fileList = listdir(dirName)
+    fileList.sort()
+    ENSDFbeta(fileList)

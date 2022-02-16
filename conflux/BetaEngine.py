@@ -168,6 +168,7 @@ def forbidden(W, W0, WM, ftype):
         result=(1+wm)*shape
 
     return result
+    if (ftype == -10):  #   first non-unique 0-
 
 #########################################
 # Final neutrino and antineutrino spectra
@@ -288,7 +289,7 @@ class BetaBranch:
         return result
 
     # calculate the spectrum uncertainty
-    def SpectUncert(self, x, nu_spectrum = False):
+    def SpectUncert(self, x, nu_spectrum=False):
         numbers = 5
         E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
         newparams = deepcopy(self.params)
@@ -327,7 +328,7 @@ class BetaBranch:
             x_high = lower+binwidths
             if x_high > self.E0:
                 x_high = self.E0
-            self.result[k] = integral(True, self.params, x_low, x_high, "quick") #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
+            self.result[k] = integral(nu_spectrum, self.params, x_low, x_high, "quick") #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
             self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low)+self.SpectUncert(x_high))/2
             lower+=binwidths
 
@@ -347,7 +348,7 @@ class BetaEngine:
         self.istplist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
-        self. = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
+        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
 
     def LoadBetaDB(self, targetDB = None):
         if targetDB == None:
@@ -365,12 +366,37 @@ class BetaEngine:
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
                 betaIstp = {}
+
+                # some isotope contains more than 1 total branches
+                # prepare to normalize
+                fracsum = 0
+                for branch in isotope:
+                    fraction = float(branch.attrib['fraction'])
+                    fracsum += fraction
+
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
                     sigma_E0 = float(branch.attrib['sigma_E0'])
-                    forbiddeness = int(branch.attrib['forbideness'])
+                    spin_par_changes = (branch.attrib['forbideness'])
+
+                    # converting spin change to forbidden types
+                    ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'], ['3-', '4-'], ['4', '5']]
+                    firstftypes = [-10, -11, 10]
+                    forbiddeness = 1e3
+                    for i in range(len(ftypes)):
+                        for j in range(len(spin_par_changes)):
+                            if spin_par_changes[j] in ftypes[i] and i < abs(forbiddeness):
+                                forbiddeness = -i
+                                if i == 1:
+                                    forbideness = firstftypes[j]
+                                elif spin_par_changes[j] == ftypes[i][-1]:
+                                    forbideness = i
+
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
+                    if fracsum > 1:
+                        fraction /= fracsum
+                        sigma_frac /= fracsum
 
                     betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
@@ -394,20 +420,3 @@ class BetaEngine:
 
             self.spectralist[ZAI] = branchspectrum
             self.uncertaintylist[ZAI] = branchuncertainty
-
-
-if __name__ == "__main__":
-    testlist = [521340, 531340, 350900]
-    testEngine = BetaEngine(testlist)
-    testEngine.CalcBetaSpectra(nu_spectrum=True)
-    #print(testEngine.spectralist[521340])
-    print(testEngine.spectralist[350900])
-    print(testEngine.uncertaintylist[350900])
-
-    fig = plt.figure()
-    x = np.linspace(0, 20, 200)
-    plt.errorbar(x, testEngine.spectralist[350900], yerr=testEngine.uncertaintylist[350900])
-    #plt.draw()
-    fig.savefig("errorbartest.png")
-
-    #testbeta = BetaBranch(1, 3, 1.0, 0, )
