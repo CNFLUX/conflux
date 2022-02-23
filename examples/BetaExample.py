@@ -5,17 +5,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # local modules
-from conflux.BetaEngine import BetaEngineif __name__ == "__main__":
-    testlist = [521340, 531340, 350900]
+from conflux.BetaEngine import BetaEngine
+
+if __name__ == "__main__":
+    testlist = [390960, 390961, 521340, 531340]
     testEngine = BetaEngine(testlist)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
     #print(testEngine.spectralist[521340])
-    print(testEngine.spectralist[350900])
-    print(testEngine.uncertaintylist[350900])
 
     fig = plt.figure()
     x = np.linspace(0, 20, 200)
-    plt.errorbar(x, testEngine.spectralist[350900], yerr=testEngine.uncertaintylist[350900])
+    plt.errorbar(x, testEngine.spectralist[390960], yerr=testEngine.uncertaintylist[390961])
     #plt.draw()
     fig.savefig("errorbartest.png")
 

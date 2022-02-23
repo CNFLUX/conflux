@@ -168,7 +168,6 @@ def forbidden(W, W0, WM, ftype):
         result=(1+wm)*shape
 
     return result
-    if (ftype == -10):  #   first non-unique 0-
 
 #########################################
 # Final neutrino and antineutrino spectra
@@ -348,7 +347,7 @@ class BetaEngine:
         self.istplist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
-        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/betaDB.xml')
+        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/ENSDFbetaDB.xml')
 
     def LoadBetaDB(self, targetDB = None):
         if targetDB == None:
@@ -402,6 +401,9 @@ class BetaEngine:
                 self.istplist[ZAI] = betaIstp
 
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+        """
+        Calculates beta spectra of the list of beta-decaying isotopes
+        """
         self.LoadBetaDB(targetDB)
         bins = int(erange/binwidths)
         for ZAI in self.istplist:

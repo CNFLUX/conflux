@@ -60,7 +60,7 @@ class SumEngine:
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
                 self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
                 self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
-                #self.spectrumUnc = self.yieldUnc+self.modelUnc
+                self.spectrumUnc = self.yieldUnc+self.modelUnc
 
             # save the list of missing branches
             else:
@@ -79,13 +79,13 @@ class SumEngine:
                     yj = self.FPYlist[j].y
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
-
-                    sigmay_ij = self.FPYlist[i].cov[j] # FIXME: Why is sigmay_ij different from desired covariance elements? Where is the
-                    #sigmai += self.FPYlist[i].cov[j]
-                    #if (i == j): print(i, sigmay_ij, self.FPYlist[i].cov[i])
-                    self.spectrumUnc += fi*sigmay_ij*fj
-
-            #print("cov sum", i, sigmai)
+                    
+                    sigmay_ij = self.FPYlist[i].cov[j]
+                    if (i==j):
+                        self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj
+                    else:
+                        self.spectrumUnc += fi*sigmay_ij*fj
+                    
 
         self.spectrumUnc = np.sqrt(self.spectrumUnc)
 
