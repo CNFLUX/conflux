@@ -11,6 +11,43 @@ from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine:
+    """
+    A Class to carry out the Summation (Ab-initio) Mode
+
+    ...
+
+    Attributes
+    ----------
+
+    FPYlist : dictionary
+        A dictionary of the Fission Percentage Yield of each isotope
+    betaSpectraList : dictionary
+        A dictionary of the Beta Spectra of each isotope
+    betaUncertainty : int list
+        A list of the beta Uncertainty's of each isotope
+    neutrino : boolean
+        A boolean of whether we are looking at the neutrino spectrum or beta spectrum
+
+    Methods
+    -------
+
+    Clear():
+        Clears all dictionaries associated with the SumEngine
+
+    AddModel(fissionModel, W=1.0):
+        method to add fission/non-fissile/non-equilibrium isotopes into the engine
+
+    Normalize():
+        Normalizes the FIssion Percentage Yield and the Fission Percentage Yield Error
+
+    CalcReactorSpectrum(betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange=20.0):
+        Calculates the neutrino Spectrum from the given database with the given energy bins and bounds
+
+    Draw(figname, summing=True, logy=True, frac=False):
+        Draws the Reactor Spectrum and saves it as a .png file.
+
+    """
+    
     def __init__(self, neutrino=True):
         self.FPYlist = {}
         self.betaSpectraList = {}
@@ -18,12 +55,29 @@ class SumEngine:
         self.neutrino = neutrino # neutrino or electon spectrum
 
     def Clear(self):
+        """
+            Clears out all associated dictionaries inside the SumEngine
+
+            Parameters:
+                None
+            Returns:
+                None
+        """
         self.FPYlist = {}
         self.betaUncertainty = {}
         self.betaSpectraList = {}
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
+        """
+            Adds a reactor model to the summation engine.
+
+            Parameters:
+                fissionModel (FissionModel): A Fission Model containing the fission/non-fissile/non-equilibrium isotopes
+                W (int) : The weight applied to the reactor model in a multi-reactor engine. The default weight is set to 1.
+            Returns:
+                None
+        """
         for FPZAI in fissionModel.FPYlist:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
@@ -34,7 +88,16 @@ class SumEngine:
                 self.FPYlist[FPZAI].yerr + fissionModel.FPYlist[FPZAI].yerr*W
                 self.FPYlist[FPZAI].AddCovariance(fissionModel.FPYlist[FPZAI])
 
-    def NormalizeFP(self):
+    def NormalizeFP(self):    
+        """
+            Normalizes the Fission Percentage Yield and the Fission Percent error.
+
+            Parameters:
+                None
+            Returns:
+                None
+
+        """
         self.sum = 0
         for FPZAI in self.FPYlist:
             self.sum += self.FPYlist[FPZAI].y
