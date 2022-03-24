@@ -400,25 +400,91 @@ class BetaEngine:
                     betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
-    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, lower=-1.0,thresh_type = 0, thresh=0.0, erange = 20.0):
         """
-        Calculates beta spectra of the list of beta-decaying isotopes
+            Calculates beta spectra of the list of beta-decaying isotopes
+
+            Params:
+                targetDB (String): the path to the betaSpectra database. if none, use the default database.
+                nu_spectrum (boolean): Determines if you are calculating a beta spectra or a neutrino spectra
+                binwidths (float): The width of the bins used in creating your spectra.
+                lower (float): ??
+                thresh_type (int): determines if your threshold is an upperbound (2), or a lowerbound (1). If neither of those values, default to no threshold.
+                thresh (float): The threshold (upper/lower) energy for your threshold.
+                erange (float): the energy range you want to calculate your spectra to.
+            Returns:
+                None
+
+
         """
+        threshold = thresh
+        threshold_type = int(thresh_type)
         self.LoadBetaDB(targetDB)
         bins = int(erange/binwidths)
-        for ZAI in self.istplist:
-            branchspectrum = np.zeros(bins)
-            branchuncertainty = np.zeros(bins)
-            for E0, branch in self.istplist[ZAI].items():
-                if branch.frac == 0:
-                    continue
-                branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
-                relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
-                branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
-                branch.result *= branch.frac
+        if threshold_type == 1:
+            print("You've selected a lower threshold")
+            for ZAI in self.istplist:
+                branchspectrum = np.zeros(bins)
+                branchuncertainty = np.zeros(bins)
+                for E0, branch in self.istplist[ZAI].items():
+                    if E0 < threshold:
+                        continue
+                    if branch.frac == 0:
+                        continue
+                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
 
-                branchspectrum += branch.result
-                branchuncertainty += branch.uncertainty
+                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
 
-            self.spectralist[ZAI] = branchspectrum
-            self.uncertaintylist[ZAI] = branchuncertainty
+                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
+
+                    branch.result *= branch.frac
+
+                    branchspectrum += branch.result
+                    branchuncertainty += branch.uncertainty
+
+                self.spectralist[ZAI] = branchspectrum
+                self.uncertaintylist[ZAI] = branchuncertainty
+        elif threshold_type == 2:
+            print("You've selected an upper threshold")
+            for ZAI in self.istplist:
+                branchspectrum = np.zeros(bins)
+                branchuncertainty = np.zeros(bins)
+                for E0, branch in self.istplist[ZAI].items():
+                    if E0 > threshold:
+                        continue
+                    if branch.frac == 0:
+                        continue
+                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+
+                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
+
+                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
+
+                    branch.result *= branch.frac
+
+                    branchspectrum += branch.result
+                    branchuncertainty += branch.uncertainty
+
+                self.spectralist[ZAI] = branchspectrum
+                self.uncertaintylist[ZAI] = branchuncertainty
+        else:
+            print("You have not picked a threshold, run as normal")
+            for ZAI in self.istplist:
+                branchspectrum = np.zeros(bins)
+                branchuncertainty = np.zeros(bins)
+                for E0, branch in self.istplist[ZAI].items():
+                    if branch.frac == 0:
+                        continue
+                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+
+                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
+
+                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
+
+                    branch.result *= branch.frac
+
+                    branchspectrum += branch.result
+                    branchuncertainty += branch.uncertainty
+
+                self.spectralist[ZAI] = branchspectrum
+                self.uncertaintylist[ZAI] = branchuncertainty
