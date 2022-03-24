@@ -182,7 +182,7 @@ class FissionIstp:
     # Method to read the prepackaged correlation csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCorrelation(self, DBpath = None):
+    def LoadCorrelation(self, DBpath = None, E_energy=0):
         if DBpath == None:
             DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
             print("Reading correlation matrices in: "+DBpath+"...")
@@ -235,7 +235,7 @@ class FissionIstp:
                         self.CFPY[Ei][nuclide].corr = {nuclide: 0 for nuclide in self.CFPY[Ei]}
                         self.CFPY[Ei][nuclide].corr[nuclide] = 1.0
 
-
+        self.CalcCovariance(E_energy)
         assert(istpfound) # assert error if isotope not found in DB
 
     # Method to calculate a covariance matrix from the correlation information
