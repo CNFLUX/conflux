@@ -106,6 +106,19 @@ class SumEngine:
             self.FPYlist[FPZAI].yerr /= self.sum
 
     def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+        """
+            Calculates the reactor spectrum based off the fission yield database as well as
+            the betaSpectra database.
+            Parameters:
+
+                betaSpectraDB (dictionary): a dictionary of the spectral information for each beta branch
+                binwidths (int): the width of the bins used in running the calculation
+                erange (int): upper limit of energy you want to run the reactor for
+            Returns:
+                None
+
+        """
+        
         print("calculating beta spectra...")
         bins = int(erange/binwidths)
         self.reactorSpectrum = np.zeros(bins)
@@ -151,40 +164,3 @@ class SumEngine:
                     
 
         self.spectrumUnc = np.sqrt(self.spectrumUnc)
-
-    def Draw(self, figname, summing = True, logy=True, frac=False):
-        print("Drawing spectrum...")
-        fig, ax = plt.subplots()
-        if (not logy):
-            ax.set_xlim([0, 10])
-            ax.set_ylim([0, 1])
-            if (summing == True):
-                ax.plot(self.bins, self.reactorSpectrum)
-            if (frac == True):
-                lines = []
-                labels = []
-                for FPZAI in self.betaSpectraList:
-                    if (self.betaSpectraList[FPZAI][90]>0):
-                        lines += ax.plot(self.bins, self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                        labels.append(str(FPZAI))
-                plt.legend(lines, labels)
-                ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
-        else:
-            #ax.set_xlim([0, 15])
-            ax.set_xlim([1e-7, 10])
-            ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='neutrino spectrum')
-
-            if (frac == True):
-                lines = []
-                labels = []
-                for FPZAI in self.betaSpectraList:
-                    if (self.betaSpectraList[FPZAI][10]>0):
-                        #print(FPZAI, self.FPYlist[FPZAI].y, self.betaSpectraList[FPZAI][90])
-                        lines += ax.plot(self.bins, \
-                        self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y)
-                        labels.append(str(FPZAI))
-
-            if (summing == True):
-                ax.semilogy(self.bins, self.reactorSpectrum)
-
-        fig.savefig(figname)
