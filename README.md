@@ -11,7 +11,7 @@ calculation:
 
 Installation:
 =============
-Execute: `pip install conflux`
+Execute: `pip3 install ./conflux-master`
 
 Program structure:
 ==================
