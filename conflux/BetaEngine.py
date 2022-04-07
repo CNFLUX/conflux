@@ -208,9 +208,8 @@ def electron(ebeta, params):
         return result*S(ebeta,buf.Z)
     return result
 
-def integral(nu_spectrum, p, x_low, x_high, verb):
+def integral(nu_spectrum, p, x_low, x_high):
     erg = 0.0
-    error = 0.0
     xh = 0.0
     x_low = max([x_low, 1e-6])
 
@@ -231,45 +230,38 @@ def integral(nu_spectrum, p, x_low, x_high, verb):
 
         ergl = [0.0, 0.0]
         ergh = [0.0, 0.0]
-        test = p.thresh
 
         # a quick integration mathod through trapezoid algorithm
-        if (verb == "quick"):
-            mid = (x_low+p.thresh)/2
-            ergl = abs(p.thresh-x_low)*function(mid)
-            mid = (xh+p.thresh)/2
-            ergh = abs(p.thresh-xh)*function(mid)
-            erg = ergl+ergh
-        else:
-            if (x_low <= p.thresh-5e-4 ): ergl = integrate.quad(function, x_low, p.thresh) # set lower limit to 1e-6 to avoid 'nan' error
-            if (xh >= p.thresh+5e-4): ergh = integrate.quad(function, p.thresh, xh)
-            erg=ergl[0]+ergh[0]
+        mid = (x_low+p.thresh)/2
+        ergl = abs(p.thresh-x_low)*function(mid)
+        mid = (xh+p.thresh)/2
+        ergh = abs(p.thresh-xh)*function(mid)
+        erg = ergl+ergh
 
         return erg
 
-    if (verb == "quick"):
-        mid = (xh+x_low)/2
-        erg = abs(xh-x_low)*function(mid)
-        return erg
-    else:
-        erg = integrate.quad(function, x_low, xh)
-        return erg[0]
+    mid = (xh+x_low)/2
+    erg = abs(xh-x_low)*function(mid)
+    return erg
+
     #print(x_low, p.thresh, x_high, erg[0])
 
 
 # BetaBranch class to save the isotopic information
 class BetaBranch:
-    def __init__(self, Z, A, frac, I, E0, sigma_E0, sigma_frac, forbiddeness=0, WM=0.0047):
+    def __init__(self, Z, A, frac, I, E0, sigma_E0, sigma_frac, forbiddeness=0, WM=0.0047, missing = False):
         self.Z = Z
         self.A = A
         self.I = I
         self.E0 = E0
-        self.sigma_E0 = 0.05*E0 #sigma_E0
+        self.sigma_E0 = sigma_E0
         self.frac = frac
         self.sigma_frac = sigma_frac
 
         self.forbiddeness = forbiddeness
         self.WM = WM
+        
+        self.missing = missing  # check if this is a 'fake' branch for missing isotopes
 
         self.params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
 
@@ -309,17 +301,16 @@ class BetaBranch:
         return grad_E0[int(numbers/2)]*self.sigma_E0
 
     # bined beta spectrum
-    def BinnedSpectrum(self, nu_spectrum=False, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
-        bins = int(erange/binwidths)
+    def BinnedSpectrum(self, nu_spectrum=False, binwidths=0.1, spectRange=[-1.0, 20.0]):
+        bins = int(spectRange[1]/binwidths)
         self.result = np.zeros(bins)
         self.uncertainty = np.zeros(bins)
 
+        lower = spectRange[0]
         if (lower > self.E0):
             return 1
         if (lower<0):
             lower=binwidths/2.0
-
-        self.params.thresh = thresh
 
         # integrating each bin
         for k in range(0, bins):
@@ -327,7 +318,7 @@ class BetaBranch:
             x_high = lower+binwidths
             if x_high > self.E0:
                 x_high = self.E0
-            self.result[k] = integral(nu_spectrum, self.params, x_low, x_high, "quick") #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
+            self.result[k] = integral(nu_spectrum, self.params, x_low, x_high) #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
             self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low)+self.SpectUncert(x_high))/2
             lower+=binwidths
 
@@ -365,6 +356,14 @@ class BetaEngine:
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
                 betaIstp = {}
+                
+                # Adding missing branches below
+                if len(isotope) < 1:
+                    E0 = float(isotope.attrib['Q'])
+                    sigma_E0 = 0
+                    spin_par_changes = 0
+                    fraction = 1
+                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac=0, forbiddeness=0., missing=True)
 
                 # some isotope contains more than 1 total branches
                 # prepare to normalize
@@ -400,7 +399,7 @@ class BetaEngine:
                     betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
-    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, lower=-1.0,thresh_type = 0, thresh=0.0, erange = 20.0):
+    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0]):
         """
             Calculates beta spectra of the list of beta-decaying isotopes
 
@@ -417,74 +416,30 @@ class BetaEngine:
 
 
         """
-        threshold = thresh
-        threshold_type = int(thresh_type)
+
         self.LoadBetaDB(targetDB)
-        bins = int(erange/binwidths)
-        if threshold_type == 1:
-            print("You've selected a lower threshold")
-            for ZAI in self.istplist:
-                branchspectrum = np.zeros(bins)
-                branchuncertainty = np.zeros(bins)
-                for E0, branch in self.istplist[ZAI].items():
-                    if E0 < threshold:
-                        continue
-                    if branch.frac == 0:
-                        continue
-                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+        bins = int(spectRange[1]/binwidths)
 
-                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
+        for ZAI in self.istplist:
+            branchSpectrum = np.zeros(bins)
+            branchUncertainty = np.zeros(bins)
+            for E0, branch in self.istplist[ZAI].items():
+                if branchErange[0] > E0 or E0 > branchErange[1]:
+                    continue
+                if branch.frac == 0:
+                    continue
+                if branch.missing:
+                    print("missing: ", ZAI, E0)
+                branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
 
-                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
+                relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
 
-                    branch.result *= branch.frac
+                branch.uncertainty = branch.uncertainty*branch.frac*relativeUnc
 
-                    branchspectrum += branch.result
-                    branchuncertainty += branch.uncertainty
+                branch.result *= branch.frac
 
-                self.spectralist[ZAI] = branchspectrum
-                self.uncertaintylist[ZAI] = branchuncertainty
-        elif threshold_type == 2:
-            print("You've selected an upper threshold")
-            for ZAI in self.istplist:
-                branchspectrum = np.zeros(bins)
-                branchuncertainty = np.zeros(bins)
-                for E0, branch in self.istplist[ZAI].items():
-                    if E0 > threshold:
-                        continue
-                    if branch.frac == 0:
-                        continue
-                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
+                branchSpectrum += branch.result
+                branchUncertainty += branch.uncertainty
 
-                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
-
-                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
-
-                    branch.result *= branch.frac
-
-                    branchspectrum += branch.result
-                    branchuncertainty += branch.uncertainty
-
-                self.spectralist[ZAI] = branchspectrum
-                self.uncertaintylist[ZAI] = branchuncertainty
-        else:
-            print("You have not picked a threshold, run as normal")
-            for ZAI in self.istplist:
-                branchspectrum = np.zeros(bins)
-                branchuncertainty = np.zeros(bins)
-                for E0, branch in self.istplist[ZAI].items():
-                    if branch.frac == 0:
-                        continue
-                    branch.BinnedSpectrum(nu_spectrum, binwidths, lower, thresh, erange)
-
-                    relativeunc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
-
-                    branch.uncertainty = branch.uncertainty*branch.frac*relativeunc
-
-                    branch.result *= branch.frac
-
-                    branchspectrum += branch.result
-                    branchuncertainty += branch.uncertainty
-
-                self.spectralist[ZAI] = branchspectrum
-                self.uncertaintylist[ZAI] = branchuncertainty
+            self.spectralist[ZAI] = branchSpectrum
+            self.uncertaintylist[ZAI] = branchUncertainty

@@ -12,7 +12,7 @@ if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
     U235.LoadCorrelation()
-    U235.CalcCovariance(Ei=0)
+    #U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
@@ -25,15 +25,14 @@ if __name__ == "__main__":
     result.AddModel(model)
 
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 10.0)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0])
 
-    result.CalcReactorSpectrum(betaSpectraDB, erange = 10.0)
+    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=True)
     summed_spect = result.reactorSpectrum
     summed_err = result.spectrumUnc
     summed_model_err = result.modelUnc
     summed_yerr = result.yieldUnc
 
-    result.Draw("Commercial.png", frac=False)
     result.Clear()
 
 
@@ -48,6 +47,10 @@ if __name__ == "__main__":
     ax.legend()
 
     fig.savefig("uncertainty.png")
+    
+    print(result.totalYield)
+    print(result.missingCount)
+    print(result.missingBranch)
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

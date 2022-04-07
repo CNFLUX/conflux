@@ -11,7 +11,7 @@ if __name__ == "__main__":
     #And the last number is the ____ (I)
 
     #This list contains Y-96, Te-134, and I-134
-    isoList = [390960, 390961, 521340, 531340]
+    isoList = [390960, 390961, 521340, 531340, 160430, 180500]
 
     #Here, I am initializing the Beta Engine with my list of isotopes.
     #Note that this is only an example for this specific engine. If you go to

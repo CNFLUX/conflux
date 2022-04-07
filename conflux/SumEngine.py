@@ -20,7 +20,7 @@ class SumEngine:
     ----------
 
     FPYlist : dictionary
-        A dictionary of the Fission Percentage Yield of each isotope
+        A dictionary of the fission product yield (FPY) of each isotope
     betaSpectraList : dictionary
         A dictionary of the Beta Spectra of each isotope
     betaUncertainty : int list
@@ -38,7 +38,7 @@ class SumEngine:
         method to add fission/non-fissile/non-equilibrium isotopes into the engine
 
     Normalize():
-        Normalizes the FIssion Percentage Yield and the Fission Percentage Yield Error
+        Normalizes the FPY and the fission product yield Error
 
     CalcReactorSpectrum(betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange=20.0):
         Calculates the neutrino Spectrum from the given database with the given energy bins and bounds
@@ -74,7 +74,7 @@ class SumEngine:
 
             Parameters:
                 fissionModel (FissionModel): A Fission Model containing the fission/non-fissile/non-equilibrium isotopes
-                W (int) : The weight applied to the reactor model in a multi-reactor engine. The default weight is set to 1.
+                W (float) : The weight applied to the reactor model in a multi-reactor engine. The default weight is set to 1.
             Returns:
                 None
         """
@@ -88,9 +88,9 @@ class SumEngine:
                 self.FPYlist[FPZAI].yerr + fissionModel.FPYlist[FPZAI].yerr*W
                 self.FPYlist[FPZAI].AddCovariance(fissionModel.FPYlist[FPZAI])
 
-    def NormalizeFP(self):    
+    def NormalizeFP(self):
         """
-            Normalizes the Fission Percentage Yield and the Fission Percent error.
+            Normalizes the fission product yield and the Fission Percent error.
 
             Parameters:
                 None
@@ -105,7 +105,7 @@ class SumEngine:
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange = 20.0):
+    def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=False):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
@@ -119,18 +119,28 @@ class SumEngine:
 
         """
         
-        print("calculating beta spectra...")
-        bins = int(erange/binwidths)
+        print("Calculating beta spectra...")
+        bins = int(spectRange[1]/binwidths)
         self.reactorSpectrum = np.zeros(bins)
         self.spectrumUnc = np.zeros(bins)   # total uncertainty
         self.modelUnc = np.zeros(bins)
         self.yieldUnc = np.zeros(bins)
-        self.bins = np.arange(0, erange, binwidths)
+        self.bins = np.arange(0, spectRange[1], binwidths)
         self.missingBranch = []
-        self.missingCont = 0.0
+        self.missingCount = 0.0
+        self.totalYield = 0.0
 
         for FPZAI in self.FPYlist:
+            self.totalYield += self.FPYlist[FPZAI].y
             if FPZAI in betaSpectraDB.spectralist:
+                
+                # process missing branches with assumptions or not
+                for branch in betaSpectraDB.istplist[FPZAI].items:
+                    if branch.missing and not processMissing:
+                        self.missingCount += self.FPYlist[FPZAI].y
+                        self.missingBranch.append(FPZAI)
+                        continue
+                
                 self.betaSpectraList[FPZAI] = betaSpectraDB.spectralist[FPZAI]
                 self.betaUncertainty[FPZAI] = betaSpectraDB.uncertaintylist[FPZAI]
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
@@ -140,7 +150,7 @@ class SumEngine:
 
             # save the list of missing branches
             else:
-                self.missingCont += self.FPYlist[FPZAI].y
+                self.missingCount += self.FPYlist[FPZAI].y
                 self.missingBranch.append(FPZAI)
 
         # Uncertainty calculation
