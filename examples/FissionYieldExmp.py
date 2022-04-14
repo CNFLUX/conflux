@@ -1,4 +1,6 @@
 from conflux.FPYEngine import FissionIstp, FissionModel
+from conflux.BetaEngine import BetaEngine
+
 import csv
 
 # test on how to define fission isotopes and add them to the reactor model
@@ -27,6 +29,18 @@ if __name__ == "__main__":
     model.AddContribution(isotope=U235, Ei = 0, fraction=1, d_frac=0.0)
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
     #model.AddIstp(390960)
-    # for FPZAI in model.FPYlist:
-    #     print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
+    totalyield = 0
+    betaSpectraDB = BetaEngine(model.FPYlist.keys())
+    betaSpectraDB.LoadBetaDB()
+    for ZAI in betaSpectraDB.istplist:
+        print("ZAI", ZAI)
+    totalFPY = 0
+    for FPZAI in model.FPYlist:
+        if FPZAI in betaSpectraDB.missinglist and FPZAI in betaSpectraDB.istplist:
+            print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
+            totalyield += model.FPYlist[FPZAI].y
+            totalFPY += 1
+    print("totalyield", totalyield)
+    print("totalFPY", totalFPY)
+
     model.DrawBranches("frac.png")

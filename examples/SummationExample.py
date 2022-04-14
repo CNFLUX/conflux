@@ -27,30 +27,53 @@ if __name__ == "__main__":
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0])
 
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=True)
+    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=False)
     summed_spect = result.reactorSpectrum
     summed_err = result.spectrumUnc
     summed_model_err = result.modelUnc
     summed_yerr = result.yieldUnc
-
+    
+    print(result.totalYield)
+    print(result.missingCount)
+    print(result.missingBranch)
+    
+    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=True)
+    miss_spect = result.reactorSpectrum
+    miss_err = result.spectrumUnc
+    miss_model_err = result.modelUnc
+    miss_yerr = result.yieldUnc
+    
+    print(result.totalYield)
+    print(result.missingCount)
+    print(result.missingBranch)
+    
     result.Clear()
 
 
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
+    plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
-    ax.plot(result.bins, summed_spect, label="Summed")
+    #ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
+    ax.plot(result.bins, summed_spect, label="w/o miss info")
+    ax.plot(result.bins, miss_spect, label="w/ miss info")
     # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
     # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("uncertainty.png")
+    fig.savefig("235Missing.png")
     
-    print(result.totalYield)
-    print(result.missingCount)
-    print(result.missingBranch)
+    fig, ax = plt.subplots()
+    #ax.set_ylim([-1, 1])
+    #plt.yscale('log')
+    ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
+    ax.plot(result.bins, summed_spect-miss_spect)
+
+    ax.legend()
+
+    fig.savefig("235Missing.png")
+
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

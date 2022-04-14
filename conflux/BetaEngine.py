@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
 import pkg_resources
+import timeit
 
 ######################
 # Declaring constants
@@ -249,10 +250,12 @@ def integral(nu_spectrum, p, x_low, x_high):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch:
-    def __init__(self, Z, A, frac, I, E0, sigma_E0, sigma_frac, forbiddeness=0, WM=0.0047, missing = False):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, WM=0.0047):
         self.Z = Z
         self.A = A
         self.I = I
+        self.Q = Q
+
         self.E0 = E0
         self.sigma_E0 = sigma_E0
         self.frac = frac
@@ -261,8 +264,6 @@ class BetaBranch:
         self.forbiddeness = forbiddeness
         self.WM = WM
         
-        self.missing = missing  # check if this is a 'fake' branch for missing isotopes
-
         self.params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
 
     # beta spectrum shape as function of energy
@@ -336,6 +337,7 @@ class BetaEngine:
     def __init__(self, inputlist):
         self.inputlist = inputlist
         self.istplist = {}
+        self.missinglist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
         self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/ENSDFbetaDB.xml')
@@ -350,11 +352,13 @@ class BetaEngine:
         root = tree.getroot()
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
+            Q = float(isotope.attrib['Q'])
             if (ZAI in self.inputlist):
                 #print(str(ZA)+"...")
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
+                
                 betaIstp = {}
                 
                 # Adding missing branches below
@@ -363,7 +367,9 @@ class BetaEngine:
                     sigma_E0 = 0
                     spin_par_changes = 0
                     fraction = 1
-                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac=0, forbiddeness=0., missing=True)
+                    betaIstp[E0] = BetaBranch(Q, Z, A, I, E0, sigma_E0, fraction, sigma_frac=0, forbiddeness=0.)
+                    self.missinglist[ZAI] = betaIstp
+                    continue
 
                 # some isotope contains more than 1 total branches
                 # prepare to normalize
@@ -396,7 +402,7 @@ class BetaEngine:
                         fraction /= fracsum
                         sigma_frac /= fracsum
 
-                    betaIstp[E0] = BetaBranch(Z, A, fraction, I, E0, sigma_E0, sigma_frac, forbiddeness)
+                    betaIstp[E0] = BetaBranch(Q, Z, A, I, E0, sigma_E0, sigma_frac, fraction, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0]):
@@ -413,13 +419,13 @@ class BetaEngine:
                 erange (float): the energy range you want to calculate your spectra to.
             Returns:
                 None
-
-
+                
         """
 
         self.LoadBetaDB(targetDB)
         bins = int(spectRange[1]/binwidths)
 
+        startTiming = timeit.default_timer()
         for ZAI in self.istplist:
             branchSpectrum = np.zeros(bins)
             branchUncertainty = np.zeros(bins)
@@ -428,8 +434,6 @@ class BetaEngine:
                     continue
                 if branch.frac == 0:
                     continue
-                if branch.missing:
-                    print("missing: ", ZAI, E0)
                 branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
 
                 relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
@@ -443,3 +447,31 @@ class BetaEngine:
 
             self.spectralist[ZAI] = branchSpectrum
             self.uncertaintylist[ZAI] = branchUncertainty
+            
+        for ZAI in self.missinglist:
+            branchSpectrum = np.zeros(bins)
+            branchUncertainty = np.zeros(bins)
+            for E0, branch in self.missinglist[ZAI].items():
+                if branchErange[0] > E0 or E0 > branchErange[1]:
+                    continue
+                if branch.frac == 0:
+                    continue
+                branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
+
+                relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
+
+                branch.uncertainty = branch.uncertainty*branch.frac*relativeUnc
+
+                branch.result *= branch.frac
+
+                branchSpectrum += branch.result
+                branchUncertainty += branch.uncertainty
+
+            self.spectralist[ZAI] = branchSpectrum
+            self.uncertaintylist[ZAI] = branchUncertainty
+            
+        endTiming = timeit.default_timer()
+        nBranch = len(self.istplist)+len(self.missinglist)
+        runTime = endTiming-startTiming
+        print("Finished calculating beta spectra of "+ str(nBranch) + " isotopes.")
+        print("Processing time: "+str(runTime)+" seconds")

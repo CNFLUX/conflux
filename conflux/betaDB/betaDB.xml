@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+	<?xml version="1.0" ?>
 <betaDB>
 	<isotope isotope="10">
 		<branch end_point_E="0.782" forbideness="0" fraction="1." sigma_E0="0.0" sigma_frac="0.0"/>

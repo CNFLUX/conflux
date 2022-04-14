@@ -135,8 +135,9 @@ class SumEngine:
             if FPZAI in betaSpectraDB.spectralist:
                 
                 # process missing branches with assumptions or not
-                for branch in betaSpectraDB.istplist[FPZAI].items:
-                    if branch.missing and not processMissing:
+                if not processMissing and FPZAI in betaSpectraDB.missinglist:
+                    for branch in betaSpectraDB.missinglist[FPZAI].items():
+                        print(FPZAI, self.FPYlist[FPZAI].y)
                         self.missingCount += self.FPYlist[FPZAI].y
                         self.missingBranch.append(FPZAI)
                         continue

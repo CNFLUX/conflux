@@ -42,6 +42,7 @@ if __name__ == "__main__":
     #Here, I'm going to plot out the Beta Spectrum for I-134 and save it as Te-134.png
     fig = plt.figure()
     x = np.linspace(0,20,200)
-    plt.errorbar(x, Engine.spectralist[521340], yerr=Engine.uncertaintylist[521340])
+    plt.errorbar(x, Engine.spectralist[180500], yerr=Engine.uncertaintylist[180500])
+    plt.errorbar(x, Engine.spectralist[160430], yerr=Engine.uncertaintylist[160430])
 
     fig.savefig("Te-134.png")
