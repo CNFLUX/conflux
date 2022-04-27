@@ -19,7 +19,7 @@ if __name__ == "__main__":
     #BetaEngine with a specific set of isotopes based off our fission yield engine,
     #whose isotopes we can find in the fissionDB folder.
     Engine = BetaEngine(isoList)
-
+    #Engine.LoadBetaDB()
 
     #You'll notice, if you've looked in the BetaEngine source file, that I haven't
     #specifically used a function to load the Beta Spectrum database. That's because

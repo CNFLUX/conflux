@@ -81,7 +81,7 @@ class VirtualBranch:
         Zfrac_sum = 0
         for ZAI in self.betaIstpList:
             for branch in self.betaIstpList[ZAI]:
-                if branch.E0 >= Elow and branch.E0 <Ehigh:
+                if branch.E0 >= Elow and branch.E0 < Ehigh:
                     frac_sum += branch.frac
                     Afrac_sum += branch.frac*branch.A
                     Zfrac_sum += branch.frac*branch.Z

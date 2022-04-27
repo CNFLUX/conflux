@@ -157,21 +157,22 @@ class XMLedit:
         self.root.appendChild(self.DB)
 
     # beta-decay isotopes
-    def createIsotope(self, isotopeID, Q = '0.0', HL = '0.0'):
+    def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = '0.0'):
         self.isotope = self.root.createElement('isotope')
+        self.isotope.setAttribute('name', str(istpName))
         self.isotope.setAttribute('isotope', str(isotopeID))
         self.isotope.setAttribute('Q', str(Q))
         self.isotope.setAttribute('HL', str(HL))
         self.DB.appendChild(self.isotope)
 
     # decay branches of the isotope
-    def editBranch(self, fraction, end_point_E, forbideness, sigma_frac='0.0', sigma_E0='0.0'):
+    def editBranch(self, fraction, end_point_E, dJpi, sigma_frac='0.0', sigma_E0='0.0'):
         branch = self.root.createElement('branch')
         branch.setAttribute('fraction', str(fraction))
         branch.setAttribute('sigma_frac', str(sigma_frac))
         branch.setAttribute('end_point_E', str(end_point_E))
         branch.setAttribute('sigma_E0', str(sigma_E0))
-        branch.setAttribute('forbideness', str(forbideness))
+        branch.setAttribute('dJpi', str(dJpi))
         self.isotope.appendChild(branch)
 
     def saveXML(self, save_path_file):
@@ -185,6 +186,7 @@ class ParentIstp:
     def __init__(self, line):
         self.A = int(line[:3].strip())
         element = line[3:5].capitalize().strip()
+        self.name = element+line[:3].strip()
         self.Z = int(elementdict[element])
         leveltxt = line[9:19].strip().replace('+X', '')
         if not line[9:19].strip().isdigit():
@@ -198,7 +200,12 @@ class ParentIstp:
 # class to save information of the level before decay
 class DecayLevel:
     def __init__(self, line):
-        self.level = float(line[9:19].strip())/1e3 if is_number(line[9:19]) else 0 #convert to MeV
+        if (is_number(line[9:19].strip())):
+            self.level = float(line[9:19].strip())/1e3 #convert to MeV
+        elif (is_number(line[9:19].strip().replace('+X',''))):
+            self.level = float(line[9:19].strip().replace('+X',''))/1e3
+        else:
+            self.level = 0
         self.d_level = transUncert(line[9:19].strip(), line[19:21].strip())/1e3 if is_number(line[19:21]) else 0
         self.HL = line[39:49]
         self.pi, self.J = convert_J(line[21:39])
@@ -252,7 +259,7 @@ def ENSDFbeta(fileList):
                         isomer = 0
                     ZAI = int(decayparent.Z*1e4 + decayparent.A*10 + isomer)
                     # save the parent isotope information
-                    xmloutput.createIsotope(ZAI, decayparent.Emax, decayparent.HL)
+                    xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL)
                     lastline = line
                     print(lastline)
                 elif MT == "  L":

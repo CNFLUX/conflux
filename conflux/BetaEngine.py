@@ -192,9 +192,8 @@ def neutrino(enu, params):
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
 
-    if (enu<thresh):
-        return result*S(buf.e0-enu, buf.Z)
-    return result
+    belowThresh = enu<thresh   # prepared for a list of comparison
+    return result*(S(buf.e0-enu, buf.Z)**belowThresh)
 
 def electron(ebeta, params):
     buf = params
@@ -205,9 +204,9 @@ def electron(ebeta, params):
     thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
     buf.thresh = thresh
     result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-    if(ebeta>=thresh):
-        return result*S(ebeta,buf.Z)
-    return result
+    
+    aboveThresh = (ebeta>=thresh)   # prepared for a list of comparison
+    return result*(S(ebeta,buf.Z)**aboveThresh)
 
 def integral(nu_spectrum, p, x_low, x_high):
     erg = 0.0
@@ -243,10 +242,10 @@ def integral(nu_spectrum, p, x_low, x_high):
 
     mid = (xh+x_low)/2
     erg = abs(xh-x_low)*function(mid)
+    
     return erg
 
     #print(x_low, p.thresh, x_high, erg[0])
-
 
 # BetaBranch class to save the isotopic information
 class BetaBranch:
@@ -265,11 +264,14 @@ class BetaBranch:
         self.WM = WM
         
         self.params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
+        
+    def Display(self):
+        print("Z: "+str(self.Z)+", A = "+str(self.A)+", Q = "+str(self.Q)+", E0 = " +str(self.E0)+", frac = "+str(self.frac))
 
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
         params = deepcopy(self.params)
-        rangecorrection = x <= self.E0 # prevent out-of-range variable to output insane results
+        rangeCorrect = x <= self.E0 # prevent out-of-range variable to output insane results
 
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, params)
@@ -282,6 +284,7 @@ class BetaBranch:
 
     # calculate the spectrum uncertainty
     def SpectUncert(self, x, nu_spectrum=False):
+        
         numbers = 5
         E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
         newparams = deepcopy(self.params)
@@ -291,16 +294,39 @@ class BetaBranch:
             function = lambda x: neutrino(x, newparams)
         else:
             function = lambda x: electron(x, newparams)
-
+            
         fE0 = function(x)
         fE0 = np.nan_to_num(fE0, nan=0.0)
-        if (fE0.all() < 1e-8):
-            return 0
+        # Commenting out unknown function
+        # if (fE0.all() < 1e-8):
+        #     return 0
 
         grad_E0 = np.gradient(fE0)
-
+        
         return grad_E0[int(numbers/2)]*self.sigma_E0
 
+    # calculate the spectrum uncertainty with MC sampling
+    def SpectUncertMC(self, x, nu_spectrum=False, samples = 30):
+        
+        samples = 50
+        E0range = np.random.normal(self.E0, self.sigma_E0, samples)
+        newparams = deepcopy(self.params)
+        newparams.e0 = E0range
+        print(newparams.e0)
+
+        if (nu_spectrum == True):
+            function = lambda x: neutrino(x, newparams)
+        else:
+            function = lambda x: electron(x, newparams)
+            
+        fE0 = function(x)
+        fE0 = np.nan_to_num(fE0, nan=0.0)
+        # Commenting out unknown function
+        # if (fE0.all() < 1e-8):
+        #     return 0
+        print(fE0)
+        return np.std(fE0)
+        
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False, binwidths=0.1, spectRange=[-1.0, 20.0]):
         bins = int(spectRange[1]/binwidths)
@@ -314,15 +340,26 @@ class BetaBranch:
             lower=binwidths/2.0
 
         # integrating each bin
+        startTiming = timeit.default_timer()
+
         for k in range(0, bins):
             x_low = lower
             x_high = lower+binwidths
             if x_high > self.E0:
                 x_high = self.E0
-            self.result[k] = integral(nu_spectrum, self.params, x_low, x_high) #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
-            self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low)+self.SpectUncert(x_high))/2
+            self.result[k] = abs(x_high-x_low)*(self.BetaSpectrum(x_low, nu_spectrum)+self.BetaSpectrum(x_high, nu_spectrum))/2 #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
+            #self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low, nu_spectrum)+self.SpectUncert(x_high, nu_spectrum))/2
+            #gradUnc = self.uncertainty[k]
+            self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncertMC(x_low, nu_spectrum)+self.SpectUncertMC(x_high, nu_spectrum))/2
+            MCUnc = self.uncertainty[k]
+            print("MCUnc", MCUnc)
             lower+=binwidths
 
+        endTiming = timeit.default_timer()
+        runTime = endTiming-startTiming
+        print("runtime", runTime)
+        
+        # normalizing the spectrum
         norm = self.result.sum()
         if norm <=0:
             self.result =np.zeros(bins)
@@ -330,29 +367,43 @@ class BetaBranch:
             self.result /= norm*binwidths
             self.uncertainty /= norm*binwidths
         return 0
-
+        
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
 # of all tallied branches
+# if inputlist is not given, load the entire betaDB from the default betaDB
 class BetaEngine:
-    def __init__(self, inputlist):
+    def __init__(self, inputlist=None, targetDB=None):
         self.inputlist = inputlist
+        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/ENSDFbetaDB.xml')
+        
+        self.LoadBetaDB(targetDB)   # loadBetaDB automatically
+        
+    def LoadBetaDB(self, targetDB=None):
+        useInputList = True         # test if the engine is defined with an inputlist
+        if self.inputlist == None:
+            print("Loading all beta data from the default betaDB...")
+            self.inputlist = []
+            useInputList = False
+            
+        if targetDB == None:
+            targetDB = self.defaultDB
+        print("Searching DB: "+targetDB+"...")
+        print("Loading spectra of beta branches...")
+
         self.istplist = {}
         self.missinglist = {}
         self.spectralist = {}
         self.uncertaintylist = {}
-        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/ENSDFbetaDB.xml')
-
-    def LoadBetaDB(self, targetDB = None):
-        if targetDB == None:
-            targetDB = self.defaultDB
-        print("Searching DB: "+targetDB+"...")
-        print("Loading spectra of beta branches:")
-
+        
         tree = ET.parse(targetDB)
         root = tree.getroot()
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
             Q = float(isotope.attrib['Q'])
+
+            if not useInputList:
+                self.inputlist.append(ZAI)
+                
             if (ZAI in self.inputlist):
                 #print(str(ZA)+"...")
                 Z = int(ZAI/10000)
@@ -381,7 +432,7 @@ class BetaEngine:
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
                     sigma_E0 = float(branch.attrib['sigma_E0'])
-                    spin_par_changes = (branch.attrib['forbideness'])
+                    spin_par_changes = (branch.attrib['dJpi'])
 
                     # converting spin change to forbidden types
                     ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'], ['3-', '4-'], ['4', '5']]
@@ -436,6 +487,7 @@ class BetaEngine:
                     continue
                 branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
 
+                # TODO:
                 relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
 
                 branch.uncertainty = branch.uncertainty*branch.frac*relativeUnc
