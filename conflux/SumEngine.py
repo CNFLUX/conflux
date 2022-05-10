@@ -143,7 +143,7 @@ class SumEngine:
                         continue
                 
                 self.betaSpectraList[FPZAI] = betaSpectraDB.spectralist[FPZAI]
-                self.betaUncertainty[FPZAI] = betaSpectraDB.uncertaintylist[FPZAI]
+                self.betaUncertainty[FPZAI] = betaSpectraDB.uncertaintyList[FPZAI]
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
                 self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
                 self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
@@ -156,7 +156,6 @@ class SumEngine:
 
         # Uncertainty calculation
         for i in self.FPYlist:
-            sigmai = 0
             for j in self.FPYlist:
                 if i in betaSpectraDB.spectralist and j in betaSpectraDB.spectralist:
                     yi = self.FPYlist[i].y
@@ -167,11 +166,11 @@ class SumEngine:
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
                     
-                    sigmay_ij = self.FPYlist[i].cov[j]
+                    sigmay_ij = yerri*self.FPYlist[i].corr[j]*yerrj
+                    
                     if (i==j):
                         self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj
                     else:
                         self.spectrumUnc += fi*sigmay_ij*fj
-                    
 
         self.spectrumUnc = np.sqrt(self.spectrumUnc)

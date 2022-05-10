@@ -1,4 +1,5 @@
 import sys
+import os
 import argparse
 import numpy as np
 from scipy import constants, special, interpolate, integrate
@@ -183,6 +184,7 @@ class params_t:
         self.thresh = thresh
 
 def neutrino(enu, params):
+    np.seterr(divide='ignore')
     buf = params
     result = 0.
     R= 1.0*FERMI_to_W * nuclear_radius(buf.A)
@@ -193,6 +195,7 @@ def neutrino(enu, params):
     result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
 
     belowThresh = enu<thresh   # prepared for a list of comparison
+    #print("E value: ",buf.e0, "calc: ", result, "stdev: ", np.std(result))
     return result*(S(buf.e0-enu, buf.Z)**belowThresh)
 
 def electron(ebeta, params):
@@ -254,6 +257,7 @@ class BetaBranch:
         self.A = A
         self.I = I
         self.Q = Q
+        self.ZAI=Z*1e4+A*10+I
 
         self.E0 = E0
         self.sigma_E0 = sigma_E0
@@ -265,8 +269,18 @@ class BetaBranch:
         
         self.params = params_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
         
+        self.corr = {E0:1}  # correlation with other branches of the same isotope
+        
+    # display the vital info of branch
     def Display(self):
         print("Z: "+str(self.Z)+", A = "+str(self.A)+", Q = "+str(self.Q)+", E0 = " +str(self.E0)+", frac = "+str(self.frac))
+    
+    # set correlation of this branch fraction and another branch's
+    def SetCorrelation(self, otherBranch, correlation):
+        assert(otherBranch.ZAI == self.ZAI, 'Only set correlation with branches of the same isotope!')
+        if self.E0 == otherBranch.E0:
+            return
+        self.corr[otherBranch.E0] = correlation
 
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
@@ -306,14 +320,12 @@ class BetaBranch:
         return grad_E0[int(numbers/2)]*self.sigma_E0
 
     # calculate the spectrum uncertainty with MC sampling
-    def SpectUncertMC(self, x, nu_spectrum=False, samples = 30):
+    def SpectUncertMC(self, x, nu_spectrum=False, samples = 50):
         
-        samples = 50
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newparams = deepcopy(self.params)
         newparams.e0 = E0range
-        print(newparams.e0)
-
+        
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newparams)
         else:
@@ -324,7 +336,6 @@ class BetaBranch:
         # Commenting out unknown function
         # if (fE0.all() < 1e-8):
         #     return 0
-        print(fE0)
         return np.std(fE0)
         
     # bined beta spectrum
@@ -340,7 +351,7 @@ class BetaBranch:
             lower=binwidths/2.0
 
         # integrating each bin
-        startTiming = timeit.default_timer()
+        # startTiming = timeit.default_timer()
 
         for k in range(0, bins):
             x_low = lower
@@ -350,22 +361,27 @@ class BetaBranch:
             self.result[k] = abs(x_high-x_low)*(self.BetaSpectrum(x_low, nu_spectrum)+self.BetaSpectrum(x_high, nu_spectrum))/2 #abs(x_high-x_low)*(self.BetaSpectrum(x_low)+self.BetaSpectrum(x_high))/2
             #self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncert(x_low, nu_spectrum)+self.SpectUncert(x_high, nu_spectrum))/2
             #gradUnc = self.uncertainty[k]
-            self.uncertainty[k] = abs(x_high-x_low)*(self.SpectUncertMC(x_low, nu_spectrum)+self.SpectUncertMC(x_high, nu_spectrum))/2
-            MCUnc = self.uncertainty[k]
-            print("MCUnc", MCUnc)
+            #print("gradUnc", gradUnc)
+            self.uncertainty[k] = abs(x_high-x_low)*self.SpectUncertMC((x_low+x_high)/2, nu_spectrum)
+            if x_high == self.E0:
+                break
+            #MCUnc = self.uncertainty[k]
+            #print("MCUnc", MCUnc)
             lower+=binwidths
 
-        endTiming = timeit.default_timer()
-        runTime = endTiming-startTiming
-        print("runtime", runTime)
+        # endTiming = timeit.default_timer()
+        # runTime = endTiming-startTiming
+        # print("runtime", runTime)
         
         # normalizing the spectrum
         norm = self.result.sum()
+        #print(self.result, self.uncertainty, norm*binwidths)
         if norm <=0:
             self.result =np.zeros(bins)
         else:
             self.result /= norm*binwidths
             self.uncertainty /= norm*binwidths
+            #print(self.result, self.uncertainty, norm*binwidths)
         return 0
         
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
@@ -374,7 +390,7 @@ class BetaBranch:
 class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None):
         self.inputlist = inputlist
-        self.defaultDB = pkg_resources.resource_filename('conflux', 'betaDB/ENSDFbetaDB.xml')
+        self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
         
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
@@ -393,7 +409,9 @@ class BetaEngine:
         self.istplist = {}
         self.missinglist = {}
         self.spectralist = {}
-        self.uncertaintylist = {}
+        self.branchUncList = {}
+        self.spectUncList = {}
+        self.uncertaintyList = {}
         
         tree = ET.parse(targetDB)
         root = tree.getroot()
@@ -414,21 +432,22 @@ class BetaEngine:
                 
                 # Adding missing branches below
                 if len(isotope) < 1:
-                    E0 = float(isotope.attrib['Q'])
+                    E0 = Q
                     sigma_E0 = 0
                     spin_par_changes = 0
                     fraction = 1
-                    betaIstp[E0] = BetaBranch(Q, Z, A, I, E0, sigma_E0, fraction, sigma_frac=0, forbiddeness=0.)
+                    betaIstp[E0] = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction, sigma_frac=0, forbiddeness=0.)
                     self.missinglist[ZAI] = betaIstp
                     continue
 
-                # some isotope contains more than 1 total branches
+                # some isotopes contain summed branch fraction greater than 1
                 # prepare to normalize
                 fracsum = 0
                 for branch in isotope:
                     fraction = float(branch.attrib['fraction'])
                     fracsum += fraction
 
+                # actually assign values from database to branches
                 for branch in isotope:
                     E0 = float(branch.attrib['end_point_E'])
                     sigma_E0 = float(branch.attrib['sigma_E0'])
@@ -446,14 +465,18 @@ class BetaEngine:
                                     forbideness = firstftypes[j]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
                                     forbideness = i
-
+                    
+                    # assign fraction values to branches
+                    # normalize if greater than one
                     fraction = float(branch.attrib['fraction'])
+                    if fraction == 0:
+                        continue
                     sigma_frac = float(branch.attrib['sigma_frac'])
                     if fracsum > 1:
                         fraction /= fracsum
                         sigma_frac /= fracsum
 
-                    betaIstp[E0] = BetaBranch(Q, Z, A, I, E0, sigma_E0, sigma_frac, fraction, forbiddeness)
+                    betaIstp[E0] = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness)
                 self.istplist[ZAI] = betaIstp
 
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0]):
@@ -479,30 +502,72 @@ class BetaEngine:
         startTiming = timeit.default_timer()
         for ZAI in self.istplist:
             branchSpectrum = np.zeros(bins)
+            spectUncertainty = np.zeros(bins)
             branchUncertainty = np.zeros(bins)
+            totalUncertainty = np.zeros(bins)
+            
+            # obtain the ground state branch info
+            Emax = 0
+            totalFrac = 0
+            GSFrac = 0
+            #GSBranch = None
             for E0, branch in self.istplist[ZAI].items():
-                if branchErange[0] > E0 or E0 > branchErange[1]:
-                    continue
+                totalFrac += branch.frac
+                if E0 > Emax:
+                    Emax = E0
+                if branch.E0 == branch.Q:
+                    GSFrac = branch.frac
+                    GSBranch = deepcopy(branch)
+            restFrac = totalFrac-GSFrac
+            
+            # prepare the correlations between ground state branch and other branches
+            for E0, branch in self.istplist[ZAI].items():
+                
+                for otherE0, otherBranch in self.istplist[ZAI].items():
+                    # define correlation with other branches
+                    # correlation = 0 if not with ground state branc
+                    if E0 == branch.Q and restFrac > 0:
+                        correlation = -1*otherBranch.frac/restFrac
+                        branch.SetCorrelation(otherBranch, correlation)
+                        otherBranch.SetCorrelation(branch, correlation)
+                    elif otherE0 != branch.Q:
+                        branch.SetCorrelation(otherBranch, E0 == otherE0)
+            
+            for E0 in list(self.istplist[ZAI]):
+                branch = self.istplist[ZAI][E0]
                 if branch.frac == 0:
                     continue
                 branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
-
-                # TODO:
-                relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
-
-                branch.uncertainty = branch.uncertainty*branch.frac*relativeUnc
-
-                branch.result *= branch.frac
-
-                branchSpectrum += branch.result
-                branchUncertainty += branch.uncertainty
-
+                if branchErange[0] > E0 or E0 > branchErange[1]:
+                    continue
+                branchSpectrum += branch.result*branch.frac
+                spectUncertainty += branch.uncertainty*branch.frac
+            
+            for E0i, branchi in self.istplist[ZAI].items():
+                si = branchi.result
+                di = branchi.sigma_frac
+                for E0j, branchj in self.istplist[ZAI].items():
+                    sj = branchj.result
+                    dj = branchj.sigma_frac
+                    corr_bij = branchi.corr[E0j]
+                    cov_bij = di*corr_bij*dj
+                    sigmab_ij = si*cov_bij*sj
+                    branchUncertainty += sigmab_ij
+                    if (E0i==E0j):
+                        totalUncertainty += (branchi.uncertainty*branchi.frac)**2 + sigmab_ij
+                    else:
+                        totalUncertainty += sigmab_ij
+            branchUncertainty = np.sqrt(branchUncertainty)
+            totalUncertainty = np.sqrt(totalUncertainty)
+                
             self.spectralist[ZAI] = branchSpectrum
-            self.uncertaintylist[ZAI] = branchUncertainty
+            self.spectUncList[ZAI] = spectUncertainty
+            self.branchUncList[ZAI] = branchUncertainty
+            self.uncertaintyList[ZAI] = totalUncertainty
             
         for ZAI in self.missinglist:
             branchSpectrum = np.zeros(bins)
-            branchUncertainty = np.zeros(bins)
+            spectUncertainty = np.zeros(bins)
             for E0, branch in self.missinglist[ZAI].items():
                 if branchErange[0] > E0 or E0 > branchErange[1]:
                     continue
@@ -512,15 +577,16 @@ class BetaEngine:
 
                 relativeUnc = np.sqrt((branch.uncertainty/branch.frac)**2+(branch.sigma_frac/branch.frac)**2)
 
-                branch.uncertainty = branch.uncertainty*branch.frac*relativeUnc
+                combinedUnc = branch.uncertainty*branch.frac*relativeUnc
 
                 branch.result *= branch.frac
 
                 branchSpectrum += branch.result
-                branchUncertainty += branch.uncertainty
+                spectUncertainty += branch.frac*branch.uncertainty
 
             self.spectralist[ZAI] = branchSpectrum
-            self.uncertaintylist[ZAI] = branchUncertainty
+            self.spectUncList[ZAI] = spectUncertainty
+            self.uncertaintyList[ZAI] = spectUncertainty
             
         endTiming = timeit.default_timer()
         nBranch = len(self.istplist)+len(self.missinglist)

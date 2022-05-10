@@ -4,6 +4,7 @@
 
 # universal modules
 import sys
+import os
 import csv
 import numpy as np
 from os import listdir
@@ -52,7 +53,7 @@ class FPNuclide:
 
     # Method to add covariance matrices together
     def AddCovariance(self, newNuclide):
-        print("ADDED COV MAT")
+        print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
             if key not in self.cov:
                 self.cov[key] = newNuclide[key]
@@ -69,12 +70,11 @@ class FissionIstp:
         self.IFPY = {}  # dictionary of independent fission yields {"FPZAI", FPNuclide}
 
     # method that load xml database of FPY and save nuclide info in dictionaries.
-    def LoadFissionDB(self, DBname = None):
+    def LoadFissionDB(self, DBname = None, defaultDB='ENDF'):
         if DBname == None:
-            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print('Reading FPY DB from folder: '+DBpath+'...')
             fileList = listdir(DBpath)
-
             istpfound = False
             for filename in fileList:
                 namecache = filename.split('.')
@@ -124,19 +124,19 @@ class FissionIstp:
     # Method to read the prepackaged covariance csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCovariance(self, DBpath = None):
+    def LoadCovariance(self, DBpath = None, defaultDB='ENDF'):
         if DBpath == None:
-            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
         assert(DBpath)
         istpfound = False
-        e_neutron = {'Thermal': 0, 'Fast': 0.5, 'High': 14}
+        e_neutron = {'T': 0, 'F': 0.5, 'H': 14}
         for filename in fileList:
             namecache = filename.split('.')
             if namecache[-1] != 'csv':
                 continue
-            if ("cov" not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+            if ("normed_cov" not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
                 continue
             istpfound = True
 
@@ -182,14 +182,14 @@ class FissionIstp:
     # Method to read the prepackaged correlation csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCorrelation(self, DBpath = None, E_energy=0):
+    def LoadCorrelation(self, DBpath = None, E_energy=0, defaultDB='ENDF'):
         if DBpath == None:
-            DBpath = pkg_resources.resource_filename("conflux", "fissionDB/")
+            DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading correlation matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
         assert(DBpath)
         istpfound = False
-        e_neutron = {'Thermal': 0, 'Fast': 0.5, 'High': 14}
+        e_neutron = {'T': 0, 'F': 0.5, 'H': 14}
         for filename in fileList:
             namecache = filename.split('.')
             if namecache[-1] != 'csv':

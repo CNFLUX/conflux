@@ -18,7 +18,6 @@ setup(
 
     packages=find_packages(),
     package_data={
-        "conflux": ["fissionDB/*", "betaDB/*", "conversionDB/*"],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
