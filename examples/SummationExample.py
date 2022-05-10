@@ -10,13 +10,17 @@ from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(defaultDB = 'JEFF')
-    U235.LoadCorrelation(defaultDB = 'JEFF')
+    U235.LoadFissionDB()
+    U235.LoadCorrelation()
+
+    Pu239 = FissionIstp(94, 239)
+    Pu239.LoadFissionDB()
+    Pu239.LoadCorrelation()
     #U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
-    #model.AddContribution(isotope=U234, Ei = 0.5, fraction=1)
+    model.AddContribution(isotope=U235, Ei = 0, fraction=0.5)
+    model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.5)
     #model.AddContribution(isotope=U233, Ei = 0, fraction=1)
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
@@ -63,7 +67,7 @@ if __name__ == "__main__":
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_JEFF.png")
+    fig.savefig("235U_241Pu.png")
     
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])

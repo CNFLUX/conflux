@@ -166,7 +166,7 @@ class SumEngine:
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
                     
-                    sigmay_ij = yerri*self.FPYlist[i].corr[j]*yerrj
+                    sigmay_ij = self.FPYlist[i].cov[j]
                     
                     if (i==j):
                         self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj

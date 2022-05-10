@@ -53,12 +53,12 @@ class FPNuclide:
 
     # Method to add covariance matrices together
     def AddCovariance(self, newNuclide):
-        print("Added FPY covaraince matrix")
+        # print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
             if key not in self.cov:
-                self.cov[key] = newNuclide[key]
+                self.cov[key] = newNuclide.cov[key]
             else:
-                self.cov[key] += newNuclide[key]
+                self.cov[key] += newNuclide.cov[key]
             #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
