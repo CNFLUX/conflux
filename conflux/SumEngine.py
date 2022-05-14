@@ -125,25 +125,24 @@ class SumEngine:
         self.spectrumUnc = np.zeros(bins)   # total uncertainty
         self.modelUnc = np.zeros(bins)
         self.yieldUnc = np.zeros(bins)
-        self.bins = np.arange(0, spectRange[1], binwidths)
+        rangelow = spectRange[0] if spectRange[0] > 0 else 0
+        self.bins = np.arange(rangelow, spectRange[1], binwidths)
         self.missingBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
 
         for FPZAI in self.FPYlist:
             self.totalYield += self.FPYlist[FPZAI].y
-            if FPZAI in betaSpectraDB.spectralist:
+            if FPZAI in betaSpectraDB.istplist:
                 
                 # process missing branches with assumptions or not
-                if not processMissing and FPZAI in betaSpectraDB.missinglist:
-                    for branch in betaSpectraDB.missinglist[FPZAI].items():
-                        print(FPZAI, self.FPYlist[FPZAI].y)
-                        self.missingCount += self.FPYlist[FPZAI].y
-                        self.missingBranch.append(FPZAI)
-                        continue
+                if not processMissing and betaSpectraDB.istplist[FPZAI].missing:
+                    self.missingCount += self.FPYlist[FPZAI].y
+                    self.missingBranch.append(FPZAI)
+                    continue
                 
-                self.betaSpectraList[FPZAI] = betaSpectraDB.spectralist[FPZAI]
-                self.betaUncertainty[FPZAI] = betaSpectraDB.uncertaintyList[FPZAI]
+                self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
+                self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].totalUnc
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
                 self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
                 self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
@@ -157,7 +156,7 @@ class SumEngine:
         # Uncertainty calculation
         for i in self.FPYlist:
             for j in self.FPYlist:
-                if i in betaSpectraDB.spectralist and j in betaSpectraDB.spectralist:
+                if i in self.betaSpectraList and j in self.betaSpectraList:
                     yi = self.FPYlist[i].y
                     yerri = self.FPYlist[i].yerr
                     fi = self.betaSpectraList[i]
@@ -165,10 +164,11 @@ class SumEngine:
                     yj = self.FPYlist[j].y
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
-                    
+            
                     sigmay_ij = self.FPYlist[i].cov[j]
                     
                     if (i==j):
+                        #print(i, sigmay_ij)
                         self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj
                     else:
                         self.spectrumUnc += fi*sigmay_ij*fj

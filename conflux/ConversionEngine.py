@@ -65,14 +65,15 @@ class VirtualBranch:
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
         for nuclide in fisIstp.CFPY[Ei]:
-            if nuclide.y == 0: continue
-            FPZAI = int(nuclide.Z*10000+nuclide.A*10+nuclide.isomer)
+            fpNuclide = fisIstp.CFPY[Ei][nuclide]
+            if fpNuclide.y == 0: continue
+            FPZAI = int(fpNuclide.Z*10000+fpNuclide.A*10+fpNuclide.isomer)
 
             if FPZAI not in self.FPYlist:
-                self.FPYlist[FPZAI] = nuclide
+                self.FPYlist[FPZAI] = fpNuclide
             else:
-                self.FPYlist[FPZAI].y += nuclide.y
-                self.FPYlist[FPZAI].yerr += nuclide.yerr
+                self.FPYlist[FPZAI].y += fpNuclide.y
+                self.FPYlist[FPZAI].yerr += fpNuclide.yerr
 
     # function to precisely calculate average Z, A value of the virtual branch
     def CalcZAavg(self, Elow, Ehigh):
@@ -81,21 +82,22 @@ class VirtualBranch:
         Zfrac_sum = 0
         for ZAI in self.betaIstpList:
             for branch in self.betaIstpList[ZAI]:
-                if branch.E0 >= Elow and branch.E0 < Ehigh:
-                    frac_sum += branch.frac
-                    Afrac_sum += branch.frac*branch.A
-                    Zfrac_sum += branch.frac*branch.Z
+                betaBranch = self.betaIstpList[ZAI][branch]
+                if betaBranch.E0 >= Elow and betaBranch.E0 < Ehigh:
+                    frac_sum += betaBranch.frac
+                    Afrac_sum += betaBranch.frac*betaBranch.A
+                    Zfrac_sum += betaBranch.frac*betaBranch.Z
         self.Aavg = Afrac_sum/frac_sum
         self.Zavg = Zfrac_sum/frac_sum
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
         return virtualbata.BetaSpectrum(x)*contirbute
 
     # define the theoretical neutrino spectrum shape
     def NueSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
         return virtualbata.BetaSpectrum(x, nu_spectrum=True)*contribute
 
     # function that fit the reference beta spectrum with virtual brances

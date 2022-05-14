@@ -53,15 +53,14 @@ if __name__ == "__main__":
     
     result.Clear()
 
-
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.fill_between(result.bins, summed_spect+summed_err, summed_spect-summed_err, alpha=.5, linewidth=0)
     ax.fill_between(result.bins, summed_spect+summed_model_err, summed_spect-summed_model_err, alpha=.5, linewidth=0)
-    ax.plot(result.bins, summed_spect) #, label="w/o miss info")
-    #ax.plot(result.bins, miss_spect, label="w/ miss info")
+    ax.plot(result.bins, summed_spect, label="w/o miss info")
+    # ax.plot(result.bins, miss_spect, label="w/ miss info")
     # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
     # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
@@ -77,7 +76,7 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    fig.savefig("235Missing.png")
+    fig.savefig("235_239_Missing.png")
 
 
     with open("Commercial.csv", "w") as output:
