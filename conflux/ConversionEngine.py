@@ -7,7 +7,9 @@ import sys
 import csv
 import numpy as np
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
+from copy import deepcopy
+import timeit
+
 
 # local modules
 from conflux.BetaEngine import BetaEngine, BetaBranch
@@ -52,15 +54,18 @@ class VirtualBranch:
     def __init__(self, fisIstp, Ei = 0):
         self.Zavg = 47  # rough avg of Z across all energy
         self.Aavg = 117 # rough avg of A across all energy
+        self.fisIstp = fisIstp
 
         # load FPY of target fission isotope
         self.FPYlist = {}
-        self.LoadFPYList(fisIstp, Ei)
+        if (not self.FPYlist):
+            self.LoadFPYList(fisIstp, Ei)
 
         # load FPY of target fission isotope
-        betaSpectra = BetaEngine(self.FPYlist)
-        betaSpectra.LoadBetaDB()
-        self.betaIstpList = betaSpectra.istplist
+        betaEngine = BetaEngine(self.FPYlist)
+        
+        betaEngine.LoadBetaDB()
+        self.istplist = betaEngine.istplist
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
@@ -76,29 +81,25 @@ class VirtualBranch:
                 self.FPYlist[FPZAI].yerr += fpNuclide.yerr
 
     # function to precisely calculate average Z, A value of the virtual branch
-    def CalcZAavg(self, Elow, Ehigh):
+    def CalcZAavg(self, Elow, Ehigh, missing=False):
         frac_sum = 0
         Afrac_sum = 0
         Zfrac_sum = 0
-        for ZAI in self.betaIstpList:
-            for branch in self.betaIstpList[ZAI]:
-                betaBranch = self.betaIstpList[ZAI][branch]
-                if betaBranch.E0 >= Elow and betaBranch.E0 < Ehigh:
-                    frac_sum += betaBranch.frac
-                    Afrac_sum += betaBranch.frac*betaBranch.A
-                    Zfrac_sum += betaBranch.frac*betaBranch.Z
+        for ZAI in self.istplist:
+            betaIstp = self.istplist[ZAI]
+            if not missing and betaIstp.missing:
+                continue
+            if betaIstp.Q >= Elow and betaIstp.Q < Ehigh:
+                frac_sum += self.FPYlist[ZAI].y
+                Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
+                Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
         self.Aavg = Afrac_sum/frac_sum
         self.Zavg = Zfrac_sum/frac_sum
 
     # define the theoretical beta spectrum shape
-    def BetaSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
-        return virtualbata.BetaSpectrum(x)*contirbute
-
-    # define the theoretical neutrino spectrum shape
-    def NueSpectrum(self, x, E0, contribute, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, forbiddeness=forbiddeness, WM=WM)
-        return virtualbata.BetaSpectrum(x, nu_spectrum=True)*contribute
+    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False, forbiddeness = 0, WM = 0.0047):
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, frac = contribute, sigma_frac = 0, forbiddeness=forbiddeness, WM=WM)
+        return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
 
     # function that fit the reference beta spectrum with virtual brances
     def FitData(self, betadata, slicesize):
@@ -106,16 +107,18 @@ class VirtualBranch:
         self.E0 = {}
         self.Zlist = {}
         self.Alist = {}
+        self.slicesize = slicesize
         # fill the sub lists as cached slices
-        subx = []
-        suby = []
-        subyerr = []
+        subx = [] # sublist x values
+        suby = [] # sublist y values
+        subyerr = [] # sublist uncertainty
         xhigh = betadata.x[-1]
         datacache = np.copy(betadata.y) # preserve the data
-        for it in range(len(betadata.x)-1, 0, -1):
-            x = betadata.x[it]
-
-            if x < xhigh - slicesize:
+        for it, x in reversed(list(enumerate(betadata.x))):
+            if x < xhigh - slicesize or x == betadata.x[0]:
+                subx.append(x)
+                suby.append(datacache[it])
+                subyerr.append(betadata.yerr[it])
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx) :
                     self.CalcZAavg(xhigh-slicesize, xhigh)
@@ -128,16 +131,14 @@ class VirtualBranch:
                     comparison[comparison < 0] = np.inf
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
-
-                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, p0 = init_guess, sigma=subyerr, absolute_sigma=True, bounds=(0, [xhigh*1.5, limit]))
+                    
+                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, p0 = init_guess, absolute_sigma=True, bounds=(0, [xhigh*1.5, limit]))
                     self.contribute[xhigh] = popt[1]
                     self.E0[xhigh] = popt[0]
 
                     # subtract the best fit spectrum from beta data
                     for i in range(len(betadata.x)):
                         datacache[i] -= self.BetaSpectrum(betadata.x[i], popt[0], popt[1])
-
-                    #TODO uncertainty process
 
                     # reset cached slices
                     subx = []
@@ -155,9 +156,31 @@ class VirtualBranch:
         result = 0
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
-                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, E0=self.E0[s], sigma_E0=0, forbiddeness=0, WM=0.0047)
-                result += vb.BetaSpectrum(x, nu_spectrum = nu_spectrum)
+                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, Q = self.E0[s], E0=self.E0[s], sigma_E0=0, sigma_frac=0, forbiddeness=0, WM=0.0047)
+                result += vb.BetaSpectrum(x, nu_spectrum)*vb.frac
+            elif sum(result*x) == 0:
+                return result*x
         return result
+    
+    def Covariance(self, betadata, x, samples = 1000, thresh = 0, nu_spectrum = True):
+        result = []
+        print('Calculating covariance matrix...')
+        startTiming = timeit.default_timer()
+
+        for i in range(0, samples):
+            toy = deepcopy(betadata)
+            for it in range(len(betadata.x)-1, 0, -1):
+                toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
+                
+            vbnew = deepcopy(self)
+            vbnew.FitData(toy, vbnew.slicesize)
+            
+            result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
+        endTiming = timeit.default_timer()
+        runTime = endTiming-startTiming
+        print("Finished calculating covairance matrix of "+ str(samples) + " samples.")
+        print("Processing time: "+str(runTime)+" seconds")
+        return np.cov(np.transpose(result))
 
 # class that search for best fit vertual branch and calculate total neutrino flux
 class ConversionEngine:
@@ -181,19 +204,6 @@ class ConversionEngine:
             vbnew = VirtualBranch(self.fisIstp[istp])
             vbnew.FitData(self.betadata[istp], slicesize)
             self.vblist[istp] = vbnew
-
-    # Draw plots to test output.
-    def DrawVB(self, name, figname, summing = True, setlog = True):
-        print("Drawing spectrum...")
-        fig = plt.figure()
-
-        xval = np.linspace(0., 10., 200)
-        #plt.errorbar(self.betadata[name].x, self.vblist[name].SumBranches(self.betadata[name].x, True))
-        # for i in range(0, 20):
-        #     print(self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))
-        #     plt.errorbar(xval, self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
-        if setlog: plt.yscale('log')
-        plt.errorbar(self.betadata[name].x, self.betadata[name].y, self.betadata[name].yerr, label='beta data')
-        plt.errorbar(xval, self.vblist[name].SumBranches(xval, nu_spectrum = False))
-
-        fig.savefig(figname)
+    
+        
+    

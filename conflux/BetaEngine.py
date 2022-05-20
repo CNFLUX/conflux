@@ -295,7 +295,7 @@ class BetaBranch:
 
         result = function(x)
         result = np.nan_to_num(result, nan=0.0)
-        return result
+        return result*rangeCorrect
 
     # calculate the spectrum uncertainty
     def SpectUncert(self, x, nu_spectrum=False):
@@ -608,7 +608,9 @@ class BetaEngine:
             None
                 
         """
-        bins = int(spectRange[1]/binwidths)
+        spectLow = spectRange[0] if spectRange[0] > 0 else 0
+        spectHigh = spectRange[1]
+        self.bins = np.arange(spectLow, spectHigh, binwidths)
 
         startTiming = timeit.default_timer()
         istpCount = 0

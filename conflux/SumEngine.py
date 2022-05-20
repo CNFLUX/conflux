@@ -164,11 +164,14 @@ class SumEngine:
                     yj = self.FPYlist[j].y
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
-            
-                    sigmay_ij = self.FPYlist[i].cov[j]
+                    
+                    # if covariance matrix were not loaded, make cov diagonal variance
+                    if not self.FPYlist[i].cov[j]:
+                        sigmay_ij = yerri*yerri if i == j else 0
+                    else:
+                        sigmay_ij = self.FPYlist[i].cov[j]
                     
                     if (i==j):
-                        #print(i, sigmay_ij)
                         self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj
                     else:
                         self.spectrumUnc += fi*sigmay_ij*fj
