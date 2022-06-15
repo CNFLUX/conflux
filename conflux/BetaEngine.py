@@ -11,13 +11,15 @@ import timeit
 
 from conflux.bsg.Constants import *
 from conflux.bsg.SpectralFunctions import *
+from conflux.bsg.Functions import *
+from conflux.bsg.Screening import *
 
 #########################################
 # Final neutrino and antineutrino spectra
 
 def electron(ebeta, p):
     result = 0.
-    W = ebeta/ELECTRON_MASS_C2 + 1
+    W = ebeta/ELECTRON_MASS_MEV + 1
     result = (phase_space(W, **p)
             *fermi_function(W, **p)
             *finite_size_L0(W, **p)
@@ -27,7 +29,7 @@ def electron(ebeta, p):
             *atomic_screening(W, **p)
             )
 
-    if parameters['L'] == 0:
+    if p['L'] == 0:
         result *= shape_factor_gamow_teller(W, **p)
     else:
         result *= shape_factor_unique_forbidden(W, **p)
@@ -36,7 +38,7 @@ def electron(ebeta, p):
 
 def neutrino(enu, p):
     result = 0.
-    Wv = enu/ELECTRON_MASS_C2 + 1
+    Wv = enu/ELECTRON_MASS_MEV + 1
     result = (phase_space(Wv, **p)
             *fermi_function(Wv, **p)
             *finite_size_L0(Wv, **p)
@@ -46,7 +48,7 @@ def neutrino(enu, p):
             *atomic_screening(Wv, **p)
             )
 
-    if parameters['L'] == 0:
+    if p['L'] == 0:
         result *= shape_factor_gamow_teller(Wv, **p)
     else:
         result *= shape_factor_unique_forbidden(Wv, **p)
@@ -111,8 +113,8 @@ class BetaBranch:
         self.Parameters = {
             'Z': Z,
             'A': A,
-            'W0': E0/ELECTRON_MASS_C2 + 1,
-            'R': getEltonRadius(A) * 1e-15 / NATURAL_LENGTH,
+            'W0': E0/ELECTRON_MASS_MEV + 1,
+            'R': getEltonNuclearRadius(A) * 1e-15 / NATURAL_LENGTH,
             'L': forbiddeness,
             'c': 1.0,
             'b': bAc*A,

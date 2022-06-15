@@ -94,7 +94,7 @@ def sirlin_g(W, W0, **kwargs):
 
     beta = np.sqrt(W**2-1)/W
 
-    g[mask] = (3*np.log(PROTON_MASS_C2/ELECTRON_MASS_C2)
+    g[mask] = (3*np.log(PROTON_MASS_W)
         -3./4.
         +4./beta*(-1*spence(1-(2*beta/(1+beta))))
         +4*(np.arctanh(beta)/beta-1)*((W0-W)/(3*W)-3/2+np.log(2*(W0-W)))
@@ -121,7 +121,7 @@ def radiative_correction_o2(W, Z, R, **kwargs):
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    M = NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = NUCLEON_MASS_W
     L = np.sqrt(10)/R
 
     gE = 0.5772
@@ -190,7 +190,7 @@ def radiative_correction(W, Z, W0, R, **kwargs):
     o3 = radiative_correction_o3(Z, W, W0, R)
     L = radiative_correction_L(W0)
 
-    return ((1+o1-ALPHA/2/np.pi*3*np.log(PROTON_MASS_C2/ELECTRON_MASS_C2/W0))
+    return ((1+o1-ALPHA/2/np.pi*3*np.log(PROTON_MASS_W/W0))
             *(L+o2+o3))
 
 def radiative_correction_neutrino(Wv, W0, **kwargs):
@@ -210,7 +210,7 @@ def radiative_correction_neutrino(Wv, W0, **kwargs):
 
     r[mask] = (1
             +ALPHA/2/np.pi
-            *(3*np.log(PROTON_MASS_C2/ELECTRON_MASS_C2)+23/4
+            *(3*np.log(PROTON_MASS_W)+23/4
                 -8/beta*spence(1-(2*beta)/(1+beta))
                 +8*(np.arctanh(beta)/beta-1)*np.log(2*W*beta)
                 +4*np.arctanh(beta)/beta*((7+3*beta**2)/8-2*np.arctanh(beta))))
@@ -224,7 +224,7 @@ def recoil_fermi(W, W0, A, **kwargs):
     :param A: Mass number (protons + neutrons) of the nuclear state
 
     """
-    M = A*NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A*NUCLEON_MASS_W
     M2 = M**2
 
     Vr0 = W0 * W0 / 2. / M2 - 11. / 6. / M2
@@ -248,7 +248,7 @@ def recoil_gamow_teller(W, W0, A, **kwargs):
     :param A: Mass number (protons + neutrons) of the nuclear state
 
     """
-    M = A*NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A*NUCLEON_MASS_W
     M2 = M**2
 
     Ar0 = -2. * W0 / 3. / M - W0 * W0 / 6. / M2 - 77. / 18. / M2
@@ -273,7 +273,7 @@ def recoil_Coulomb_fermi(W, Z, W0, A, **kwargs):
     :param A: Mass number (protons + neutrons) of the nuclear state
 
     """
-    M = A*NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A*NUCLEON_MASS_W
     p = np.sqrt(W**2-1)
 
     return (1
@@ -291,7 +291,7 @@ def recoil_Coulomb_gamow_teller(W, Z, W0, A, **kwargs):
     """
     beta_type = Z/abs(Z)
 
-    M = A*NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A*NUCLEON_MASS_W
     p = np.sqrt(W**2-1)
 
     return (1
@@ -334,7 +334,7 @@ def shape_factor_gamow_teller(W, Z, W0, R, A, b, c, d, Lambda, **kwargs):
     Form factors are in Holstein notation and that of Hayen et al., RMP 90 (2018) 015008
 
     """
-    M = A*NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A*NUCLEON_MASS_W
     bt = Z/abs(Z)
 
     L = Lambda
@@ -428,7 +428,7 @@ def atomic_mismatch(W, Z, W0, A, **kwargs):
     K = -0.872 + 1.270 * np.power(abs(Z), 0.097) + 9.062e-11 * np.power(abs(Z), 4.5)
     beta = np.sqrt(W**2-1)/W
     l = 1.83E-3 * K * Z / beta
-    M = A * NUCLEON_MASS_C2/ELECTRON_MASS_C2
+    M = A * NUCLEON_MASS_W
     vR = np.sqrt(1 - M * M / (M * M + (W0 * W0 - 1) / 4.))
     psi2 = 1 + 2 * ALPHA / beta * (np.arctan(1 / l) - l / 2 / (1 + l * l))
     C0 = -ALPHA**3*Z / beta * l / (1 + l * l) / psi2 #CHECK ALPHA power

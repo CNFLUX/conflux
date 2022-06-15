@@ -11,3 +11,9 @@ NUCLEON_MASS_W = NUCLEON_MASS_EV/(1.0*ELECTRON_MASS_EV)
 PROTON_MASS_W = PROTON_MASS_EV/(1.0*ELECTRON_MASS_EV)
 NATURAL_LENGTH = (constants.hbar*constants.speed_of_light/constants.e)/ELECTRON_MASS_EV
 ALPHA = constants.alpha
+
+####################
+# Nucleon coupling constants
+
+GA = 1.27
+GM = 4.706
