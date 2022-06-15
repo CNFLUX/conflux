@@ -159,7 +159,7 @@ class BetaBranch:
         numbers = 5
         E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
         newParameters = deepcopy(self.Parameters)
-        newParameters.e0 = E0range
+        newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
 
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newParameters)
@@ -181,7 +181,7 @@ class BetaBranch:
 
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
-        newParameters.e0 = E0range
+        newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
 
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newParameters)
