@@ -2,214 +2,56 @@ import sys
 import os
 import argparse
 import numpy as np
-from scipy import constants, special, interpolate, integrate
+from scipy import special, interpolate, integrate
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
 import pkg_resources
 import timeit
 
-######################
-# Declaring constants
-
-ELECTRON_MASS_MEV = constants.m_e/constants.eV*constants.speed_of_light**2/1E6
-ELECTRON_MASS_EV = constants.m_e/constants.eV*constants.speed_of_light**2
-PROTON_MASS_EV = constants.m_p/constants.eV*constants.speed_of_light**2
-NUCLEON_MASS_EV = (constants.m_p+constants.m_n)/2.0/constants.eV*constants.speed_of_light**2
-NUCLEON_MASS_W = NUCLEON_MASS_EV/(1.0*ELECTRON_MASS_EV)
-PROTON_MASS_W = PROTON_MASS_EV/(1.0*ELECTRON_MASS_EV)
-FERMI_to_W= 1e-15/(constants.hbar*constants.speed_of_light/constants.e)*ELECTRON_MASS_EV
-
-################
-# Fermi theory
-def nuclear_radius(A):
-    result = 1.121*pow(A,1/3.0)+2.426*pow(A,-1/3.0)-6.614/A
-    return result
-
-WO = lambda energy: energy/(1.0*ELECTRON_MASS_MEV) + 1.0
-
-p = lambda W: np.sqrt(W**2 - 1.)
-
-y = lambda W, Z: 1.0*Z*W/p(W)*constants.fine_structure
-
-gamma = lambda Z: np.sqrt(1.0 - (constants.fine_structure*Z*1.0)**2)
-
-phasespace = lambda W, W0: p(W)*W*(W0-W)*(W0-W)
-
-def F(y, gamma, p, R):
-    result = 0.
-    res = special.loggamma(gamma+y*1j)
-    absgamma2= np.exp(2*res.real)
-    g2g = special.gamma(2*gamma+1)
-    result = 2*(gamma+1)*absgamma2*np.exp(y*np.pi)/(pow(2*p*R,(2*(1-gamma)))*g2g**2)
-    return result
-
-###############
-# Finite size
-
-l0dat = [[0.115, -1.8123, 8.2498, -11.223, -14.854, 32.086],
-		    [-0.00062, 0.007165, 0.01841, -0.53736, 1.2691, -1.5467],
-		    [0.02482, -0.5975, 4.84199, -15.3374, 23.9774, -12.6534],
-		    [-0.14038, 3.64953,-38.8143,172.1368,-346.708, 288.7873],
-		    [0.008152,-1.15664,49.9663,-273.711,657.6292, -603.7033],
-		    [1.2145, -23.9931,149.9718,-471.2985, 662.1909,-305.6804],
-		    [-1.5632,33.4192,-255.1333,938.5297,-1641.2845,1095.358]]
-
-def L0(W, Z, R, gamma):
-    result = 0.
-    alpha = constants.fine_structure
-    result = 1. + (13/60.)*(alpha*Z)*(alpha*Z) - (W*R*alpha*Z*(41 - 26*gamma))/(15*(2*gamma - 1)) - (alpha*Z*R*gamma*(17 - 2*gamma))/(30*W*(2*gamma -1)) - 0.41*(R-0.0164)*pow(alpha*Z,4.5);
-    return result
-
-def af(j0, Z):
-    j = j0+1
-    result = 0.
-    for i in range(0, 6):
-        result += l0dat[j][i]*pow(Z*constants.fine_structure, i+1.0)
-    return result
-
-def L0b(W, Z, R):
-    result = 0.
-    for k in range(0, 6):
-        result += af(k,Z)*pow(W*R,k)
-    result=result+af(-1,Z)*R/W;
-    return result
-
-######################
-# Screening Correction
-#TODO: build a screening effect database to replace
-
-Wb = lambda energy, V0: WO(energy)-V0
-
-nn_energy =[1,8,13,16,23,27,29,49,84,92]
-nn_mfp=[1,1.42,1.484,1.497,1.52,1.544,1.561,1.637,1.838,1.907]
-nn_spline = interpolate.InterpolatedUnivariateSpline(nn_energy,nn_mfp)
-
-def NN(Z):
-    return nn_spline(Z)
-
-def V0(Z):
-    return NN(Z-1)*constants.fine_structure**2*pow(Z-1, 4/3.)
-
-def S(energy, Z):
-    result = 0.
-    result = (Wb(energy,V0(Z))/WO(energy))*pow(p(Wb(energy,V0(Z)))/p(WO(energy)),2*gamma(Z)-1)*np.exp(-np.pi*(y(WO(energy),Z)-y(Wb(energy,V0(Z)),Z)))
-    res = special.loggamma((gamma(Z) + 1j*y(Wb(energy,V0(Z)),Z)))
-    absgamma2b= np.exp(2*res.real)
-    res = special.loggamma((gamma(Z) + 1j*y(WO(energy),Z)))
-    absgamma2= np.exp(2*res.real)
-    result = result*absgamma2b/absgamma2
-    return result
-
-#####################
-# Shape Corrections
-
-def CC(R, Z, W, W0):
-    result = 0.
-    alpha = constants.fine_structure*1.0
-    result += (-(233/630.0))*(alpha*Z)*(alpha*Z) - (1/5.0)*(W0*R)*(W0*R) + (2.0/35)*W0*R*alpha*Z
-    result += W*((-(21/35.0))*R*alpha*Z + (4*W0*R*R)/9.0)
-    result += -((4*R*R)/9.0)*W*W
-    return result+1
-
-###########################
-# QED radiative corrections
-
-def G(W, W0):
-    result = 0.
-    beta = p(W)/W
-    result += 3*np.log(NUCLEON_MASS_W)-3/4.0+4*(np.arctanh(beta)/beta-1.0)*((W0-W)/(3*W)-3/2.0+np.log(2*(W0-W)))
-    result += (4.0*special.spence(1-(2*beta)/(1+ beta)))/beta
-    result += (np.arctanh(beta)*(2.0*(1.0+beta**2)+(W0-W)*(W0-W)/(6.0*W**2)-4.0*np.arctanh(beta)))/beta
-    result = result*constants.fine_structure/(2.0*np.pi)+1.0
-    return result
-
-def GN(W):
-    result=0.
-    beta=np.sqrt(W*W-1.0)/W
-    result += 3.0*np.log(PROTON_MASS_W)+23.0/4.0-8.0/beta * special.spence(1-2.0 * beta/(1+beta))
-    result += 8.0*(np.arctanh(beta)/beta-1.0)*np.log(2.0*W*beta)
-    result += 4.0*np.arctanh(beta)/beta*((7.0+3.0*beta*beta)/8.0-2.0*np.arctanh(beta))
-    result = result*constants.fine_structure/(2.0*np.pi)+1.0
-    return result
-
-#######################
-# Forbidden shapes
-
-def forbidden(W, W0, WM, ftype):
-    p1 = p(W)
-    pn = W0-W
-    result = 1.0
-    enu = pn*ELECTRON_MASS_MEV*1.0
-    ee = W*ELECTRON_MASS_MEV*1.0
-    beta = p1/W
-    shape = 0.
-    wm = 0.
-    pe = np.sqrt(ee**2 - ELECTRON_MASS_MEV**2*1.0)
-
-    if ((ftype==1) or (ftype==-2)): # first unique, 2nd non-unique
-        result = (pn*pn+p1*p1)*(1+W*ELECTRON_MASS_MEV*WM)
-    if ((ftype==2) or (ftype==-3)): # 2nd unique, 3rd non-unique
-        result=(pow(pn,4)+10.0/3*pn*pn*p1*p1+pow(p1,4))*(1+W*ELECTRON_MASS_MEV*WM)
-    if ((ftype==3) or (ftype==-4)): # 3rd unique, 4th non-unique
-        result=(pow(pn,6)+7.0*pow(pn,4)*p1*p1+7.0*pow(p1,4)*pn*pn+pow(p1,6))*(1+W*ELECTRON_MASS_MEV*WM)
-    if (ftype == -10):  #   first non-unique 0-
-        shape=(pe*pe+enu*enu+2*beta*beta*enu*ee)
-        wm=0
-        wm=wm*WM
-        result=(1+wm)*shape
-    if (ftype==-11):    #   first non-unique 1-
-        shape= pe*pe + enu*enu - 4.0/3.0*beta*beta*enu*ee
-        wm=((pe*pe + enu*enu)*(beta*beta*ee - enu) + 2.0*beta*beta*ee*enu*(enu - ee)/3.0)/((pe*pe + enu*enu - 4.0*beta*beta*enu*ee/3.0))
-        wm=wm*WM
-        result=(1+wm)*shape
-    if (ftype == 10):   #   first unique, 2-
-        shape=pe**2 + enu**2
-        wm=3.0/5.0*((pe*pe + enu*enu)*(beta*beta*ee - enu) + 2.0*beta*beta*ee*enu*(enu - ee)/3.0)/((pe*pe + enu*enu))
-        wm=wm*WM
-        result=(1+wm)*shape
-
-    return result
+from conflux.bsg.Constants import *
+from conflux.bsg.SpectralFunctions import *
 
 #########################################
 # Final neutrino and antineutrino spectra
 
-class Parameters_t:
-    def __init__(self, e0, Z, A, ftype, WM, thresh=0):
-        self.e0 = e0
-        self.Z = Z
-        self.A = A
-        self.ftype = ftype
-        self.WM = WM
-        self.thresh = thresh
-
-def neutrino(enu, Parameters):
-    np.seterr(divide='ignore')
-    buf = Parameters
+def electron(ebeta, p):
     result = 0.
-    R= 1.0*FERMI_to_W * nuclear_radius(buf.A)
-    W0=WO(buf.e0)
-    W=W0-enu/(ELECTRON_MASS_MEV*1.0)
-    thresh=(W0-1.0-V0(buf.Z))*(ELECTRON_MASS_MEV*1.0)
-    buf.thresh = thresh
-    result = forbidden(W,W0,buf.WM,buf.ftype)*GN(W)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))*CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
+    W = ebeta/ELECTRON_MASS_C2 + 1
+    result = (phase_space(W, **p)
+            *fermi_function(W, **p)
+            *finite_size_L0(W, **p)
+            *recoil_gamow_teller(W, **p)
+            *radiative_correction(W, **p)
+            *recoil_Coulomb_gamow_teller(W, **p)
+            *atomic_screening(W, **p)
+            )
 
-    belowThresh = enu<thresh   # prepared for a list of comparison
-    #print("E value: ",buf.e0, "calc: ", result, "stdev: ", np.std(result))
-    return result*(S(buf.e0-enu, buf.Z)**belowThresh)
+    if parameters['L'] == 0:
+        result *= shape_factor_gamow_teller(W, **p)
+    else:
+        result *= shape_factor_unique_forbidden(W, **p)
 
-def electron(ebeta, Parameters):
-    buf = Parameters
+    return result
+
+def neutrino(enu, p):
     result = 0.
-    R = 1.0*FERMI_to_W * nuclear_radius(buf.A)
-    W0=WO(buf.e0)
-    W=WO(ebeta)
-    thresh=V0(buf.Z)*(ELECTRON_MASS_MEV*1.0)
-    buf.thresh = thresh
-    result = forbidden(W,W0,buf.WM,buf.ftype)*G(W,W0)*(L0(W, buf.Z, R, gamma(buf.Z))+L0b(W,buf.Z,R))* CC(R, buf.Z, W, W0)*phasespace(W, W0)*F(y(W,buf.Z), gamma(buf.Z), p(W), R)
-    
-    aboveThresh = (ebeta>=thresh)   # prepared for a list of comparison
-    return result*(S(ebeta,buf.Z)**aboveThresh)
+    Wv = enu/ELECTRON_MASS_C2 + 1
+    result = (phase_space(Wv, **p)
+            *fermi_function(Wv, **p)
+            *finite_size_L0(Wv, **p)
+            *recoil_gamow_teller(Wv, **p)
+            *radiative_correction_neutrino(Wv, **p)
+            *recoil_Coulomb_gamow_teller(Wv, **p)
+            *atomic_screening(Wv, **p)
+            )
+
+    if parameters['L'] == 0:
+        result *= shape_factor_gamow_teller(Wv, **p)
+    else:
+        result *= shape_factor_unique_forbidden(Wv, **p)
+
+    return result
 
 def integral(nu_spectrum, p, x_low, x_high):
     erg = 0.0
@@ -245,14 +87,14 @@ def integral(nu_spectrum, p, x_low, x_high):
 
     mid = (xh+x_low)/2
     erg = abs(xh-x_low)*function(mid)
-    
+
     return erg
 
     #print(x_low, p.thresh, x_high, erg[0])
 
 # BetaBranch class to save the isotopic information
 class BetaBranch:
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, WM=0.0047):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=4.7):
         self.Z = Z
         self.A = A
         self.I = I
@@ -265,24 +107,36 @@ class BetaBranch:
         self.sigma_frac = sigma_frac
 
         self.forbiddeness = forbiddeness
-        self.WM = WM
-        
-        self.Parameters = Parameters_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
-        
+
+        self.Parameters = {
+            'Z': Z,
+            'A': A,
+            'W0': E0/ELECTRON_MASS_C2 + 1,
+            'R': getEltonRadius(A) * 1e-15 / NATURAL_LENGTH,
+            'L': forbiddeness,
+            'c': 1.0,
+            'b': bAc*A,
+            'd': 0.0,
+            'Lambda': 0.0,
+            'l': screening_potential(Z)
+        }
+
+        #self.Parameters = Parameters_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
+
         self.corr = {E0:1}  # correlation with other branches of the same isotope
         self.cov = {E0:self.sigma_frac**2}
-        
+
     # display the vital info of branch
     def Display(self):
         print("Branch E0 = " +str(self.E0)+"+\-"+str(self.sigma_E0)+", frac = "+str(self.frac)+"+\-"+str(self.sigma_frac))
-    
+
     # set correlation of this branch fraction and all another branches
     def SetCovariance(self, otherBranch, correlation):
         if self.E0 == otherBranch.E0:
             return
         self.corr[otherBranch.E0] = correlation
         self.cov[otherBranch.E0] = self.sigma_frac*correlation*otherBranch.sigma_frac
-            
+
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
         Parameters = deepcopy(self.Parameters)
@@ -299,7 +153,7 @@ class BetaBranch:
 
     # calculate the spectrum uncertainty
     def SpectUncert(self, x, nu_spectrum=False):
-        
+
         numbers = 5
         E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
         newParameters = deepcopy(self.Parameters)
@@ -309,7 +163,7 @@ class BetaBranch:
             function = lambda x: neutrino(x, newParameters)
         else:
             function = lambda x: electron(x, newParameters)
-            
+
         fE0 = function(x)
         fE0 = np.nan_to_num(fE0, nan=0.0)
         # Commenting out unknown function
@@ -317,28 +171,28 @@ class BetaBranch:
         #     return 0
 
         grad_E0 = np.gradient(fE0)
-        
+
         return grad_E0[int(numbers/2)]*self.sigma_E0
 
     # calculate the spectrum uncertainty with MC sampling
     def SpectUncertMC(self, x, nu_spectrum=False, samples = 50):
-        
+
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
         newParameters.e0 = E0range
-        
+
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newParameters)
         else:
             function = lambda x: electron(x, newParameters)
-            
+
         fE0 = function(x)
         fE0 = np.nan_to_num(fE0, nan=0.0)
         # Commenting out unknown function
         # if (fE0.all() < 1e-8):
         #     return 0
         return np.std(fE0)
-        
+
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False, binwidths=0.1, spectRange=[-1.0, 20.0]):
         bins = int(spectRange[1]/binwidths)
@@ -373,7 +227,7 @@ class BetaBranch:
         # endTiming = timeit.default_timer()
         # runTime = endTiming-startTiming
         # print("runtime", runTime)
-        
+
         # normalizing the spectrum
         norm = self.result.sum()
         #print(self.result, self.uncertainty, norm*binwidths)
@@ -396,7 +250,7 @@ class BetaIstp:
         self.ZAI=Z*1e4+A*10+I
         self.branch={}
         self.missing=False
-    
+
     def AddBranch(self, branch):
         """
         Add beta branch to this isotope
@@ -404,7 +258,7 @@ class BetaIstp:
             None
         """
         self.branch[branch.E0] = branch
-    
+
     def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0., forbiddeness = 0):
         """
         Add or edit branches to the isotope with analyzer's assumptions
@@ -417,7 +271,7 @@ class BetaIstp:
             None
         """
         self.branch[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness)
-        
+
     def MaxBranch(self):
         """
         Get the maximum E0 branch of the isotope
@@ -426,7 +280,7 @@ class BetaIstp:
         """
         Emax = max(self.branch)
         return self.branch[Emax]
-    
+
     def CalcCovariance(self, GSF=True):
         """
         Calculate the covaraince matrix for all the beta branches of this isotope
@@ -442,13 +296,13 @@ class BetaIstp:
         for E0, branch in self.branch.items():
             totalFrac += branch.frac
         restFrac = totalFrac-GSFrac
-        
+
         if GSF == False or MaxBranch.E0 != self.Q or restFrac == 0:
             for i, branchi in self.branch.items():
                 for j, branchj in self.branch.items():
                     branchi.SetCovariance(branchj, 0)
             return
-        
+
         # calculate the covariance matrix with ground state anticorrelation
         for i, branchi in self.branch.items():
             for j, branchj in self.branch.items():
@@ -458,7 +312,7 @@ class BetaIstp:
                     branchj.SetCovariance(branchi, correlation)
                 elif j != self.Q:
                     branchi.SetCovariance(branchj, 0)
-                
+
     def CalcBetaSpectrum(self, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0]):
         """
         Calculate the cumulative beta/antineutrino spectrum of all branches
@@ -476,12 +330,12 @@ class BetaIstp:
         self.spectUnc=np.zeros(bins)
         self.branchUnc=np.zeros(bins)
         self.totalUnc=np.zeros(bins)
-        
+
         for E0,branch in self.branch.items():
             branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
             self.spectrum += branch.result*branch.frac
             self.spectUnc += branch.uncertainty*branch.frac
-        
+
         for E0i, branchi in self.branch.items():
             si = branchi.result
             di = branchi.sigma_frac
@@ -497,7 +351,7 @@ class BetaIstp:
                     self.totalUnc += sigmab_ij
         self.branchUnc = np.sqrt(self.branchUnc)
         self.totalUnc = np.sqrt(self.totalUnc)
-        
+
     def Display(self):
         """
         Display isotope property and branch information
@@ -505,7 +359,7 @@ class BetaIstp:
         print('Beta isotope: '+self.name+', ZAI = '+str(self.ZAI)+', Q = '+str(self.Q)+" MeV, " +str(len(self.branch))+" branches")
         for E0, branch in self.branch.items():
             branch.Display()
-    
+
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
 # of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
@@ -513,23 +367,23 @@ class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None):
         self.inputlist = inputlist
         self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
-        
+
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
-        
+
     def LoadBetaDB(self, targetDB=None):
         useInputList = True         # test if the engine is defined with an inputlist
         if self.inputlist == None:
             print("Loading all beta data from the default betaDB...")
             self.inputlist = []
             useInputList = False
-            
+
         if targetDB == None:
             targetDB = self.defaultDB
         print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches...")
 
         self.istplist = {}
-        
+
         tree = ET.parse(targetDB)
         root = tree.getroot()
         for isotope in root:
@@ -539,15 +393,15 @@ class BetaEngine:
 
             if not useInputList:
                 self.inputlist.append(ZAI)
-                
+
             if (ZAI in self.inputlist):
                 #print(str(ZA)+"...")
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
-                
+
                 betaIstp = BetaIstp(Z, A, I, Q, name)
-                
+
                 # Adding missing branches below
                 if len(isotope) < 1:
                     betaIstp.missing = True
@@ -580,7 +434,7 @@ class BetaEngine:
                                     forbideness = firstftypes[j]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
                                     forbideness = i
-                    
+
                     # assign fraction values to branches
                     # normalize if greater than one
                     fraction = float(branch.attrib['fraction'])
@@ -593,7 +447,7 @@ class BetaEngine:
                     betaIstp.AddBranch(betaBranch)
                 self.istplist[ZAI] = betaIstp
 
-        
+
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0]):
         """
         Calculates beta spectra of the list of beta-decaying isotopes
@@ -606,7 +460,7 @@ class BetaEngine:
             branchErange (list): defind the range of interested Q values
         Returns:
             None
-                
+
         """
         spectLow = spectRange[0] if spectRange[0] > 0 else 0
         spectHigh = spectRange[1]
