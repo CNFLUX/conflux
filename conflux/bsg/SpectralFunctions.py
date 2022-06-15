@@ -23,13 +23,10 @@ def fermi_function(W, Z, R, **kwargs):
     :param R: Nuclear radius in units of the electron Compton wavelength
 
     """
-    f = np.ones(W.shape)
+    f = 1
 
     if Z == 0:
         return f
-
-    mask = (W>1)
-    W = W[mask]
 
     g = np.sqrt(1-(ALPHA*Z)**2)
     p = np.sqrt(W**2-1)
@@ -38,7 +35,7 @@ def fermi_function(W, Z, R, **kwargs):
     #We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1+gamma)
     #This is consistent with the L0 description below
 
-    f[mask] = (4
+    f = (4
             *np.power(2*p*R, 2*(g-1))
             *np.exp(np.pi*y)
             *(np.abs(gamma(g+1.j*y))/(gamma(1+2*g)))**2)
@@ -88,13 +85,11 @@ def sirlin_g(W, W0, **kwargs):
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    g = np.zeros(W.shape)
-    mask = (W > 1) & (W<W0)
-    W = W[mask]
+    g = 0
 
     beta = np.sqrt(W**2-1)/W
 
-    g[mask] = (3*np.log(PROTON_MASS_W)
+    g = (3*np.log(PROTON_MASS_W)
         -3./4.
         +4./beta*(-1*spence(1-(2*beta/(1+beta))))
         +4*(np.arctanh(beta)/beta-1)*((W0-W)/(3*W)-3/2+np.log(2*(W0-W)))
@@ -200,15 +195,12 @@ def radiative_correction_neutrino(Wv, W0, **kwargs):
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    r = np.ones(Wv.shape)
-    mask = (Wv<W0)
-
-    W = Wv[mask]
+    r = 1
 
     p = np.sqrt(W**2-1)
     beta = p/W
 
-    r[mask] = (1
+    r = (1
             +ALPHA/2/np.pi
             *(3*np.log(PROTON_MASS_W)+23/4
                 -8/beta*spence(1-(2*beta)/(1+beta))
@@ -382,11 +374,8 @@ def atomic_screening(W, Z, R, l, **kwargs):
     """
     beta_type = Z/abs(Z)
 
-    S = np.ones(W.shape)
-    X = np.ones(W.shape)
-    mask = (W>1)
-
-    W = W[mask]
+    S = 1
+    X = 1
 
     p = np.sqrt(W**2-1)
     Wt = W - beta_type * 0.5 * ALPHA * (abs(Z)-beta_type)*l
@@ -398,13 +387,13 @@ def atomic_screening(W, Z, R, l, **kwargs):
     yt = ALPHA*Z*Wt/pt
     g = np.sqrt(1-(ALPHA*Z)**2)
 
-    S[mask] = (np.abs(gamma(g+1.j*yt)/gamma(g+1.j*y))**2
+    S = (np.abs(gamma(g+1.j*yt)/gamma(g+1.j*y))**2
             *np.abs(np.exp(loggamma(g+2.j*pt/l)-loggamma(1+2.j*p/l)))**2
             #*np.abs(gamma(g+1.j*2*pt/l))**2/np.abs(gamma(1+1.j*2*p/l))**2
             *np.exp(-np.pi*y)
             *np.power(2*p/l, 2*(1-g)))
 
-    X[mask] = (1/(1+0.25*(l/p)**2)
+    X = (1/(1+0.25*(l/p)**2)
             *(1+1/8*(Wt+g)/Wt*(l/p)**2
                 +0.5*g**2/(1+np.sqrt(1-ALPHA*Z*l/(W+1)))**2
                 *(W-1)/Wt*(l/p)**2
