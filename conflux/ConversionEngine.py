@@ -205,5 +205,10 @@ class ConversionEngine:
             vbnew.FitData(self.betadata[istp], slicesize)
             self.vblist[istp] = vbnew
     
-        
+    def SummedSpectrum(self, xval, nu_spectrum = False):
+        summedSpec = np.zeros(len(xval))
+        for istp in self.betadata:
+            summedSpec += self.fissionfrac[istp]*self.vblist[istp].SumBranches(xval, nu_spectrum)
+            
+        return summedSpec
     
