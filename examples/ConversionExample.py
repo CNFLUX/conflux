@@ -27,7 +27,7 @@ if __name__ == "__main__":
     
     convertmodel = ConversionEngine()
     convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
-    convertmodel.VBfit(0.5)
+    convertmodel.VBfit(0.25)
 
     # Draw plots to test output.
     print("Drawing spectrum...")
@@ -38,17 +38,18 @@ if __name__ == "__main__":
     #     print(self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))
     #     plt.errorbar(xval, self.vblist[name].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
     plt.yscale('log')
+    plt.ylim([1e-5, 2])
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
-    for i in range(0, 20):
-        if not sum(convertmodel.vblist["Pu239"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
+    for i in range(0, 40):
+        if not sum(convertmodel.vblist["Pu239"].SumBranches(xval, thresh =i*0.25, nu_spectrum = False))>0:
             continue
-        plt.errorbar(xval, convertmodel.vblist["Pu239"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
+        plt.errorbar(xval, convertmodel.vblist["Pu239"].SumBranches(xval, thresh =i*0.25, nu_spectrum = False), fmt='--')
     plt.errorbar(convertmodel.betadata["Pu239"].x, convertmodel.betadata["Pu239"].y, convertmodel.betadata["Pu239"].yerr, label='beta data')
     plt.errorbar(xval, convertmodel.vblist["Pu239"].SumBranches(xval, nu_spectrum = False), label='beta')
     plt.errorbar(xval, convertmodel.vblist["Pu239"].SumBranches(xval, nu_spectrum = True), label='neutrino')
     plt.legend()
-    fig.savefig("Pu239_conversion.png")
+    fig.savefig("Pu239_conversion_new.png")
 
     # ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
     covmat=convertmodel.vblist["Pu239"].Covariance(beta239, xval, nu_spectrum = False, samples=50)
@@ -72,14 +73,14 @@ if __name__ == "__main__":
     plt.fill_between(xval, relativeErr, -relativeErr, label='beta', alpha = 0.4)
     plt.fill_between(xval, relativeErrNu, -relativeErrNu, label='neutrino', alpha = 0.4)
     plt.legend()
-    fig.savefig("Pu239_errs.png")
+    fig.savefig("Pu239_errs_new.png")
         
     fig = plt.figure()
     im = plt.imshow(covmat)
     plt.colorbar(im)
-    fig.savefig("Pu239_cov.png")
+    fig.savefig("Pu239_cov_new.png")
     
     fig = plt.figure()
     im = plt.imshow(covmat_nu)
     plt.colorbar(im)
-    fig.savefig("Pu239_cov_nu.png")
+    fig.savefig("Pu239_cov_nu_new.png")

@@ -38,7 +38,8 @@ def electron(ebeta, p):
 
 def neutrino(enu, p):
     result = 0.
-    Wv = enu/ELECTRON_MASS_MEV + 1
+    W0 = p['W0']
+    Wv = W0-enu/(ELECTRON_MASS_MEV*1.0) #enu/ELECTRON_MASS_MEV + 1
     result = (phase_space(Wv, **p)
             *fermi_function(Wv, **p)
             *finite_size_L0(Wv, **p)

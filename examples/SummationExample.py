@@ -86,8 +86,8 @@ if __name__ == "__main__":
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.fill_between(result.bins, miss_spect+miss_err, miss_spect-miss_err, alpha=.5, linewidth=0)
-    ax.fill_between(result.bins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0)
+    ax.fill_between(result.bins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
+    ax.fill_between(result.bins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
     ax.plot(result.bins, miss_spect, label="w/ miss info")
     ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
     # ax.plot(result.bins, miss_spect, label="w/ miss info")
@@ -96,7 +96,24 @@ if __name__ == "__main__":
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP1.png")
+    fig.savefig("235U_ENDF_TOP_linear.png")
+    
+
+    fig, ax = plt.subplots()
+    ax.set_xlim([0, 10])
+    #plt.yscale('log')
+    ax.set(xlabel='E (MeV)', ylabel='relative error (%)')
+    ax.fill_between(result.bins, miss_yerr/miss_spect*100, -miss_yerr/miss_spect*100, label="fission product error", alpha=.5)
+    ax.fill_between(result.bins, miss_model_err/miss_spect*100, -miss_model_err/miss_spect*100, label="beta model error", alpha=.5)
+    ax.plot(result.bins, miss_spect-miss_spect)
+    #ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
+    # ax.plot(result.bins, miss_spect, label="w/ miss info")
+    # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
+    # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
+    # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
+    ax.legend()
+
+    fig.savefig("235U_ENDF_Unc.png")
     
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])

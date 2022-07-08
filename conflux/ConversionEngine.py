@@ -93,12 +93,12 @@ class VirtualBranch:
                 frac_sum += self.FPYlist[ZAI].y
                 Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
                 Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
-        self.Aavg = Afrac_sum/frac_sum
-        self.Zavg = Zfrac_sum/frac_sum
+        self.Aavg = round(Afrac_sum/frac_sum)
+        self.Zavg = round(Zfrac_sum/frac_sum)
 
     # define the theoretical beta spectrum shape
-    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False, forbiddeness = 0, WM = 0.0047):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, frac = contribute, sigma_frac = 0, forbiddeness=forbiddeness, WM=WM)
+    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False, forbiddeness = 0, bAc = 4.7):
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, frac = contribute, sigma_frac = 0, forbiddeness=forbiddeness, bAc=4.7)
         return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
 
     # function that fit the reference beta spectrum with virtual brances
@@ -156,7 +156,7 @@ class VirtualBranch:
         result = 0
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
-                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, Q = self.E0[s], E0=self.E0[s], sigma_E0=0, sigma_frac=0, forbiddeness=0, WM=0.0047)
+                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, Q = self.E0[s], E0=self.E0[s], sigma_E0=0, sigma_frac=0, forbiddeness=0, bAc=4.7)
                 result += vb.BetaSpectrum(x, nu_spectrum)*vb.frac
             elif sum(result*x) == 0:
                 return result*x

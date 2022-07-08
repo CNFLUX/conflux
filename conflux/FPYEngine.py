@@ -156,6 +156,7 @@ class FissionIstp:
                 print('Reading covariance data: '+DBpath+filename+'...')
                 with open(DBname) as inputfile:
                     reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
+                    
                     for row in reader:
                         row_id = int(row[''])
                         z = int(row_id/10000)
@@ -164,8 +165,8 @@ class FissionIstp:
                         fpzai = z*10000+a*10+i
                         if fpzai not in self.CFPY[Ei]:
                             continue
-                        for corrzai in self.CFPY[Ei]:
                             
+                        for corrzai in self.CFPY[Ei]:
                             col_id = int(corrzai)
                             z = int(col_id/10000)
                             a = int((col_id-z*10000)/10)

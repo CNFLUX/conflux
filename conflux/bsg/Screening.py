@@ -5,6 +5,9 @@ def screening_potential(Z):
 
     :param Z: Proton number of the nuclear state
     """
+    
+    if Z < 1:
+        return 0
 
     a, b = screening_parameters(Z)
 

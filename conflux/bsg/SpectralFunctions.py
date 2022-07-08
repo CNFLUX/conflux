@@ -188,7 +188,7 @@ def radiative_correction(W, Z, W0, R, **kwargs):
     return ((1+o1-ALPHA/2/np.pi*3*np.log(PROTON_MASS_W/W0))
             *(L+o2+o3))
 
-def radiative_correction_neutrino(Wv, W0, **kwargs):
+def radiative_correction_neutrino(W, W0, **kwargs):
     """Radiative correction to the (anti)neutrino spectrum to order alpha
 
     :param Wv: (Anti)neutrino energy in units of me c^2
