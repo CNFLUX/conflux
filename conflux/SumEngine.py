@@ -10,7 +10,7 @@ import csv
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
-class SumEngine:
+class SumEngine():
     """
     A Class to carry out the Summation (Ab-initio) Mode
 
@@ -111,7 +111,7 @@ class SumEngine:
             the betaSpectra database.
             Parameters:
 
-                betaSpectraDB (dictionary): a dictionary of the spectral information for each beta branch
+                betaSpectraDB (BetaEngine): a dictionary of the spectral information for each beta branch
                 binwidths (int): the width of the bins used in running the calculation
                 erange (int): upper limit of energy you want to run the reactor for
             Returns:
@@ -141,6 +141,7 @@ class SumEngine:
                     self.missingBranch.append(FPZAI)
                     continue
                 
+                print(FPZAI)
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].totalUnc
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
@@ -160,10 +161,12 @@ class SumEngine:
                     yi = self.FPYlist[i].y
                     yerri = self.FPYlist[i].yerr
                     fi = self.betaSpectraList[i]
-
+                    ferri = self.betaUncertainty[i]
+                    
                     yj = self.FPYlist[j].y
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
+                    ferri = self.betaUncertainty[i]
                     
                     # if covariance matrix were not loaded, make cov diagonal variance
                     if not self.FPYlist[i].cov[j]:
@@ -171,9 +174,11 @@ class SumEngine:
                     else:
                         sigmay_ij = self.FPYlist[i].cov[j]
                     
+                    cov_ij = fi*sigmay_ij*fj
+                    
                     if (i==j):
-                        self.spectrumUnc += (self.betaUncertainty[i]*yi)**2 + fi*sigmay_ij*fj
+                        self.spectrumUnc += (ferri*yi)**2 + cov_ij*fi**2
                     else:
-                        self.spectrumUnc += fi*sigmay_ij*fj
+                        self.spectrumUnc += cov_ij
 
         self.spectrumUnc = np.sqrt(self.spectrumUnc)

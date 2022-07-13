@@ -29,9 +29,9 @@ if __name__ == "__main__":
     result = SumEngine()
     result.AddModel(model)
 
-    betaSpectraDB = BetaEngine(result.FPYlist.keys())
+    betaSpectraDB = BetaEngine(result.FPYlist.keys(), binwidths=0.1, spectRange=[0.0, 15.0])
     #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 15.0], branchErange=[-1.0, 20.0])
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
         
     betaDBBase = BetaEngine()
     count = 0
@@ -41,18 +41,18 @@ if __name__ == "__main__":
             fig, ax = plt.subplots()
             ax.set(xlabel='E (MeV)', ylabel='variance-covariance', title='neutrino spectrum uncertainty')
             yerr = nuclide.yerr
-            ax.plot(betaSpectraDB.bins, yerr**2*betaSpectraDB.istplist[nuclide.FPZAI].spectrum, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" variance")
-            positive=np.zeros(len(betaSpectraDB.bins))
-            negative=np.zeros(len(betaSpectraDB.bins))
+            ax.plot(betaSpectraDB.xbins, yerr**2*betaSpectraDB.istplist[nuclide.FPZAI].spectrum, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" variance")
+            positive=np.zeros(len(betaSpectraDB.xbins))
+            negative=np.zeros(len(betaSpectraDB.xbins))
             for FPZAI, frac in (sorted(nuclide.cov.items(), key=lambda item: abs(item[1]), reverse=True)):
                 if FPZAI in betaSpectraDB.istplist:
                     if frac >0:
                         positive += frac*betaSpectraDB.istplist[FPZAI].spectrum
-                        ax.fill_between(betaSpectraDB.bins, positive,  positive-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
+                        ax.fill_between(betaSpectraDB.xbins, positive,  positive-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
                     else:
                         negative += frac*betaSpectraDB.istplist[FPZAI].spectrum
-                        ax.fill_between(betaSpectraDB.bins, negative,  negative-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
-            ax.plot(betaSpectraDB.bins, positive+negative, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" covariance")
+                        ax.fill_between(betaSpectraDB.xbins, negative,  negative-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
+            ax.plot(betaSpectraDB.xbins, positive+negative, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" covariance")
             ax.legend()
             fig.savefig(betaDBBase.istplist[nuclide.FPZAI].name+"_cov.png")
             newlist.append(nuclide.FPZAI)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         if count == 5:
             break
 
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 15.0], branchErange=[-1.0, 20.0], processMissing=False)
+    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[0.0, 15.0], branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = result.reactorSpectrum
     summed_err = result.spectrumUnc
     summed_model_err = result.modelUnc
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     print(result.missingCount)
     print(result.missingBranch)
     
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0, 15.0], branchErange=[-1.0, 20.0], processMissing=True)
+    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[0.0, 15.0], branchErange=[0.0, 20.0], processMissing=True)
     miss_spect = result.reactorSpectrum
     miss_err = result.spectrumUnc
     miss_model_err = result.modelUnc

@@ -23,6 +23,8 @@ class BetaData:
         self.yerr = []
         self.inputDB = inputDB
         self.LoadConversionDB(inputDB)
+        self.spectrum = np.array(self.y)
+        self.uncertainty = np.array(self.yerr)
 
     def LoadConversionDB(self, inputDB, rel_err=True):
         self.x = []
@@ -113,12 +115,12 @@ class VirtualBranch:
         suby = [] # sublist y values
         subyerr = [] # sublist uncertainty
         xhigh = betadata.x[-1]
-        datacache = np.copy(betadata.y) # preserve the data
+        datacache = np.copy(betadata.spectrum) # preserve the data
         for it, x in reversed(list(enumerate(betadata.x))):
             if x < xhigh - slicesize or x == betadata.x[0]:
                 subx.append(x)
                 suby.append(datacache[it])
-                subyerr.append(betadata.yerr[it])
+                subyerr.append(betadata.uncertainty[it])
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx) :
                     self.CalcZAavg(xhigh-slicesize, xhigh)
@@ -149,7 +151,7 @@ class VirtualBranch:
             else:
                 subx.append(x)
                 suby.append(datacache[it])
-                subyerr.append(betadata.yerr[it])
+                subyerr.append(betadata.uncertainty[it])
 
     # function to calculate summed spectra of virtual branches
     def SumBranches(self, x, thresh = 0, nu_spectrum = True):
