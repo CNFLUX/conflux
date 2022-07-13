@@ -141,7 +141,6 @@ class SumEngine():
                     self.missingBranch.append(FPZAI)
                     continue
                 
-                print(FPZAI)
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].totalUnc
                 self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
