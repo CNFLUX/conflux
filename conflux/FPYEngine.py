@@ -42,7 +42,7 @@ class FPNuclide:
         # force yeild uncertainty to equal 0, when yeild is zero
         self.yerr = np.nan_to_num(self.yerr, nan=0.0)
 
-        # Also normalize the covariance matrix.
+        # Also scale the covariance matrix.
         for key in self.cov:
             if key == self.FPZAI:
                 self.cov[key] = self.y*fraction*np.sqrt((self.cov[key]/self.y)**2 + (d_fraction/fraction**2))
