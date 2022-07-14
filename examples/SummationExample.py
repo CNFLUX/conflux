@@ -26,7 +26,7 @@ if __name__ == "__main__":
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
-    result = SumEngine()
+    result = SumEngine(spectRange=[0.0, 15.0])
     result.AddModel(model)
 
     betaSpectraDB = BetaEngine(result.FPYlist.keys(), binwidths=0.1, spectRange=[0.0, 15.0])
@@ -60,9 +60,10 @@ if __name__ == "__main__":
         if count == 5:
             break
 
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[0.0, 15.0], branchErange=[0.0, 20.0], processMissing=False)
-    summed_spect = result.reactorSpectrum
-    summed_err = result.spectrumUnc
+    result.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+    result.CalcReactorSpectrum(betaSpectraDB, processMissing=False)
+    summed_spect = result.spectrum
+    summed_err = result.uncertainty
     summed_model_err = result.modelUnc
     summed_yerr = result.yieldUnc
     
@@ -70,9 +71,9 @@ if __name__ == "__main__":
     print(result.missingCount)
     print(result.missingBranch)
     
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[0.0, 15.0], branchErange=[0.0, 20.0], processMissing=True)
-    miss_spect = result.reactorSpectrum
-    miss_err = result.spectrumUnc
+    result.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)
+    miss_spect = result.spectrum
+    miss_err = result.uncertainty
     miss_model_err = result.modelUnc
     miss_yerr = result.yieldUnc
     
@@ -86,10 +87,10 @@ if __name__ == "__main__":
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.fill_between(result.bins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
-    ax.fill_between(result.bins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
-    ax.plot(result.bins, miss_spect, label="w/ miss info")
-    ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
+    ax.fill_between(result.xbins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
+    ax.fill_between(result.xbins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
+    ax.plot(result.xbins, miss_spect, label="w/ miss info")
+    ax.plot(result.xbins, miss_spect-summed_spect, label="missing info")
     # ax.plot(result.bins, miss_spect, label="w/ miss info")
     # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
     # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
@@ -103,9 +104,9 @@ if __name__ == "__main__":
     ax.set_xlim([0, 10])
     #plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='relative error (%)')
-    ax.fill_between(result.bins, miss_yerr/miss_spect*100, -miss_yerr/miss_spect*100, label="fission product error", alpha=.5)
-    ax.fill_between(result.bins, miss_model_err/miss_spect*100, -miss_model_err/miss_spect*100, label="beta model error", alpha=.5)
-    ax.plot(result.bins, miss_spect-miss_spect)
+    ax.fill_between(result.xbins, miss_yerr/miss_spect*100, -miss_yerr/miss_spect*100, label="fission product error", alpha=.5)
+    ax.fill_between(result.xbins, miss_model_err/miss_spect*100, -miss_model_err/miss_spect*100, label="beta model error", alpha=.5)
+    ax.plot(result.xbins, miss_spect-miss_spect)
     #ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
     # ax.plot(result.bins, miss_spect, label="w/ miss info")
     # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
@@ -119,7 +120,7 @@ if __name__ == "__main__":
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.plot(result.bins, miss_spect-summed_spect)
+    ax.plot(result.xbins, miss_spect-summed_spect)
 
     ax.legend()
 

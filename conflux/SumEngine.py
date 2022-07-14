@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import csv
 
 # local modules
+from conflux.Basic import *
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
-class SumEngine():
+class SumEngine(Spectrum):
     """
     A Class to carry out the Summation (Ab-initio) Mode
 
@@ -48,11 +49,18 @@ class SumEngine():
 
     """
     
-    def __init__(self, neutrino=True):
+    def __init__(self, neutrino=True, binwidths=0.1, spectRange=[-1.0, 20.0]):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
         self.neutrino = neutrino # neutrino or electon spectrum
+        
+        self.binwidths=binwidths
+        self.spectRange=spectRange
+        self.bins = int(spectRange[1]/binwidths)
+        self.xbins = np.arange(*spectRange, binwidths)
+        self.spectrum = np.zeros(self.bins)
+        self.uncertainty = np.zeros(self.bins)
 
     def Clear(self):
         """
@@ -105,7 +113,7 @@ class SumEngine():
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=False):
+    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
@@ -119,14 +127,9 @@ class SumEngine():
 
         """
         
-        print("Calculating beta spectra...")
-        bins = int(spectRange[1]/binwidths)
-        self.reactorSpectrum = np.zeros(bins)
-        self.spectrumUnc = np.zeros(bins)   # total uncertainty
-        self.modelUnc = np.zeros(bins)
-        self.yieldUnc = np.zeros(bins)
-        rangelow = spectRange[0] if spectRange[0] > 0 else 0
-        self.bins = np.arange(rangelow, spectRange[1], binwidths)
+        print("Summing beta spectra...")
+        self.modelUnc = np.zeros(self.bins)
+        self.yieldUnc = np.zeros(self.bins)
         self.missingBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
@@ -143,7 +146,7 @@ class SumEngine():
                 
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].totalUnc
-                self.reactorSpectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
+                self.spectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
                 self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
                 self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
                 self.spectrumUnc = self.yieldUnc+self.modelUnc
@@ -180,4 +183,4 @@ class SumEngine():
                     else:
                         self.spectrumUnc += cov_ij
 
-        self.spectrumUnc = np.sqrt(self.spectrumUnc)
+        self.uncertainty = np.sqrt(self.spectrumUnc)
