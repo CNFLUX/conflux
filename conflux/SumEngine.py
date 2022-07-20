@@ -110,7 +110,6 @@ class SumEngine():
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
             Parameters:
-
                 betaSpectraDB (BetaEngine): a dictionary of the spectral information for each beta branch
                 binwidths (int): the width of the bins used in running the calculation
                 erange (int): upper limit of energy you want to run the reactor for
@@ -162,11 +161,11 @@ class SumEngine():
                     yerri = self.FPYlist[i].yerr
                     fi = self.betaSpectraList[i]
                     ferri = self.betaUncertainty[i]
-                    
+
                     yj = self.FPYlist[j].y
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
-                    ferri = self.betaUncertainty[i]
+                    ferrj = self.betaUncertainty[j]
                     
                     # if covariance matrix were not loaded, make cov diagonal variance
                     if not self.FPYlist[i].cov[j]:

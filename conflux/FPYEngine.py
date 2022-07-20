@@ -305,6 +305,16 @@ class FissionModel:
     def GetNuclide(self, ZAI):
         return self.FPYlist[ZAI]
 
+    # Function that save FPYs in a csv file
+    def SaveToFile(self, filename):
+        with open(filename, 'w', newline='') as outputfile:
+            colNames = ['Z', 'A', 'I', 'Y', 'Yerr']
+            writer = csv.DictWriter(outputfile, fieldnames=colNames)
+            writer.writeheader()
+            for FPZAI in self.FPYlist:
+                nuclide = self.FPYlist[FPZAI]
+                writer.writerow({'Z':nuclide.Z, 'A':nuclide.A, 'I':nuclide.isomer, 'Y':nuclide.y, 'Yerr':nuclide.yerr})
+
     # Draw a histogram of branch fractions
     def DrawBranches(self, figname):
         print("Drawing branches...")
@@ -312,13 +322,12 @@ class FissionModel:
         alist = np.arange(50, 180, 1)
         branchlist = np.zeros(len(alist))
         errlist = np.zeros(len(alist))
-
+    
         for FPZAI in self.FPYlist:
             A = self.FPYlist[FPZAI].A
             branchlist[A-50] += self.FPYlist[FPZAI].y
             errlist[A-50] += self.FPYlist[FPZAI].yerr
-
-
+    
         ax.errorbar(alist, branchlist, yerr=errlist)
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)

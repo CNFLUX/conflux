@@ -36,11 +36,12 @@ if __name__ == "__main__":
         print("ZAI", ZAI)
     totalFPY = 0
     for FPZAI in model.FPYlist:
-        if FPZAI in betaSpectraDB.missinglist and FPZAI in betaSpectraDB.istplist:
+        if FPZAI in betaSpectraDB.istplist and betaSpectraDB.istplist[FPZAI].missing == False:
             print('nuclide: ', FPZAI, 'y: ', model.FPYlist[FPZAI].y, 'yerr: ', model.FPYlist[FPZAI].yerr )
             totalyield += model.FPYlist[FPZAI].y
             totalFPY += 1
     print("totalyield", totalyield)
     print("totalFPY", totalFPY)
 
-    model.DrawBranches("frac.png")
+    model.DrawBranches("frac.3.png")
+    model.SaveToFile('frac.3.csv')
