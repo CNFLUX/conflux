@@ -9,7 +9,7 @@ setup(
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",
-    long_description=["README.md"],
+    long_description="README.md",
     long_description_content_type="text/markdown",
     url="https://lc.llnl.gov/bitbucket/projects/CFX/repos/conflux/browse",
     project_urls={
