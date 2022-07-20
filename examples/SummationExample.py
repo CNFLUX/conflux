@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
     #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 15.0], branchErange=[-1.0, 20.0])
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[0.0, 15.0], branchErange=[0.0, 20.0])
         
     betaDBBase = BetaEngine()
     count = 0
