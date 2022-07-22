@@ -9,7 +9,8 @@ from copy import deepcopy
 import pkg_resources
 import timeit
 
-<<<<<<< HEAD
+from conflux.Basic import *
+
 ######################
 # Declaring constants
 
@@ -26,13 +27,6 @@ FERMI_to_W= 1e-15/(constants.hbar*constants.speed_of_light/constants.e)*ELECTRON
 def nuclear_radius(A):
     result = 1.121*pow(A,1/3.0)+2.426*pow(A,-1/3.0)-6.614/A
     return result
-=======
-from conflux.Basic import *
-from conflux.bsg.Constants import *
-from conflux.bsg.SpectralFunctions import *
-from conflux.bsg.Functions import *
-from conflux.bsg.Screening import *
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
 
 WO = lambda energy: energy/(1.0*ELECTRON_MASS_MEV) + 1.0
 
@@ -132,7 +126,6 @@ def G(W, W0):
     result = result*constants.fine_structure/(2.0*np.pi)+1.0
     return result
 
-<<<<<<< HEAD
 def GN(W):
     result=0.
     beta=np.sqrt(W*W-1.0)/W
@@ -260,15 +253,10 @@ def integral(nu_spectrum, p, x_low, x_high):
     #print(x_low, p.thresh, x_high, erg[0])
 
 # BetaBranch class to save the isotopic information
-class BetaBranch:
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, WM=0.0047):
-=======
-# BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=0.047, binwidths=0.1, spectRange=[0.0, 20.0]):
         self.ID = E0
         
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         self.Z = Z
         self.A = A
         self.I = I
@@ -287,7 +275,7 @@ class BetaBranch(Spectrum):
         self.sigma_frac = sigma_frac
 
         self.forbiddeness = forbiddeness
-        self.WM = WM
+        self.WM = bAc
         
         self.Parameters = Parameters_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
         
@@ -319,29 +307,6 @@ class BetaBranch(Spectrum):
         result = np.nan_to_num(result, nan=0.0)
         return result*rangeCorrect
 
-<<<<<<< HEAD
-    # calculate the spectrum uncertainty
-    def SpectUncert(self, x, nu_spectrum=False):
-        
-        numbers = 5
-        E0range = np.linspace(self.E0-self.sigma_E0, self.E0+self.sigma_E0, numbers)
-        newParameters = deepcopy(self.Parameters)
-        newParameters.e0 = E0range
-
-        if (nu_spectrum == True):
-            function = lambda x: neutrino(x, newParameters)
-        else:
-            function = lambda x: electron(x, newParameters)
-            
-        fE0 = function(x)
-        fE0 = np.nan_to_num(fE0, nan=0.0)
-        # Commenting out unknown function
-        # if (fE0.all() < 1e-8):
-        #     return 0
-
-        grad_E0 = np.gradient(fE0)
-        
-        return grad_E0[int(numbers/2)]*self.sigma_E0
 
     # calculate the spectrum uncertainty with MC sampling
     def SpectUncertMC(self, x, nu_spectrum=False, samples = 50):
@@ -349,14 +314,6 @@ class BetaBranch(Spectrum):
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
         newParameters.e0 = E0range
-=======
-    # calculate the spectrum uncertainty with MC sampling
-    def SpectUncertMC(self, x, nu_spectrum=False, samples = 150):
-
-        E0range = np.random.normal(self.E0, self.sigma_E0, samples)
-        newParameters = deepcopy(self.Parameters)
-        newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newParameters)
@@ -389,19 +346,9 @@ class BetaBranch(Spectrum):
             self.uncertainty[k] = abs(x_high-x_low)*self.SpectUncertMC((x_low+x_high)/2, nu_spectrum)
             if x_high == self.E0:
                 break
-<<<<<<< HEAD
-            #MCUnc = self.uncertainty[k]
-            #print("MCUnc", MCUnc)
-            lower+=binwidths
 
-        # endTiming = timeit.default_timer()
-        # runTime = endTiming-startTiming
-        # print("runtime", runTime)
-        
-=======
             lower+=self.binwidths
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         # normalizing the spectrum
         norm = self.spectrum.sum()
 
@@ -432,12 +379,9 @@ class BetaIstp(Spectrum, Summed):
         self.Q = Q
         self.name = name
         self.missing=False
-<<<<<<< HEAD
-    
-=======
+
         self.branches = {}
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
     def AddBranch(self, branch):
         """
         Add beta branch to this isotope
@@ -446,13 +390,8 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-<<<<<<< HEAD
-        self.branch[branch.E0] = branch
-    
-=======
         self.branches[branch.ID] = branch
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
     def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0., forbiddeness = 0):
         """
         Add or edit branches to the isotope with analyzer's assumptions
@@ -464,28 +403,17 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-<<<<<<< HEAD
-        self.branch[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness)
-        
-=======
         self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness, binwidths=self.binwidths, spectRange=self.spectRange)
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
     def MaxBranch(self):
         """
         Get the maximum E0 branch of the isotope
         Returns:
             self.branch(Emax) (BetaBranch)
         """
-<<<<<<< HEAD
-        Emax = max(self.branch)
-        return self.branch[Emax]
-    
-=======
         Emax = max(self.branches)
         return self.branches[Emax]
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
     def CalcCovariance(self, GSF=True):
         """
         Calculate the covaraince matrix for all the beta branches of this isotope
@@ -518,13 +446,8 @@ class BetaIstp(Spectrum, Summed):
                     branchj.SetCovariance(branchi, correlation)
                 elif j != self.Q:
                     branchi.SetCovariance(branchj, 0)
-<<<<<<< HEAD
-                
-    def CalcBetaSpectrum(self, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0]):
-=======
             
     def SumSpectra(self, nu_spectrum=True):
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         """
         Calculate the cumulative beta/antineutrino spectrum of all branches
         Parameters:
@@ -534,24 +457,6 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-<<<<<<< HEAD
-        spectLow = spectRange[0] if spectRange[0] > 0 else 0
-        spectHigh = spectRange[1]
-        bins = int((spectHigh-spectLow)/binwidths)
-        self.spectrum=np.zeros(bins)
-        self.spectUnc=np.zeros(bins)
-        self.branchUnc=np.zeros(bins)
-        self.totalUnc=np.zeros(bins)
-        
-        for E0,branch in self.branch.items():
-            branch.BinnedSpectrum(nu_spectrum, binwidths, spectRange)
-            self.spectrum += branch.result*branch.frac
-            self.spectUnc += branch.uncertainty*branch.frac
-        
-        for E0i, branchi in self.branch.items():
-            si = branchi.result
-=======
-        
         self.spectUnc=np.zeros(self.bins) # theoretical uncertainty
         self.branchUnc=np.zeros(self.bins)
         self.totalUnc=np.zeros(self.bins)
@@ -560,7 +465,6 @@ class BetaIstp(Spectrum, Summed):
         for E0i, branchi in self.branches.items():
             si = branchi.spectrum
             fi = branchi.frac
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
             di = branchi.sigma_frac
             
             branchi.BinnedSpectrum(nu_spectrum)
@@ -579,16 +483,13 @@ class BetaIstp(Spectrum, Summed):
                     self.totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij*si**2
                 else:
                     self.totalUnc += sigma_bij
+                    #print(sigma_bij)
 
             
         self.branchUnc = np.sqrt(self.branchUnc)
         self.totalUnc = np.sqrt(self.totalUnc)
-<<<<<<< HEAD
-        
-=======
         self.uncertainty = self.totalUnc
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
     def Display(self):
         """
         Display isotope property and branch information
@@ -604,14 +505,11 @@ class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None, binwidths=0.1, spectRange=[0.0, 20.0]):
         self.inputlist = inputlist
         self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
-        
-<<<<<<< HEAD
-=======
+
         self.binwidths=binwidths
         self.spectRange=spectRange
         self.xbins = np.arange(*spectRange, binwidths)
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
     def LoadBetaDB(self, targetDB=None):
@@ -642,15 +540,9 @@ class BetaEngine:
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
-<<<<<<< HEAD
-                
-                betaIstp = BetaIstp(Z, A, I, Q, name)
-                
-=======
 
                 betaIstp = BetaIstp(Z, A, I, Q, name, binwidths=self.binwidths, spectRange=self.spectRange)
 
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
                 # Adding missing branches below
                 if len(isotope) < 1:
                     betaIstp.missing = True
@@ -700,13 +592,7 @@ class BetaEngine:
                 if betaIstp.branches:
                     self.istplist[ZAI] = betaIstp
 
-<<<<<<< HEAD
-        
-    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0]):
-=======
-
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, branchErange=[0.0, 20.0]):
->>>>>>> 8acd209 (Prepared common classes for different modes for combined analysis)
         """
         Calculates beta spectra of the list of beta-decaying isotopes
 
