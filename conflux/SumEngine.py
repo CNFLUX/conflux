@@ -170,15 +170,15 @@ class SumEngine(Spectrum):
                     
                     # if covariance matrix were not loaded, make cov diagonal variance
                     if not self.FPYlist[i].cov[j]:
-                        sigmay_ij = yerri*yerri if i == j else 0
+                        cov_ij = yerri*yerri if i == j else 0
                     else:
-                        sigmay_ij = self.FPYlist[i].cov[j]
+                        cov_ij = self.FPYlist[i].cov[j]
                     
-                    cov_ij = fi*sigmay_ij*fj
+                    sigmay_ij = fi*cov_ij*fj
                     
                     if (i==j):
-                        self.spectrumUnc += (ferri*yi)**2 + cov_ij*fi**2
+                        self.spectrumUnc += (ferri*yi)**2 + sigmay_ij
                     else:
-                        self.spectrumUnc += cov_ij
+                        self.spectrumUnc += sigmay_ij
 
         self.uncertainty = np.sqrt(self.spectrumUnc)

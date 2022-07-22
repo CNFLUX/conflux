@@ -70,6 +70,7 @@ if __name__ == "__main__":
     print(result.totalYield)
     print(result.missingCount)
     print(result.missingBranch)
+    result.Clear()
     
     result.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)
     miss_spect = result.spectrum
