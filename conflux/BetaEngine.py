@@ -295,7 +295,7 @@ class BetaIstp(Spectrum, Summed):
                 sigma_bij = si*cov_bij*sj
                 self.branchUnc += sigma_bij
                 if (E0i==E0j):
-                    self.totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij*si**2
+                    self.totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij
                 else:
                     self.totalUnc += sigma_bij
 
