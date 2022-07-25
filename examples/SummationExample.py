@@ -12,7 +12,7 @@ from conflux.SumEngine import SumEngine
 if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='ENDF')
-    U235.LoadCorrelation(defaultDB='ENDF')
+    #U235.LoadCorrelation(defaultDB='ENDF')
 
         # Pu239 = FissionIstp(94, 239)
         # Pu239.LoadFissionDB()
@@ -101,8 +101,8 @@ if __name__ == "__main__":
     # ax.errorbar(sum2.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP_linear.3.png")
-    sum2.SaveToFile('235U_nu.3.csv')
+    fig.savefig("235U_ENDF_TOP_linear.4.png")
+    sum2.SaveToFile('235U_nu.4.csv')
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_Unc.3.png")
+    fig.savefig("235U_ENDF_Unc.4.png")
     
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    fig.savefig("235_239_Missing.3.png")
+    fig.savefig("235_239_Missing.4.png")
 
 
     with open("Commercial.csv", "w") as output:
