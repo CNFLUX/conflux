@@ -170,7 +170,8 @@ class SumEngine(Spectrum):
                     ferrj = self.betaUncertainty[j]
                     
                     # if covariance matrix were not loaded, make cov diagonal variance
-                    if not self.FPYlist[i].cov[j]:
+                    cov_ij = 0
+                    if j not in self.FPYlist[i].cov:
                         cov_ij = yerri*yerri if i == j else 0
                     else:
                         cov_ij = self.FPYlist[i].cov[j]

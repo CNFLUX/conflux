@@ -43,5 +43,5 @@ if __name__ == "__main__":
     print("totalyield", totalyield)
     print("totalFPY", totalFPY)
 
-    model.DrawBranches("frac.3.png")
-    model.SaveToFile('frac.3.csv')
+    model.DrawBranches("frac.4.png")
+    model.SaveToFile('frac.4.csv')
