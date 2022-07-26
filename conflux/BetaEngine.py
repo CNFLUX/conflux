@@ -49,17 +49,16 @@ def neutrino(enu, p):
             *recoil_Coulomb_gamow_teller(Wv, **p)
             *atomic_screening(Wv, **p)
             )
-
+    
     if p['L'] == 0:
         result *= shape_factor_gamow_teller(Wv, **p)
     else:
         result *= shape_factor_unique_forbidden(Wv, **p)
-
     return result
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, m = 0, forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
         self.ID = E0
         
         self.Z = Z
@@ -354,6 +353,11 @@ class BetaEngine:
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
+                
+                # if same ZAI reappear it is an isomer
+                if ZAI in self.istplist:
+                    I += 1
+                    ZAI += 1
 
                 betaIstp = BetaIstp(Z, A, I, Q, name, binwidths=self.binwidths, spectRange=self.spectRange)
 
@@ -388,9 +392,9 @@ class BetaEngine:
                             if spin_par_changes[j] in ftypes[i] and i < abs(forbiddeness):
                                 forbiddeness = -i
                                 if i == 1:
-                                    forbideness = firstftypes[j]
+                                    forbiddeness = firstftypes[j]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
-                                    forbideness = i
+                                    forbiddeness = i
 
                     # assign fraction values to branches
                     # normalize if greater than one

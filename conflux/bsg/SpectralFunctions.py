@@ -359,6 +359,7 @@ def shape_factor_unique_forbidden(W, L, W0, Z, R, **kwargs):
     C = 0.
     pe = np.sqrt(W**2.0 - 1.)
     pnu = W0-W
+    L = abs(L)
     for k in range(1, L+1, 1):
         C += lambda_k(W, Z, R, k) * pe**(2*(k-1))*pnu**(2*(L-k))/factorial(2*k-1)/factorial(2*(L-k)+1)
     return C
