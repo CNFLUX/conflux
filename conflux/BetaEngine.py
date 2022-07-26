@@ -75,6 +75,7 @@ def L0b(W, Z, R):
     for k in range(0, 6):
         result += af(k,Z)*pow(W*R,k)
     result=result+af(-1,Z)*R/W;
+
     return result
 
 ######################
@@ -540,6 +541,11 @@ class BetaEngine:
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
+                
+                # if same ZAI reappear it is an isomer
+                if ZAI in self.istplist:
+                    I += 1
+                    ZAI += 1
 
                 betaIstp = BetaIstp(Z, A, I, Q, name, binwidths=self.binwidths, spectRange=self.spectRange)
 
@@ -574,10 +580,10 @@ class BetaEngine:
                             if spin_par_changes[j] in ftypes[i] and i < abs(forbiddeness):
                                 forbiddeness = -i
                                 if i == 1:
-                                    forbideness = firstftypes[j]
+                                    forbiddeness = firstftypes[j]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
-                                    forbideness = i
-                    
+                                    forbiddeness = i
+
                     # assign fraction values to branches
                     # normalize if greater than one
                     fraction = float(branch.attrib['fraction'])

@@ -66,6 +66,7 @@ if __name__ == "__main__":
     summed_model_err = sum1.modelUnc
     summed_yerr = sum1.yieldUnc
     
+    print('spectrum integral', sum1.Integral())
     print(sum1.totalYield)
     print(sum1.missingCount)
     print(sum1.missingBranch)
@@ -101,8 +102,8 @@ if __name__ == "__main__":
     # ax.errorbar(sum2.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP_linear.4.png")
-    sum2.SaveToFile('235U_nu.4.csv')
+    fig.savefig("235U_ENDF_TOP_linear.3.png")
+    sum2.SaveToFile('235U_nu.3.csv')
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_Unc.4.png")
+    fig.savefig("235U_ENDF_Unc.3.png")
     
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
@@ -128,7 +129,7 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    fig.savefig("235_239_Missing.4.png")
+    fig.savefig("235_239_Missing.3.png")
 
 
     with open("Commercial.csv", "w") as output:
