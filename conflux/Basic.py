@@ -36,7 +36,7 @@ class Spectrum:
         '''
         The absolute integral of the spectrum
         '''
-        self.integral = spectrum.sum()*binwidths
+        self.integral = self.spectrum.sum()*self.binwidths
         return self.integral
         
     def SaveToFile(self, filename):
