@@ -10,8 +10,12 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
+    spectBE = [0.05, 10.05]
+    width = 0.1
+    
+    
     U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(defaultDB='ENDF')
+    U235.LoadFissionDB(defaultDB='JEFF')
     #U235.LoadCorrelation(defaultDB='ENDF')
 
         # Pu239 = FissionIstp(94, 239)
@@ -26,10 +30,10 @@ if __name__ == "__main__":
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
-    sum1 = SumEngine(spectRange=[0.0, 15.0])
+    sum1 = SumEngine(binwidths=width, spectRange=spectBE)
     sum1.AddModel(model)
 
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), binwidths=0.1, spectRange=[0.0, 15.0])
+    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), binwidths=width, spectRange=spectBE)
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
         
@@ -72,14 +76,15 @@ if __name__ == "__main__":
     print(sum1.missingBranch)
     #result.Clear()
     
-    sum2 = SumEngine(spectRange=[0.0, 15.0])
+    sum2 = SumEngine(binwidths=width, spectRange=spectBE)
     sum2.AddModel(model)
     sum2.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)
     miss_spect = sum2.spectrum
     miss_err = sum2.uncertainty
     miss_model_err = sum2.modelUnc
     miss_yerr = sum2.yieldUnc
-    
+    sum2.SaveToFile('235U_nu_endf.csv')
+    sum1.SaveToFile('235U_nu_jeff_nomiss.csv')
     # print(sum2.totalYield)
     # print(sum2.missingCount)
     # print(sum2.missingBranch)
@@ -93,7 +98,7 @@ if __name__ == "__main__":
     ax.fill_between(sum2.xbins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
     ax.fill_between(sum2.xbins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
     ax.plot(sum2.xbins, miss_spect, label="w/ miss info")
-    ax.plot(sum2.xbins, summed_spect, label="w/o info")
+    #ax.plot(sum2.xbins, summed_spect, label="w/o info")
 
     ax.plot(sum2.xbins, miss_spect-summed_spect, label="missing info")
     # ax.plot(sum2.bins, miss_spect, label="w/ miss info")
@@ -102,8 +107,8 @@ if __name__ == "__main__":
     # ax.errorbar(sum2.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP_linear.4.png")
-    sum2.SaveToFile('235U_nu.4.csv')
+    fig.savefig("235U_ENDF_TOP_linear_jeff.png")
+    
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -119,7 +124,7 @@ if __name__ == "__main__":
     # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_Unc.4.png")
+    fig.savefig("235U_ENDF_Unc_jeff.png")
     
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
@@ -129,7 +134,7 @@ if __name__ == "__main__":
 
     ax.legend()
 
-    fig.savefig("235_239_Missing.4.png")
+    fig.savefig("235_239_Missing_jeff.png")
 
 
     with open("Commercial.csv", "w") as output:

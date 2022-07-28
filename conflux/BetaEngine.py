@@ -58,7 +58,7 @@ def neutrino(enu, p):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, m = 0, forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
         self.ID = E0
         
         self.Z = Z

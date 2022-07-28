@@ -91,7 +91,7 @@ class VirtualBranch:
             betaIstp = self.istplist[ZAI]
             if not missing and betaIstp.missing:
                 continue
-            if betaIstp.Q >= Elow and betaIstp.Q < Ehigh:
+            if betaIstp.Q >= Elow and betaIstp.Q < Ehigh and ZAI in self.FPYlist:
                 frac_sum += self.FPYlist[ZAI].y
                 Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
                 Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
