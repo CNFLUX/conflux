@@ -205,7 +205,7 @@ class BetaIstp(Spectrum, Summed):
         """
         self.branches[branch.ID] = branch
 
-    def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0., forbiddeness = 0):
+    def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0., forbiddeness = 0, bAc = 4.7):
         """
         Add or edit branches to the isotope with analyzer's assumptions
         Parameters:
@@ -216,7 +216,7 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-        self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness, binwidths=self.binwidths, spectRange=self.spectRange)
+        self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness, bAc = bAc, binwidths=self.binwidths, spectRange=self.spectRange)
 
     def MaxBranch(self):
         """
@@ -354,7 +354,7 @@ class BetaEngine:
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
                 
-                # if same ZAI reappear it is an isomer
+                # if same ZAI reappear it is tagged as an isomer (unmarked in the original DB)
                 if ZAI in self.istplist:
                     I += 1
                     ZAI += 1

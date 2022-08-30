@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    model.SaveToFile('FPY_235_JEFF.csv')
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0)
     #model.AddContribution(isotope=U233, Ei = 0, fraction=1)
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)

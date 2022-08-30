@@ -74,6 +74,8 @@ class SumEngine(Spectrum):
         self.FPYlist = {}
         self.betaUncertainty = {}
         self.betaSpectraList = {}
+        self.spectrum = np.zeros(self.bins)
+        self.uncertainty = np.zeros(self.bins)
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
