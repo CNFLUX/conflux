@@ -2,13 +2,13 @@ import numpy as np
 import csv
 
 class Spectrum:
-    '''
+    """
     A general class of a spectrum to initialize, add, and modify the object
-    '''
+    """
     def __init__(self, binwidths=0.1, spectRange=[0.0, 20.0]):
-        '''
+        """
         initializer
-        '''
+        """
         self.binwidths=binwidths
         self.bins = int(spectRange[1]/binwidths)
         self.xbins = np.arange(*spectRange, binwidths)
@@ -29,7 +29,8 @@ class Spectrum:
         An operator to scale the spectrum by a weighting factor
         '''
         uncertainty = self.uncertainty
-        self.uncertainty = W*self.spectrum*np.sqrt((sigma_W/W)**2+(uncertainty*self.spectrum)**2)
+        relativeUnc = np.sqrt((sigma_W/W)**2+(uncertainty*self.spectrum)**2)
+        self.uncertainty = W*self.spectrum*relativeUnc
         self.spectrum *= W
     
     def Integral(self):

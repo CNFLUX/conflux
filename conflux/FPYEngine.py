@@ -72,11 +72,10 @@ class FissionIstp:
 
     # method that load xml database of FPY and save nuclide info in dictionaries.
     def LoadFissionDB(self, customDB = None, defaultDB='ENDF'):
-        # TODO: prevent unreadable DBname
-        DBname = custromDB
-        if DBname == None or not os.path.exist(DBname):
+        DBname = customDB
+        if DBname == None or not os.path.exists(DBname):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
-            if not os.path.exist(DBname):
+            if DBname != None:
                 print('Custom DB: '+ DBname + ' NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')
             fileList = listdir(DBpath)
@@ -131,7 +130,7 @@ class FissionIstp:
     # flux calcuation.
     def LoadCovariance(self, customDB = None, defaultDB='ENDF', percent=True):
         DBpath = customDB
-        if DBpath == None or not os.path.exist(DBpath):
+        if DBpath == None or not os.path.exists(DBpath):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
@@ -202,7 +201,7 @@ class FissionIstp:
     # flux calcuation.
     def LoadCorrelation(self, DBpath = None, defaultDB='ENDF'):
         DBpath = customDB
-        if DBpath == None or not os.path.exist(DBpath):
+        if DBpath == None or not os.path.exists(DBpath):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading correlation matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
