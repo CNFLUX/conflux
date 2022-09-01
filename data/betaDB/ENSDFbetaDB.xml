@@ -9923,7 +9923,8 @@
 		<branch fraction="0.303" sigma_frac="0.004" end_point_E="0.582" sigma_E0="0.003" dJpi="1-"/>
 		<branch fraction="0.697" sigma_frac="0.004" end_point_E="0.437" sigma_E0="0.005" dJpi="0-"/>
 	</isotope>
-	<isotope name="Xe142" isotope="541420" Q="0.005286" HL="1.23 S    ">
+	<isotope name="Xe142" isotope="541420" Q="5.286" HL="1.23 S    ">
+		<!--Changed by hand due to inconsistent unit used in ENSDF-->
 		<branch fraction="1.000" sigma_frac="0.000" end_point_E="4.200" sigma_E0="0.100" dJpi="0"/>
 		<branch fraction="1.000" sigma_frac="0.000" end_point_E="3.700" sigma_E0="0.100" dJpi="0"/>
 	</isotope>

@@ -71,10 +71,13 @@ class FissionIstp:
         self.DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
 
     # method that load xml database of FPY and save nuclide info in dictionaries.
-    def LoadFissionDB(self, DBname = None, defaultDB='ENDF'):
-        if DBname == None:
+    def LoadFissionDB(self, customDB = None, defaultDB='ENDF'):
+        DBname = customDB
+        if DBname == None or not os.path.exists(DBname):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
-            print('Reading FPY DB from folder: '+DBpath+'...')
+            if DBname != None:
+                print('Custom DB: '+ DBname + ' NOT found!')
+            print('Reading default FPY DB from folder: '+DBpath+'...')
             fileList = listdir(DBpath)
             istpfound = False
             for filename in fileList:
@@ -125,8 +128,9 @@ class FissionIstp:
     # Method to read the prepackaged covariance csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCovariance(self, DBpath = None, defaultDB='ENDF', percent=True):
-        if DBpath == None:
+    def LoadCovariance(self, customDB = None, defaultDB='ENDF', percent=True):
+        DBpath = customDB
+        if DBpath == None or not os.path.exists(DBpath):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
@@ -195,7 +199,8 @@ class FissionIstp:
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
     def LoadCorrelation(self, DBpath = None, defaultDB='ENDF'):
-        if DBpath == None:
+        DBpath = customDB
+        if DBpath == None or not os.path.exists(DBpath):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
             print("Reading correlation matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
