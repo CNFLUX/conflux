@@ -38,7 +38,8 @@ class BetaData:
                 if E > 100:
                    E /= 1000.
 
-                # convert relative uncertainty in percentage to absolute uncertainty
+                # convert relative uncertainty in percentage to absolute
+                # uncertainty
                 y = float(row["Ne"])
                 yerr = float(row["dNe"])
                 if rel_err:
@@ -91,7 +92,8 @@ class VirtualBranch:
             betaIstp = self.istplist[ZAI]
             if not missing and betaIstp.missing:
                 continue
-            if betaIstp.Q >= Elow and betaIstp.Q < Ehigh and ZAI in self.FPYlist:
+            if (betaIstp.Q >= Elow and betaIstp.Q < Ehigh
+                and ZAI in self.FPYlist):
                 frac_sum += self.FPYlist[ZAI].y
                 Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
                 Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
@@ -99,8 +101,11 @@ class VirtualBranch:
         self.Zavg = round(Zfrac_sum/frac_sum)
 
     # define the theoretical beta spectrum shape
-    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False, forbiddeness = 0, bAc = 4.7):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0, sigma_E0=0, frac = contribute, sigma_frac = 0, forbiddeness=forbiddeness, bAc=4.7)
+    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False,
+                    forbiddeness = 0, bAc = 4.7):
+        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0,
+                                sigma_E0=0, frac = contribute, sigma_frac = 0,
+                                forbiddeness=forbiddeness, bAc=4.7)
         return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
 
     # function that fit the reference beta spectrum with virtual brances
@@ -134,13 +139,16 @@ class VirtualBranch:
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
                     
-                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby, p0 = init_guess, absolute_sigma=True, bounds=(0, [xhigh*1.5, limit]))
+                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby,
+                                           p0 = init_guess, absolute_sigma=True,
+                                           bounds=(0, [xhigh*1.5, limit]))
                     self.contribute[xhigh] = popt[1]
                     self.E0[xhigh] = popt[0]
 
                     # subtract the best fit spectrum from beta data
                     for i in range(len(betadata.x)):
-                        datacache[i] -= self.BetaSpectrum(betadata.x[i], popt[0], popt[1])
+                        datacache[i] -= self.BetaSpectrum(betadata.x[i],
+                                                          popt[0], popt[1])
 
                     # reset cached slices
                     subx = []
@@ -155,16 +163,41 @@ class VirtualBranch:
 
     # function to calculate summed spectra of virtual branches
     def SumBranches(self, x, thresh = 0, nu_spectrum = True):
+        """
+        SumBranches(self, x, thresh = 0, nu_spectrum = True)
+        
+        Function to calculate summed spectra of virtual branches
+        
+        Parameters
+        ----------
+        x : ndarray
+            The array of x values of the spectrum
+        thresh: float
+            Overrides the threshold. If threhold > 0, only add branch whose
+            energy range is above the threshold
+        nu_spectrum: bool
+            Overrides the nu_spectrum boolean, detemining whether to sum
+            neutrino spectra or beta spectra
+        
+        Returns
+        -------
+        result: ndarray
+            The summed spectra in the form of ndarray
+        """
         result = 0
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
-                vb = BetaBranch(self.Zlist[s], self.Alist[s], frac=self.contribute[s], I=0, Q = self.E0[s], E0=self.E0[s], sigma_E0=0, sigma_frac=0, forbiddeness=0, bAc=4.7)
+                vb = BetaBranch(self.Zlist[s], self.Alist[s],
+                                frac=self.contribute[s], I=0, Q = self.E0[s],
+                                E0=self.E0[s], sigma_E0=0, sigma_frac=0,
+                                forbiddeness=0, bAc=4.7)
                 result += vb.BetaSpectrum(x, nu_spectrum)*vb.frac
             elif sum(result*x) == 0:
                 return result*x
         return result
     
-    def Covariance(self, betadata, x, samples = 1000, thresh = 0, nu_spectrum = True):
+    def Covariance(self, betadata, x, samples = 500, thresh = 0,
+                   nu_spectrum = True):
         result = []
         print('Calculating covariance matrix...')
         startTiming = timeit.default_timer()
@@ -180,22 +213,26 @@ class VirtualBranch:
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()
         runTime = endTiming-startTiming
-        print("Finished calculating covairance matrix of "+ str(samples) + " samples.")
+        print("Finished calculating covairance matrix of "
+              + str(samples) + " samples.")
         print("Processing time: "+str(runTime)+" seconds")
         return np.cov(np.transpose(result))
 
-# class that search for best fit vertual branch and calculate total neutrino flux
+# Class that search for best fit vertual branch and calculate total neutrino
+# flux
 class ConversionEngine:
     def __init__(self):
         self.betadata = {}
-        self.fissionfrac = {}
+        self.fission_frac = {}
+        self.fission_dfrac = {}
         self.fisIstp = {}
         self.vblist = {}
 
     # load the beta spectrum measurement
-    def AddBetaData(self, betadata, fisIstp, name, frac):
+    def AddBetaData(self, betadata, fisIstp, name, frac, dfrac=0):
         self.betadata[name] = betadata
-        self.fissionfrac[name] = frac
+        self.fission_frac[name] = frac
+        self.fission_dfrac[name] = dfrac
         self.fisIstp[name] = fisIstp
 
     # Function that lets VB to fit against beta data with user chosen slice size
@@ -207,10 +244,63 @@ class ConversionEngine:
             vbnew.FitData(self.betadata[istp], slicesize)
             self.vblist[istp] = vbnew
     
-    def SummedSpectrum(self, xval, nu_spectrum = False):
-        summedSpec = np.zeros(len(xval))
+    def SummedSpectrum(self, x, nu_spectrum = True, cov_samp = 50):
+        """
+        SummedSpectrum(self, x, nu_spectrum = True, cov_samp = 50)
+        
+        Function to sum all best fit spectra calculated in the conversion engine
+        
+        Parameters
+        ----------
+        x : ndarray
+            The array of x values of the spectrum
+        nu_spectrum: bool
+            Overrides the nu_spectrum boolean, detemining whether to sum
+            neutrino spectra or beta spectra
+        cov_samp: int
+            The number of MC samples to calculate the covariance matrix. If the
+            sample number is below 50, calculation of covariance matrix will be
+            skipped.
+        
+        Returns
+        -------
+        spectrum: ndarray
+            The summed spectrum in the form of ndarray
+        uncertainty: ndarray
+            The uncertainty array of the summed spectrum
+        covariance: ndarray
+            The covariance matrix of the of the spectrum on given energy bin
+        """
+        # Determine whether to calculate the covariance matrix
+        calc_cov = cov_samp >= 50
+        # Define the function outputs
+        nbins_x = len(x)
+        spectrum = np.zeros(nbins_x)
+        uncertainty = np.zeros(nbins_x)
+        covariance = np.zeros((nbins_x, nbins_x))
+        
+        # Summing all fissile isotopes spectra and uncertainties
         for istp in self.betadata:
-            summedSpec += self.fissionfrac[istp]*self.vblist[istp].SumBranches(xval, nu_spectrum)
+            this_frac = self.fission_frac[istp]
+            this_vb = self.vblist[istp]
+            this_dfrac = self.fission_dfrac[istp]
             
-        return summedSpec
+            # Summing spectra with respect to the fraction of fissile isotope
+            new_spect = this_vb.SumBranches(x, nu_spectrum)
+            spectrum += this_frac*new_spect
+        
+            # Calculate covariance matrix
+            new_cov = (calc_cov
+                        *this_vb.Covariance(self.betadata[istp], x=x,
+                                            samples=cov_samp,
+                                            nu_spectrum=nu_spectrum))
+            sqratio1 = new_cov/this_frac**2 if this_frac!=0 else 0
+            sqratio2 = np.where(new_spect > 0, this_dfrac**2/new_spect, 0)
+            new_cov = sqratio1+np.identity(nbins_x)*sqratio2
+            covariance += new_cov
+            
+        # Get the sqrt diagonal of summed covariance matrix as the uncertainty
+        # at each energy bin.
+        uncertainty = np.sqrt(covariance.diagonal().copy())
+        return spectrum, uncertainty, covariance
     
