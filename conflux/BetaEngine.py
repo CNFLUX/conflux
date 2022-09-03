@@ -255,7 +255,8 @@ def integral(nu_spectrum, p, x_low, x_high):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac, forbiddeness=0, bAc=0.047, binwidths=0.1, spectRange=[0.0, 20.0]):
+    def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
+                forbiddeness=0, bAc=4.7, binwidths=0.1, spectRange=[0.0, 20.0]):
         self.ID = E0
         
         self.Z = Z
@@ -285,19 +286,22 @@ class BetaBranch(Spectrum):
         
     # display the vital info of branch
     def Display(self):
-        print("Branch E0 = " +str(self.E0)+"+\-"+str(self.sigma_E0)+", frac = "+str(self.frac)+"+\-"+str(self.sigma_frac))
-    
+        print("Branch E0 = " + str(self.E0)+ "+\-" + str(self.sigma_E0)
+            + ", frac = " + str(self.frac) + "+\-"+str(self.sigma_frac))
+
     # set correlation of this branch fraction and all another branches
     def SetCovariance(self, otherBranch, correlation):
         if self.E0 == otherBranch.E0:
             return
         self.corr[otherBranch.E0] = correlation
-        self.cov[otherBranch.E0] = self.sigma_frac*correlation*otherBranch.sigma_frac
-            
+        self.cov[otherBranch.E0] = (self.sigma_frac * correlation
+                                    * otherBranch.sigma_frac)
+
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
         Parameters = deepcopy(self.Parameters)
-        rangeCorrect = x <= self.E0 # prevent out-of-range variable to output insane results
+        # prevent out-of-range variable to create insane results
+        rangeCorrect = x <= self.E0
 
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, Parameters)
@@ -343,8 +347,10 @@ class BetaBranch(Spectrum):
             x_high = lower+self.binwidths
             if x_high > self.E0:
                 x_high = self.E0
-            self.spectrum[k] = abs(x_high-x_low)*self.BetaSpectrum((x_low+x_high)/2, nu_spectrum)
-            self.uncertainty[k] = abs(x_high-x_low)*self.SpectUncertMC((x_low+x_high)/2, nu_spectrum)
+            self.spectrum[k] = (abs(x_high-x_low)
+                                *self.BetaSpectrum((x_low+x_high)/2, nu_spectrum))
+            self.uncertainty[k] = (abs(x_high-x_low)
+                                    *self.SpectUncertMC((x_low+x_high)/2, nu_spectrum))
             if x_high == self.E0:
                 break
 
@@ -404,7 +410,11 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-        self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness, binwidths=self.binwidths, spectRange=self.spectRange)
+        self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0,
+                                        sigma_E0, fraction, sigma_frac,
+                                        forbiddeness, bAc = bAc,
+                                        binwidths=self.binwidths,
+                                        spectRange=self.spectRange)
 
     def MaxBranch(self):
         """
@@ -417,9 +427,11 @@ class BetaIstp(Spectrum, Summed):
 
     def CalcCovariance(self, GSF=True):
         """
-        Calculate the covaraince matrix for all the beta branches of this isotope
+        Calculate the covaraince matrix for all the beta branches of this
+        isotope
         Parameters:
-            GSF (boolean): determine whether to calculate covaraince matrix with ground state feeding
+            GSF (boolean): determine whether to calculate covaraince matrix with
+            ground state feeding
         Returns:
             None
         """
@@ -495,7 +507,8 @@ class BetaIstp(Spectrum, Summed):
         """
         Display isotope property and branch information
         """
-        print('Beta isotope: '+self.name+', ZAI = '+str(self.ZAI)+', Q = '+str(self.Q)+" MeV, " +str(len(self.branches))+" branches")
+        print('Beta isotope: '+self.name+', ZAI = '+str(self.ZAI)+', Q = '
+            +str(self.Q)+" MeV, " +str(len(self.branches))+" branches")
         for E0, branch in self.branches.items():
             branch.Display()
     
@@ -514,7 +527,7 @@ class BetaEngine:
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
     def LoadBetaDB(self, targetDB=None):
-        useInputList = True         # test if the engine is defined with an inputlist
+        useInputList = True # test if the engine is defined with an inputlist
         if self.inputlist == None:
             print("Loading all beta data from the default betaDB...")
             self.inputlist = []
@@ -542,12 +555,14 @@ class BetaEngine:
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
                 
-                # if same ZAI reappear it is an isomer
+                # if same ZAI reappear it is tagged as an isomer (unmarked in
+                # the original DB)
                 if ZAI in self.istplist:
                     I += 1
                     ZAI += 1
 
-                betaIstp = BetaIstp(Z, A, I, Q, name, binwidths=self.binwidths, spectRange=self.spectRange)
+                betaIstp = BetaIstp(Z, A, I, Q, name, binwidths=self.binwidths,
+                                    spectRange=self.spectRange)
 
                 # Adding missing branches below
                 if len(isotope) < 1:
@@ -572,7 +587,8 @@ class BetaEngine:
                     spin_par_changes = (branch.attrib['dJpi'])
 
                     # converting spin change to forbidden types
-                    ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'], ['3-', '4-'], ['4', '5']]
+                    ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
+                              ['3-', '4-'], ['4', '5']]
                     firstftypes = [-10, -11, 10]
                     forbiddeness = 1e3
                     for i in range(len(ftypes)):
@@ -592,13 +608,18 @@ class BetaEngine:
                         fraction /= fracsum
                         sigma_frac /= fracsum
 
-                    betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction, sigma_frac, forbiddeness, binwidths=self.binwidths, spectRange=self.spectRange)
+                    betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
+                                            sigma_frac, forbiddeness,
+                                            binwidths=self.binwidths,
+                                            spectRange=self.spectRange)
                     betaIstp.AddBranch(betaBranch)
                     
                 if betaIstp.branches:
                     self.istplist[ZAI] = betaIstp
 
-    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True, branchErange=[0.0, 20.0]):
+
+    def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True,
+                        branchErange=[0.0, 20.0]):
         """
         Calculates beta spectra of the list of beta-decaying isotopes
 
