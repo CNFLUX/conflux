@@ -5,6 +5,52 @@ from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
 import numpy as np
 
+def HuberZavg(x, c0, c1, c2):
+    return c0+c1*x+c2*x**2
+
+def Rebin(inputx, inputy, outputx):
+    # Rebinning the histogram
+    new_xbins = outputx
+    new_bin_width = outputx[1] - outputx[0]
+    new_xbins_low= new_xbins - new_bin_width/2
+    new_ybins = np.zeros(len(new_xbins))
+    
+    # get information from the old bins
+    old_xbins = inputx
+    old_ybins = inputy
+    old_bin_width = old_xbins[1] - old_xbins[0]
+    old_bins_low = inputx - old_bin_width
+
+    for j in range(len(new_xbins_low)):
+        norm = 0
+        for i in range(len(old_bins_low)):
+            # process if only old bin is in the new bin's range
+            weight = old_bin_width
+            if old_bins_low[i]>=new_xbins_low[j]:
+                # deal with case if old bin is partially in the new bin
+                old_bin = old_bins_low[i]
+                new_bin = new_xbins_low[j]
+                diff = old_bin - new_bin
+                # print(diff)
+                if diff < old_bin_width:
+                    weight = diff
+                    norm += weight
+                    new_ybins[j] += weight * old_ybins[i-1]
+                    
+                elif diff > new_bin_width:
+                    weight = old_bin_width + new_bin_width - diff
+                    norm += weight
+                    new_ybins[j] += weight * old_ybins[i]
+                    break
+                else:
+                    norm += weight
+                    new_ybins[j] += weight * old_ybins[i]
+
+        if norm > 0:
+            new_ybins[j] /= norm
+    
+    return new_ybins
+
 # test
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
@@ -19,7 +65,7 @@ if __name__ == "__main__":
     Pu241 = FissionIstp(94, 241)
     
     # Loading default fission product DB
-    U235.LoadFissionDB()
+    U235.LoadFissionDB(defaultDB='JEFF')
     Pu239.LoadFissionDB()
     Pu241.LoadFissionDB()
 
@@ -31,13 +77,16 @@ if __name__ == "__main__":
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    convertmodel.VBfit(branch_slice)
+    xval = np.linspace(0., 10., 200)
+    Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
+    print(Zlist)
+    convertmodel.VBfitbeta("U235", branch_slice, Zlist=Zlist)
 
     # Draw plots to test output.
     print("Drawing spectrum...")
     fig = plt.figure()
     # Define x values of data points to be drawn in the figure
-    xval = np.arange(2., 10., 0.25)
+    
     
     # Setting figure parameters
     plt.yscale('log')
@@ -105,6 +154,12 @@ if __name__ == "__main__":
     # fig.savefig("Pu239_cov_nu_new.png")
     
     final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
-    print(final_spect)
-    print(final_unc)
-    print(final_cov)
+    # print(final_spect)
+    # print(final_unc)
+    # print(final_cov)
+    
+    newxval = np.arange(2, 8.25, 0.25)
+    newyval = Rebin(xval, final_spect, newxval)
+    for i in newyval:
+        print(i)
+            

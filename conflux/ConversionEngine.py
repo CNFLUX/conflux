@@ -54,9 +54,27 @@ class BetaData:
 
 # Class that creates virtual branch based on nuclear data
 class VirtualBranch:
-    def __init__(self, fisIstp, Ei = 0):
+    def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}):
+        """
+        Class that creates virtual branch based on nuclear data
+        
+        Parameters
+        ----------
+        fisIstp : FissionIstp
+            input fission isotope model to calculate average atom number
+        Ei: float
+            incedent neutron energy that triggers the fission
+        Zlist: dictionary with float keys and float values
+            The mapping between the beta energy and input average Z number
+        Alist: dictionary with float keys and float values
+            The mapping between the beta energy and input average A number
+        """
+        
         self.Zavg = 47  # rough avg of Z across all energy
         self.Aavg = 117 # rough avg of A across all energy
+        self.Zlist = {}
+        self.Alist = {}
+
         self.fisIstp = fisIstp
 
         # load FPY of target fission isotope
@@ -69,6 +87,9 @@ class VirtualBranch:
         
         betaEngine.LoadBetaDB()
         self.istplist = betaEngine.istplist
+        
+        self._Zlist_cp = deepcopy(Zlist)
+        self._Alist_cp = deepcopy(Alist)
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
@@ -97,13 +118,18 @@ class VirtualBranch:
                 frac_sum += self.FPYlist[ZAI].y
                 Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
                 Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
-        self.Aavg = round(Afrac_sum/frac_sum)
-        self.Zavg = round(Zfrac_sum/frac_sum)
+        Aavg = round(Afrac_sum/frac_sum)
+        Zavg = round(Zfrac_sum/frac_sum)
+        return Zavg, Aavg
 
     # define the theoretical beta spectrum shape
-    def BetaSpectrum(self, x, E0, contribute, nu_spectrum=False,
-                    forbiddeness = 0, bAc = 4.7):
-        virtualbata = BetaBranch(self.Zavg, self.Aavg, I=0, Q=E0, E0=E0,
+    def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
+                    nu_spectrum=False, forbiddeness = 0, bAc = 4.7):
+        if Zavg is None:
+            Zavg = self.Zavg
+        if Aavg is None:
+            Aavg = self.Aavg
+        virtualbata = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0,
                                 sigma_E0=0, frac = contribute, sigma_frac = 0,
                                 forbiddeness=forbiddeness, bAc=4.7)
         return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
@@ -112,8 +138,6 @@ class VirtualBranch:
     def FitData(self, betadata, slicesize):
         self.contribute = {}
         self.E0 = {}
-        self.Zlist = {}
-        self.Alist = {}
         self.slicesize = slicesize
         # fill the sub lists as cached slices
         subx = [] # sublist x values
@@ -127,19 +151,29 @@ class VirtualBranch:
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
                 # when the sublist is filled in this slice, do fitting
-                if len(subx)>1 and len(suby) == len(subx) :
-                    self.CalcZAavg(xhigh-slicesize, xhigh)
-                    self.Zlist[xhigh] = self.Zavg
-                    self.Alist[xhigh] = self.Aavg
+                if len(subx)>1 and len(suby) == len(subx):
+                    if self._Zlist_cp:
+                        Zavg = round(np.interp(xhigh-slicesize/2, list(self._Zlist_cp.keys()), list(self._Zlist_cp.values())))
+                    else:
+                        Zavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
+                    if not self.Zlist[xhigh]:
+                        self.Zlist[xhigh] = Zavg
+                    if self._Alist_cp:
+                        Aavg = round(np.interp(xhigh-slicesize/2, list(self._Alist_cp.keys()), list(self._Alist_cp.values())))
+                    else:
+                        _, Aavg = self.CalcZAavg(xhigh-slicesize, xhigh)
+                    if not self.Alist[xhigh]:
+                        self.Alist[xhigh] = Zavg
 
                     # initial guess and boundary setting for parameters
-                    tempspec = self.BetaSpectrum(betadata.x, xhigh, 1)
+                    tempspec = self.BetaSpectrum(betadata.x, xhigh, 1, Zavg, Aavg)
                     comparison = (datacache/tempspec)
                     comparison[comparison < 0] = np.inf
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
+                    fitfunc = lambda x, e0, c: self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg)
                     
-                    popt, pcov = curve_fit(self.BetaSpectrum, subx, suby,
+                    popt, pcov = curve_fit(fitfunc, subx, suby,
                                            p0 = init_guess, absolute_sigma=True,
                                            bounds=(0, [xhigh*1.5, limit]))
                     self.contribute[xhigh] = popt[1]
@@ -151,9 +185,9 @@ class VirtualBranch:
                                                           popt[0], popt[1])
 
                     # reset cached slices
-                    subx = []
-                    suby = []
-                    subyerr = []
+                    subx = [] # [x]
+                    suby = [] # [datacache[i]]
+                    subyerr = [] # [betadata.uncertainty[it]]
 
                 xhigh -= slicesize
             else:
@@ -236,13 +270,12 @@ class ConversionEngine:
         self.fisIstp[name] = fisIstp
 
     # Function that lets VB to fit against beta data with user chosen slice size
-    def VBfit(self, slicesize = 0.5):
-        self.slicesize = slicesize
-        for istp in self.betadata:
-            # define the virtual branches to be fit
-            vbnew = VirtualBranch(self.fisIstp[istp])
-            vbnew.FitData(self.betadata[istp], slicesize)
-            self.vblist[istp] = vbnew
+    def VBfitbeta(self, istp, slicesize = 0.5, Ei = 0, Zlist={}, Alist={}):
+        assert istp in self.betadata
+        # define the virtual branches to be fit
+        vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
+        vbnew.FitData(self.betadata[istp], slicesize)
+        self.vblist[istp] = vbnew
     
     def SummedSpectrum(self, x, nu_spectrum = True, cov_samp = 50):
         """

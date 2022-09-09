@@ -49,18 +49,16 @@ class SumEngine(Spectrum):
 
     """
     
-    def __init__(self, neutrino=True, binwidths=0.1, spectRange=[-1.0, 20.0]):
+    def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
         self.neutrino = neutrino # neutrino or electon spectrum
         
-        self.binwidths=binwidths
-        self.spectRange=spectRange
-        self.bins = int(spectRange[1]/binwidths)
-        self.xbins = np.arange(*spectRange, binwidths)
-        self.spectrum = np.zeros(self.bins)
-        self.uncertainty = np.zeros(self.bins)
+        self.xbins = xbins
+        self.nbin = len(xbins)
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
 
     def Clear(self):
         """
@@ -74,8 +72,8 @@ class SumEngine(Spectrum):
         self.FPYlist = {}
         self.betaUncertainty = {}
         self.betaSpectraList = {}
-        self.spectrum = np.zeros(self.bins)
-        self.uncertainty = np.zeros(self.bins)
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
@@ -129,8 +127,8 @@ class SumEngine(Spectrum):
         """
         
         print("Summing beta spectra...")
-        self.modelUnc = np.zeros(self.bins)
-        self.yieldUnc = np.zeros(self.bins)
+        self.modelUnc = np.zeros(self.nbin)
+        self.yieldUnc = np.zeros(self.nbin)
         self.missingBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
