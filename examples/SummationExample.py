@@ -10,17 +10,15 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
-    spectBE = [0.05, 10.05]
-    width = 0.1
-    
+    xbins = np.arange(2, 8.25, 0.25)
     
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')
     #U235.LoadCorrelation(defaultDB='ENDF')
 
-        # Pu239 = FissionIstp(94, 239)
-        # Pu239.LoadFissionDB()
-        # Pu239.LoadCorrelation()
+    # Pu239 = FissionIstp(94, 239)
+    # Pu239.LoadFissionDB()
+    # Pu239.LoadCorrelation()
     #U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
@@ -31,10 +29,10 @@ if __name__ == "__main__":
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
-    sum1 = SumEngine(binwidths=width, spectRange=spectBE)
+    sum1 = SumEngine(xbins = xbins)
     sum1.AddModel(model)
 
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), binwidths=width, spectRange=spectBE)
+    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xbins)
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
         
@@ -77,15 +75,15 @@ if __name__ == "__main__":
     print(sum1.missingBranch)
     #result.Clear()
     
-    sum2 = SumEngine(binwidths=width, spectRange=spectBE)
+    sum2 = SumEngine(xbins=xbins)
     sum2.AddModel(model)
     sum2.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)
     miss_spect = sum2.spectrum
     miss_err = sum2.uncertainty
     miss_model_err = sum2.modelUnc
     miss_yerr = sum2.yieldUnc
-    sum2.SaveToFile('235U_nu_endf.csv')
-    sum1.SaveToFile('235U_nu_jeff_nomiss.csv')
+    sum2.SaveToFile('235U_nu_endf_test.csv')
+    sum1.SaveToFile('235U_nu_jeff_nomiss_test.csv')
     # print(sum2.totalYield)
     # print(sum2.missingCount)
     # print(sum2.missingBranch)

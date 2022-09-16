@@ -19,7 +19,7 @@ def Rebin(inputx, inputy, outputx):
     old_xbins = inputx
     old_ybins = inputy
     old_bin_width = old_xbins[1] - old_xbins[0]
-    old_bins_low = inputx - old_bin_width
+    old_bins_low = inputx - old_bin_width/2
 
     for j in range(len(new_xbins_low)):
         norm = 0
@@ -31,19 +31,23 @@ def Rebin(inputx, inputy, outputx):
                 old_bin = old_bins_low[i]
                 new_bin = new_xbins_low[j]
                 diff = old_bin - new_bin
-                # print(diff)
+                
                 if diff < old_bin_width:
                     weight = diff
                     norm += weight
-                    new_ybins[j] += weight * old_ybins[i-1]
+                    print(1, i, old_bin, new_bin, weight, old_ybins[i])
+                    new_ybins[j] += weight * old_ybins[i]
                     
-                elif diff > new_bin_width:
+                elif diff >= new_bin_width:
                     weight = old_bin_width + new_bin_width - diff
                     norm += weight
+                    print(2, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
                     break
+                    
                 else:
                     norm += weight
+                    print(3, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
 
         if norm > 0:
@@ -55,6 +59,7 @@ def Rebin(inputx, inputy, outputx):
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData("./data/conversionDB/U_235_e_2014.csv")
+    beta235s = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
     beta239 = BetaData("./data/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData("./data/conversionDB/Pu_241_e_2014.csv")
     
@@ -77,9 +82,8 @@ if __name__ == "__main__":
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.linspace(0., 10., 200)
+    xval = np.arange(2, 8.25, 0.25)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
-    print(Zlist)
     convertmodel.VBfitbeta("U235", branch_slice, Zlist=Zlist)
 
     # Draw plots to test output.
@@ -153,13 +157,22 @@ if __name__ == "__main__":
     # plt.colorbar(im)
     # fig.savefig("Pu239_cov_nu_new.png")
     
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
-    # print(final_spect)
-    # print(final_unc)
-    # print(final_cov)
-    
-    newxval = np.arange(2, 8.25, 0.25)
-    newyval = Rebin(xval, final_spect, newxval)
-    for i in newyval:
+    # final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
+    # # print(final_spect)
+    # # print(final_unc)
+    # # print(final_cov)
+    #
+    # newxval = np.arange(2, 8.25, 0.25)
+    # newyval = Rebin(xval, final_spect, newxval)
+    for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
         print(i)
-            
+        
+    testxval = np.linspace(0,200,201)
+    testyval = 1*testxval+2
+    testxout = np.linspace(0,200,21)
+    testyout = Rebin(testxval, testyval, testxout)
+    
+    fig = plt.figure()
+    plt.plot(testxval, testyval)
+    plt.plot(testxout, testyout)
+    plt.show()

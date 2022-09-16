@@ -156,7 +156,7 @@ class VirtualBranch:
                         Zavg = round(np.interp(xhigh-slicesize/2, list(self._Zlist_cp.keys()), list(self._Zlist_cp.values())))
                     else:
                         Zavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
-                    if not self.Zlist[xhigh]:
+                    if xhigh not in self.Zlist:
                         self.Zlist[xhigh] = Zavg
                     if self._Alist_cp:
                         Aavg = round(np.interp(xhigh-slicesize/2, list(self._Alist_cp.keys()), list(self._Alist_cp.values())))
