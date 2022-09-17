@@ -256,7 +256,7 @@ def integral(nu_spectrum, p, x_low, x_high):
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
-                forbiddeness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1)):
+                forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1)):
         self.ID = E0
         
         self.Z = Z
@@ -401,7 +401,7 @@ class BetaIstp(Spectrum, Summed):
         self.branches[branch.ID] = branch
 
     def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0.,
-                    forbiddeness = 0, bAc = 4.7):
+                    forbiddenness = 0, bAc = 4.7):
         """
         Add or edit branches to the isotope with analyzer's assumptions
         Parameters:
@@ -414,7 +414,7 @@ class BetaIstp(Spectrum, Summed):
         """
         self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0,
                                         sigma_E0, fraction, sigma_frac,
-                                        forbiddeness, bAc=bAc, xbins=self.xbins)
+                                        forbiddenness, bAc=bAc, xbins=self.xbins)
 
     def MaxBranch(self):
         """
@@ -587,15 +587,15 @@ class BetaEngine:
                     ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
                               ['3-', '4-'], ['4', '5']]
                     firstftypes = [-10, -11, 10]
-                    forbiddeness = 1e3
+                    forbiddenness = 1e3
                     for i in range(len(ftypes)):
                         for j in range(len(spin_par_changes)):
-                            if spin_par_changes[j] in ftypes[i] and i < abs(forbiddeness):
-                                forbiddeness = -i
+                            if spin_par_changes[j] in ftypes[i] and i < abs(forbiddenness):
+                                forbiddenness = -i
                                 if i == 1:
-                                    forbiddeness = firstftypes[j]
+                                    forbiddenness = firstftypes[j]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
-                                    forbiddeness = i
+                                    forbiddenness = i
 
                     # assign fraction values to branches
                     # normalize if greater than one
@@ -606,7 +606,7 @@ class BetaEngine:
                         sigma_frac /= fracsum
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
-                                            sigma_frac, forbiddeness,
+                                            sigma_frac, forbiddenness,
                                             xbins=self.xbins)
                     betaIstp.AddBranch(betaBranch)
                     

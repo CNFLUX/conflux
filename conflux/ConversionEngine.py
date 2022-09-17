@@ -54,7 +54,7 @@ class BetaData:
 
 # Class that creates virtual branch based on nuclear data
 class VirtualBranch:
-    def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}):
+    def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}, fblist={}, wmlist={}):
         """
         Class that creates virtual branch based on nuclear data
         
@@ -68,12 +68,20 @@ class VirtualBranch:
             The mapping between the beta energy and input average Z number
         Alist: dictionary with float keys and float values
             The mapping between the beta energy and input average A number
+        fblist: dictionary with float keys and float values
+            The mapping between the beta energy and customized ratio 1st order
+            forbidden transition in the corresponding virtual branches
+        wmlist: dictionary with float keys and float values
+            The mapping between the beta energy and weak magnatism correction of
+            corresponding virtual branches
         """
         
         self.Zavg = 47  # rough avg of Z across all energy
         self.Aavg = 117 # rough avg of A across all energy
         self.Zlist = {}
         self.Alist = {}
+        self.fblist = {}
+        self.wmlist = {}
 
         self.fisIstp = fisIstp
 
@@ -90,6 +98,8 @@ class VirtualBranch:
         
         self._Zlist_cp = deepcopy(Zlist)
         self._Alist_cp = deepcopy(Alist)
+        self._fblist_cp = deepcopy(fblist)
+        self._wmlist_cp = deepcopy(wmlist)
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
@@ -131,7 +141,7 @@ class VirtualBranch:
             Aavg = self.Aavg
         virtualbata = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0,
                                 sigma_E0=0, frac = contribute, sigma_frac = 0,
-                                forbiddeness=forbiddeness, bAc=4.7)
+                                forbiddeness=forbiddeness, bAc=bAc)
         return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
 
     # function that fit the reference beta spectrum with virtual brances
@@ -158,12 +168,27 @@ class VirtualBranch:
                         Zavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
                     if xhigh not in self.Zlist:
                         self.Zlist[xhigh] = Zavg
+                        
                     if self._Alist_cp:
                         Aavg = round(np.interp(xhigh-slicesize/2, list(self._Alist_cp.keys()), list(self._Alist_cp.values())))
                     else:
                         _, Aavg = self.CalcZAavg(xhigh-slicesize, xhigh)
-                    if not self.Alist[xhigh]:
-                        self.Alist[xhigh] = Zavg
+                    if xhigh not in self.Alist:
+                        self.Alist[xhigh] = Aavg
+                        
+                    if self._fblist_cp:
+                        fbratio = (np.interp(xhigh-slicesize/2, list(self._fblist_cp.keys()), list(self._fblist_cp.values())))
+                    else:
+                        fbratio = 0.0
+                    if xhigh not self.fblist:
+                        self.fblist[xhigh] = 0.0
+                        
+                    if self._wmlist_cp:
+                        wm = (np.interp(xhigh-slicesize/2, list(self._wmlist_cp.keys()), list(self._wmlist_cp.values())))
+                    else:
+                        wm = 4.7
+                    if xhigh not self.wmlist:
+                        self.wmlist[xhigh] = 4.7
 
                     # initial guess and boundary setting for parameters
                     tempspec = self.BetaSpectrum(betadata.x, xhigh, 1, Zavg, Aavg)
@@ -171,7 +196,10 @@ class VirtualBranch:
                     comparison[comparison < 0] = np.inf
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
-                    fitfunc = lambda x, e0, c: self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg)
+                    fitfunc = (lambda x, e0, c: (self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
+                                                                forbiddeness=0, bAc=wm))
+                                                + fbratio*self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
+                                                                            forbiddeness=1, bAc=wm))
                     
                     popt, pcov = curve_fit(fitfunc, subx, suby,
                                            p0 = init_guess, absolute_sigma=True,
@@ -224,7 +252,7 @@ class VirtualBranch:
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
                                 frac=self.contribute[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
-                                forbiddeness=0, bAc=4.7)
+                                forbiddeness=self.fblist[s], bAc=self.wmlist[s])
                 result += vb.BetaSpectrum(x, nu_spectrum)*vb.frac
             elif sum(result*x) == 0:
                 return result*x
