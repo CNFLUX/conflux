@@ -196,10 +196,10 @@ class VirtualBranch:
                     comparison[comparison < 0] = np.inf
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
-                    fitfunc = (lambda x, e0, c: (self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
+                    fitfunc = (lambda x, e0, c: (1-fbratio)*(self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
                                                                 forbiddeness=0, bAc=wm))
-                                                + fbratio*self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
-                                                                            forbiddeness=1, bAc=wm))
+                                                + fbratio*(self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
+                                                                            forbiddeness=1, bAc=wm)))
                     
                     popt, pcov = curve_fit(fitfunc, subx, suby,
                                            p0 = init_guess, absolute_sigma=True,
