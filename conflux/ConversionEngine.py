@@ -163,43 +163,59 @@ class VirtualBranch:
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx):
                     if self._Zlist_cp:
-                        Zavg = round(np.interp(xhigh-slicesize/2, list(self._Zlist_cp.keys()), list(self._Zlist_cp.values())))
+                        Zavg = round(np.interp(xhigh-slicesize/2,
+                                                list(self._Zlist_cp.keys()),
+                                                list(self._Zlist_cp.values())))
                     else:
                         Zavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
                     if xhigh not in self.Zlist:
                         self.Zlist[xhigh] = Zavg
                         
                     if self._Alist_cp:
-                        Aavg = round(np.interp(xhigh-slicesize/2, list(self._Alist_cp.keys()), list(self._Alist_cp.values())))
+                        Aavg = round(np.interp(xhigh-slicesize/2,
+                                                list(self._Alist_cp.keys()),
+                                                list(self._Alist_cp.values())))
                     else:
                         _, Aavg = self.CalcZAavg(xhigh-slicesize, xhigh)
                     if xhigh not in self.Alist:
                         self.Alist[xhigh] = Aavg
                         
                     if self._fblist_cp:
-                        fbratio = (np.interp(xhigh-slicesize/2, list(self._fblist_cp.keys()), list(self._fblist_cp.values())))
+                        fbratio = (np.interp(xhigh-slicesize/2,
+                                            list(self._fblist_cp.keys()),
+                                            list(self._fblist_cp.values())))
                     else:
                         fbratio = 0.0
                     if xhigh not self.fblist:
                         self.fblist[xhigh] = 0.0
                         
                     if self._wmlist_cp:
-                        wm = (np.interp(xhigh-slicesize/2, list(self._wmlist_cp.keys()), list(self._wmlist_cp.values())))
+                        wm = (np.interp(xhigh-slicesize/2,
+                                        list(self._wmlist_cp.keys()),
+                                        list(self._wmlist_cp.values())))
                     else:
                         wm = 4.7
                     if xhigh not self.wmlist:
                         self.wmlist[xhigh] = 4.7
 
                     # initial guess and boundary setting for parameters
-                    tempspec = self.BetaSpectrum(betadata.x, xhigh, 1, Zavg, Aavg)
+                    tempspec = self.BetaSpectrum(betadata.x, xhigh, 1, Zavg,
+                                                Aavg)
                     comparison = (datacache/tempspec)
                     comparison[comparison < 0] = np.inf
                     limit = min(comparison)
                     init_guess = [xhigh, limit/2]
-                    fitfunc = (lambda x, e0, c: (1-fbratio)*(self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
-                                                                forbiddeness=0, bAc=wm))
-                                                + fbratio*(self.BetaSpectrum(x, e0, c, Zavg=Zavg, Aavg=Aavg,
-                                                                            forbiddeness=1, bAc=wm)))
+                    fitfunc = (lambda x, e0, c:
+                                (1-fbratio)*(self.BetaSpectrum(x, e0, c,
+                                                                Zavg=Zavg,
+                                                                Aavg=Aavg,
+                                                                forbiddeness=0,
+                                                                bAc=wm))
+                                + fbratio*(self.BetaSpectrum(x, e0, c,
+                                                                Zavg=Zavg,
+                                                                Aavg=Aavg,
+                                                                forbiddeness=1,
+                                                                bAc=wm)))
                     
                     popt, pcov = curve_fit(fitfunc, subx, suby,
                                            p0 = init_guess, absolute_sigma=True,
