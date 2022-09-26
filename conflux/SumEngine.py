@@ -130,6 +130,7 @@ class SumEngine(Spectrum):
         self.modelUnc = np.zeros(self.bins)
         self.yieldUnc = np.zeros(self.bins)
         self.missingBranch = []
+        self.unaddedBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
 
@@ -141,6 +142,11 @@ class SumEngine(Spectrum):
                 if not processMissing and betaSpectraDB.istplist[FPZAI].missing:
                     self.missingCount += self.FPYlist[FPZAI].y
                     self.missingBranch.append(FPZAI)
+                    continue
+                # If the spectrum doesn't exist (Because it wasn't calculated)
+                # skip over that branch
+                if (not hasattr(betaSpectraDB.istplist[FPZAI], "spectrum")):
+                    self.unaddedBranch.append(FPZAI)
                     continue
                 
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
