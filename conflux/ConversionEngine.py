@@ -186,7 +186,7 @@ class VirtualBranch:
                                             list(self._fblist_cp.values())))
                     else:
                         fbratio = 0.0
-                    if xhigh not self.fblist:
+                    if xhigh not in self.fblist:
                         self.fblist[xhigh] = 0.0
                         
                     if self._wmlist_cp:
@@ -195,7 +195,7 @@ class VirtualBranch:
                                         list(self._wmlist_cp.values())))
                     else:
                         wm = 4.7
-                    if xhigh not self.wmlist:
+                    if xhigh not in self.wmlist:
                         self.wmlist[xhigh] = 4.7
 
                     # initial guess and boundary setting for parameters
