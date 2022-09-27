@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.arange(2, 8.25, 0.25)
+    xval = np.arange(0, 10, 0.01)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     convertmodel.VBfitbeta("U235", branch_slice, Zlist=Zlist)
 
@@ -156,22 +156,24 @@ if __name__ == "__main__":
     # plt.colorbar(im)
     # fig.savefig("Pu239_cov_nu_new.png")
     
-    # final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
-    # # print(final_spect)
-    # # print(final_unc)
-    # # print(final_cov)
-    #
-    # newxval = np.arange(2, 8.25, 0.25)
-    # newyval = Rebin(xval, final_spect, newxval)
-    for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
-        print(i)
-        
-    testxval = np.linspace(0,200,201)
-    testyval = 1*testxval+2
-    testxout = np.linspace(0,200,21)
-    testyout = Rebin(testxval, testyval, testxout)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
+    print(final_spect)
+    print(final_unc)
+    print(final_cov)
     
-    fig = plt.figure()
-    plt.plot(testxval, testyval)
-    plt.plot(testxout, testyout)
-    plt.show()
+    newxval = np.arange(2, 8.25, 0.25)
+    newyval = Rebin(xval, final_spect, newxval)
+    for i in newyval:
+        print(i)
+    # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
+    #     print(i)
+    #
+    # testxval = np.linspace(0,200,201)
+    # testyval = 1*testxval+2
+    # testxout = np.linspace(0,200,21)
+    # testyout = Rebin(testxval, testyval, testxout)
+    #
+    # fig = plt.figure()
+    # plt.plot(testxval, testyval)
+    # plt.plot(testxout, testyout)
+    # plt.show()

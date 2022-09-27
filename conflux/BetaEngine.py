@@ -275,10 +275,10 @@ class BetaBranch(Spectrum):
         self.frac = frac
         self.sigma_frac = sigma_frac
 
-        self.forbiddeness = forbiddeness
+        self.forbiddenness = forbiddenness
         self.WM = bAc
         
-        self.Parameters = Parameters_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddeness)
+        self.Parameters = Parameters_t(Z = self.Z+1, A = self.A, e0=self.E0, WM=self.WM, ftype=self.forbiddenness)
         
         self.corr = {E0:1}  # correlation with other branches of the same isotope
         self.cov = {E0:self.sigma_frac**2}
