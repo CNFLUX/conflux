@@ -10,9 +10,9 @@ if __name__ == "__main__":
     #Load data into the simulation (Change this directory location to the location
     #Of U_235_e_2014.csv on the host machine)
     #This is the conversion Data
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
-    beta239 = BetaData("../data/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData("../data/conversionDB/Pu_241_e_2014.csv")
+    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
+    beta239 = BetaData("../../data/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData("../../data/conversionDB/Pu_241_e_2014.csv")
     #This is the loaded Fission Data
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
@@ -28,35 +28,37 @@ if __name__ == "__main__":
     ConvertModel.AddBetaData(beta235, U235, "U235", .6304)
     ConvertModel.AddBetaData(beta239, Pu239, "Pu239", .2525)
     ConvertModel.AddBetaData(beta241, Pu241, "Pu241", 0.0417)
-    ConvertModel.VBfit()
+    ConvertModel.VBfitbeta(istp="U235")
+    ConvertModel.VBfitbeta(istp="Pu239")
+    ConvertModel.VBfitbeta(istp="Pu241")
 
+    print("Beta Conversion calculations done")
 
     #This is the summation calculation
     FisModel = FissionModel()
     FisModel.AddContribution(isotope=U238, Ei=0.5, fraction=0.0754)
-    result = SumEngine(spectRange=[0.0,20.0])
+    result = SumEngine()
     result.AddModel(FisModel)
 
 
 
     #This is the U238 Summation Calculation
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 1.8])
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
     result.CalcReactorSpectrum(betaSpectraDB)
+
+    print("Summation Calculation done")
+
     SumY = result.spectrum
 
     x = np.linspace(0., 20., 200)
-    convertY = ConvertModel.SummedSpectrum(x)
-    U235Spec = ConvertModel.vblist["U235"].SumBranches(x, nu_spectrum=True)
-    Pu239Spec = ConvertModel.vblist["Pu239"].SumBranches(x, nu_spectrum=True)
-    Pu241Spec = ConvertModel.vblist["Pu241"].SumBranches(x, nu_spectrum=True)
+    convertY, uncertainty, covariance = ConvertModel.SummedSpectrum(x)
 
     #Combine the spectra together
     y = []
-    for i in range(len(SumY)):
-        y.append(convertY[i] + SumY[i])
+    for i in range(len(convertY)):
 
-    print("This works")
+        y.append(convertY[i] + SumY[i])
 
 
     fig = plt.figure()
@@ -64,9 +66,6 @@ if __name__ == "__main__":
 
     plt.plot(x,y, label = "total combined spectrum")
     plt.plot(x, convertY, label = "Conversion Spectrum")
-    plt.plot(x, U235Spec, label = "U235 Conv Spectrum")
-    plt.plot(x, Pu239Spec, label = "Pu239 Conv Spectrum")
-    plt.plot(x, Pu241Spec, label = "Pu241 Conv Spectrum")
     plt.plot(x, SumY, label = "U238 Sum Spectrum")
     plt.yscale('log')
     plt.title("U238 Added to Conversion model for U235/Pu239/Pu241")

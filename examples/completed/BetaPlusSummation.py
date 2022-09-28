@@ -9,23 +9,23 @@ if __name__ == "__main__":
 
     #Load data into the simulation (Change this directory location to the location
     #Of U_235_e_2014.csv on the host machine)
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
-    U235.LoadCorrelation()
+    #U235.LoadCorrelation()
   
     #This is the conversion calculation
 
     ConvertModel = ConversionEngine()
     ConvertModel.AddBetaData(beta235, U235, "U235", 1.0)
-    ConvertModel.VBfit()
+    ConvertModel.VBfitbeta("U235", 1.0)
 
     #This is the summation calculation
 
     FisModel = FissionModel()
     FisModel.AddContribution(isotope=U235, Ei=0, fraction=1.0)
 
-    result = SumEngine(spectRange=[0.0,20.0])
+    result = SumEngine()
     result.AddModel(FisModel)
 
     #This is the lower range of energy for SumEngine
@@ -35,21 +35,19 @@ if __name__ == "__main__":
     result.CalcReactorSpectrum(betaSpectralow)
     lowY = result.spectrum
 
-    for i in result.istplist:
-        print(i)
 
     #This is to clear out the SumEngine
     result.Clear()
-    result.spectrum = np.zeros(result.bins)
-    result.uncertainty = np.zeros(result.bins)
+    result.spectrum = np.zeros(len(result.xbins))
+    result.uncertainty = np.zeros(len(result.xbins))
 
     #This is the high range of energy for SumEngine
     result.AddModel(FisModel)
     betaSpectraHigh = BetaEngine(result.FPYlist.keys())
     #Note that I've defined the branch range to have a Q value between 8 and 20
-    # betaSpectraHigh.CalcBetaSpectra(nu_spectrum=True, branchErange=[8.0, 20.0])
-    # result.CalcReactorSpectrum(betaSpectraHigh)
-    # highY = result.spectrum
+    betaSpectraHigh.CalcBetaSpectra(nu_spectrum=True, branchErange=[8.0, 20.0])
+    result.CalcReactorSpectrum(betaSpectraHigh)
+    highY = result.spectrum
 
     x = np.linspace(0., 20., 200)
     convertY = ConvertModel.vblist["U235"].SumBranches(x, nu_spectrum=True)
@@ -57,15 +55,16 @@ if __name__ == "__main__":
     #Combine the spectra together
     y = []
     for i in range(len(convertY)):
-        y.append(convertY[i] + lowY[i])
+        y.append(convertY[i] + highY[i] + lowY[i])
 
 
     fig = plt.figure()
-    SumX = result.bins
+    SumX = result.xbins
     SumY = result.spectrum
 
+    #Plot out our spectra
     plt.plot(x,y, label = "total combined spectrum")
-    #plt.plot(x, highY, label = "SumEngine Q>8.0")
+    plt.plot(x, highY, label = "SumEngine Q>8.0")
     plt.plot(x, lowY, label = "SumEgine Q<1.8")
     plt.plot(x, convertY, label = "conversion Mode")
     plt.yscale('log')
@@ -74,6 +73,8 @@ if __name__ == "__main__":
     fig.savefig("HybridCalc_U235.png")
 
     print("Everything Worked!")
+
+    #Code to output the combined spectra to a text file.
 
     # #Output relevant data to a text file.
     # f = open("Hybrid_Model.txt", "a")

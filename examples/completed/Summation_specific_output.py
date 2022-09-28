@@ -19,7 +19,7 @@ if __name__ == "__main__":
     #Initialize the JEFF Summation calculation
     Jeff = SumEngine()
     Jeff.AddModel(modelJ)
-
+    #Run the Summation calculation for JEFF
     betaSpectraDBJ = BetaEngine(Jeff.FPYlist.keys())
     betaSpectraDBJ.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
@@ -34,25 +34,37 @@ if __name__ == "__main__":
     #Initialize the ENDF Summation Calculation
     Endf = SumEngine()
     Endf.AddModel(model)
-
+    # Run the Summation calculation for ENDF
     betaSpectraDB = BetaEngine(Endf.FPYlist.keys())
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
     Endf.CalcReactorSpectrum(betaSpectraDB)
+
+    #Calculate the fractional difference between the
+    #used summation databases.
+    summedDiff = []
+    for i in range(len(Jeff.spectrum)):
+        added =  Endf.spectrum[i] - Jeff.spectrum[i]
+        average = (Jeff.spectrum[i] + Endf.spectrum[i])/2.
+        total = added/average
+        summedDiff.append(total)
 
 
     #Plotting
 
     x = np.linspace(0.,20.,200)
 
-    fig = plt.plot()
-    plt.plot(x, Jeff.spectrum, label="JEFF")
-    plt.plot(x, Endf.spectrum, label='ENDF')
-    plt.xlim(0,14.0)
-    plt.ylabel("neutrinos/fission/MeV")
-    plt.xlabel("E (in MeV)")
-    plt.legend()
-    plt.title("JEFF vs ENDF for U235")
+    fig, (ax1, ax2) = plt.subplots(2)
+    ax1.plot(x, Jeff.spectrum, label="JEFF")
+    ax1.plot(x, Endf.spectrum, label='ENDF')
+    ax1.set_yscale("log")
+    ax1.set_xlim(0,14.0)
+    ax2.set(xlabel = "E (in MeV)", ylabel = "Fractional Difference")
+    ax1.set(ylabel = "(electrons/neutrinos) /fission/MeV")
+
+    ax1.legend()
+    ax2.plot(x, summedDiff)
+    ax1.set_title("JEFF vs ENDF for U235")
     plt.savefig("JEFFvENDF")
 
     print("This worked")
