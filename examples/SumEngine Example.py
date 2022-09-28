@@ -2,7 +2,7 @@ from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 import matplotlib.pyplot as plt
-
+import numpy as np
 if __name__  == "__main__":
 
     #---------------------------------------------------
@@ -15,7 +15,7 @@ if __name__  == "__main__":
     U235.LoadFissionDB()
     #Load up the Correlation data, and calculate the Covariance matrix (both are done by calling LoadCorrelation).
     #Must be done after loading up the Fission Data
-    U235.LoadCorrelation()
+    #U235.LoadCorrelation()
 
     #Initialize the model you'd like to work with, and add the isotope
     #into the model
@@ -24,28 +24,31 @@ if __name__  == "__main__":
 
     #Initialize the type of engine you want to run (The Summation engine in our case)
     #And then add the specific model to that engine
-    result = SumEngine()
+    result = SumEngine(xbins=np.arange(0, 15., 0.1))
     result.AddModel(model)
 
 
     #Load in the Beta Shape data and calculate the total beta shape of our reactor
-    betaSpectraDB = BetaEngine(result.FPYlist.keys())
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1, spectRange=[-1.0, 15.0], branchErange=[-1.0,15.0])
+    betaSpectraDB = BetaEngine(result.FPYlist.keys(), xbins=np.arange(0, 15, 0.1))
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 15.0])
 
     #Calculate the total reactor spectrum from the loaded shape data(betaSpectraDB)
     #And the fission Yield data (result)
-    result.CalcReactorSpectrum(betaSpectraDB, spectRange=[-1.0,15.0])
+    result.CalcReactorSpectrum(betaSpectraDB)
 
 
     #Draw the resulting spectra
     fig = plt.figure()
-    x = result.bins
+    x = result.xbins
     for FPZAI in result.betaSpectraList:
         #This is to draw out the individual branches
         plt.plot(x, result.betaSpectraList[FPZAI] * result.FPYlist[FPZAI].y)
     #This is the total spectrum
-    plt.plot(x, result.reactorSpectrum, 'b--')
+    plt.plot(x, result.spectrum, 'b--')
     plt.yscale('log')
+    plt.xlabel("E (in MeV)", fontsize= 18)
+    plt.ylabel("neutrinos/MeV/Fission", fontsize = 18)
+    plt.title("U235 Neutrino Spectrum", fontsize=20)
     fig.savefig("U235 - Neutrino Spectrum")
 
 
