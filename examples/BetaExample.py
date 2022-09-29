@@ -13,11 +13,17 @@ if __name__ == "__main__":
     testlist = [390960, 390961, 521340, 531340]
     testEngine = BetaEngine(testlist, xbins=x)
     testEngine.CalcBetaSpectra(nu_spectrum=True)
+    
     #print(testEngine.spectralist[521340])
 
     fig = plt.figure()
-    plt.errorbar(x, testEngine.istplist[390960].spectrum, yerr=testEngine.istplist[390961].uncertainty)
-    #plt.draw()
-    fig.savefig("errorbartest.png")
+    plt.errorbar(x, testEngine.istplist[531340].spectrum, yerr=testEngine.istplist[531340].uncertainty)
+    print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
+    testEngine.CalcBetaSpectra(nu_spectrum=False)
+    plt.errorbar(x, testEngine.istplist[531340].spectrum, yerr=testEngine.istplist[531340].uncertainty)
+    print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
+
+    plt.show()
+    # fig.savefig("errorbartest.png")
 
     #testbeta = BetaBranch(1, 3, 1.0, 0, )

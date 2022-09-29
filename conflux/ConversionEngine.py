@@ -106,7 +106,7 @@ class VirtualBranch:
         for nuclide in fisIstp.CFPY[Ei]:
             fpNuclide = fisIstp.CFPY[Ei][nuclide]
             if fpNuclide.y == 0: continue
-            FPZAI = int(fpNuclide.Z*10000+fpNuclide.A*10+fpNuclide.isomer)
+            FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
 
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fpNuclide
@@ -134,15 +134,15 @@ class VirtualBranch:
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
-                    nu_spectrum=False, forbiddeness = 0, bAc = 4.7):
+                    nu_spectrum=False, forbiddenness=0, bAc=4.7):
         if Zavg is None:
             Zavg = self.Zavg
         if Aavg is None:
             Aavg = self.Aavg
-        virtualbata = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0,
-                                sigma_E0=0, frac = contribute, sigma_frac = 0,
-                                forbiddeness=forbiddeness, bAc=bAc)
-        return virtualbata.BetaSpectrum(x, nu_spectrum)*contribute
+        virtualbata = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0, sigma_E0=0,
+                                frac=contribute, sigma_frac=0,
+                                forbiddenness=forbiddenness, bAc=bAc)
+        return virtualbata.BetaSpectrum(x, nu_spectrum) * contribute
 
     # function that fit the reference beta spectrum with virtual brances
     def FitData(self, betadata, slicesize):
@@ -209,14 +209,15 @@ class VirtualBranch:
                                 (1-fbratio)*(self.BetaSpectrum(x, e0, c,
                                                                 Zavg=Zavg,
                                                                 Aavg=Aavg,
-                                                                forbiddeness=0,
+                                                                forbiddenness=0,
                                                                 bAc=wm))
                                 + fbratio*(self.BetaSpectrum(x, e0, c,
                                                                 Zavg=Zavg,
                                                                 Aavg=Aavg,
-                                                                forbiddeness=1,
+                                                                forbiddenness=1,
                                                                 bAc=wm)))
                     
+                    # actual fitting
                     popt, pcov = curve_fit(fitfunc, subx, suby,
                                            p0 = init_guess, absolute_sigma=True,
                                            bounds=(0, [xhigh*1.5, limit]))
@@ -226,7 +227,8 @@ class VirtualBranch:
                     # subtract the best fit spectrum from beta data
                     for i in range(len(betadata.x)):
                         datacache[i] -= self.BetaSpectrum(betadata.x[i],
-                                                          popt[0], popt[1])
+                                                          E0=popt[0],
+                                                          contribute=popt[1])
 
                     # reset cached slices
                     subx = [] # [x]
@@ -268,8 +270,8 @@ class VirtualBranch:
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
                                 frac=self.contribute[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
-                                forbiddeness=self.fblist[s], bAc=self.wmlist[s])
-                result += vb.BetaSpectrum(x, nu_spectrum)*vb.frac
+                                forbiddenness=self.fblist[s], bAc=self.wmlist[s])
+                result += vb.BetaSpectrum(x, nu_spectrum) * vb.frac
             elif sum(result*x) == 0:
                 return result*x
         return result
@@ -321,9 +323,9 @@ class ConversionEngine:
         vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
     
-    def SummedSpectrum(self, x, nu_spectrum = True, cov_samp = 50):
+    def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50):
         """
-        SummedSpectrum(self, x, nu_spectrum = True, cov_samp = 50)
+        SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50)
         
         Function to sum all best fit spectra calculated in the conversion engine
         
@@ -363,7 +365,7 @@ class ConversionEngine:
             this_dfrac = self.fission_dfrac[istp]
             
             # Summing spectra with respect to the fraction of fissile isotope
-            new_spect = this_vb.SumBranches(x, nu_spectrum)
+            new_spect = this_vb.SumBranches(x, nu_spectrum=nu_spectrum)
             spectrum += this_frac*new_spect
         
             # Calculate covariance matrix
@@ -372,8 +374,8 @@ class ConversionEngine:
                                             samples=cov_samp,
                                             nu_spectrum=nu_spectrum))
             sqratio1 = new_cov/this_frac**2 if this_frac!=0 else 0
-            sqratio2 = np.where(new_spect > 0, this_dfrac**2/new_spect, 0)
-            new_cov = sqratio1+np.identity(nbins_x)*sqratio2
+            sqratio2 = np.where(new_spect>0, this_dfrac**2/new_spect, 0)
+            new_cov = sqratio1 + np.identity(nbins_x) * sqratio2
             covariance += new_cov
             
         # Get the sqrt diagonal of summed covariance matrix as the uncertainty

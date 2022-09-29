@@ -35,19 +35,19 @@ def Rebin(inputx, inputy, outputx):
                 if diff < old_bin_width:
                     weight = diff
                     norm += weight
-                    print(1, i, old_bin, new_bin, weight, old_ybins[i])
+                    # print(1, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
                     
                 elif diff >= new_bin_width:
                     weight = old_bin_width + new_bin_width - diff
                     norm += weight
-                    print(2, i, old_bin, new_bin, weight, old_ybins[i])
+                    # print(2, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
                     break
                     
                 else:
                     norm += weight
-                    print(3, i, old_bin, new_bin, weight, old_ybins[i])
+                    # print(3, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
 
         if norm > 0:
@@ -82,30 +82,32 @@ if __name__ == "__main__":
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.arange(2, 8.25, 0.25)
+    xval = np.arange(0,10, 0.01)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     convertmodel.VBfitbeta("U235", branch_slice, Zlist=Zlist)
 
     # Draw plots to test output.
     print("Drawing spectrum...")
-    fig = plt.figure()
     # Define x values of data points to be drawn in the figure
     
     
     # Setting figure parameters
-    plt.yscale('log')
-    plt.ylim([1e-5, 2])
+    fig = plt.figure()
+    # plt.yscale('log')
+    # plt.ylim([1e-5, 2])
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
     
-    # # Draw the spectra of all vertual branches
-    # for i in range(0, 40):
-    #     if (sum(convertmodel.vblist["Pu239"].SumBranches(xval,
-    #             thresh =i*branch_slice, nu_spectrum = False))<=0):
-    #         continue
-    #     plt.errorbar(xval, convertmodel.vblist["Pu239"].SumBranches(xval,
-    #         thresh =i*branch_slice, nu_spectrum = False), fmt='--')
-    #
+    # Draw the spectra of all vertual branches
+    for i in range(0, 40):
+        if (sum(convertmodel.vblist["U235"].SumBranches(xval,
+                thresh=i*branch_slice, nu_spectrum = False))<=0):
+            continue
+    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
+            thresh=1*branch_slice, nu_spectrum = False), fmt='--')
+    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
+            thresh=1*branch_slice, nu_spectrum = True), fmt='--')
+    
     # # Draw the original beta spectrum
     # plt.errorbar(convertmodel.betadata["Pu239"].x,
     #     convertmodel.betadata["Pu239"].y, convertmodel.betadata["Pu239"].yerr,
@@ -156,23 +158,34 @@ if __name__ == "__main__":
     # im = plt.imshow(covmat_nu)
     # plt.colorbar(im)
     # fig.savefig("Pu239_cov_nu_new.png")
+    # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
+
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True)
+
+    # print(final_spect)
+    # print(final_spect)
     
-    # final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval)
-    # # print(final_spect)
-    # # print(final_unc)
-    # # print(final_cov)
-    #
-    # newxval = np.arange(2, 8.25, 0.25)
-    # newyval = Rebin(xval, final_spect, newxval)
-    for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
-        print(i)
-        
-    testxval = np.linspace(0,200,201)
-    testyval = 1*testxval+2
-    testxout = np.linspace(0,200,21)
-    testyout = Rebin(testxval, testyval, testxout)
+    # print(final_unc)
+    # print(final_cov)
+    print("beta integral", sum(final_spect))
+    print("neu integral",sum(final_spect1))
+
+    
+    newxval = np.arange(2, 8.25, 0.25)
+    newyval = Rebin(xval, final_spect, newxval)
+    # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
+    #     print(i)
+    
+    # testxval = np.linspace(0,200,201)
+    # testyval = 1*testxval+2
+    # testxout = np.linspace(0,200,21)
+    # testyout = Rebin(testxval, testyval, testxout)
     
     fig = plt.figure()
-    plt.plot(testxval, testyval)
-    plt.plot(testxout, testyout)
+    plt.errorbar(convertmodel.betadata["U235"].x,
+        convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
+        label='beta data')
+    plt.plot(xval, final_spect)
+    plt.plot(xval, final_spect1)
     plt.show()

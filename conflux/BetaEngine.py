@@ -282,6 +282,8 @@ class BetaIstp(Spectrum, Summed):
             None
         """
         
+        self.spectrum=np.zeros(self.nbin)
+        self.uncertainty=np.zeros(self.nbin)
         self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
         self.branchUnc=np.zeros(self.nbin)
         self.totalUnc=np.zeros(self.nbin)
