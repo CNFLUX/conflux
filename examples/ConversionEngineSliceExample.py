@@ -24,7 +24,7 @@ if __name__ == "__main__":
         plt.xlabel("E (MeV)")
         plt.ylabel("(electron/neutrino)/fission/MeV")
         k = j * 0.2
-        convertmodel.VBfit(k)
+        convertmodel.VBfitbeta("U235", slicesize=k)
         for i in range(0, 15):
             if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
                 continue
