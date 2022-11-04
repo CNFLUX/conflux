@@ -160,8 +160,8 @@ if __name__ == "__main__":
     # fig.savefig("Pu239_cov_nu_new.png")
     # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=20)
+    # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True)
 
     # print(final_spect)
     # print(final_spect)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     # print(final_unc)
     # print(final_cov)
     print("beta integral", sum(final_spect))
-    print("neu integral",sum(final_spect1))
+    # print("neu integral",sum(final_spect1))
 
     
     newxval = np.arange(2, 8.25, 0.25)
@@ -183,9 +183,17 @@ if __name__ == "__main__":
     # testyout = Rebin(testxval, testyval, testxout)
     
     fig = plt.figure()
+    # plt.yscale('log')
     plt.errorbar(convertmodel.betadata["U235"].x,
         convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
         label='beta data')
-    plt.plot(xval, final_spect)
-    plt.plot(xval, final_spect1)
+    plt.plot(newxval, newyval)
+    # plt.plot(xval, final_spect1)
+    plt.show()
+    
+    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    diff = (final_spect-betaspect)/betaspect
+    fig = plt.figure()
+    plt.ylim([-0.2, 0.2])
+    plt.plot(xval, diff)
     plt.show()
