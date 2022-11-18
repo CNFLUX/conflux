@@ -8,6 +8,7 @@ import csv
 import numpy as np
 from scipy.optimize import curve_fit, nnls
 from scipy.stats import chisquare
+from scipy import interpolate
 from copy import deepcopy
 import timeit
 import matplotlib.pyplot as plt
@@ -171,10 +172,10 @@ class VirtualBranch:
         subx = [] # sublist x values
         suby = [] # sublist y values
         subyerr = [] # sublist uncertainty
-        xhigh = betadata.x[-1]
+        xhigh = 9
         datacache = np.copy(betadata.spectrum) # preserve the data
         for it, x in reversed(list(enumerate(betadata.x))):
-            if x < xhigh - slicesize or x == betadata.x[0]:
+            if x <= xhigh - slicesize or x == betadata.x[0]:
                 subx.append(x)
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
@@ -226,8 +227,8 @@ class VirtualBranch:
                     stepsize = 0.1
                     e_upper = xhigh+slicesize/2
                     e_lower = xhigh-slicesize
-                    if subx[0] == max(betadata.x):
-                        e_upper = xhigh+5
+                    if subx[0] == 9:
+                        e_upper = xhigh+3
                         
                     betafunc = (lambda x, e, c:
                                 ((1-fbratio)*(self.BetaSpectrum(x, e, 1,
@@ -248,21 +249,25 @@ class VirtualBranch:
                     for energy in np.arange(e_lower, e_upper, stepsize):
                         tempspec = betafunc(subx, energy, 1)
                         norm = sum(suby)/sum(tempspec)
+                        print(subx, suby)
                         fitfunc = (lambda x, c: betafunc(x, energy, c))
-                        leastfunc = (lambda c: np.sum((suby - fitfunc(subx, c)) ** 2/suby**2))
-                        # popt, pcov = curve_fit(fitfunc, subx, suby,
-                        #                    p0 = norm, absolute_sigma=True,
-                        #                    bounds=(0, np.inf))
-                        # a = popt[0]
+                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
+                        popt, pcov = curve_fit(fitfunc, subx, suby,
+                                                p0 = norm, absolute_sigma=True,
+                                                bounds=(0, np.inf))
+                        a = popt[0]
                         
                         newspect = norm*tempspec
                         # print(sum(suby)/sum(tempspec))
                         # print(sum(suby)/sum(betafunc(subx, energy, norm)))
-                        newtest = leastfunc(norm)
+                        newtest = leastfunc(a)
+                        print(energy, newtest)
                         if newtest < testvalue:
                             testvalue = newtest
                             best_energy = energy
-                            if norm>0: best_norm = norm
+                            if norm>0: best_norm = a
+                            
+                    print(best_energy, best_norm)
                     # comparison = (suby/tempspec)
                     #
                     # comparison[comparison < 0] = np.inf
@@ -303,7 +308,7 @@ class VirtualBranch:
                     subyerr = [] # [betadata.uncertainty[it]]
 
                 xhigh -= slicesize
-            else:
+            elif x <= xhigh:
                 subx.append(x)
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
@@ -312,9 +317,12 @@ class VirtualBranch:
     def FitDataNNLS(self, betadata, slicesize, seeds=100):
         self.contribute = {}
         self.E0 = {}
+        self.betadata = betadata
         self.slicesize = slicesize
         
-        xhigh = (np.arange(betadata.x[-1], betadata.x[0], -self.slicesize))
+        # setting the spectrum limits
+        xscales = betadata.x[betadata.x<=9.0]
+        xhigh = (np.arange(xscales[-1], xscales[0], -self.slicesize))
         
         least = np.inf
         bestnorm = np.zeros(len(xhigh))
@@ -364,7 +372,7 @@ class VirtualBranch:
             randarray = np.random.rand(len(xhigh))
             new_xhigh = xhigh-self.slicesize + (randarray*1.5)*self.slicesize
             # for the spectrum with highest energy, allow the end point to go upto 12 MeV
-            new_xhigh[0] = xhigh[0] - self.slicesize + (12-xhigh[0]+self.slicesize)*randarray[0]
+            new_xhigh[0] = xhigh[0] - self.slicesize + 3*randarray[0]
             
             # define the spectra matrix with and fill it virtual spetra
             spectra_matrix = []
@@ -388,6 +396,7 @@ class VirtualBranch:
         
         self.contribute = dict(zip(xhigh, bestnorm))
         self.E0 = dict(zip(xhigh, beste0))
+        print(self.E0, self.contribute)
             
     def FitDataNNLS_v2(self, betadata, slicesize, seeds=100):
         self.contribute = {}
@@ -464,7 +473,7 @@ class VirtualBranch:
         self.E0 = dict(zip(xhigh, beste0))
 
     # function to calculate summed spectra of virtual branches
-    def SumBranches(self, x, thresh = 0, nu_spectrum = True):
+    def SumBranches(self, x, thresh = 0, nu_spectrum = False):
         """
         SumBranches(self, x, thresh = 0, nu_spectrum = True)
         
@@ -490,6 +499,7 @@ class VirtualBranch:
         # print(len(self.E0))
         # print(self.E0)
         # print(self.contribute)
+        datacache = np.interp(x, self.betadata.x, self.betadata.spectrum)
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
@@ -505,6 +515,14 @@ class VirtualBranch:
                                     + self.fblist[s]
                                         * vb_fb.BetaSpectrum(x, nu_spectrum))
                 result += newspect
+                datacache -= newspect
+                fig = plt.figure()
+                plt.ylim([-1.5*abs(max(newspect)), 1.5*abs(max(newspect))])
+                plt.plot(x, newspect)
+                plt.plot(x, datacache)
+                plt.pause(1)
+                plt.show()
+                
             elif sum(result*x) == 0:
                 return result*x
         return result
@@ -521,7 +539,7 @@ class VirtualBranch:
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
                 
             vbnew = deepcopy(self)
-            vbnew.FitDataNNLS_v2(toy, vbnew.slicesize)
+            vbnew.FitData(toy, vbnew.slicesize)
             
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()
@@ -553,7 +571,7 @@ class ConversionEngine:
         assert istp in self.betadata
         # define the virtual branches to be fit
         vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
-        vbnew.FitDataNNLS_v2(self.betadata[istp], slicesize)
+        vbnew.FitData(self.betadata[istp], slicesize)
         # vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
     
