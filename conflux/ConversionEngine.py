@@ -224,7 +224,7 @@ class VirtualBranch:
                     subyerr = np.array(subyerr)
                     
                     # initial guess and boundary setting for parameters
-                    stepsize = 0.1
+                    stepsize = 0.02
                     e_upper = xhigh+slicesize/2
                     e_lower = xhigh-slicesize
                     if subx[0] == 9:
@@ -249,24 +249,37 @@ class VirtualBranch:
                     for energy in np.arange(e_lower, e_upper, stepsize):
                         tempspec = betafunc(subx, energy, 1)
                         norm = sum(suby)/sum(tempspec)
-                        print(subx, suby)
-                        fitfunc = (lambda x, c: betafunc(x, energy, c))
-                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
-                        popt, pcov = curve_fit(fitfunc, subx, suby,
-                                                p0 = norm, absolute_sigma=True,
-                                                bounds=(0, np.inf))
-                        a = popt[0]
+                        print(subx, suby, norm)
                         
-                        newspect = norm*tempspec
+                        fitfunc = (lambda x, c: c*betafunc(x, energy, norm))
+                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2)
+                        print(leastfunc(1))
+                        norm_range = np.arange(0.75, 1.25, 0.01)
+                        for a in norm_range:
+                            newtest = leastfunc(a)
+                            # print(a, newtest)
+                            if (newtest < testvalue):
+                                testvalue = newtest
+                                best_energy = energy
+                                if norm > 0: best_norm = a*norm
+                        
+                        
+                        # fitfunc = (lambda x, c: betafunc(x, energy, c))
+                        # leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
+                        # popt, pcov = curve_fit(fitfunc, subx, suby,
+                        #                         p0 = norm, absolute_sigma=True,
+                        #                         bounds=(0, np.inf))
+                        # a = popt[0]
+                        #
+                        # newspect = norm*tempspec
                         # print(sum(suby)/sum(tempspec))
                         # print(sum(suby)/sum(betafunc(subx, energy, norm)))
-                        newtest = leastfunc(a)
-                        print(energy, newtest)
-                        if newtest < testvalue:
-                            testvalue = newtest
-                            best_energy = energy
-                            if norm>0: best_norm = a
-                            
+                        # newtest = leastfunc(a)
+                        # print(energy, newtest)
+                        # if newtest < testvalue:
+                        #     testvalue = newtest
+                        #     best_energy = energy
+                        #     if norm>0: best_norm = a
                     print(best_energy, best_norm)
                     # comparison = (suby/tempspec)
                     #
@@ -278,7 +291,7 @@ class VirtualBranch:
                                         
                     
                     newspect = betafunc(subx, best_energy, best_norm)
-                    print('BEST FITTING', best_energy, best_norm, testvalue, sum(suby)/sum(newspect))
+                    print('BEST FIT', best_energy, best_norm, testvalue, sum(suby)/sum(newspect))
                     # least1 = np.sum((suby - norm*tempspec) ** 2 / subyerr ** 2)
                     # least2 = np.sum((suby - popt[1]*self.BetaSpectrum(subx, E0=popt[0], contribute = 1)) ** 2 / subyerr ** 2)
                     # least3 = np.sum((suby - popt[1]*newspect) ** 2 / subyerr ** 2)
@@ -499,7 +512,7 @@ class VirtualBranch:
         # print(len(self.E0))
         # print(self.E0)
         # print(self.contribute)
-        datacache = np.interp(x, self.betadata.x, self.betadata.spectrum)
+        # datacache = np.interp(x, self.betadata.x, self.betadata.spectrum)
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
@@ -515,13 +528,13 @@ class VirtualBranch:
                                     + self.fblist[s]
                                         * vb_fb.BetaSpectrum(x, nu_spectrum))
                 result += newspect
-                datacache -= newspect
-                fig = plt.figure()
-                plt.ylim([-1.5*abs(max(newspect)), 1.5*abs(max(newspect))])
-                plt.plot(x, newspect)
-                plt.plot(x, datacache)
-                plt.pause(1)
-                plt.show()
+                # datacache -= newspect
+                # fig = plt.figure()
+                # plt.ylim([-1.5*abs(max(newspect)), 1.5*abs(max(newspect))])
+                # plt.plot(x, newspect)
+                # plt.plot(x, datacache)
+                # plt.pause(1)
+                # plt.show()
                 
             elif sum(result*x) == 0:
                 return result*x
