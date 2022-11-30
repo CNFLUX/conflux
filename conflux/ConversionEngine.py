@@ -12,6 +12,8 @@ from scipy import interpolate
 from copy import deepcopy
 import timeit
 import matplotlib.pyplot as plt
+from iminuit.cost import LeastSquares
+
 from iminuit import Minuit
 
 
@@ -252,16 +254,27 @@ class VirtualBranch:
                         print(subx, suby, norm)
                         
                         fitfunc = (lambda x, c: c*betafunc(x, energy, norm))
-                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2)
-                        print(leastfunc(1))
-                        norm_range = np.arange(0.75, 1.25, 0.01)
-                        for a in norm_range:
-                            newtest = leastfunc(a)
-                            # print(a, newtest)
-                            if (newtest < testvalue):
-                                testvalue = newtest
-                                best_energy = energy
-                                if norm > 0: best_norm = a*norm
+                        leastfunc = LeastSquares(subx, suby, subyerr, fitfunc)
+                        m1 = Minuit(fitfunc, c = 1)
+                        m1.migrad()
+                        
+                        if (m1.fval < testvalue):
+                            testvalue = m1.fval
+                            best_energy = energy
+                            if norm > 0: best_norm = a*norm
+                                                
+                        
+                        # grid search method
+                        # leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2)
+                        # print(leastfunc(1))
+                        # norm_range = np.arange(0.75, 1.25, 0.01)
+                        # for a in norm_range:
+                        #     newtest = leastfunc(a)
+                        #     # print(a, newtest)
+                        #     if (newtest < testvalue):
+                        #         testvalue = newtest
+                        #         best_energy = energy
+                        #         if norm > 0: best_norm = a*norm
                         
                         
                         # fitfunc = (lambda x, c: betafunc(x, energy, c))
