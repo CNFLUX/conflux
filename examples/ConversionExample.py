@@ -94,7 +94,8 @@ if __name__ == "__main__":
     # Setting figure parameters
     fig = plt.figure()
     # plt.yscale('log')
-    # plt.ylim([1e-5, 2])
+    plt.xlim([2, 10])
+    plt.yscale('log')
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
     
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
 
     final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=20)
-    # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=20)
 
     # print(final_spect)
     # print(final_spect)
@@ -174,6 +175,7 @@ if __name__ == "__main__":
     
     newxval = np.arange(2, 8.25, 0.25)
     newyval = Rebin(xval, final_spect, newxval)
+    newyval1 = Rebin(xval, final_spect1, newxval)
     # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
     #     print(i)
     
@@ -181,6 +183,8 @@ if __name__ == "__main__":
     # testyval = 1*testxval+2
     # testxout = np.linspace(0,200,21)
     # testyout = Rebin(testxval, testyval, testxout)
+    for a in (newyval1):
+        print(newyval1)
     
     fig = plt.figure()
     # plt.yscale('log')
