@@ -81,10 +81,14 @@ if __name__ == "__main__":
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
+    # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
+    # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
     xval = np.arange(0,10, 0.01)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
-    convertmodel.VBfitbeta("U235", branch_slice, Zlist=Zlist)
+    #convertmodel.VBfitbeta("U235", branch_slice)
+    convertmodel.VBfitbeta("U235", branch_slice)
+
 
     # Draw plots to test output.
     print("Drawing spectrum...")
@@ -110,72 +114,72 @@ if __name__ == "__main__":
             thresh=1*branch_slice, nu_spectrum = True), fmt='--')
     
     # # Draw the original beta spectrum
-    # plt.errorbar(convertmodel.betadata["Pu239"].x,
-    #     convertmodel.betadata["Pu239"].y, convertmodel.betadata["Pu239"].yerr,
+    # plt.errorbar(convertmodel.betadata["U235"].x,
+    #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
     #     label='beta data')
     # # Draw the summed best fit virtual beta spectrum of this calculation
-    # spectrum = convertmodel.vblist["Pu239"].SumBranches(xval,
+    # spectrum = convertmodel.vblist["U235"].SumBranches(xval,
     #     nu_spectrum = False)
     # plt.errorbar(xval, spectrum, label='best fit beta')
     # # Draw the summed neutrino spectrum from converted best fit beta spectra
-    # spectrumNu = convertmodel.vblist["Pu239"].SumBranches(xval,
+    # spectrumNu = convertmodel.vblist["U235"].SumBranches(xval,
     # nu_spectrum = True)
     # plt.errorbar(xval, spectrumNu, label='neutrino')
     # plt.legend()
-    # fig.savefig("Pu239_conversion_new.png")
+    # fig.savefig("U235_conversion_new.png")
     #
-    # # Calculate covariance matrix of summed best fit beta spectrum
-    # covmat=convertmodel.vblist["Pu239"].Covariance(beta239,
-    #     xval, nu_spectrum = False, samples=50)
-    # # Calculate covariance matrix of summed converted neutrino spectrum
-    # covmat_nu=convertmodel.vblist["Pu239"].Covariance(beta239,
-    #     xval, nu_spectrum = True, samples=50)
-    #
-    # relativeErr = np.zeros(len(xval))
-    # for i in range(len(spectrum)):
-    #     if spectrum[i] > 0:
-    #         relativeErr[i] = np.sqrt(covmat[i][i])/spectrum[i]
-    #
-    # relativeErrNu = np.zeros(len(xval))
-    # for i in range(len(spectrum)):
-    #     if spectrumNu[i] > 0:
-    #         relativeErrNu[i] = np.sqrt(covmat_nu[i][i])/spectrumNu[i]
-    #
-    # fig = plt.figure()
-    # plt.ylim([-.3, .3])
-    # plt.fill_between(xval, relativeErr, -relativeErr, label='beta',
-    # alpha = 0.4)
-    # plt.fill_between(xval, relativeErrNu, -relativeErrNu, label='neutrino',
-    # alpha = 0.4)
-    # plt.legend()
-    # fig.savefig("Pu239_errs_new.png")
+
     #
     # fig = plt.figure()
     # im = plt.imshow(covmat)
     # plt.colorbar(im)
-    # fig.savefig("Pu239_cov_new.png")
+    # fig.savefig("U235_cov_new.png")
     #
     # fig = plt.figure()
     # im = plt.imshow(covmat_nu)
     # plt.colorbar(im)
-    # fig.savefig("Pu239_cov_nu_new.png")
+    # fig.savefig("U235_cov_nu_new.png")
     # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=20)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=20)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=50)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=50)
 
     # print(final_spect)
     # print(final_spect)
+    # Calculate covariance matrix of summed best fit beta spectrum
+    covmat=convertmodel.vblist["U235"].Covariance(beta235,
+        xval, nu_spectrum = False, samples=50)
+    # Calculate covariance matrix of summed converted neutrino spectrum
+    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235,
+        xval, nu_spectrum = True, samples=50)
+    #
+    relativeErr = np.zeros(len(xval))
+    for i in range(len(final_spect)):
+        if final_spect[i] > 0:
+            relativeErr[i] = np.sqrt(final_cov[i][i])/final_spect[i]
     
+    relativeErrNu = np.zeros(len(xval))
+    for i in range(len(final_spect1)):
+        if final_spect1[i] > 0:
+            relativeErrNu[i] = np.sqrt(final_cov1[i][i])/final_spect1[i]
+    
+    fig = plt.figure()
+    plt.ylim([-.3, .3])
+    plt.fill_between(xval, relativeErr, -relativeErr, label='beta',
+                    alpha = 0.4)
+    plt.fill_between(xval, relativeErrNu, -relativeErrNu, label='neutrino',
+                    alpha = 0.4)
+    plt.legend()
+    fig.savefig("U235_errs_new.png")
     # print(final_unc)
     # print(final_cov)
     print("beta integral", sum(final_spect))
     # print("neu integral",sum(final_spect1))
 
     
-    newxval = np.arange(2, 8.25, 0.25)
+    newxval = np.arange(2.125, 8.375, 0.25)
     newyval = Rebin(xval, final_spect, newxval)
-    newyval1 = Rebin(xval, final_spect1, newxval)
+    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=20)
     # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
     #     print(i)
     
@@ -184,7 +188,7 @@ if __name__ == "__main__":
     # testxout = np.linspace(0,200,21)
     # testyout = Rebin(testxval, testyval, testxout)
     for a in (newyval1):
-        print(newyval1)
+        print(a)
     
     fig = plt.figure()
     # plt.yscale('log')
@@ -198,6 +202,7 @@ if __name__ == "__main__":
     betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     fig = plt.figure()
-    plt.ylim([-0.2, 0.2])
+    plt.ylim([-0.05, 0.05])
+    plt.xlim([2, 9])
     plt.plot(xval, diff)
     plt.show()

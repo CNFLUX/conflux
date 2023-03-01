@@ -142,7 +142,7 @@ def radiative_correction_o2(W, Z, R, **kwargs):
             +np.pi**2/6
             -6*np.log(2))
 
-    return Z*ALPHA**2*(d1f+d2+d3+d01d4)
+    return abs(Z)*ALPHA**2*(d1f+d2+d3+d01d4)
 
 def radiative_correction_o3(W, Z, W0, R, **kwargs):
     """Radiative correction of order alpha^3 Z^2 to the beta spectrum shape
@@ -181,8 +181,8 @@ def radiative_correction(W, Z, W0, R, **kwargs):
 
     """
     o1 = radiative_correction_o1(W, W0)
-    o2 = radiative_correction_o2(Z, W, R)
-    o3 = radiative_correction_o3(Z, W, W0, R)
+    o2 = radiative_correction_o2(W, Z, R)
+    o3 = radiative_correction_o3(W, Z, W0, R)
     L = radiative_correction_L(W0)
 
     return ((1+o1-ALPHA/2/np.pi*3*np.log(PROTON_MASS_W/W0))
@@ -382,7 +382,7 @@ def atomic_screening(W, Z, R, l, **kwargs):
     Wt = W - beta_type * 0.5 * ALPHA * (abs(Z)-beta_type)*l
 
     pt = (0.5*p
-            +0.5*np.sqrt(p**2-beta_type*2*ALPHA*Z*Wt*l+0.j))
+            +0.5*np.sqrt(p**2-beta_type*2*ALPHA*abs(Z)*Wt*l+0.j))
 
     y = ALPHA*Z*W/p
     yt = ALPHA*Z*Wt/pt

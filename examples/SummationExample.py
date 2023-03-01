@@ -10,7 +10,7 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
-    xbins = np.arange(2, 8.25, 0.25)
+    xbins = np.arange(0, 8.25, 0.25)
     
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')

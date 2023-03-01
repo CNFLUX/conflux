@@ -229,7 +229,7 @@ class VirtualBranch:
                     # TODO there is a correlation between fitting quality and the range
                     stepsize = 0.02
                     e_upper = xhigh+slicesize
-                    e_lower = xhigh
+                    e_lower = xhigh+slicesize/8
                     if subx[0] == 9:
                         e_upper = xhigh+3
                         
@@ -254,17 +254,17 @@ class VirtualBranch:
                         tempspec = betafunc(subx, energy, 1)
                         norm = sum(suby)/sum(tempspec)
                         #
-                        # fitfunc = (lambda x, c: c*betafunc(x, energy, norm))
-                        # leastfunc = LeastSquares(subx, suby, subyerr, fitfunc)
-                        # m1 = Minuit(leastfunc, c = 1)
-                        # m1.migrad()
-                        # a = m1.values[0]
+                        fitfunc = (lambda x, c: c*betafunc(x, energy, norm))
+                        leastfunc = LeastSquares(subx, suby, subyerr, fitfunc)
+                        m1 = Minuit(leastfunc, c = 1)
+                        m1.migrad()
+                        a = m1.values[0]
                         # print(energy, a, m1.fval)
-                        #
-                        # if (m1.fval < testvalue):
-                        #     testvalue = m1.fval
-                        #     best_energy = energy
-                        #     if norm > 0: best_norm = a*norm
+                        
+                        if (m1.fval < testvalue):
+                            testvalue = m1.fval
+                            best_energy = energy
+                            if norm > 0: best_norm = a*norm
                                                 
                         
                         # grid search method
@@ -280,22 +280,22 @@ class VirtualBranch:
                         #         if norm > 0: best_norm = a*norm
                         
                         
-                        fitfunc = (lambda x, c: betafunc(x, energy, c))
-                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
-                        popt, pcov = curve_fit(fitfunc, subx, suby,
-                                                p0 = norm, absolute_sigma=True,
-                                                bounds=(0, np.inf))
-                        a = popt[0]
-                        
-                        newspect = norm*tempspec
-                        print(sum(suby)/sum(tempspec))
-                        print(sum(suby)/sum(betafunc(subx, energy, norm)))
-                        newtest = leastfunc(a)
-                        print(energy, newtest)
-                        if newtest < testvalue:
-                            testvalue = newtest
-                            best_energy = energy
-                            if norm>0: best_norm = a
+                        # fitfunc = (lambda x, c: betafunc(x, energy, c))
+                        # leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
+                        # popt, pcov = curve_fit(fitfunc, subx, suby,
+                        #                         p0 = norm, absolute_sigma=True,
+                        #                         bounds=(0, np.inf))
+                        # a = popt[0]
+                        #
+                        # newspect = norm*tempspec
+                        # print(sum(suby)/sum(tempspec))
+                        # print(sum(suby)/sum(betafunc(subx, energy, norm)))
+                        # newtest = leastfunc(a)
+                        # print(energy, newtest)
+                        # if newtest < testvalue:
+                        #     testvalue = newtest
+                        #     best_energy = energy
+                        #     if norm>0: best_norm = a
                     # comparison = (suby/tempspec)
                     #
                     # comparison[comparison < 0] = np.inf
@@ -306,7 +306,7 @@ class VirtualBranch:
                                         
                     
                     newspect = betafunc(betadata.x, best_energy, best_norm)
-                    print('BEST FIT', xhigh-slicesize, xhigh, best_energy, best_norm, testvalue, a)
+                    # print('BEST FIT', xhigh-slicesize, xhigh, best_energy, best_norm, testvalue, a)
                     # least1 = np.sum((suby - norm*tempspec) ** 2 / subyerr ** 2)
                     # least2 = np.sum((suby - popt[1]*self.BetaSpectrum(subx, E0=popt[0], contribute = 1)) ** 2 / subyerr ** 2)
                     # least3 = np.sum((suby - popt[1]*newspect) ** 2 / subyerr ** 2)
@@ -320,16 +320,19 @@ class VirtualBranch:
                     # print('result:', popt[0], popt[1])
 
                     # subtract the best fit spectrum from beta data
-                    fig = plt.figure()
+                    # fig = plt.figure()
+                    # # plt.yscale('log')
                     # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
-                    # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
-                    plt.plot(betadata.x, newspect)
-                    plt.errorbar(subx, suby, subyerr)
-                    plt.pause(1)
-                    plt.show()
+                    # # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
+                    # plt.plot(betadata.x, newspect)
+                    # plt.plot(betadata.x, datacache)
+                    #
+                    # plt.errorbar(subx, suby, subyerr)
+                    # plt.pause(1)
+                    # plt.show()
                     
-                    for i in range(len(betadata.x)):
-                        datacache[i] -= betafunc(betadata.x[i], best_energy, best_norm)
+                    # for i in range(len(betadata.x)):
+                    datacache -= newspect
                     
                     # reset cached slices
                     subx = [] # [x]
@@ -572,7 +575,7 @@ class VirtualBranch:
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
                 
             vbnew = deepcopy(self)
-            vbnew.FitDataNNLS_v2(toy, vbnew.slicesize)
+            vbnew.FitData(toy, vbnew.slicesize)
             
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()
@@ -604,7 +607,7 @@ class ConversionEngine:
         assert istp in self.betadata
         # define the virtual branches to be fit
         vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
-        vbnew.FitDataNNLS_v2(self.betadata[istp], slicesize)
+        vbnew.FitData(self.betadata[istp], slicesize)
         # vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
     
