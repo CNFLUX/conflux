@@ -15,6 +15,39 @@ import pkg_resources
 
 # this class saves nuclide info of fission products
 class FPNuclide:
+    """
+    Class to handle all the Fission Nuclide Information.
+
+    ...
+
+    Attributes
+    ----------
+    Z : (int)
+        Atomis number of your nuclide
+    A : (int)
+        atomic mass of your nuclide
+    N : (int)
+        Neutron count in your nuclide
+    isomer : (int)
+        The isomer number of your nuclide
+    FPZAI : (dictionary)
+        Fission Product dictionary for this nuclide. Is denoted with it's ZAI number
+    y : (float)
+        The yield of the specific nuclide
+    cov : (dictionary)
+        The covariance matrix for the specific nuclide
+    corr : (dictionary)
+        The correlation matrix for the specific nuclide
+    yerr : (float)
+        The yield error for this specific nuclide
+        
+    Methods
+    -------
+    Contribute(fraction, d_fraction=0):
+        Adds the fission yield of a specific branch to the overall fission yield
+    AddCovariance(newNuclide):
+        Add the covariance matrices of different nuclides together
+    """  
     def __init__(self, FPZAI, y, yerr):
         self.Z = int(FPZAI/10000)
         self.A = int((FPZAI-self.Z*10000)/10)
@@ -30,6 +63,18 @@ class FPNuclide:
     # When use_corr == True, assume correlation matrix is loaded, calculate a
     # new covariance matrix.
     def Contribute(self, fraction, d_fraction=0, use_corr = False):
+        """
+           Adds the fission yield of this branch to the total fission yield
+
+            Parameters:
+                fraction (float) : The fractional contribution of this nuclide to the overall yield
+                d_fraction (float) : the uncertainty in the fractional contribution of this nuclide
+            Returns:
+                None
+        """
+
+        
+        
         #
         # if use_corr:
         #     assert self.corr, "Correlation matrix was not loaded!"
@@ -52,7 +97,15 @@ class FPNuclide:
         self.y *= fraction  # multiply fission yield with fission fraction
 
     # Method to add covariance matrices together
-    def AddCovariance(self, newNuclide):
+    def AddCovariance(self, newNuclide):     
+        """
+            Adds covariance matrices together
+
+            Parameters:
+                newNuclide (FPNuclide) : The nuclide whose covariance matrix you want to add to this one.
+            Returns:
+                None
+        """
         # print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
             if key not in self.cov:
