@@ -170,9 +170,13 @@ class BetaBranch(Spectrum):
             if x_high == self.E0:
                 break
             lower+=binwidths
-
+        
+        full_range = np.arange(0, 20, 0.01)
+        this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
+        full_spect = self.BetaSpectrum(full_range, nu_spectrum)
+        this_spect = self.BetaSpectrum(this_range, nu_spectrum)
         # normalizing the spectrum
-        norm = self.spectrum.sum()
+        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum()
 
         if norm <=0:
             self.spectrum = np.zeros(self.nbin)
