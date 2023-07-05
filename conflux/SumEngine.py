@@ -144,7 +144,7 @@ class SumEngine(Spectrum):
                     continue
                 
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
-                self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].totalUnc
+                self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].uncertainty
                 self.spectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
                 self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
                 self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
