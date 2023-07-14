@@ -8,8 +8,8 @@ if __name__ == "__main__":
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
     U235.LoadCovariance()
-    U235.LoadCorrelation('/Users/zhang39//Downloads/')
-    U235.CalcCovariance(Ei =0)
+    # U235.LoadCorrelation('/Users/zhang39//Downloads/')
+    # U235.CalcCovariance(Ei =0)
     with open('cov_235_U_processed_v2.csv', 'w', newline='') as csvoutput:
         fieldnames = ['']
         for i in U235.CFPY[0]:

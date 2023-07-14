@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+
 if __name__ == "__main__":
 
     #So, we are now in conversion mode. First thing we will have to do is import our
@@ -24,6 +25,8 @@ if __name__ == "__main__":
     U235 = FissionIstp(92,235)
     U235.LoadFissionDB()
 
+    print("Check One")
+
     #Now I'm going to initialize the conversion Engine, and add the U235 Fission
     #and beta information into it. Note that the first variable needs to be the
     #beta data, and the second variable needs to be the fission information
@@ -35,14 +38,17 @@ if __name__ == "__main__":
     #Finally, we fit virtual beta branches to the beta spectra data with a user
     #Defined slice size (Default slice size is 0.5). Here I've chosen a slice size of
     #1.0
-    convertmodel.VBfit(1.0)
+    xval = np.arange(0.,10.0, 0.05)
 
-    #Everything above here is the conversion  mode calculation. Once I've done the
-    #Calculation, I need to extract the data and plot it/visualize/represent it.
-    #All plotting and data-visualization will be below.
+
+    convertmodel.VBfitbeta("U235")
+
+    print("Check Three")
+    # Everything above here is the conversion  mode calculation. Once I've done the
+    # Calculation, I need to extract the data and plot it/visualize/represent it.
+    # All plotting and data-visualization will be below.
 
     fig = plt.figure()
-    xval = np.linspace(0., 10., 200)
 
 
 
@@ -53,6 +59,11 @@ if __name__ == "__main__":
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
     #Plot out the model branches
+
+
+    #Something wrong with the plotting on this one
+
+
     for i in range(0, 20):
         if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
             continue

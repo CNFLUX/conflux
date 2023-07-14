@@ -14,11 +14,8 @@ if __name__ == "__main__":
     Pu239 = FissionIstp(94, 239)
     Pu241 = FissionIstp(94, 241)
     U235.LoadFissionDB()
-    U235.LoadCorrelation()
     Pu239.LoadFissionDB()
-    Pu239.LoadCorrelation()
     Pu241.LoadFissionDB()
-    Pu241.LoadCorrelation()
 
 
     #Summation culation
@@ -30,7 +27,7 @@ if __name__ == "__main__":
     SumEngine = SumEngine()
     SumEngine.AddModel(FisModel)
     BetaSpectraDB = BetaEngine(SumEngine.FPYlist.keys())
-    BetaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1)
+    BetaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
 
     SumEngine.CalcReactorSpectrum(BetaSpectraDB)
 
@@ -39,18 +36,20 @@ if __name__ == "__main__":
     ConvertModel.AddBetaData(beta235, U235, "U235", frac = 0.25)
     ConvertModel.AddBetaData(beta239, Pu239, "Pu239", frac = 0.65)
     ConvertModel.AddBetaData(beta241, Pu241, "Pu241", frac = 0.10)
-    ConvertModel.VBfit()
+    ConvertModel.VBfitbeta("U235")
+    ConvertModel.VBfitbeta("Pu239")
+    ConvertModel.VBfitbeta("Pu241")
 
     #Plotting
 
     fig = plt.figure()
     convertX = np.linspace(0., 10., 200)
-    totalY = ConvertModel.SummedSpectrum(convertX)
+    totalY, uncertainty, covariance = ConvertModel.SummedSpectrum(convertX)
     # convert235Y = ConvertModel.vblist["U235"].SumBranches(convertX, nu_spectrum = True)
     # convert239Y = ConvertModel.vblist["Pu239"].SumBranches(convertX, nu_spectrum= True)
     # convert241Y = ConvertModel.vblist["Pu241"].SumBranches(convertX, nu_spectrum=True)
-    SumX = SumEngine.bins
-    SumY = SumEngine.reactorSpectrum
+    SumX = SumEngine.xbins
+    SumY = SumEngine.spectrum
 
     # plt.plot(convertX, convert235Y, label="conversion mode 235")
     # plt.plot(convertX, convert239Y, label="conversion mode 239")

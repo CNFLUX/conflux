@@ -14,8 +14,6 @@ if __name__ == "__main__":
     U235 = FissionIstp(92,235)
     U235.LoadFissionDB()
     U235.LoadCovariance()
-    U235.LoadCorrelation()
-    U235.CalcCovariance(Ei=0)
     #-------------------------------------------#
 
     #Okay, now that that's out of the way, let's get onto the new part of this.

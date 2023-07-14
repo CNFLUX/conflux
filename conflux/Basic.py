@@ -2,18 +2,17 @@ import numpy as np
 import csv
 
 class Spectrum:
-    '''
+    """
     A general class of a spectrum to initialize, add, and modify the object
-    '''
-    def __init__(self, binwidths=0.1, spectRange=[0.0, 20.0]):
-        '''
+    """
+    def __init__(self, xbins=np.arange(0, 20, 0.1)):
+        """
         initializer
-        '''
-        self.binwidths=binwidths
-        self.bins = int(spectRange[1]/binwidths)
-        self.xbins = np.arange(*spectRange, binwidths)
-        self.spectrum = np.zeros(self.bins)
-        self.uncertainty = np.zeros(self.bins)
+        """
+        self.xbins = xbins
+        self.nbin = len(xbins)
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
         self.integral = 0
         
     def Add(self, targetSpec, W=1, sigma_W = 0):
@@ -29,14 +28,15 @@ class Spectrum:
         An operator to scale the spectrum by a weighting factor
         '''
         uncertainty = self.uncertainty
-        self.uncertainty = W*self.spectrum*np.sqrt((sigma_W/W)**2+(uncertainty*self.spectrum)**2)
+        relativeUnc = np.sqrt((sigma_W/W)**2+(uncertainty*self.spectrum)**2)
+        self.uncertainty = W*self.spectrum*relativeUnc
         self.spectrum *= W
     
     def Integral(self):
         '''
         The absolute integral of the spectrum
         '''
-        self.integral = self.spectrum.sum()*self.binwidths
+        self.integral = np.dot(self.spectrum.sum(), self.xbins)
         return self.integral
         
     def SaveToFile(self, filename):
@@ -47,7 +47,7 @@ class Spectrum:
             colNames = ['E', 'count', 'error']
             writer = csv.DictWriter(outputfile, fieldnames=colNames)
             writer.writeheader()
-            for i in range(self.bins):
+            for i in range(self.nbin):
                 E = self.xbins[i]
                 count = self.spectrum[i]
                 error = self.uncertainty[i]
