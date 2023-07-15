@@ -19,8 +19,8 @@ def is_number(s):
 # global method to generate a dictionary of element and Z
 def element_to_Z():
     zdict = {}
-    listname = pkg_resources.resource_filename('conflux', 'betaDB/Z_to_element.csv')
-    with open(listname) as csvinput:
+    # listname = pkg_resources.resource_filename('conflux', 'betaDB/Z_to_element.csv')
+    with open("Z_to_element.csv") as csvinput:
         csvreader = csv.reader(csvinput, delimiter=',')
         for row in csvreader:
             if row[0].isdigit:
@@ -157,12 +157,13 @@ class XMLedit:
         self.root.appendChild(self.DB)
 
     # beta-decay isotopes
-    def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = '0.0'):
+    def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = '0.0', Ex = '0.0'):
         self.isotope = self.root.createElement('isotope')
         self.isotope.setAttribute('name', str(istpName))
         self.isotope.setAttribute('isotope', str(isotopeID))
         self.isotope.setAttribute('Q', str(Q))
         self.isotope.setAttribute('HL', str(HL))
+        self.isotope.setAttribute('Ex', str(Ex))
         self.DB.appendChild(self.isotope)
 
     # decay branches of the isotope
@@ -188,8 +189,19 @@ class ParentIstp:
         element = line[3:5].capitalize().strip()
         self.name = element+line[:3].strip()
         self.Z = int(elementdict[element])
-        leveltxt = line[9:19].strip().replace('+X', '')
-        if not line[9:19].strip().isdigit():
+        leveltxt = line[9:19].strip()
+        
+        for a in leveltxt:
+            if a in ["X", "Y", "Z"]:
+                print("+"+a)
+                leveltxt=line[9:19].strip().replace("+"+a, "")
+                print(leveltxt)
+                break
+        
+        print(leveltxt, line[9:19].strip().isdigit())
+        if not any(char.isdigit() for char in leveltxt):
+            leveltxt = '0'
+        if not float(leveltxt):
             leveltxt = '0'
         self.level = float(leveltxt)/1e3#convert to MeV
         self.HL = line[39:49]
@@ -225,7 +237,6 @@ def ENSDFbeta(fileList):
     for filename in tqdm(fileList):
         inputfile = open(dirName+filename, "r", errors='replace')
 
-
         lastline = ""
         betabool = False
         beginlevel = 0.
@@ -247,6 +258,8 @@ def ENSDFbeta(fileList):
             if betabool == True:
                 # save information of the parent isotope
                 if MT == "  P":
+                    print(lastline)
+                    print(line)
                     decayparent = ParentIstp(line)
                     if 1e3 in decayparent.J:
                         decayparent.J = np.array([decayparent.A/2 - int(decayparent.A/2)])
@@ -259,9 +272,8 @@ def ENSDFbeta(fileList):
                         isomer = 0
                     ZAI = int(decayparent.Z*1e4 + decayparent.A*10 + isomer)
                     # save the parent isotope information
-                    xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL)
+                    xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL, decayparent.level)
                     lastline = line
-                    print(lastline)
                 elif MT == "  L":
                     lastline = line
                 elif MT == "  B" and "  B" not in lastline:
@@ -291,7 +303,7 @@ def ENSDFbeta(fileList):
                     lastline = line
                     #print(lastline)
 
-    xmloutput.saveXML("ENSDFbetaDB.xml")
+    xmloutput.saveXML("ENSDFbetaDB2.xml")
 
     return 0
 
