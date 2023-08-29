@@ -58,12 +58,10 @@ if __name__ == "__main__":
     ax1.set_yscale('log')
     ax1.set(ylabel = "(electron/neutrino)/fission/MeV")
     ax1.plot(xval, totalSpec, label = "60% U235, 40% Pu239")
-    ax1.plot(xval, otherSpec, label="100% U235")
+    ax1.plot(xval, otherSpec, label = "100% U235")
     ax2.plot(xval, comp)
     ax2.set(xlabel = "E (MeV)", ylabel = "Fractional difference")
     ax1.set_title("Comparison between pure U235 and a 60/40 mix of U235/Pu239")
     ax1.legend()
 
     plt.savefig("60-40")
-
-

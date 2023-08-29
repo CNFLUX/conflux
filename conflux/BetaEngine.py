@@ -112,6 +112,7 @@ class BetaBranch(Spectrum):
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False):
         Parameters = deepcopy(self.Parameters)
+        
         # prevent out-of-range variable to create insane results
         rangeCorrect = x <= self.E0
 
@@ -163,20 +164,26 @@ class BetaBranch(Spectrum):
             x_high = lower+binwidths
             if x_high > self.E0:
                 x_high = self.E0
-            self.spectrum[k] = (abs(x_high-x_low)
+            thisbinwidth = abs(x_high-x_low)
+            relativewidth = abs(x_high-x_low)/binwidths
+            self.spectrum[k] = (thisbinwidth*relativewidth
                                 *self.BetaSpectrum((x_low+x_high)/2, nu_spectrum))
-            self.uncertainty[k] = (abs(x_high-x_low)
+            if self.ZAI == 521330:
+                print("E0", self.E0, (x_low+x_high)/2, self.spectrum[k])
+            self.uncertainty[k] = (thisbinwidth*relativewidth
                                 *self.SpectUncertMC((x_low+x_high)/2, nu_spectrum))
             if x_high == self.E0:
                 break
-            lower+=binwidths
+            lower += binwidths
         
-        full_range = np.arange(0, 20, 0.01)
+        full_range = np.arange(0, 20, binwidths)
         this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
         full_spect = self.BetaSpectrum(full_range, nu_spectrum)
         this_spect = self.BetaSpectrum(this_range, nu_spectrum)
+        if self.ZAI == 521330 and self.E0 == 0.006:
+            print(self.spectrum.sum())
         # normalizing the spectrum
-        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum()
+        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum() if self.E0 > binwidths else self.spectrum.sum()
 
         if norm <=0:
             self.spectrum = np.zeros(self.nbin)
@@ -227,6 +234,8 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
+        if sigma_E0 > E0:
+            sigma_E0 = E0
         self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0,
                                         sigma_E0, fraction, sigma_frac,
                                         forbiddenness, bAc=bAc, xbins=self.xbins)
@@ -299,7 +308,8 @@ class BetaIstp(Spectrum, Summed):
             di = branchi.sigma_frac
             
             branchi.BinnedSpectrum(nu_spectrum)
-            # branch.spectrum.Norm(branch.spectrum, branch.frac)
+            if self.ZAI == 521330:
+                print(E0i, si, fi)
             self.spectrum += si*fi
             self.spectUnc += branchi.uncertainty*fi
             
@@ -452,9 +462,11 @@ class BetaEngine:
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-
+            
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
+            if betaIstp.ZAI == 521330:
+                print(betaIstp.spectrum)
             istpCount += 1
 
         endTiming = timeit.default_timer()

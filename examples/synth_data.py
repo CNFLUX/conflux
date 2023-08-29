@@ -72,6 +72,9 @@ if __name__ == "__main__":
 
     sumY = sumE.spectrum
     sumUnc = sumE.uncertainty
+    print(convertY)
+    print(sumY)
+    
 
     for i in range(len(percent)):
         diff = convertY[i] - sumY[i]

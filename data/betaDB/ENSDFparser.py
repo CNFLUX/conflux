@@ -205,7 +205,7 @@ class ParentIstp:
             leveltxt = '0'
         self.level = float(leveltxt)/1e3#convert to MeV
         self.HL = line[39:49]
-        self.Emax = float(line[64:74].strip())/1e3
+        self.Emax = float(line[64:74].strip())/1e3+float(leveltxt)/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
         self.pi, self.J = convert_J(line[21:39])
 
