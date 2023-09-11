@@ -174,7 +174,7 @@ class BetaBranch(Spectrum):
                 break
             lower += binwidths
         
-        full_range = np.arange(0, 20, binwidths)
+        full_range = np.arange(0, 20, 0.01)
         this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
         full_spect = self.BetaSpectrum(full_range, nu_spectrum)
         this_spect = self.BetaSpectrum(this_range, nu_spectrum)

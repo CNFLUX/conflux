@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 
 if __name__ == "__main__":
-    x = np.linspace(0, 4, 200)
-    binwidth =  1
+    x = np.linspace(0, 10, 200)
+    binwidth = 1
 
     testlist = [390960, 390961, 521340, 531340, 922390, 932390]
     testEngine = BetaEngine(testlist, xbins=x)
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     testEngine2 = BetaEngine(testlist, xbins=x)
     testEngine2.CalcBetaSpectra(nu_spectrum=True)
     y2 = testEngine2.istplist[index].spectrum*binwidth
-    print("beta/nu", sum(y1)/sum(y2))
+    print("beta/nu", sum(y1))
     plt.xlabel("E (MeV)")
     plt.plot(x, y2, "--", label=str(index)+"_nu") #, yerr=testEngine.istplist[index].uncertainty)
     plt.legend()
