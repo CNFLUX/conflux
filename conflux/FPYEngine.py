@@ -47,7 +47,7 @@ class FPNuclide:
         Adds the fission yield of a specific branch to the overall fission yield
     AddCovariance(newNuclide):
         Add the covariance matrices of different nuclides together
-    """  
+    """
     def __init__(self, FPZAI, y, yerr):
         self.Z = int(FPZAI/10000)
         self.A = int((FPZAI-self.Z*10000)/10)
@@ -73,8 +73,6 @@ class FPNuclide:
                 None
         """
 
-        
-        
         #
         # if use_corr:
         #     assert self.corr, "Correlation matrix was not loaded!"
@@ -97,7 +95,7 @@ class FPNuclide:
         self.y *= fraction  # multiply fission yield with fission fraction
 
     # Method to add covariance matrices together
-    def AddCovariance(self, newNuclide):     
+    def AddCovariance(self, newNuclide):
         """
             Adds covariance matrices together
 
@@ -357,6 +355,44 @@ class FissionModel:
         else:
             self.FPYlist[FPZAI].y + nuclide.y
             self.FPYlist[FPZAI].yerr + nuclide.yerr
+            
+    # Method to load a customized covariance matrix
+    def CustomCovariance(self, DBname):
+        with open(DBname) as inputfile:
+            reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
+            
+            for row in reader:
+                row_id = int(row[''])
+                z = int(row_id/10000)
+                i = int((row_id-z*10000)/1000)
+                a = int(row_id-z*10000-i*1000)
+                fpzai = z*10000+a*10+i
+                if fpzai not in self.CFPY[Ei]:
+                    continue
+                    
+                for corrzai in self.CFPY[Ei]:
+                    col_id = int(corrzai)
+                    z = int(col_id/10000)
+                    a = int((col_id-z*10000)/10)
+                    i = int(col_id-z*10000-a*10)
+                    key = z*10000+a+i*1000
+                    keystr = ' '+str(key)
+                    # if key is not found in the covaraince matrix, set
+                    # value to zero
+                    rate = 1
+                    if percent:
+                        rate=1e4
+                    if keystr in row:
+                        self.FPYlist[fpzai].cov[corrzai] = float(row[keystr])/1e4
+                    else:
+                        self.FPYlist[fpzai].cov[corrzai] = 0.0
+
+            # if element not found, set diagonal element to 'yerr'
+            for nuclide in self.FPYlist:
+
+                if nuclide not in self.FPYlist[nuclide].cov:
+                    self.FPYlist[nuclide].cov = {otherNuclide: 0 for otherNuclide in self.FPYlist}
+                    self.FPYlist[nuclide].cov[nuclide] = self.FPYlist[nuclide].yerr**2
 
     # Get the nuclide information based on ZAI
     def GetNuclide(self, ZAI):
