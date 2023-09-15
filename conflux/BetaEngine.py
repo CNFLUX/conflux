@@ -182,7 +182,7 @@ class BetaBranch(Spectrum):
         # normalizing the spectrum
         norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum() if self.E0 > binwidths else self.spectrum.sum()
 
-        if norm <=0:
+        if self.spectrum.sum() <=0:
             self.spectrum = np.zeros(self.nbin)
         else:
             self.spectrum /= norm*binwidths
@@ -460,6 +460,7 @@ class BetaEngine:
             
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
+            # print(ZAI, betaIstp.spectrum)
             istpCount += 1
 
         endTiming = timeit.default_timer()

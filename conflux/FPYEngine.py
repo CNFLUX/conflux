@@ -250,7 +250,7 @@ class FissionIstp:
     # Method to read the prepackaged correlation csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCorrelation(self, DBpath = None, defaultDB='ENDF'):
+    def LoadCorrelation(self, customDB = None, defaultDB='ENDF'):
         DBpath = customDB
         if DBpath == None or not os.path.exists(DBpath):
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
@@ -367,10 +367,10 @@ class FissionModel:
                 i = int((row_id-z*10000)/1000)
                 a = int(row_id-z*10000-i*1000)
                 fpzai = z*10000+a*10+i
-                if fpzai not in self.CFPY[Ei]:
+                if fpzai not in self.FPYlist:
                     continue
                     
-                for corrzai in self.CFPY[Ei]:
+                for corrzai in self.FPYlist:
                     col_id = int(corrzai)
                     z = int(col_id/10000)
                     a = int((col_id-z*10000)/10)

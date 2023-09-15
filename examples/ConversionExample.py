@@ -59,7 +59,7 @@ def Rebin(inputx, inputy, outputx):
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData("./data/conversionDB/U_235_e_2014.csv")
-    beta235s = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
+    beta235s = BetaData("./examples/U235_synth_data_1.5_8.csv")
     beta239 = BetaData("./data/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData("./data/conversionDB/Pu_241_e_2014.csv")
     
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     # database
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
-    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
+    convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
     # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
     # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range

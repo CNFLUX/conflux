@@ -8,15 +8,15 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 
 if __name__ == "__main__":
-    x = np.linspace(0, 10, 200)
+    x = np.arange(1.5, 10, 0.05)
     binwidth = 1
 
-    testlist = [390960, 390961, 521340, 531340, 922390, 932390]
+    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
     testEngine = BetaEngine(testlist, xbins=x)
     testEngine.CalcBetaSpectra(nu_spectrum=False)
     
     #print(testEngine.spectralist[521340])
-    index = 922390
+    index = 521331
     fig = plt.figure()
     y1 = testEngine.istplist[index].spectrum*binwidth
     plt.errorbar(x, y1, label=str(index)+"_beta") #, yerr=testEngine.istplist[index].uncertainty)

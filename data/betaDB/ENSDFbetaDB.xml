@@ -9309,7 +9309,7 @@
 		<branch fraction="0.000" sigma_frac="0.000" end_point_E="0.731" sigma_E0="0.031" dJpi="0"/>
 		<branch fraction="0.000" sigma_frac="0.000" end_point_E="0.710" sigma_E0="0.031" dJpi="0"/>
 	</isotope>
-	<isotope name="I137" isotope="531370" Q="5.88" HL="24.5 S    " Ex="0.0">
+	<isotope name="I137" isotope="531371" Q="5.88" HL="24.5 S    " Ex="0.0">
 		<branch fraction="0.002" sigma_frac="0.000" end_point_E="1.777" sigma_E0="0.031" dJpi="0"/>
 		<branch fraction="0.000" sigma_frac="0.000" end_point_E="1.727" sigma_E0="0.034" dJpi="0"/>
 		<branch fraction="0.001" sigma_frac="0.000" end_point_E="1.699" sigma_E0="0.032" dJpi="0"/>
