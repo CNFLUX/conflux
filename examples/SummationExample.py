@@ -63,7 +63,7 @@ if __name__ == "__main__":
         if count == 5:
             break
 
-        sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = sum1.spectrum
     summed_err = sum1.uncertainty
     summed_model_err = sum1.modelUnc

@@ -6,14 +6,15 @@ from conflux.bsg.CoulombFunctions import lambda_k
 
 from conflux.bsg.Constants import *
 
-def phase_space(W, W0, **kwargs):
+def phase_space(W, W0, numass = 0, **kwargs):
     """Phase space
 
     :param W: Electron energy in iunits of me c^2
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    return np.sqrt(W**2-1)*(W-W0)**2*W
+    nue = W-W0
+    return np.sqrt(W**2-1)*W*nue*np.sqrt(nue**2-numass**2)
 
 def fermi_function(W, Z, R, **kwargs):
     """Traditional Fermi Function

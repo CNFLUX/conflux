@@ -18,10 +18,10 @@ from conflux.bsg.Screening import *
 #########################################
 # Final neutrino and antineutrino spectra
 
-def electron(ebeta, p):
+def electron(ebeta, p, numass=0):
     result = 0.
     W = ebeta/ELECTRON_MASS_MEV + 1
-    result = (phase_space(W, **p)
+    result = (phase_space(W, numass=numass, **p, )
             *fermi_function(W, **p)
             *finite_size_L0(W, **p)
             *recoil_gamow_teller(W, **p)
@@ -37,11 +37,11 @@ def electron(ebeta, p):
 
     return result
 
-def neutrino(enu, p):
+def neutrino(enu, p, numass=0):
     result = 0.
     W0 = p['W0']
     Wv = W0-enu/(ELECTRON_MASS_MEV*1.0) #enu/ELECTRON_MASS_MEV + 1
-    result = (phase_space(Wv, **p)
+    result = (phase_space(Wv, numass=numass, **p)
             *fermi_function(Wv, **p)
             *finite_size_L0(Wv, **p)
             *recoil_gamow_teller(Wv, **p)
@@ -110,16 +110,16 @@ class BetaBranch(Spectrum):
                                     * otherBranch.sigma_frac)
 
     # beta spectrum shape as function of energy
-    def BetaSpectrum(self, x, nu_spectrum=False):
+    def BetaSpectrum(self, x, nu_spectrum=False, numass=0):
         Parameters = deepcopy(self.Parameters)
         
-        # prevent out-of-range variable to create insane results
+        # prevent out-of-range (> Q value)variable to create insane results
         rangeCorrect = x <= self.E0
 
         if (nu_spectrum == True):
-            function = lambda x: neutrino(x, Parameters)
+            function = lambda x: neutrino(x, Parameters, numass=numass)
         else:
-            function = lambda x: electron(x, Parameters)
+            function = lambda x: electron(x, Parameters, numass=numass)
 
         result = function(x)
         result = np.nan_to_num(result, nan=0.0)

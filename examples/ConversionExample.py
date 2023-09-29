@@ -4,6 +4,9 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
 import numpy as np
+from conflux.BetaEngine import BetaEngine
+from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.SumEngine import SumEngine
 
 def HuberZavg(x, c0, c1, c2):
     return c0+c1*x+c2*x**2
@@ -59,6 +62,7 @@ def Rebin(inputx, inputy, outputx):
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData("./data/conversionDB/U_235_e_2014.csv")
+    beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
     beta235s = BetaData("./examples/U235_synth_data_1.5_8.csv")
     beta239 = BetaData("./data/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData("./data/conversionDB/Pu_241_e_2014.csv")
@@ -141,18 +145,20 @@ if __name__ == "__main__":
     # fig.savefig("U235_cov_nu_new.png")
     # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=50)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=50)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=20)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=20)
 
     # print(final_spect)
     # print(final_spect)
     # Calculate covariance matrix of summed best fit beta spectrum
-    covmat=convertmodel.vblist["U235"].Covariance(beta235,
-        xval, nu_spectrum = False, samples=50)
+    covmat=convertmodel.vblist["U235"].Covariance(beta235s,
+        xval, nu_spectrum = False, samples=20)
     # Calculate covariance matrix of summed converted neutrino spectrum
-    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235,
-        xval, nu_spectrum = True, samples=50)
+    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235s,
+        xval, nu_spectrum = True, samples=20)
     #
+    print("covariance beta result", final_cov)
+    print("covariance neutrino result", final_cov1)
     relativeErr = np.zeros(len(xval))
     for i in range(len(final_spect)):
         if final_spect[i] > 0:
@@ -187,22 +193,66 @@ if __name__ == "__main__":
     # testyval = 1*testxval+2
     # testxout = np.linspace(0,200,21)
     # testyout = Rebin(testxval, testyval, testxout)
-    for a in (newyval1):
-        print(a)
+    # for a in (newyval1):
+    #     print(a)
     
     fig = plt.figure()
     # plt.yscale('log')
     plt.errorbar(convertmodel.betadata["U235"].x,
         convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
         label='beta data')
-    plt.plot(newxval, newyval)
-    # plt.plot(xval, final_spect1)
+    plt.plot(newxval, newyval1)
+    plt.plot(xval, final_spect1)
     plt.show()
+    
+    xbins = np.arange(0, 8.25, 0.1)
+    
+    U235 = FissionIstp(92, 235)
+    U235.LoadFissionDB(defaultDB='JEFF')
+    #U235.LoadCorrelation(defaultDB='ENDF')
+
+    # Pu239 = FissionIstp(94, 239)
+    # Pu239.LoadFissionDB()
+    # Pu239.LoadCorrelation()
+    #U235.CalcCovariance(Ei=0)
+
+    model = FissionModel()
+    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    model.SaveToFile('FPY_235_JEFF.csv')
+    #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0)
+    #model.AddContribution(isotope=U233, Ei = 0, fraction=1)
+    #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
+    #model.AddIstp(39, 96, 1.0)
+
+# a testing summation calculation
+    sum1 = SumEngine(xbins = xval)
+    sum1.AddModel(model)
+
+    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xval)
+    #betaSpectraDB = BetaEngine(newlist)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+        
+    betaDBBase = BetaEngine()
+    count = 0
+    newlist = []
+
+    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+    summed_spect = sum1.spectrum
+    summed_err = sum1.uncertainty
+    summed_model_err = sum1.modelUnc
+    summed_yerr = sum1.yieldUnc
     
     betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     fig = plt.figure()
     plt.ylim([-0.05, 0.05])
+    plt.xlim([2, 9])
+    plt.plot(xval, diff)
+    plt.show()
+    
+    diff = (final_spect1-summed_spect)/summed_spect
+    fig = plt.figure()
+    plt.ylim([-0.1, 0.1])
     plt.xlim([2, 9])
     plt.plot(xval, diff)
     plt.show()

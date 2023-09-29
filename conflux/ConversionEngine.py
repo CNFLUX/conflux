@@ -571,11 +571,13 @@ class VirtualBranch:
 
         for i in range(0, samples):
             toy = deepcopy(betadata)
-            for it in range(len(betadata.x)-1, 0, -1):
+            for it in range(len(betadata.x)-1, -1, -1):
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
                 
             vbnew = deepcopy(self)
+            print(toy.y)
             vbnew.FitData(toy, vbnew.slicesize)
+            print('best fit', vbnew.SumBranches(x, thresh, nu_spectrum))
             
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()
