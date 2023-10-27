@@ -49,7 +49,7 @@ def neutrino(enu, p, numass=0):
             *recoil_Coulomb_gamow_teller(Wv, **p)
             *atomic_screening(Wv, **p)
             )
-    
+
     if p['L'] == 0:
         result *= shape_factor_gamow_teller(Wv, **p)
     else:
@@ -61,18 +61,18 @@ class BetaBranch(Spectrum):
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1)):
         self.ID = E0
-        
+
         self.Z = Z
         self.A = A
         self.I = I
         self.Q = Q
         self.ZAI=Z*1e4+A*10+I
-        
+
         self.xbins = xbins
         self.nbin = len(xbins)
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
-        
+
         self.E0 = E0
         self.sigma_E0 = sigma_E0
         self.frac = frac
@@ -112,7 +112,7 @@ class BetaBranch(Spectrum):
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False, numass=0):
         Parameters = deepcopy(self.Parameters)
-        
+
         # prevent out-of-range (> Q value)variable to create insane results
         rangeCorrect = x <= self.E0
 
@@ -131,7 +131,7 @@ class BetaBranch(Spectrum):
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
         newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
-        
+
         if (nu_spectrum == True):
             function = lambda x: neutrino(x, newParameters)
         else:
@@ -146,7 +146,7 @@ class BetaBranch(Spectrum):
 
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False):
-        
+
         # to prevent lower limit of the energy range < 0
         lower = self.xbins[0]
         i = 1
@@ -155,7 +155,7 @@ class BetaBranch(Spectrum):
             i += 1
         if (lower > self.E0):
             return 1
-            
+
         # TODO make the code compatible to uneven binning
         binwidths = self.xbins[1]-self.xbins[0]
         # integrating each bin
@@ -173,7 +173,7 @@ class BetaBranch(Spectrum):
             if x_high == self.E0:
                 break
             lower += binwidths
-        
+
         full_range = np.arange(0, 20, 0.01)
         this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
         full_spect = self.BetaSpectrum(full_range, nu_spectrum)
@@ -187,7 +187,7 @@ class BetaBranch(Spectrum):
         else:
             self.spectrum /= norm*binwidths
             self.uncertainty /= norm*binwidths
-            
+
         return 0
 
 # class to save isotope information, including Z A I Q and beta brances
@@ -195,12 +195,12 @@ class BetaIstp(Spectrum, Summed):
     def __init__(self, Z, A, I, Q, name, xbins=np.arange(0, 20, 0.1)):
         self.ZAI=Z*1e4+A*10+I # unique ID of a isotope
         self.ID = self.ZAI
-        
+
         self.xbins = xbins
         self.nbin = len(xbins)
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
-        
+
         self.Z = Z
         self.A = A
         self.I = I
@@ -264,13 +264,13 @@ class BetaIstp(Spectrum, Summed):
         for E0, branch in self.branches.items():
             totalFrac += branch.frac
         restFrac = totalFrac-GSFrac
-        
+
         if GSF == False or MaxBranch.E0 != self.Q or restFrac == 0:
             for i, branchi in self.branches.items():
                 for j, branchj in self.branches.items():
                     branchi.SetCovariance(branchj, 0)
             return
-        
+
         # calculate the covariance matrix with ground state anticorrelation
         for i, branchi in self.branches.items():
             for j, branchj in self.branches.items():
@@ -280,7 +280,7 @@ class BetaIstp(Spectrum, Summed):
                     branchj.SetCovariance(branchi, correlation)
                 elif j != self.Q:
                     branchi.SetCovariance(branchj, 0)
-            
+
     def SumSpectra(self, nu_spectrum=True):
         """
         Calculate the cumulative beta/antineutrino spectrum of all branches
@@ -291,7 +291,7 @@ class BetaIstp(Spectrum, Summed):
         Returns:
             None
         """
-        
+
         self.spectrum=np.zeros(self.nbin)
         self.uncertainty=np.zeros(self.nbin)
         self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
@@ -303,11 +303,11 @@ class BetaIstp(Spectrum, Summed):
             si = branchi.spectrum
             fi = branchi.frac
             di = branchi.sigma_frac
-            
+
             branchi.BinnedSpectrum(nu_spectrum)
             self.spectrum += si*fi
             self.spectUnc += branchi.uncertainty*fi
-            
+
             for E0j, branchj in self.branches.items():
                 sj = branchj.spectrum
                 fj = branchi.frac
@@ -320,7 +320,7 @@ class BetaIstp(Spectrum, Summed):
                 else:
                     self.totalUnc += sigma_bij
 
-            
+
         self.branchUnc = np.sqrt(self.branchUnc)
         self.totalUnc = np.sqrt(self.totalUnc)
         self.uncertainty = self.totalUnc
@@ -373,7 +373,7 @@ class BetaEngine:
                 Z = int(ZAI/10000)
                 A = int(ZAI%10000/10)
                 I = int(ZAI%10)
-                
+
                 # if same ZAI reappear it is tagged as an isomer (unmarked in
                 # the original DB)
                 if ZAI in self.istplist:
@@ -430,7 +430,7 @@ class BetaEngine:
                                             sigma_frac, forbiddenness,
                                             xbins=self.xbins)
                     betaIstp.AddBranch(betaBranch)
-                    
+
                 if betaIstp.branches:
                     self.istplist[ZAI] = betaIstp
 
@@ -457,7 +457,7 @@ class BetaEngine:
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-            
+
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
             # print(ZAI, betaIstp.spectrum)
@@ -466,5 +466,5 @@ class BetaEngine:
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
-        print("Finished calculating beta spectra of "+ str(nBranch) + " isotopes.")
-        print("Processing time: "+str(runTime)+" seconds")
+        # print("Finished calculating beta spectra of "+ str(nBranch) + " isotopes.")
+        # print("Processing time: "+str(runTime)+" seconds")

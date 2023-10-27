@@ -13,7 +13,7 @@ def phase_space(W, W0, numass = 0, **kwargs):
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    nue = W-W0
+    nue = W0-W-numass
     return np.sqrt(W**2-1)*W*nue*np.sqrt(nue**2-numass**2)
 
 def fermi_function(W, Z, R, **kwargs):
@@ -28,7 +28,7 @@ def fermi_function(W, Z, R, **kwargs):
 
     if Z == 0:
         return f
-    
+
     np.seterr(divide='ignore', invalid='ignore', over='ignore')
 
     g = np.sqrt(1-(ALPHA*Z)**2)
@@ -91,14 +91,14 @@ def sirlin_g(W, W0, **kwargs):
     g = 0
 
     beta = np.sqrt(W**2-1)/W
-    
+
     np.seterr(divide='ignore', invalid='ignore')
     g = (3*np.log(PROTON_MASS_W)
         -3./4.
         +4./beta*(-1*spence(1-(2*beta/(1+beta))))
         +4*(np.arctanh(beta)/beta-1)*((W0-W)/(3*W)-3/2+np.log(2*(W0-W)))
         +np.arctanh(beta)/beta*(2*(1+beta**2)+(W0-W)**2/(6*W**2)))
-        
+
 
     return g
 
