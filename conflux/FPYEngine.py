@@ -364,25 +364,17 @@ class FissionModel:
             for row in reader:
                 row_id = int(row[''])
                 z = int(row_id/10000)
-                i = int((row_id-z*10000)/1000)
-                a = int(row_id-z*10000-i*1000)
+                i = int(row_id%10)
+                a = int((row_id-z*10000-i*1000)/10)
                 fpzai = z*10000+a*10+i
                 if fpzai not in self.FPYlist:
                     continue
                     
                 for corrzai in self.FPYlist:
                     col_id = int(corrzai)
-                    z = int(col_id/10000)
-                    a = int((col_id-z*10000)/10)
-                    i = int(col_id-z*10000-a*10)
-                    key = z*10000+a+i*1000
-                    keystr = ' '+str(key)
-                    # if key is not found in the covaraince matrix, set
+                    # if col_id is not found in the covaraince matrix, set
                     # value to zero
-                    rate = 1
-                    if percent:
-                        rate=1e4
-                    if keystr in row:
+                    if str(col_id) in row:
                         self.FPYlist[fpzai].cov[corrzai] = float(row[keystr])/1e4
                     else:
                         self.FPYlist[fpzai].cov[corrzai] = 0.0
