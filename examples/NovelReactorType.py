@@ -7,9 +7,9 @@ import numpy as np
 
 if __name__ == "__main__":
     #Load all the data into the simulation
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
-    beta241 = BetaData("../data/conversionDB/Pu_241_e_2014.csv")
-    beta239 = BetaData("../data/conversionDB/Pu_239_e_2014.csv")
+    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
+    beta241 = BetaData("../../data/conversionDB/Pu_241_e_2014.csv")
+    beta239 = BetaData("../../data/conversionDB/Pu_239_e_2014.csv")
     U235 = FissionIstp(92, 235)
     Pu239 = FissionIstp(94, 239)
     Pu241 = FissionIstp(94, 241)

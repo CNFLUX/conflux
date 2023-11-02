@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     #Load data into the simulation (Change this directory location to the location
     #Of U_235_e_2014.csv on the host machine)
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
     U235.LoadCorrelation()
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     SumEngine.AddModel(FisModel)
 
     BetaSpectraDB = BetaEngine(SumEngine.FPYlist.keys())
-    BetaSpectraDB.CalcBetaSpectra(nu_spectrum=True, binwidths=0.1)
+    BetaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
 
     SumEngine.CalcReactorSpectrum(BetaSpectraDB)
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     ConvertModel = ConversionEngine()
     ConvertModel.AddBetaData(beta235, U235, "U235", 1.0)
-    ConvertModel.VBfit()
+    ConvertModel.VBfitbeta("U235", )
 
 
     #This is plotting and applying cuts to the data.
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     fig = plt.figure()
     convertX = np.linspace(0., 10., 200)
     convertY = ConvertModel.vblist["U235"].SumBranches(convertX, nu_spectrum = True)
-    SumX = SumEngine.bins
-    SumY = SumEngine.reactorSpectrum
+    SumX = SumEngine.xbins
+    SumY = SumEngine.spectrum
     #cut everything below 1.8 and above 8~ MeV
     convertX= convertX[36:]
     convertY= convertY[36:]

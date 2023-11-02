@@ -6,7 +6,7 @@ import numpy as np
 if __name__ == "__main__":
 
     #Load up data to run the conversion engine (change this to the local directory for U_235_e_2014.csv)
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
 
     U235 = FissionIstp(92,235)
     U235.LoadFissionDB()
@@ -25,6 +25,7 @@ if __name__ == "__main__":
         plt.ylabel("(electron/neutrino)/fission/MeV")
         k = j * 0.2
         convertmodel.VBfitbeta("U235", slicesize=k)
+        #Lots of plotting here.
         for i in range(0, 15):
             if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
                 continue
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         plt.title(name)
         fig.savefig(name)
 
+        #Calculate the relative error from the covariance matrices.
         covmat = convertmodel.vblist["U235"].Covariance(beta235, xval, nu_spectrum=False, samples=50)
         covmat_nu = convertmodel.vblist["U235"].Covariance(beta235, xval, nu_spectrum=True, samples=50)
         spectrum = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=False)
