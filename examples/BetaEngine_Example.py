@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #set the range from 0MeV to 10MeV
     #Engine.CalcBetaSpectra(self, targetDB = None, nu_spectrum=True,branchErange=[0.0, 20.0])
     Engine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 10.0])
-
+    print(Engine.istplist)
     #Now that we've calculated the Beta Spectrum, we can plot our spectrum
     #Note that we've saved our spectra in a dictionary, and to access the spectrum
     #We need to know the specific 'key' for each item. Thankfully, the 'keys' to our

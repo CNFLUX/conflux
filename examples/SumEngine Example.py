@@ -27,7 +27,6 @@ if __name__  == "__main__":
     result = SumEngine(xbins=np.arange(0, 15., 0.1))
     result.AddModel(model)
 
-
     #Load in the Beta Shape data and calculate the total beta shape of our reactor
     betaSpectraDB = BetaEngine(result.FPYlist.keys(), xbins=np.arange(0, 15, 0.1))
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 15.0])
@@ -40,16 +39,20 @@ if __name__  == "__main__":
     #Draw the resulting spectra
     fig = plt.figure()
     x = result.xbins
-    for FPZAI in result.betaSpectraList:
+#    for FPZAI in result.betaSpectraList:
         #This is to draw out the individual branches
-        plt.plot(x, result.betaSpectraList[FPZAI] * result.FPYlist[FPZAI].y)
+#       plt.plot(x, result.betaSpectraList[FPZAI] * result.FPYlist[FPZAI].y)
     #This is the total spectrum
-    plt.plot(x, result.spectrum, 'b--')
-    plt.yscale('log')
+    plt.plot(x, result.spectrum, 'b', label="w/ missing info")
+    plt.fill_between(x, result.spectrum + result.uncertainty, result.spectrum - result.uncertainty, label= "fission product error", alpha=0.5)
+    plt.fill_between(x, result.spectrum + result.modelUnc, result.spectrum - result.modelUnc, label="beta model error", alpha=0.5)
+ #   plt.plot(x, result.modelUnc, label="")
+#    plt.yscale('log')
     plt.xlabel("E (in MeV)", fontsize= 18)
     plt.ylabel("neutrinos/MeV/Fission", fontsize = 18)
     plt.title("U235 Neutrino Spectrum", fontsize=20)
-    fig.savefig("U235 - Neutrino Spectrum")
+    plt.legend()
+    fig.savefig("U235 - Neutrino Spectrum.png")
 
 
     #Finally, print out all the beta branches that didn't go into creating this spectrum.

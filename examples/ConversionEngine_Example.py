@@ -12,7 +12,7 @@ if __name__ == "__main__":
     #specify the path where the data is located in the function.
     #betaU235 = BetaData("path/to/file")
     #(change this to the local directory for U_235_e_2014.csv)
-    betaU235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    betaU235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
 
     #Next, just to make sure the data looks good, we're going to print out the
     #error and the yield.
@@ -61,7 +61,6 @@ if __name__ == "__main__":
     #Plot out the model branches
 
 
-    #Something wrong with the plotting on this one
 
 
     for i in range(0, 20):
@@ -98,3 +97,6 @@ if __name__ == "__main__":
     for i in range(len(xval)):
         if spectrumNu[i] > 0:
             relativeErrNu[i] = np.sqrt(covmat_nu[i][i] / spectrumNu[i])
+
+    print(relativeErr)
+    print(relativeErrNu)

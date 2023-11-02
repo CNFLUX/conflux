@@ -5,11 +5,14 @@ import csv
 
 # test on how to define fission isotopes and add them to the reactor model
 if __name__ == "__main__":
+    #Load a Fission Isotope, load its fission and covariance databases.
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
     U235.LoadCovariance()
     # U235.LoadCorrelation('/Users/zhang39//Downloads/')
     # U235.CalcCovariance(Ei =0)
+
+    #Write out the processed U235 Covariance matrix
     with open('cov_235_U_processed_v2.csv', 'w', newline='') as csvoutput:
         fieldnames = ['']
         for i in U235.CFPY[0]:
@@ -21,10 +24,11 @@ if __name__ == "__main__":
             rowcontent[''] = i
             writer.writerow(rowcontent)
 
-
+    #Load Pu239 and it's fission DB.
     Pu239 = FissionIstp(94, 239)
     Pu239.LoadFissionDB()
 
+    #Add U235 to the fission model you just initialized.
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1, d_frac=0.0)
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0.4, d_frac=0.05)
@@ -32,6 +36,7 @@ if __name__ == "__main__":
     totalyield = 0
     betaSpectraDB = BetaEngine(model.FPYlist.keys())
     betaSpectraDB.LoadBetaDB()
+    #Print out various bits of information regarding the Fission Isotopes and their beta branches/daughters
     for ZAI in betaSpectraDB.istplist:
         print("ZAI", ZAI)
     totalFPY = 0

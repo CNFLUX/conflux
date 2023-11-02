@@ -10,8 +10,9 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
-    xbins = np.arange(0, 8.25, 0.25)
-    
+    xbins = np.arange(0, 8.25, 0.1)
+
+    #Initialize the Fission isotope, load the fission databases.
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')
     #U235.LoadCorrelation(defaultDB='ENDF')
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     # Pu239.LoadCorrelation()
     #U235.CalcCovariance(Ei=0)
 
+    #Load the Fission Model, add the U235 isotope to the model.
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)
     model.SaveToFile('FPY_235_JEFF.csv')
@@ -29,9 +31,12 @@ if __name__ == "__main__":
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
+
+    #Create a summation engine and add the Fission Model to it.
     sum1 = SumEngine(xbins = xbins)
     sum1.AddModel(model)
 
+    #Create a Beta engine and calculate the spectra of all branches.
     betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xbins)
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
@@ -63,7 +68,7 @@ if __name__ == "__main__":
         if count == 5:
             break
 
-    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+        sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = sum1.spectrum
     summed_err = sum1.uncertainty
     summed_model_err = sum1.modelUnc
