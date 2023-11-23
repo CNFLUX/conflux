@@ -190,11 +190,13 @@ class BetaBranch(Spectrum):
 
         return 0
 
+
 # class to save isotope information, including Z A I Q and beta brances
 class BetaIstp(Spectrum, Summed):
-    def __init__(self, Z, A, I, Q, name, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1)):
         self.ZAI=Z*1e4+A*10+I # unique ID of a isotope
         self.ID = self.ZAI
+        self.HL = HL
 
         self.xbins = xbins
         self.nbin = len(xbins)
@@ -334,6 +336,18 @@ class BetaIstp(Spectrum, Summed):
         for E0, branch in self.branches.items():
             branch.Display()
 
+    def decay_time_adjust(self, begin=0, end=0):
+        '''
+        function to calculate the decay rate of this isotope from the begin of
+        counting to the end of the counting.
+        if no argument is given, return 1
+        '''
+        # print(self.name, self.HL)
+        if begin < end:
+            return 2**(-begin/self.HL)-2**(-end/self.HL)
+        else:
+            return 1
+
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
 # of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
@@ -364,6 +378,7 @@ class BetaEngine:
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
             Q = float(isotope.attrib['Q'])
+            HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
 
             if not useInputList:
@@ -380,7 +395,7 @@ class BetaEngine:
                     I += 1
                     ZAI += 1
 
-                betaIstp = BetaIstp(Z, A, I, Q, name, xbins=self.xbins)
+                betaIstp = BetaIstp(Z, A, I, Q, HL, name, xbins=self.xbins)
 
                 # Adding missing branches below
                 if len(isotope) < 1:

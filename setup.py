@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="conflux",
-    version="0.5.1",
+    version="0.6.0",
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",

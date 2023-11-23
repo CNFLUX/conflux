@@ -48,13 +48,13 @@ class SumEngine(Spectrum):
         Draws the Reactor Spectrum and saves it as a .png file.
 
     """
-    
+
     def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
         self.neutrino = neutrino # neutrino or electon spectrum
-        
+
         self.xbins = xbins
         self.nbin = len(xbins)
         self.spectrum = np.zeros(self.nbin)
@@ -89,6 +89,7 @@ class SumEngine(Spectrum):
         for FPZAI in fissionModel.FPYlist:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
+                # print(fissionModel.FPYlist[FPZAI].cov)
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
             else:
@@ -113,7 +114,7 @@ class SumEngine(Spectrum):
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False):
+    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False, ifp_begin = 0, ifp_end = 0):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
@@ -125,7 +126,7 @@ class SumEngine(Spectrum):
                 None
 
         """
-        
+
         print("Summing beta spectra...")
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
@@ -134,25 +135,37 @@ class SumEngine(Spectrum):
         self.totalYield = 0.0
 
         for FPZAI in self.FPYlist:
-            self.totalYield += self.FPYlist[FPZAI].y
+            # get the yield of the fission products
+            thisyield = self.FPYlist[FPZAI].y
+            yielderr = self.FPYlist[FPZAI].yerr
+
+            self.totalYield += thisyield
+
             if FPZAI in betaSpectraDB.istplist:
-                
+
+                # for IFP calculation, adjust the decay rate of the target isotope
+                # by the rate of isotope that are decayed in the time window
+                if (ifp_begin < ifp_end):
+                    adjustment = betaSpectraDB.istplist[FPZAI].decay_time_adjust(ifp_begin, ifp_end)
+                    thisyield *= adjustment
+                    yielderr *= adjustment
+
                 # process missing branches with assumptions or not
                 if not processMissing and betaSpectraDB.istplist[FPZAI].missing:
-                    self.missingCount += self.FPYlist[FPZAI].y
+                    self.missingCount += thisyield
                     self.missingBranch.append(FPZAI)
                     continue
-                
+
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].uncertainty
-                self.spectrum += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].y
-                self.yieldUnc += self.betaSpectraList[FPZAI]*self.FPYlist[FPZAI].yerr
-                self.modelUnc += self.betaUncertainty[FPZAI]*self.FPYlist[FPZAI].y
+                self.spectrum += self.betaSpectraList[FPZAI]*thisyield
+                self.yieldUnc += self.betaSpectraList[FPZAI]*yielderr
+                self.modelUnc += self.betaUncertainty[FPZAI]*thisyield
                 self.spectrumUnc = self.yieldUnc+self.modelUnc
 
             # save the list of missing branches
             else:
-                self.missingCount += self.FPYlist[FPZAI].y
+                self.missingCount += thisyield
                 self.missingBranch.append(FPZAI)
 
         # Uncertainty calculation
@@ -168,16 +181,16 @@ class SumEngine(Spectrum):
                     yerrj = self.FPYlist[j].yerr
                     fj = self.betaSpectraList[j]
                     ferrj = self.betaUncertainty[j]
-                    
+
                     # if covariance matrix were not loaded, make cov diagonal variance
                     cov_ij = 0
                     if j not in self.FPYlist[i].cov:
                         cov_ij = yerri*yerri if i == j else 0
                     else:
                         cov_ij = self.FPYlist[i].cov[j]
-                    
+
                     sigmay_ij = fi*cov_ij*fj
-                    
+
                     if (i==j):
                         self.spectrumUnc += (ferri*yi)**2 + sigmay_ij
                     else:

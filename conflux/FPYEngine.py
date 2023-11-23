@@ -40,7 +40,7 @@ class FPNuclide:
         The correlation matrix for the specific nuclide
     yerr : (float)
         The yield error for this specific nuclide
-        
+
     Methods
     -------
     Contribute(fraction, d_fraction=0):
@@ -110,6 +110,8 @@ class FPNuclide:
                 self.cov[key] = newNuclide.cov[key]
             else:
                 self.cov[key] += newNuclide.cov[key]
+
+            # print(self.FPZAI, self.cov[key])
             #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
@@ -211,7 +213,7 @@ class FissionIstp:
                 print('Reading covariance data: '+DBpath+filename+'...')
                 with open(DBname) as inputfile:
                     reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
-                    
+
                     for row in reader:
                         row_id = int(row[''])
                         z = int(row_id/10000)
@@ -220,7 +222,7 @@ class FissionIstp:
                         fpzai = z*10000+a*10+i
                         if fpzai not in self.CFPY[Ei]:
                             continue
-                            
+
                         for corrzai in self.CFPY[Ei]:
                             col_id = int(corrzai)
                             z = int(col_id/10000)
@@ -244,7 +246,7 @@ class FissionIstp:
                         if nuclide not in self.CFPY[Ei][nuclide].cov:
                             self.CFPY[Ei][nuclide].cov = {otherNuclide: 0 for otherNuclide in self.CFPY[Ei]}
                             self.CFPY[Ei][nuclide].cov[nuclide] = self.CFPY[Ei][nuclide].yerr**2
-                
+
         assert(filesfound) # assert error if isotope not found in DB
 
     # Method to read the prepackaged correlation csv file
@@ -277,7 +279,7 @@ class FissionIstp:
                     Ei = e_neutron[mode]
                 else:
                     continue
-                    
+
                 DBname = DBpath+filename
                 print('Reading correlation data: '+DBpath+filename+'...')
                 with open(DBname) as inputfile:
@@ -309,7 +311,7 @@ class FissionIstp:
                         if nuclide not in self.CFPY[Ei][nuclide].corr:
                             self.CFPY[Ei][nuclide].corr = {otherNuclide: 0 for otherNuclide in self.CFPY[Ei]}
                             self.CFPY[Ei][nuclide].corr[nuclide] = 1.0
-            
+
                 self.CalcCovariance(Ei)
         assert(filesfound) # assert error if isotope not found in DB
         #print(self.CFPY[Ei][240660].cov)
@@ -333,18 +335,20 @@ class FissionModel:
         self.W = 1.0
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
-    def AddContribution(self, isotope, Ei, fraction, d_frac=0.0):
+    def AddContribution(self, isotope, Ei, fraction, d_frac=0.0, IFP=False):
         assert Ei in isotope.CFPY, 'Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!'
-        CFPYlist = isotope.CFPY[Ei]
-        for FPZAI in CFPYlist:
-            if CFPYlist[FPZAI].y == 0: continue
-            CFPYlist[FPZAI].Contribute(self.W*fraction, d_frac) # add the contribution of a fission product, also modify uncertainties
+        FPYlist = isotope.CFPY[Ei]
+        if IFP == True:
+            FPYLIST = isotope.IFPY[Ei]
+        for FPZAI in FPYlist:
+            if FPYlist[FPZAI].y == 0: continue
+            FPYlist[FPZAI].Contribute(self.W*fraction, d_frac) # add the contribution of a fission product, also modify uncertainties
             if FPZAI not in self.FPYlist:
-                self.FPYlist[FPZAI] = CFPYlist[FPZAI]
+                self.FPYlist[FPZAI] = FPYlist[FPZAI]
             else:
-                self.FPYlist[FPZAI].y += CFPYlist[FPZAI].y
-                self.FPYlist[FPZAI].yerr += CFPYlist[FPZAI].yerr
-                self.FPYlist[FPZAI].AddCovariance(CFPYlist[FPZAI]) # summing the covariance matrix
+                self.FPYlist[FPZAI].y += FPYlist[FPZAI].y
+                self.FPYlist[FPZAI].yerr += FPYlist[FPZAI].yerr
+                self.FPYlist[FPZAI].AddCovariance(FPYlist[FPZAI]) # summing the covariance matrix
 
     # method that accumulates beta-decaying isotopes into the list of FPY
     def AddIstp(self, Z, A, fraction, isomer=0, d_frac = 0.0):
@@ -355,27 +359,28 @@ class FissionModel:
         else:
             self.FPYlist[FPZAI].y + nuclide.y
             self.FPYlist[FPZAI].yerr + nuclide.yerr
-            
+
     # Method to load a customized covariance matrix
     def CustomCovariance(self, DBname):
         with open(DBname) as inputfile:
             reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
-            
+
             for row in reader:
                 row_id = int(row[''])
                 z = int(row_id/10000)
                 i = int(row_id%10)
                 a = int((row_id-z*10000-i*1000)/10)
                 fpzai = z*10000+a*10+i
+                # keystr = str(key)
                 if fpzai not in self.FPYlist:
                     continue
-                    
+
                 for corrzai in self.FPYlist:
                     col_id = int(corrzai)
                     # if col_id is not found in the covaraince matrix, set
                     # value to zero
                     if str(col_id) in row:
-                        self.FPYlist[fpzai].cov[corrzai] = float(row[keystr])/1e4
+                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(fpzai)])/1e4
                     else:
                         self.FPYlist[fpzai].cov[corrzai] = 0.0
 
@@ -407,12 +412,12 @@ class FissionModel:
         alist = np.arange(50, 180, 1)
         branchlist = np.zeros(len(alist))
         errlist = np.zeros(len(alist))
-    
+
         for FPZAI in self.FPYlist:
             A = self.FPYlist[FPZAI].A
             branchlist[A-50] += self.FPYlist[FPZAI].y
             errlist[A-50] += self.FPYlist[FPZAI].yerr
-    
+
         ax.errorbar(alist, branchlist, yerr=errlist)
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)
