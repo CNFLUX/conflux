@@ -104,14 +104,14 @@ class FPNuclide:
             Returns:
                 None
         """
-        # print("Added FPY covaraince matrix")
+        print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
             if key not in self.cov:
                 self.cov[key] = newNuclide.cov[key]
             else:
                 self.cov[key] += newNuclide.cov[key]
 
-            # print(self.FPZAI, self.cov[key])
+            print(self.FPZAI, self.cov[key])
             #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
@@ -380,13 +380,12 @@ class FissionModel:
                     # if col_id is not found in the covaraince matrix, set
                     # value to zero
                     if str(col_id) in row:
-                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(fpzai)])/1e4
+                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(corrzai)])/1e4
                     else:
                         self.FPYlist[fpzai].cov[corrzai] = 0.0
 
             # if element not found, set diagonal element to 'yerr'
             for nuclide in self.FPYlist:
-
                 if nuclide not in self.FPYlist[nuclide].cov:
                     self.FPYlist[nuclide].cov = {otherNuclide: 0 for otherNuclide in self.FPYlist}
                     self.FPYlist[nuclide].cov[nuclide] = self.FPYlist[nuclide].yerr**2

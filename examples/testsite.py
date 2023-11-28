@@ -9,6 +9,11 @@ from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
+e_fission = 3.2e-11 #joules
+e_TNT = 4.184e9
+fission_per_t = e_TNT/e_fission
+test_flux = 15*fission_per_t
+
 if __name__ == "__main__":
     xbins = np.arange(0, 20, 0.1)
 
@@ -31,75 +36,49 @@ if __name__ == "__main__":
     #model.AddContribution(isotope=Pu241, Ei = 0, fraction=0.0572)
     #model.AddIstp(39, 96, 1.0)
 
-    sum1 = SumEngine(xbins = xbins)
-    sum1.AddModel(model)
-
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xbins)
-    #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
-
-    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False,  ifp_begin = 10,  ifp_end = 100)
-    summed_spect = sum1.spectrum
-    summed_err = sum1.uncertainty
-    summed_model_err = sum1.modelUnc
-    summed_yerr = sum1.yieldUnc
-
-    #result.Clear()
-
-    sum2 = SumEngine(xbins=xbins)
-    sum2.AddModel(model)
-    sum2.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False,  ifp_begin = 0,  ifp_end = 10)
-    miss_spect = sum2.spectrum
-    miss_err = sum2.uncertainty
-    miss_model_err = sum2.modelUnc
-    miss_yerr = sum2.yieldUnc
-    sum2.SaveToFile('235U_nu_jeff_ifp.csv')
-
-
-    sum2.Clear()
-
+    # define the time windows of the calculation
+    windows = np.logspace(-1, 5, 7)
+    print('time:', windows)
     fig, ax = plt.subplots()
-    #ax.set_ylim([-1, 1])
-    #plt.yscale('log')
-    ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-    # ax.fill_between(sum2.xbins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
-    # ax.fill_between(sum2.xbins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
-    ax.plot(sum2.xbins, miss_spect, label="10-100")
-    #ax.plot(sum2.xbins, summed_spect, label="w/o info")
+    spect_time = []
 
-    ax.plot(sum2.xbins, summed_spect, label="0-10")
+    # generate neutrino spectra in different time window after ignition
+    for i in range(len(windows)-1):
+        begin = windows[i]
+        end = windows[i+1]
 
+        sum_model= SumEngine(xbins = xbins)
+        sum_model.AddModel(model)
+
+        betaSpectraDB = BetaEngine(sum_model.FPYlist.keys(), xbins=xbins)
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+        sum_model.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False,  ifp_begin = begin,  ifp_end = end)
+        spect = sum_model.spectrum
+
+        spect_time.append(spect)
+
+        ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
+        ax.plot(sum_model.xbins, spect, label=str(begin)+' s - '+str(end)+' s')
     ax.legend()
+    fig.savefig("235U_ENDF_jeff_14_MeV_time.png")
 
-    fig.savefig("235U_ENDF_jeff_14_MeV.png")
-
-
+    # calcualte cumulative spectrum at time windows after the ignition
     fig, ax = plt.subplots()
-    ax.set_xlim([0, 10])
-    #plt.yscale('log')
-    ax.set(xlabel='E (MeV)', ylabel='relative error (%)')
-    ax.fill_between(sum2.xbins, miss_yerr/miss_spect*100, -miss_yerr/miss_spect*100, label="fission product error", alpha=.5)
-    ax.fill_between(sum2.xbins, miss_model_err/miss_spect*100, -miss_model_err/miss_spect*100, label="beta model error", alpha=.5)
-    ax.plot(sum2.xbins, miss_spect-miss_spect)
-    #ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
-    # ax.plot(result.bins, miss_spect, label="w/ miss info")
-    # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
-    # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
-    # ax.errorbar(result.bins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
+    total_spect = np.zeros(len(xbins))
+    i = 0
+    for spect in spect_time:
+        print('spectrum intergral', sum(spect))
+        total_spect+=spect
+        ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
+        ax.plot(sum_model.xbins, total_spect, label='by'+str(windows[i+1])+' s')
     ax.legend()
+    fig.savefig("235U_ENDF_jeff_14_MeV_cumulative.png")
 
-    fig.savefig("235U_ENDF_jeff_14_MeV_unc.png")
 
+    spect_time = np.array(spect_time)
+    ybins = windows
     fig, ax = plt.subplots()
-    #ax.set_ylim([-1, 1])
-    #plt.yscale('log')
-    ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
-    ax.plot(sum2.xbins, miss_spect-summed_spect)
-
-    ax.legend()
-
-    fig.savefig("235_239_Missing_jeff.png")
-
-
-    with open("Commercial.csv", "w") as output:
-        write = csv.writer(output)
+    pcmesh = ax.pcolormesh(xbins, ybins[:-1], spect_time)
+    ax.set_yscale('log')
+    fig.colorbar(pcmesh, ax=ax)
+    fig.savefig("235U_ENDF_jeff_14_MeV_time_energy.png")

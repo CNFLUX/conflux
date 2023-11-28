@@ -89,7 +89,7 @@ class SumEngine(Spectrum):
         for FPZAI in fissionModel.FPYlist:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
-                # print(fissionModel.FPYlist[FPZAI].cov)
+                print(FPZAI, fissionModel.FPYlist[FPZAI].cov)
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
             else:
