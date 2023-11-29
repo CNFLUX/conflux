@@ -201,6 +201,8 @@ class FissionIstp:
                 continue
             filesfound.append(filename)
 
+        # determine the whether the covariance are relative or absolute
+        rate = 1e4 if percent else 1
         Ei = 0
         for mode in e_neutron:
             for filename in filesfound:
@@ -232,11 +234,9 @@ class FissionIstp:
                             keystr = ' '+str(key)
                             # if key is not found in the covaraince matrix, set
                             # value to zero
-                            rate = 1
-                            if percent:
-                                rate=1e4
+
                             if keystr in row:
-                                self.CFPY[Ei][fpzai].cov[corrzai] = float(row[keystr])/1e4
+                                self.CFPY[Ei][fpzai].cov[corrzai] = float(row[keystr])/rate
                             else:
                                 self.CFPY[Ei][fpzai].cov[corrzai] = 0.0
 
@@ -361,7 +361,9 @@ class FissionModel:
             self.FPYlist[FPZAI].yerr + nuclide.yerr
 
     # Method to load a customized covariance matrix
-    def CustomCovariance(self, DBname):
+    def CustomCovariance(self, DBname, percent = False):
+        # determine the whether the covariance are relative or absolute
+        rate = 1e4 if percent else 1
         with open(DBname) as inputfile:
             reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
 
@@ -380,7 +382,7 @@ class FissionModel:
                     # if col_id is not found in the covaraince matrix, set
                     # value to zero
                     if str(col_id) in row:
-                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(corrzai)])/1e4
+                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(corrzai)])/rate
                     else:
                         self.FPYlist[fpzai].cov[corrzai] = 0.0
 

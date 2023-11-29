@@ -27,7 +27,7 @@ if __name__ == "__main__":
     #U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 14, fraction=1, IFP=True)
+    model.AddContribution(isotope=U235, Ei = 0.4, fraction=1, IFP=True)
     model.SaveToFile('FPY_235_JEFF_IFP_14MeV.csv')
     # model.AddContribution(isotope=Pu239, Ei = 0.4, fraction=1)
     # model.SaveToFile('FPY_239_JEFF_IFP.csv')
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
         ax.plot(sum_model.xbins, spect, label=str(begin)+' s - '+str(end)+' s')
     ax.legend()
-    fig.savefig("235U_ENDF_jeff_14_MeV_time.png")
+    fig.savefig("235U_ENDF_jeff_0.4_MeV_time.png")
 
     # calcualte cumulative spectrum at time windows after the ignition
     fig, ax = plt.subplots()
@@ -70,15 +70,16 @@ if __name__ == "__main__":
         print('spectrum intergral', sum(spect))
         total_spect+=spect
         ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
-        ax.plot(sum_model.xbins, total_spect, label='by'+str(windows[i+1])+' s')
+        ax.plot(sum_model.xbins, total_spect, label='by'+ str(windows[i+1])+' s')
+        i+=1
     ax.legend()
-    fig.savefig("235U_ENDF_jeff_14_MeV_cumulative.png")
-
+    fig.savefig("235U_ENDF_jeff_0.4_MeV_cumulative.png")
 
     spect_time = np.array(spect_time)
     ybins = windows
     fig, ax = plt.subplots()
-    pcmesh = ax.pcolormesh(xbins, ybins[:-1], spect_time)
+    pcmesh = ax.pcolormesh(xbins, ybins[1:], spect_time)
     ax.set_yscale('log')
+    ax.set_ylim([1e-1, 1e5])
     fig.colorbar(pcmesh, ax=ax)
-    fig.savefig("235U_ENDF_jeff_14_MeV_time_energy.png")
+    fig.savefig("235U_ENDF_jeff_0.4_MeV_time_energy.png")

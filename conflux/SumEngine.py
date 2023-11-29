@@ -89,7 +89,6 @@ class SumEngine(Spectrum):
         for FPZAI in fissionModel.FPYlist:
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
-                print(FPZAI, fissionModel.FPYlist[FPZAI].cov)
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
             else:
@@ -159,6 +158,10 @@ class SumEngine(Spectrum):
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].uncertainty
                 self.spectrum += self.betaSpectraList[FPZAI]*thisyield
+
+                '''
+                obsolete code
+                '''
                 self.yieldUnc += self.betaSpectraList[FPZAI]*yielderr
                 self.modelUnc += self.betaUncertainty[FPZAI]*thisyield
                 self.spectrumUnc = self.yieldUnc+self.modelUnc
@@ -172,15 +175,21 @@ class SumEngine(Spectrum):
         for i in self.FPYlist:
             for j in self.FPYlist:
                 if i in self.betaSpectraList and j in self.betaSpectraList:
-                    yi = self.FPYlist[i].y
-                    yerri = self.FPYlist[i].yerr
-                    fi = self.betaSpectraList[i]
-                    ferri = self.betaUncertainty[i]
+                    adjustmenti = 1
+                    adjustmentj = 1
+                    if (ifp_begin < ifp_end):
+                        adjustmenti = betaSpectraDB.istplist[i].decay_time_adjust(ifp_begin, ifp_end)
+                        adjustmentj = betaSpectraDB.istplist[j].decay_time_adjust(ifp_begin, ifp_end)
 
-                    yj = self.FPYlist[j].y
-                    yerrj = self.FPYlist[j].yerr
-                    fj = self.betaSpectraList[j]
-                    ferrj = self.betaUncertainty[j]
+                    yi = self.FPYlist[i].y*adjustmenti
+                    yerri = self.FPYlist[i].yerr*adjustmenti
+                    fi = self.betaSpectraList[i]*adjustmenti
+                    ferri = self.betaUncertainty[i]*adjustmenti
+
+                    yj = self.FPYlist[j].y*adjustmentj
+                    # yerrj = self.FPYlist[j].yerr*adjustmentj
+                    fj = self.betaSpectraList[j]*adjustmentj
+                    ferrj = self.betaUncertainty[j]*adjustmentj
 
                     # if covariance matrix were not loaded, make cov diagonal variance
                     cov_ij = 0
@@ -192,8 +201,8 @@ class SumEngine(Spectrum):
                     sigmay_ij = fi*cov_ij*fj
 
                     if (i==j):
-                        self.spectrumUnc += (ferri*yi)**2 + sigmay_ij
+                        self.uncertainty += sigmay_ij # + (ferri*yi)**2
                     else:
-                        self.spectrumUnc += sigmay_ij
+                        self.uncertainty += sigmay_ij
 
-        self.uncertainty = np.sqrt(self.spectrumUnc)
+        self.uncertainty = np.sqrt(self.uncertainty)
