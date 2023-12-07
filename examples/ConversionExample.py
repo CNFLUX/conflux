@@ -17,7 +17,7 @@ def Rebin(inputx, inputy, outputx):
     new_bin_width = outputx[1] - outputx[0]
     new_xbins_low= new_xbins - new_bin_width/2
     new_ybins = np.zeros(len(new_xbins))
-    
+
     # get information from the old bins
     old_xbins = inputx
     old_ybins = inputy
@@ -34,20 +34,20 @@ def Rebin(inputx, inputy, outputx):
                 old_bin = old_bins_low[i]
                 new_bin = new_xbins_low[j]
                 diff = old_bin - new_bin
-                
+
                 if diff < old_bin_width:
                     weight = diff
                     norm += weight
                     # print(1, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
-                    
+
                 elif diff >= new_bin_width:
                     weight = old_bin_width + new_bin_width - diff
                     norm += weight
                     # print(2, i, old_bin, new_bin, weight, old_ybins[i])
                     new_ybins[j] += weight * old_ybins[i]
                     break
-                    
+
                 else:
                     norm += weight
                     # print(3, i, old_bin, new_bin, weight, old_ybins[i])
@@ -55,24 +55,24 @@ def Rebin(inputx, inputy, outputx):
 
         if norm > 0:
             new_ybins[j] /= norm
-    
+
     return new_ybins
 
 # test
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData("./data/conversionDB/U_235_e_2014.csv")
-    beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData("./examples/U235_synth_data_1.5_8.csv")
+    # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
+    # beta235s = BetaData("./examples/U235_synth_data_1.5_8.csv")
     beta239 = BetaData("./data/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData("./data/conversionDB/Pu_241_e_2014.csv")
-    
+
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches
     U235 = FissionIstp(92, 235)
     Pu239 = FissionIstp(94, 239)
     Pu241 = FissionIstp(94, 241)
-    
+
     # Loading default fission product DB
     U235.LoadFissionDB(defaultDB='JEFF')
     Pu239.LoadFissionDB()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # database
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
-    convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
+    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
     # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
@@ -97,8 +97,8 @@ if __name__ == "__main__":
     # Draw plots to test output.
     print("Drawing spectrum...")
     # Define x values of data points to be drawn in the figure
-    
-    
+
+
     # Setting figure parameters
     fig = plt.figure()
     # plt.yscale('log')
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     plt.yscale('log')
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
-    
+
     # Draw the spectra of all vertual branches
     for i in range(0, 40):
         if (sum(convertmodel.vblist["U235"].SumBranches(xval,
@@ -116,7 +116,7 @@ if __name__ == "__main__":
             thresh=1*branch_slice, nu_spectrum = False), fmt='--')
     plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
             thresh=1*branch_slice, nu_spectrum = True), fmt='--')
-    
+
     # # Draw the original beta spectrum
     # plt.errorbar(convertmodel.betadata["U235"].x,
     #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
@@ -145,32 +145,32 @@ if __name__ == "__main__":
     # fig.savefig("U235_cov_nu_new.png")
     # final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=20)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=20)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=50)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=50)
 
     # print(final_spect)
     # print(final_spect)
     # Calculate covariance matrix of summed best fit beta spectrum
-    covmat=convertmodel.vblist["U235"].Covariance(beta235s,
+    covmat=convertmodel.vblist["U235"].Covariance(beta235,
         xval, nu_spectrum = False, samples=20)
     # Calculate covariance matrix of summed converted neutrino spectrum
-    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235s,
+    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235,
         xval, nu_spectrum = True, samples=20)
-    #
+
     print("covariance beta result", final_cov)
     print("covariance neutrino result", final_cov1)
     relativeErr = np.zeros(len(xval))
     for i in range(len(final_spect)):
         if final_spect[i] > 0:
             relativeErr[i] = np.sqrt(final_cov[i][i])/final_spect[i]
-    
+
     relativeErrNu = np.zeros(len(xval))
     for i in range(len(final_spect1)):
         if final_spect1[i] > 0:
             relativeErrNu[i] = np.sqrt(final_cov1[i][i])/final_spect1[i]
-    
+
     fig = plt.figure()
-    plt.ylim([-.3, .3])
+    # plt.ylim([-.3, .3])
     plt.fill_between(xval, relativeErr, -relativeErr, label='beta',
                     alpha = 0.4)
     plt.fill_between(xval, relativeErrNu, -relativeErrNu, label='neutrino',
@@ -180,22 +180,22 @@ if __name__ == "__main__":
     # print(final_unc)
     # print(final_cov)
     print("beta integral", sum(final_spect))
-    # print("neu integral",sum(final_spect1))
+    print("neu integral",sum(final_spect1))
 
-    
+
     newxval = np.arange(2.125, 8.375, 0.25)
     newyval = Rebin(xval, final_spect, newxval)
     newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=20)
     # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
     #     print(i)
-    
+
     # testxval = np.linspace(0,200,201)
     # testyval = 1*testxval+2
     # testxout = np.linspace(0,200,21)
     # testyout = Rebin(testxval, testyval, testxout)
     # for a in (newyval1):
     #     print(a)
-    
+
     fig = plt.figure()
     # plt.yscale('log')
     plt.errorbar(convertmodel.betadata["U235"].x,
@@ -204,9 +204,9 @@ if __name__ == "__main__":
     plt.plot(newxval, newyval1)
     plt.plot(xval, final_spect1)
     plt.show()
-    
+
     xbins = np.arange(0, 8.25, 0.1)
-    
+
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')
     #U235.LoadCorrelation(defaultDB='ENDF')
@@ -225,23 +225,23 @@ if __name__ == "__main__":
     #model.AddIstp(39, 96, 1.0)
 
 # a testing summation calculation
-    sum1 = SumEngine(xbins = xval)
-    sum1.AddModel(model)
-
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xval)
-    #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
-        
-    betaDBBase = BetaEngine()
-    count = 0
-    newlist = []
-
-    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
-    summed_spect = sum1.spectrum
-    summed_err = sum1.uncertainty
-    summed_model_err = sum1.modelUnc
-    summed_yerr = sum1.yieldUnc
-    
+    # sum1 = SumEngine(xbins = xval)
+    # sum1.AddModel(model)
+    #
+    # betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xval)
+    # #betaSpectraDB = BetaEngine(newlist)
+    # betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+    #
+    # betaDBBase = BetaEngine()
+    # count = 0
+    # newlist = []
+    #
+    # sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+    # summed_spect = sum1.spectrum
+    # summed_err = sum1.uncertainty
+    # summed_model_err = sum1.modelUnc
+    # summed_yerr = sum1.yieldUnc
+    #
     betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     fig = plt.figure()
@@ -249,10 +249,10 @@ if __name__ == "__main__":
     plt.xlim([2, 9])
     plt.plot(xval, diff)
     plt.show()
-    
-    diff = (final_spect1-summed_spect)/summed_spect
-    fig = plt.figure()
-    plt.ylim([-0.1, 0.1])
-    plt.xlim([2, 9])
-    plt.plot(xval, diff)
-    plt.show()
+    #
+    # diff = (final_spect1-summed_spect)/summed_spect
+    # fig = plt.figure()
+    # plt.ylim([-0.1, 0.1])
+    # plt.xlim([2, 9])
+    # plt.plot(xval, diff)
+    # plt.show()

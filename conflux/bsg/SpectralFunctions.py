@@ -97,7 +97,7 @@ def sirlin_g(W, W0, **kwargs):
         -3./4.
         +4./beta*(-1*spence(1-(2*beta/(1+beta))))
         +4*(np.arctanh(beta)/beta-1)*((W0-W)/(3*W)-3/2+np.log(2*(W0-W)))
-        +np.arctanh(beta)/beta*(2*(1+beta**2)+(W0-W)**2/(6*W**2)))
+        +np.arctanh(beta)/beta*(2*(1+beta**2)+(W0-W)**2/(6*W**2)-4*np.arctanh(beta)))
 
 
     return g

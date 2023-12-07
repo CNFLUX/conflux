@@ -113,7 +113,7 @@ class SumEngine(Spectrum):
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False, ifp_begin = 0, ifp_end = 0):
+    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
@@ -200,9 +200,14 @@ class SumEngine(Spectrum):
 
                     sigmay_ij = fi*cov_ij*fj
 
-                    if (i==j):
-                        self.uncertainty += sigmay_ij # + (ferri*yi)**2
-                    else:
-                        self.uncertainty += sigmay_ij
+                    self.uncertainty += sigmay_ij
+                    # if (i==j):
+                    #     self.uncertainty += sigmay_ij + (ferri*yi)**2
+                    # else:
+                    #     self.uncertainty += sigmay_ij
+
+        # if allowed, add beta model uncertainty to the result
+        if modelunc:
+            self.uncertainty += self.modelUnc
 
         self.uncertainty = np.sqrt(self.uncertainty)
