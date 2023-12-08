@@ -57,6 +57,8 @@ class BetaData:
         self.x = np.array(self.x)
         self.y = np.array(self.y)
         self.yerr = np.array(self.yerr)
+        self.spectrum = np.array(self.y)
+        self.uncertainty = np.array(self.yerr)
 
 # Class that creates virtual branch based on nuclear data
 class VirtualBranch:
@@ -192,12 +194,12 @@ class VirtualBranch:
         suby = [] # sublist y values
         subyerr = [] # sublist uncertainty
         xhigh = 9
-        datacache = np.copy(betadata.spectrum) # preserve the data
+        datacache = np.copy(betadata.y) # preserve the data
         for it, x in reversed(list(enumerate(betadata.x))):
             if x <= xhigh - slicesize or x == betadata.x[0]:
                 subx.append(x)
                 suby.append(datacache[it])
-                subyerr.append(betadata.uncertainty[it])
+                subyerr.append(betadata.yerr[it])
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx):
                     # setup the virtual isotope properties
@@ -332,7 +334,7 @@ class VirtualBranch:
 
                     self.contribute[xhigh] = best_norm
                     self.E0[xhigh] = best_energy
-                    print(best_norm/norm, best_energy)
+                    # print(best_norm/norm, best_energy)
 
 
                     newspect = betafunc(betadata.x, best_energy, best_norm)
@@ -603,11 +605,13 @@ class VirtualBranch:
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
+                if toy.y[it] < 0: toy.y[it] = 0
 
             vbnew = deepcopy(self)
-            print(toy.y)
             vbnew.FitData(toy, vbnew.slicesize)
-            print('best fit', vbnew.SumBranches(x, thresh, nu_spectrum))
+            print(vbnew.E0)
+
+            # print('best fit', vbnew.SumBranches(x, thresh, nu_spectrum))
 
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()

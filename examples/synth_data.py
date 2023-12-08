@@ -22,7 +22,7 @@ if __name__ == "__main__":
     betaFDB = BetaEngine(sumE.FPYlist.keys(), xbins=np.arange(0.0,8.0,0.1))
     betaFDB.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 8.0])
 
-        print("-----Summation Engine Created, Beta Spectrum Calculated-----")
+    print("-----Summation Engine Created, Beta Spectrum Calculated-----")
 
 
     totalSpec = np.zeros(len(np.arange(0.0,8.0,0.1)))
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     sumUnc = sumE.uncertainty
     print(convertY)
     print(sumY)
-    
+
 
     for i in range(len(percent)):
         diff = convertY[i] - sumY[i]
