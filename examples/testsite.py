@@ -14,6 +14,13 @@ e_TNT = 4.184e9
 fission_per_t = e_TNT/e_fission
 test_flux = 15*fission_per_t
 
+def ibd_xsection(enu):
+    epos = enu - 1.15
+    ppos = np.sqrt(epos**2 - 0.511*2)
+    xsection = 0.0952*epos*ppos*1e-42 #Phys. Rev. D 60 053003 (Vogel model)
+    xsection[np.isnan(xsection)] = 0
+    return xsection
+
 if __name__ == "__main__":
     xbins = np.arange(1.8, 15, 0.1)
 
@@ -37,10 +44,11 @@ if __name__ == "__main__":
     #model.AddIstp(39, 96, 1.0)
 
     # define the time windows of the calculation
-    windows = np.logspace(-1, 6, 22)
+    windows = np.logspace(-1, 6, 8)
     print('time:', windows)
     fig, ax = plt.subplots()
     spect_time = []
+    print(ibd_xsection(xbins))
 
     # generate neutrino spectra in different time window after ignition
     for i in range(len(windows)-1):
@@ -54,7 +62,7 @@ if __name__ == "__main__":
         betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
         sum_model.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False,  ifp_begin = begin,  ifp_end = end)
         spect = sum_model.spectrum
-
+        print(np.argmax(spect), max(spect))
         spect_time.append(spect)
 
         ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
@@ -71,9 +79,24 @@ if __name__ == "__main__":
         print('spectrum intergral', sum(spect))
         total_spect+=spect
         ax.set(xlabel='E (MeV)', ylabel='neutrino/MeV', title='U-235 neutrino flux')
-        ax.plot(sum_model.xbins, total_spect, label='by '+ str(windows[i+1])+' s')
+        ax.plot(xbins, total_spect, label='by '+ str(windows[i+1])+' s')
         i+=1
         y_time.append(sum(total_spect[xbins > 1.8]))
+    fig.savefig('neutrino_overtime.png')
+
+
+    fig, ax = plt.subplots()
+    total_spect = np.zeros(len(xbins))
+    i = 0
+    y_time = []
+    for spect in spect_time:
+        print('spectrum intergral', sum(spect))
+        total_spect+=spect
+        ax.set(xlabel='E (MeV)', ylabel='IBD/MeV', title='U-235 neutrino flux')
+        ax.plot(sum_model.xbins, total_spect*ibd_xsection(sum_model.xbins), label='by '+ str(windows[i+1])+' s')
+        i+=1
+        y_time.append(sum(total_spect[xbins > 1.8]))
+    fig.savefig('IBD_overtime.png')
     # ax.legend()
     # fig.savefig("239Pu_ENDF_jeff_0.4_MeV_cumulative.png")
     print(windows[1:], y_time)

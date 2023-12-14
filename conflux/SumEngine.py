@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+from copy import deepcopy
 
 # local modules
 from conflux.Basic import *
@@ -60,6 +61,9 @@ class SumEngine(Spectrum):
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
+    # def __del__(self):
+    #     print("Summation model cleared")
+
     def Clear(self):
         """
             Clears out all associated dictionaries inside the SumEngine
@@ -86,15 +90,16 @@ class SumEngine(Spectrum):
             Returns:
                 None
         """
-        for FPZAI in fissionModel.FPYlist:
+        inputFPY = deepcopy(fissionModel)
+        for FPZAI in inputFPY.FPYlist:
             if FPZAI not in self.FPYlist:
-                self.FPYlist[FPZAI] = fissionModel.FPYlist[FPZAI]
+                self.FPYlist[FPZAI] = inputFPY.FPYlist[FPZAI]
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
             else:
-                self.FPYlist[FPZAI].y + fissionModel.FPYlist[FPZAI].y*W
-                self.FPYlist[FPZAI].yerr + fissionModel.FPYlist[FPZAI].yerr*W
-                self.FPYlist[FPZAI].AddCovariance(fissionModel.FPYlist[FPZAI])
+                self.FPYlist[FPZAI].y += inputFPY.FPYlist[FPZAI].y*W
+                self.FPYlist[FPZAI].yerr += inputFPY.FPYlist[FPZAI].yerr*W
+                self.FPYlist[FPZAI].AddCovariance(inputFPY.FPYlist[FPZAI])
 
     def NormalizeFP(self):
         """

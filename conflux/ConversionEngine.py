@@ -270,6 +270,7 @@ class VirtualBranch:
                     testvalue = np.inf
                     a = 0
                     # find the bestfit virtual branches to the spectrum slices
+
                     for energy in np.arange(e_lower, e_upper, stepsize):
                         tempspec = betafunc(subx, energy, 1)
                         norm = sum(suby)/sum(tempspec)
@@ -334,7 +335,7 @@ class VirtualBranch:
 
                     self.contribute[xhigh] = best_norm
                     self.E0[xhigh] = best_energy
-                    # print(best_norm/norm, best_energy)
+                    print(e_lower, e_upper ,best_norm/norm, best_energy)
 
 
                     newspect = betafunc(betadata.x, best_energy, best_norm)
@@ -377,17 +378,23 @@ class VirtualBranch:
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
 
-
+    # TODO: revisit the NNLS fitter by changing the selection strat of the energy slice
     def FitDataNNLS(self, betadata, slicesize, seeds=100):
         self.contribute = {}
         self.E0 = {}
         self.betadata = betadata
         self.slicesize = slicesize
 
-        # setting the spectrum limits
+        # Setting the virtual spectra eneregy ranges
+        # To get the x ticks for the beta data in the E range (0, 9]
         xscales = betadata.x[betadata.x<=9.0]
+        # To count down from the highest tick to the lowest with the defined
+        # stepsize, and let each xhigh be the bondaries of the spectrum slices
         xhigh = (np.arange(xscales[-1], xscales[0], -self.slicesize))
+        print(xhigh)
 
+        # To pre-declare the least square value and the bestfit values of each
+        # virtual spectrum
         least = np.inf
         bestnorm = np.zeros(len(xhigh))
         beste0 = np.zeros(len(xhigh))
@@ -609,9 +616,6 @@ class VirtualBranch:
 
             vbnew = deepcopy(self)
             vbnew.FitData(toy, vbnew.slicesize)
-            print(vbnew.E0)
-
-            # print('best fit', vbnew.SumBranches(x, thresh, nu_spectrum))
 
             result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
         endTiming = timeit.default_timer()
