@@ -475,11 +475,8 @@ class BetaEngine:
 
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
-            # print(ZAI, betaIstp.spectrum)
             istpCount += 1
 
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
-        # print("Finished calculating beta spectra of "+ str(nBranch) + " isotopes.")
-        # print("Processing time: "+str(runTime)+" seconds")

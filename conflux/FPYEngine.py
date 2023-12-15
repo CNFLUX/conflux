@@ -111,7 +111,6 @@ class FPNuclide:
             else:
                 self.cov[key] += newNuclide.cov[key]
 
-            print(self.FPZAI, self.cov[key])
             #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
@@ -360,8 +359,10 @@ class FissionModel:
             self.FPYlist[FPZAI].y + nuclide.y
             self.FPYlist[FPZAI].yerr + nuclide.yerr
 
-    # Method to load a customized covariance matrix
-    def CustomCovariance(self, DBname, percent = False):
+    def CustomCovariance(self, DBname, percent = False, rel = False):
+        """
+        Method to load a customized covariance matrix
+        """
         # determine the whether the covariance are relative or absolute
         rate = 1e4 if percent else 1
         with open(DBname) as inputfile:
@@ -381,8 +382,11 @@ class FissionModel:
                     col_id = int(corrzai)
                     # if col_id is not found in the covaraince matrix, set
                     # value to zero
+                    y1 = self.FPYlist[fpzai].y
+                    y2 = self.FPYlist[corrzai].y
+                    y_prod = (y1*y2)**rel
                     if str(col_id) in row:
-                        self.FPYlist[fpzai].cov[corrzai] = float(row[str(corrzai)])/rate
+                        self.FPYlist[fpzai].cov[corrzai] = y_prod*float(row[str(corrzai)])/rate
                     else:
                         self.FPYlist[fpzai].cov[corrzai] = 0.0
 

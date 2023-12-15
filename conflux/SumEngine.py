@@ -206,10 +206,6 @@ class SumEngine(Spectrum):
                     sigmay_ij = fi*cov_ij*fj
 
                     self.uncertainty += sigmay_ij
-                    # if (i==j):
-                    #     self.uncertainty += sigmay_ij + (ferri*yi)**2
-                    # else:
-                    #     self.uncertainty += sigmay_ij
 
         # if allowed, add beta model uncertainty to the result
         if modelunc:

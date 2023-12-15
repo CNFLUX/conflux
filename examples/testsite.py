@@ -11,8 +11,14 @@ from conflux.SumEngine import SumEngine
 
 e_fission = 3.2e-11 #joules
 e_TNT = 4.184e9
+r2 = 10000*2
 fission_per_t = e_TNT/e_fission
-test_flux = 15*fission_per_t
+test_flux = 15*fission_per_t/r2 # cm^-2
+
+proton_per_cc = 6.81e22
+ej309_dens = 0.962 # g_per_cc
+detect_mass = 10e6 # g (e6 means ton)
+proton_count = detect_mass/ej309_dens*proton_per_cc # per 10 ton
 
 def ibd_xsection(enu):
     epos = enu - 1.15
@@ -93,9 +99,10 @@ if __name__ == "__main__":
         print('spectrum intergral', sum(spect))
         total_spect+=spect
         ax.set(xlabel='E (MeV)', ylabel='IBD/MeV', title='U-235 neutrino flux')
-        ax.plot(sum_model.xbins, total_spect*ibd_xsection(sum_model.xbins), label='by '+ str(windows[i+1])+' s')
+        ax.plot(sum_model.xbins, total_spect*ibd_xsection(sum_model.xbins)*proton_count, label='by '+ str(windows[i+1])+' s')
         i+=1
         y_time.append(sum(total_spect[xbins > 1.8]))
+    ax.legend()
     fig.savefig('IBD_overtime.png')
     # ax.legend()
     # fig.savefig("239Pu_ENDF_jeff_0.4_MeV_cumulative.png")
