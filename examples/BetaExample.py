@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 
 if __name__ == "__main__":
-    x = np.arange(1.5, 10, 0.05)
+    x = np.arange(0, 10, 0.05)
     binwidth = 1
 
     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine(testlist, xbins=x)
-    testEngine.CalcBetaSpectra(nu_spectrum=False)
-    
+    testEngine = BetaEngine()
+    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 0.1])
+
     #print(testEngine.spectralist[521340])
     index = 521331
     fig = plt.figure()
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # plt.errorbar(x, testEngine.istplist[531340].spectrum, yerr=testEngine.istplist[531340].uncertainty)
     # print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
 
-    
+
     testEngine2 = BetaEngine(testlist, xbins=x)
     testEngine2.CalcBetaSpectra(nu_spectrum=True)
     y2 = testEngine2.istplist[index].spectrum*binwidth
@@ -34,5 +34,5 @@ if __name__ == "__main__":
     plt.plot(x, y2, "--", label=str(index)+"_nu") #, yerr=testEngine.istplist[index].uncertainty)
     plt.legend()
     plt.show()
-    
+
     # print(testEngine2.istplist[index].branches)

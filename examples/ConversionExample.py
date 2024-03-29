@@ -1,12 +1,11 @@
 # local modules
 from conflux.BetaEngine import BetaEngine, BetaBranch
 from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
 import numpy as np
-from conflux.BetaEngine import BetaEngine
-from conflux.FPYEngine import FissionModel, FissionIstp
-from conflux.SumEngine import SumEngine
+import os
 
 def HuberZavg(x, c0, c1, c2):
     return c0+c1*x+c2*x**2
@@ -61,11 +60,11 @@ def Rebin(inputx, inputy, outputx):
 # test
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
-    beta235 = BetaData("./data/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData("./U235_synth_data_1.5_9.6.csv")
-    beta239 = BetaData("./data/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData("./data/conversionDB/Pu_241_e_2014.csv")
+    beta235s = BetaData(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
 
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches
@@ -229,6 +228,15 @@ if __name__ == "__main__":
 
     sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = sum1.spectrum
+
+    file = open("U235_synth_compare.csv", "w")
+    file.write("E,Ne,dNe")
+    file.write("\n")
+    for i in range(len(summed_spect)):
+        file.write(str(xval[i] * 1000) + " , " + str(summed_spect[i]) + ",0", file=file)
+    #
+    #
+    file.close()
 
     #
     diff = (final_spect1-summed_spect)/summed_spect

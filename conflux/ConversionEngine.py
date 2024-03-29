@@ -16,6 +16,8 @@ from iminuit.cost import LeastSquares
 
 from iminuit import Minuit
 
+import math
+
 
 # local modules
 from conflux.BetaEngine import BetaEngine, BetaBranch
@@ -142,30 +144,30 @@ class VirtualBranch:
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
-                    nu_spectrum=False, forbiddenness=0, bAc=4.7):
+                    nu_spectrum=False, forbiddenness=0, bAc=4.7, norm=True):
         if Zavg is None:
             Zavg = self.Zavg
         if Aavg is None:
             Aavg = self.Aavg
-        virtualbata = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0, sigma_E0=0,
+        virtualbeta = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0, sigma_E0=0,
                                 frac=contribute, sigma_frac=0,
                                 forbiddenness=forbiddenness, bAc=bAc)
-        return virtualbata.BetaSpectrum(x, nu_spectrum) * contribute
 
-    def SpecFitFunc(self, x, *E0s):
+        binwidths = abs(x[1]-x[0])
+        new_spect = virtualbeta.BetaSpectrum(x, nu_spectrum)
 
-        spectra_matrix = []
-        for energy in E0s:
-            spectra_matrix.append(self.BetaSpectrum(betadata.x, energy, 1))
+        normalize = 1
+        full_range = np.arange(0, 20, binwidths)
+        full_spect = np.zeros(len(full_range))
+        if norm:
+            full_spect = virtualbeta.BetaSpectrum(full_range, nu_spectrum)
+            normalize = full_spect.sum()
+            #normalize = new_spect.sum()*full_spect.sum()/this_spect.sum() if E0 > binwidths else new_spect.sum()
+            # print("test", this_spect.sum()/full_spect.sum())
 
-        spectra_matrix = np.array(spectra_matrix)
-
-        spectra_matrix = np.transpose(spectra_matrix)
-        a, rnorm = nnls(spectra_matrix, betadata.y)
-        new_spect = (np.dot(spectra_matrix, a))
-
-        return
-
+        new_spect /= normalize*binwidths
+        # print("again", sum(new_spect))
+        return new_spect
 
     # function that fit the reference beta spectrum with virtual brances
     def FitData(self, betadata, slicesize):
@@ -248,11 +250,12 @@ class VirtualBranch:
                     # TODO there is a correlation between fitting quality and the range
                     stepsize = 0.02
                     e_upper = xhigh+slicesize
-                    e_lower = xhigh+slicesize/8
-                    if subx[0] == 9:
-                        e_upper = xhigh+3
+                    e_lower = xhigh-slicesize/8
+                    print(subx, xhigh)
+                    if math.isclose(subx[0], 9, rel_tol = 1e-6):
+                        e_upper = xhigh+5
 
-                    betafunc = (lambda x, e, c:
+                    betafunc = (lambda x, e:
                                 ((1-fbratio)*(self.BetaSpectrum(x, e, 1,
                                                                 Zavg=Zavg,
                                                                 Aavg=Aavg,
@@ -262,8 +265,11 @@ class VirtualBranch:
                                                                 Zavg=Zavg,
                                                                 Aavg=Aavg,
                                                                 forbiddenness=1,
-                                                                bAc=wm)))
-                                * c )
+                                                                bAc=wm))))
+
+                    binwidths = betadata.x[1]-betadata.x[0]
+                    full_range = np.arange(0, 20, binwidths)
+
 
                     best_energy = np.inf
                     best_norm = 0
@@ -272,32 +278,21 @@ class VirtualBranch:
                     # find the bestfit virtual branches to the spectrum slices
 
                     for energy in np.arange(e_lower, e_upper, stepsize):
-                        tempspec = betafunc(subx, energy, 1)
-                        norm = sum(suby)/sum(tempspec)
-                        fitfunc = (lambda x, c: c*betafunc(x, energy, norm))
-                        # TODO: big issue here
-                        # The uncertainty of reference data should not be
-                        # considered here, as it is correlated to the subtracted
-                        # bestfit vitual spectra's uncertainties.
-                        # The LeastSquares function requires errors. Thus
-                        # alternative function is needed.
+                        # print(energy)
+                        full_spect = betafunc(full_range, energy)
+                        norm = full_spect.sum()
 
-                        # Method 1 LeastSquares from numpy
-                        # Cons: must provide error
-
-                        # leastfunc = LeastSquares(subx, suby, subyerr, fitfunc)
-                        leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2)
+                        leastfunc = lambda c: np.sum((suby - c*betafunc(subx, energy)/norm/binwidths)**2/suby**2)
                         m1 = Minuit(leastfunc, c = 1)
+
                         m1.migrad()
                         a = m1.values[0]
                         f = m1.fval
-                        # print(energy, a, m1.fval)
 
                         if (f < testvalue):
                             testvalue = f
                             best_energy = energy
-                            if norm > 0: best_norm = a*norm
-
+                            if a > 0: best_norm = a
 
                         # Method 2: grid search
 
@@ -335,10 +330,10 @@ class VirtualBranch:
 
                     self.contribute[xhigh] = best_norm
                     self.E0[xhigh] = best_energy
-                    print(e_lower, e_upper ,best_norm/norm, best_energy)
 
-
-                    newspect = betafunc(betadata.x, best_energy, best_norm)
+                    newspect = best_norm*betafunc(betadata.x, best_energy)
+                    least = np.sum((suby - best_norm*betafunc(subx, best_energy))**2)
+                    print(e_lower, e_upper, best_norm, best_energy, least)
                     # print('BEST FIT', xhigh-slicesize, xhigh, best_energy, best_norm, testvalue, a)
                     # least1 = np.sum((suby - norm*tempspec) ** 2 / subyerr ** 2)
                     # least2 = np.sum((suby - popt[1]*self.BetaSpectrum(subx, E0=popt[0], contribute = 1)) ** 2 / subyerr ** 2)
@@ -352,7 +347,7 @@ class VirtualBranch:
                     # # chi2 = chisquare(suby, f_exp=newspect)
                     # print('result:', popt[0], popt[1])
 
-                    # # subtract the best fit spectrum from beta data
+                    # # subtract the best fit spectrum from final_spect
                     # fig = plt.figure()
                     # # plt.yscale('log')
                     # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
@@ -373,13 +368,13 @@ class VirtualBranch:
                     subyerr = [] # [betadata.uncertainty[it]]
 
                 xhigh -= slicesize
-            elif x <= xhigh:
+            elif x <= xhigh or math.isclose(x, xhigh, rel_tol=1e-6):
                 subx.append(x)
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
 
     # TODO: revisit the NNLS fitter by changing the selection strat of the energy slice
-    def FitDataNNLS(self, betadata, slicesize, seeds=100):
+    def FitDataNNLS(self, betadata, slicesize, seeds=2000):
         self.contribute = {}
         self.E0 = {}
         self.betadata = betadata
@@ -391,7 +386,6 @@ class VirtualBranch:
         # To count down from the highest tick to the lowest with the defined
         # stepsize, and let each xhigh be the bondaries of the spectrum slices
         xhigh = (np.arange(xscales[-1], xscales[0], -self.slicesize))
-        print(xhigh)
 
         # To pre-declare the least square value and the bestfit values of each
         # virtual spectrum
@@ -401,15 +395,20 @@ class VirtualBranch:
 
         # setup the virtual isotope properties
         for x in xhigh:
+            # Calculate the average Z number of isotopes with end point energy
+            # sitting in the specific energy range
             if self._Zlist_cp:
+                # if given a list of Z numbers
                 Zavg = round(np.interp(x-slicesize/2,
                                         list(self._Zlist_cp.keys()),
                                         list(self._Zlist_cp.values())))
             else:
                 Zavg, _ = self.CalcZAavg(x-slicesize, x)
+            # fill the Z numbers in the list of virtual isotopes
             if x not in self.Zlist:
                 self.Zlist[x] = Zavg
 
+            # calculate the avg A number in the same fashion above
             if self._Alist_cp:
                 Aavg = round(np.interp(x-slicesize/2,
                                         list(self._Alist_cp.keys()),
@@ -419,6 +418,7 @@ class VirtualBranch:
             if x not in self.Alist:
                 self.Alist[x] = Aavg
 
+            # create the ratio of forbidden transitions in the virtual isotopes
             if self._fblist_cp:
                 fbratio = (np.interp(x-slicesize/2,
                                     list(self._fblist_cp.keys()),
@@ -428,6 +428,8 @@ class VirtualBranch:
             if x not in self.fblist:
                 self.fblist[x] = 0.0
 
+            # create the weak magnatism correction fectors for the virtual
+            # isotopes
             if self._wmlist_cp:
                 wm = (np.interp(x-slicesize/2,
                                 list(self._wmlist_cp.keys()),
@@ -437,115 +439,59 @@ class VirtualBranch:
             if x not in self.wmlist:
                 self.wmlist[x] = 4.7
 
-
+        # Fit the beta spectrum with virtual beta spectra.
+        # One virtual spectra for each slice of the beta spectrum.
+        # Each beta spectrum's end point energy is randomized to minimize the
+        # least square value of the summed virtual spectrum to the beta spectrum
+        # data.
+        # The virtual branches are fitted with the non-negative least square
+        # method to search for the best fit while forbid any below-zero spectrum
+        # amplitude.
+        bestspectra = []
         for seed in range(seeds):
             # set random end point energy within each energy slice
             randarray = np.random.rand(len(xhigh))
-            new_xhigh = xhigh-self.slicesize + (randarray*1.5)*self.slicesize
+            # limiting the range of parameter randomization
+            new_xhigh = xhigh + (randarray*1.)*self.slicesize - 0.3*self.slicesize
             # for the spectrum with highest energy, allow the end point to go upto 12 MeV
-            new_xhigh[0] = xhigh[0] - self.slicesize + 3*randarray[0]
+            new_xhigh[0] = xhigh[0] + 10*randarray[0]*self.slicesize
 
             # define the spectra matrix with and fill it virtual spetra
             spectra_matrix = []
             for energy in new_xhigh:
-                spectra_matrix.append(self.BetaSpectrum(betadata.x, energy, 1))
+                spectra_matrix.append(self.BetaSpectrum(betadata.x, energy, 1)/betadata.y)
 
             # find the transpose
             spectra_matrix = np.array(spectra_matrix)
             spectra_matrix = np.transpose(spectra_matrix)
-
-            # NNLS fitter
-            a, rnorm = nnls(spectra_matrix, betadata.y)
+            a, rnorm = nnls(spectra_matrix, betadata.y/betadata.y, maxiter=2000)
             new_spect = (np.dot(spectra_matrix, a))
 
             # find the minimum within the randomized end point energy groups
-            leastfunc = np.sum((new_spect - betadata.y)**2/betadata.y**2)
+            leastfunc = np.sqrt(np.sum((new_spect - 1)**2))
+
+            # TODO: There is one problem, the least square found by NNLS does
+            # not produce least value in a separated calculation
             if least>rnorm:
                 least = rnorm
                 bestnorm = a
                 beste0 = new_xhigh
 
-        self.contribute = dict(zip(xhigh, bestnorm))
-        self.E0 = dict(zip(xhigh, beste0))
-        print(self.E0, self.contribute)
-
-    def FitDataNNLS_v2(self, betadata, slicesize, seeds=100):
-        '''
-        Uses the NNLS algorithm to find the best fit virtual spectra
-        '''
-        self.contribute = {}
-        self.E0 = {}
-        self.slicesize = slicesize
-
-        # defining the higher end of each spectrum slice
-        xhigh = np.arange(betadata.x[-1], betadata.x[0], -self.slicesize)
-
-        least = np.inf
-        bestnorm = np.zeros(len(xhigh))
-        beste0 = np.zeros(len(xhigh))
-
-        # setup the virtual isotope properties
-        # not important to the fitter
-        for x in xhigh:
-            if self._Zlist_cp:
-                Zavg = round(np.interp(x-slicesize/2,
-                                        list(self._Zlist_cp.keys()),
-                                        list(self._Zlist_cp.values())))
-            else:
-                Zavg, _ = self.CalcZAavg(x-slicesize, x)
-            if x not in self.Zlist:
-                self.Zlist[x] = Zavg
-
-            if self._Alist_cp:
-                Aavg = round(np.interp(x-slicesize/2,
-                                        list(self._Alist_cp.keys()),
-                                        list(self._Alist_cp.values())))
-            else:
-                _, Aavg = self.CalcZAavg(x-slicesize, x)
-            if x not in self.Alist:
-                self.Alist[x] = Aavg
-
-            if self._fblist_cp:
-                fbratio = (np.interp(x-slicesize/2,
-                                    list(self._fblist_cp.keys()),
-                                    list(self._fblist_cp.values())))
-            else:
-                fbratio = 0.0
-            if x not in self.fblist:
-                self.fblist[x] = 0.0
-
-            if self._wmlist_cp:
-                wm = (np.interp(x-slicesize/2,
-                                list(self._wmlist_cp.keys()),
-                                list(self._wmlist_cp.values())))
-            else:
-                wm = 4.7
-            if x not in self.wmlist:
-                self.wmlist[x] = 4.7
-
-        # the fitting process
-        for seed in range(seeds):
-            new_xhigh = xhigh-self.slicesize/2 + seed*(self.slicesize/seeds)*1.5
-            # new_xhigh[0] = xhigh[0] - self.slicesize + (12-xhigh[0]+self.slicesize)*randarray[0]
-
-            spectra_matrix = []
-            for energy in new_xhigh:
-                spectra_matrix.append(self.BetaSpectrum(betadata.x, energy, 1))
-
-            spectra_matrix = np.array(spectra_matrix)
-
-            spectra_matrix = np.transpose(spectra_matrix)
-            a, rnorm = nnls(spectra_matrix, betadata.y)
-            new_spect = (np.dot(spectra_matrix, a))
-
-            leastfunc = np.sum((new_spect - betadata.y)**2/betadata.y**2)
-            if least>rnorm:
-                least = rnorm
-                bestnorm = a
-                beste0 = new_xhigh
+                bestspectra = np.transpose(spectra_matrix)*betadata.y
 
         self.contribute = dict(zip(xhigh, bestnorm))
         self.E0 = dict(zip(xhigh, beste0))
+        self.bestfits =  dict(zip(xhigh, bestspectra))
+        # subtract the best fit spectrum from final_spect
+        fig = plt.figure()
+        # plt.yscale('log')
+        # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
+        # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
+        plt.plot(betadata.x, new_spect - 1)
+
+        plt.pause(1)
+        plt.show()
+        print(least, self.E0, self.contribute)
 
     # function to calculate summed spectra of virtual branches
     def SumBranches(self, x, thresh = 0, nu_spectrum = False):
@@ -571,35 +517,68 @@ class VirtualBranch:
             The summed spectra in the form of ndarray
         """
         result = 0
-        # print(len(self.E0))
+        # # print(len(self.E0))
         # print(self.E0)
         # print(self.contribute)
         # datacache = np.interp(x, self.betadata.x, self.betadata.spectrum)
+        spect_array = []
+        cont_array = []
+        best_array = []
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
-                                frac=self.contribute[s], I=0, Q = self.E0[s],
+                                frac=1, I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
                                 forbiddenness=0, bAc=self.wmlist[s])
                 vb_fb = BetaBranch(self.Zlist[s], self.Alist[s],
-                                frac=self.contribute[s], I=0, Q = self.E0[s],
+                                frac=1, I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
                                 forbiddenness=1, bAc=self.wmlist[s])
                 newspect = vb.frac * ((1-self.fblist[s])
                                         * vb.BetaSpectrum(x, nu_spectrum)
                                     + self.fblist[s]
                                         * vb_fb.BetaSpectrum(x, nu_spectrum))
-                result += newspect
-                # datacache -= newspect
+
+                binwidths = x[1]-x[0]
+                full_range = np.arange(0, 20, binwidths)
+                this_range = np.arange(x[0], x[-1], 0.01)
+                full_spect = vb.frac * ((1-self.fblist[s])
+                                        * vb.BetaSpectrum(full_range, nu_spectrum)
+                                    + self.fblist[s]
+                                        * vb_fb.BetaSpectrum(full_range, nu_spectrum))
+                this_spect = vb.frac * ((1-self.fblist[s])
+                                        * vb.BetaSpectrum(this_range, nu_spectrum)
+                                    + self.fblist[s]
+                                        * vb_fb.BetaSpectrum(this_range, nu_spectrum))
+                norm = full_spect.sum() if s > binwidths else newspect.sum()
+                # print('e0', s, full_spect.sum()/this_spect.sum(), newspect.sum(), sum(newspect))
+                newspect /= norm*binwidths
+                # print('max', max(newspect)/max(self.bestfits[s]))
+                # print('sum', sum(newspect)/sum(self.bestfits[s]))
+
+                spect_array.append(newspect)
+                cont_array.append(self.contribute[s])
+                # best_array.append(self.bestfits[s])
                 # fig = plt.figure()
-                # plt.ylim([-1.5*abs(max(newspect)), 1.5*abs(max(newspect))])
+                # plt.title('two best fit compare'+str(s))
                 # plt.plot(x, newspect)
-                # plt.plot(x, datacache)
-                # plt.pause(1)
+                # plt.plot(self.betadata.x, self.bestfits[s])
                 # plt.show()
 
             elif sum(result*x) == 0:
                 return result*x
+
+        spect_array = np.transpose(np.array(spect_array))
+        cont_array = np.array(cont_array)
+        result = np.transpose(spect_array @ cont_array)
+        # bestfit = np.transpose(cont_array @ best_array)
+        # fig = plt.figure()
+        # plt.title('two best fit compare')
+        # plt.plot(x, result)
+        # plt.plot(self.betadata.x, bestfit)
+        # plt.show()
+
+
         return result
 
     def Covariance(self, betadata, x, samples = 500, thresh = 0,
@@ -712,3 +691,141 @@ class ConversionEngine:
         # at each energy bin.
         uncertainty = np.sqrt(covariance.diagonal().copy())
         return spectrum, uncertainty, covariance
+
+def HuberZavg(x, c0, c1, c2):
+    return c0+c1*x+c2*x**2
+
+def rebin(data, bins):
+    # Set the number of points in the averaged array
+    num_points = 10
+
+    # Calculate the size of each chunk
+    chunk_size = len(data) // num_points
+
+    # Reshape the data into chunks and calculate the average for each chunk
+    averaged_data = np.mean(data[:num_points * chunk_size].reshape((num_points, -1)), axis=1)
+
+    return averaged_data
+
+# testing script
+if __name__ == "__main__":
+    from conflux.BetaEngine import BetaEngine, BetaBranch
+    from conflux.FPYEngine import FissionModel, FissionIstp
+    from conflux.SumEngine import SumEngine
+    # from conflux.ConversionEngine import ConversionEngine, BetaData
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import os
+
+    # Begin the calculation by sourcing the default beta data
+    beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
+    # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
+    beta235s = BetaData(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    print(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
+
+    # Define isotopic fission yield DB to calculate average atom numbers of
+    # virtual branches
+    U235 = FissionIstp(92, 235)
+    Pu239 = FissionIstp(94, 239)
+    Pu241 = FissionIstp(94, 241)
+
+    # Loading default fission product DB
+    U235.LoadFissionDB(defaultDB='JEFF')
+    Pu239.LoadFissionDB()
+    Pu241.LoadFissionDB()
+
+    # Define the size of energy slice
+    branch_slice = 0.25
+    # Declare the conversion engine by adding beta data with corresponding FPY
+    # database
+    convertmodel = ConversionEngine()
+    # Add beta spectra and fission products to the conversion engine
+    convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
+    print(beta235s)
+    # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
+    # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
+    # Do virtual branch fitting with the defined virtual branch energy range
+    xval = np.arange(0,10, 0.01)
+    Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
+    #convertmodel.VBfitbeta("U235", branch_slice)
+    convertmodel.VBfitbeta("U235", branch_slice)
+
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=5)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=5)
+
+    newxval = np.arange(2.125, 8.375, 0.25)
+    # newyval = Rebin(xval, final_spect, newxval)
+    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=5)
+    # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
+    #     print(i)
+
+    # testxval = np.linspace(0,200,201)
+    # testyval = 1*testxval+2
+    # testxout = np.linspace(0,200,21)
+    # testyout = Rebin(testxval, testyval, testxout)
+    # for a in (newyval1):
+    #     print(a)
+
+    # fig = plt.figure()
+    # # plt.yscale('log')
+    # plt.errorbar(convertmodel.betadata["U235"].x,
+    #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
+    #     label='beta data')
+    # plt.plot(newxval, newyval1, label='neutrino rebined')
+    # plt.plot(xval, final_spect1, label='best fit neutrino')
+    # plt.legend()
+    # plt.show()
+    # fig.savefig("bestfit_spectra.png")
+
+    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    diff = (final_spect-betaspect)/betaspect
+    fig = plt.figure()
+    plt.title('Beta fit beta residual')
+    plt.ylim([-0.1, 0.1])
+    plt.xlim([2,9])
+    plt.plot(xval, diff)
+    # plt.plot(xval, betaspect)
+    # plt.plot(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, 'o')
+
+    plt.xlabel('Beta E (MeV)')
+    plt.ylabel('Residual')
+    plt.show()
+    fig.savefig("bestfit_beta_compare.png")
+
+    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    diff = (final_spect-betaspect)/betaspect
+    print('leastsquare', sum(diff[xval<=9]**2))
+    fig = plt.figure()
+    plt.title('Beta and neutrino spectra')
+    plt.yscale('log')
+    plt.xlim([0, 10])
+    plt.plot(xval, final_spect, label='bestfit beta')
+    plt.plot(xval, betaspect, label='beta data')
+    plt.plot(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, 'o')
+
+    plt.xlabel('Beta E (MeV)')
+    plt.ylabel('Residual')
+    plt.legend()
+    plt.show()
+    fig.savefig("bestfit_beta_compare2.png")
+
+    neu235s = BetaData(os.environ["HOME"]+"/conflux/conflux/examples/U235_synth_compare.csv")
+
+    new235spect = neu235s.y
+    diff = (final_spect1-new235spect)/new235spect
+    final_spect1_avg = rebin(final_spect1, 40)
+    new235spect_avg = rebin(new235spect, 40)
+    xval_avg = rebin(xval, 40)
+    diff_avg = (final_spect1_avg-new235spect_avg)/new235spect_avg
+    fig = plt.figure()
+    plt.title("converted neutrino compared to synthetic neutrino spectrum")
+    plt.ylim([-0.2, 0.2])
+    plt.xlim([2,9])
+    plt.plot(xval, diff)
+    plt.plot(xval_avg, diff_avg)
+    plt.xlabel('E (MeV)')
+    plt.ylabel('Residual')
+    plt.show()
+    fig.savefig("bestfit_neu_compare.png")

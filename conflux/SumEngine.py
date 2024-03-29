@@ -132,6 +132,9 @@ class SumEngine(Spectrum):
         """
 
         print("Summing beta spectra...")
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
+
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
         self.missingBranch = []

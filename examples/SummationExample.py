@@ -11,7 +11,7 @@ from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
     xbins = np.arange(0, 8.25, 0.1)
-    
+
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')
     #U235.LoadCorrelation(defaultDB='ENDF')
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xbins)
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
-        
+
     betaDBBase = BetaEngine()
     count = 0
     newlist = []
@@ -68,13 +68,13 @@ if __name__ == "__main__":
     summed_err = sum1.uncertainty
     summed_model_err = sum1.modelUnc
     summed_yerr = sum1.yieldUnc
-    
+
     print('spectrum integral', sum1.Integral())
     print(sum1.totalYield)
     print(sum1.missingCount)
     print(sum1.missingBranch)
     #result.Clear()
-    
+
     sum2 = SumEngine(xbins=xbins)
     sum2.AddModel(model)
     sum2.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # print(sum2.totalYield)
     # print(sum2.missingCount)
     # print(sum2.missingBranch)
-    
+
     sum2.Clear()
 
     fig, ax = plt.subplots()
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     ax.legend()
 
     fig.savefig("235U_ENDF_TOP_linear_jeff.png")
-    
+
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     ax.legend()
 
     fig.savefig("235U_ENDF_Unc_jeff.png")
-    
+
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')

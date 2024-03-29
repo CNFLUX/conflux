@@ -473,6 +473,8 @@ class BetaEngine:
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
 
+            if len(betaIstp.branches) == 1:
+                print(betaIstp.name)
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
             istpCount += 1
@@ -480,3 +482,11 @@ class BetaEngine:
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
+
+if __name__ == "__main__":
+    x = np.arange(0, 10, 0.05)
+    binwidth = 1
+
+    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
+    testEngine = BetaEngine()
+    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 0.1])
