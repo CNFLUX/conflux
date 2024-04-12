@@ -1,0 +1,64 @@
+{
+  "spectrum": {
+    "binlow": 0,
+    "binhigh": 20,
+    "binwidth": 0.01
+  },
+
+  "beta_spec":{
+    "neutrino": 1,
+    "numass": {
+      "value": 0,
+      "unit": "eV"
+    }
+  },
+
+  "sum_model": {
+    "qlow": 0,
+    "qhigh": 20,
+    "missing": 1,
+    "time": [0, 0],
+    "composition": [
+      {
+        "name": "U238",
+        "Z": 92,
+        "A": 238,
+        "fissiondb": "JEFF",
+        "ei": 0.4,
+        "fraction": 0.0
+      },
+      {
+        "name": "U235",
+        "Z": 92,
+        "A": 235,
+        "fissiondb": "JEFF",
+        "ei": 0,
+        "fraction": 1
+      }
+    ]
+  },
+
+  "convert_model": {
+    "composition": [
+      {
+        "name": "Pu239",
+        "Z": 93,
+        "A": 239,
+        "fissiondb": "JEFF",
+        "convesiondb": "$CONFLUX_DB/conversionDB/Pu_239_e_2014.csv",
+        "fraction": 0.3
+      },
+      {
+        "name": "Pu239",
+        "Z": 93,
+        "A": 241,
+        "fissiondb": "JEFF",
+        "convesiondb": "$CONFLUX_DB/conversionDB/Pu_241_e_2014.csv",
+        "fraction": 0.1
+      }
+    ]
+  },
+
+  "txtout": "BLAH",
+  "figout": "BLAH"
+}

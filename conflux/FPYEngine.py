@@ -104,7 +104,7 @@ class FPNuclide:
             Returns:
                 None
         """
-        print("Added FPY covaraince matrix")
+        # print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
             if key not in self.cov:
                 self.cov[key] = newNuclide.cov[key]

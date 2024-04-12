@@ -472,9 +472,8 @@ class BetaEngine:
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-
-            if len(betaIstp.branches) == 1:
-                print(betaIstp.name)
+            # if len(betaIstp.branches) == 1:
+            #     print(betaIstp.name)
             betaIstp.CalcCovariance(GSF=True)
             betaIstp.SumSpectra(nu_spectrum)
             istpCount += 1

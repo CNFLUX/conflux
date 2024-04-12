@@ -91,13 +91,13 @@ if __name__ == "__main__":
     sum2.Clear()
 
     fig, ax = plt.subplots()
-    #ax.set_ylim([-1, 1])
-    #plt.yscale('log')
+    # ax.set_ylim([-1, 1])
+    # plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.fill_between(sum2.xbins, miss_spect+miss_yerr, miss_spect-miss_yerr, alpha=.5, linewidth=0, label="fission product error")
     ax.fill_between(sum2.xbins, miss_spect+miss_model_err, miss_spect-miss_model_err, alpha=.5, linewidth=0, label="beta model error")
     ax.plot(sum2.xbins, miss_spect, label="w/ miss info")
-    #ax.plot(sum2.xbins, summed_spect, label="w/o info")
+    # ax.plot(sum2.xbins, summed_spect, label="w/o info")
 
     ax.plot(sum2.xbins, miss_spect-summed_spect, label="missing info")
     # ax.plot(sum2.bins, miss_spect, label="w/ miss info")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     ax.fill_between(sum2.xbins, miss_yerr/miss_spect*100, -miss_yerr/miss_spect*100, label="fission product error", alpha=.5)
     ax.fill_between(sum2.xbins, miss_model_err/miss_spect*100, -miss_model_err/miss_spect*100, label="beta model error", alpha=.5)
     ax.plot(sum2.xbins, miss_spect-miss_spect)
-    #ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
+    # ax.plot(result.bins, miss_spect-summed_spect, label="missing info")
     # ax.plot(result.bins, miss_spect, label="w/ miss info")
     # ax.fill_between(result.bins, summed_err, -summed_err, alpha=.5, linewidth=0)
     # ax.fill_between(result.bins, summed_yerr, -summed_yerr, alpha=.5, linewidth=0)
@@ -126,8 +126,8 @@ if __name__ == "__main__":
     fig.savefig("235U_ENDF_Unc_jeff.png")
 
     fig, ax = plt.subplots()
-    #ax.set_ylim([-1, 1])
-    #plt.yscale('log')
+    # ax.set_ylim([-1, 1])
+    # plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.plot(sum2.xbins, miss_spect-summed_spect)
 

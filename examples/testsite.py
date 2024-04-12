@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
     # Add colorbar
     cbar = plt.colorbar()
-    cbar.set_label('Logarithmic Scale')
+    cbar.set_label('total IBD events')
 
     interp_func = interp2d(tonage, distance, ibd_rate, kind='linear')
     y_interp = np.logspace(0, 3, 100)
