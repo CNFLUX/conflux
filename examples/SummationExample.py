@@ -130,11 +130,8 @@ if __name__ == "__main__":
     # plt.yscale('log')
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.plot(sum2.xbins, miss_spect-summed_spect)
-
     ax.legend()
-
     fig.savefig("235_239_Missing_jeff.png")
-
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

@@ -10,6 +10,8 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 units = {'meV': 1e-9, 'eV': 1e-6, 'keV': 1e-3, 'MeV': 1}
+JtoMeV = 6.242e12
+rxunits = {"MW": 1e6*JtoMeV, "GW": 1e9*JtoMeV}
 
 def read_json_file(json_file_path):
     try:
@@ -43,6 +45,10 @@ def model_setup(json_file):
     if 'numass' in json_file['beta_spec']:
         numassarg = json_file['beta_spec']['numass']
         numass = numassarg['value']*units[numassarg['unit']]
+
+    rxpower = 1
+    if 'rxpower' in json_file:
+        rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['value']]
 
     summation = json_file['sum_model']
     if summation:

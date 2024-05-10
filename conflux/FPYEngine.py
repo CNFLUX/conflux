@@ -6,6 +6,7 @@
 import sys
 import os
 import csv
+import copy
 import numpy as np
 from os import listdir
 import xml
@@ -336,9 +337,9 @@ class FissionModel:
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0, IFP=False):
         assert Ei in isotope.CFPY, 'Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!'
-        FPYlist = isotope.CFPY[Ei]
+        FPYlist = copy.deepcopy(isotope.CFPY[Ei])
         if IFP == True:
-            FPYLIST = isotope.IFPY[Ei]
+            FPYLIST = copy.deepcopy(isotope.IFPY[Ei])
         for FPZAI in FPYlist:
             if FPYlist[FPZAI].y == 0: continue
             FPYlist[FPZAI].Contribute(self.W*fraction, d_frac) # add the contribution of a fission product, also modify uncertainties
