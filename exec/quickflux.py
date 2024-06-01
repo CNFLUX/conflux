@@ -8,6 +8,8 @@ import csv
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
+from conflux.ConversionEngine import ConversionEngine, BetaData
+
 
 units = {'meV': 1e-9, 'eV': 1e-6, 'keV': 1e-3, 'MeV': 1}
 JtoMeV = 6.242e12
@@ -33,6 +35,7 @@ def model_setup(json_file):
     if 'spectrum' in json_file:
         spect = json_file['spectrum']
         xbins = np.arange(spect['binlow'], spect['binhigh'], spect['binwidth'])
+    spectrum = np.zeros(len(xbins))
 
     # Setup beta spectrum calculation
     # decide whether to calculate beta spectrum or neutrino spectrum
@@ -46,12 +49,15 @@ def model_setup(json_file):
         numassarg = json_file['beta_spec']['numass']
         numass = numassarg['value']*units[numassarg['unit']]
 
+    # Reactor power setup for absolute neutrino flux calcualtion
     rxpower = 1
     if 'rxpower' in json_file:
-        rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['value']]
+        rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['unit']]
 
-    summation = json_file['sum_model']
-    if summation:
+    # Calculate reactor composition with summation mode
+
+    if 'sum_model' in json_file:
+        summation = json_file['sum_model']
         qlow = summation['qlow']          # select the lower limit of the beta q values
         qhigh = summation['qhigh']        # select the upper limit of the beta q values
         missing = summation['missing']    # whether to process the missing beta isotopes
@@ -89,16 +95,42 @@ def model_setup(json_file):
             betaIstp = betaSpectraDB.istplist[istp]
             print(betaIstp.Q)
         sum_model.CalcReactorSpectrum(betaSpectraDB, branchErange=[qlow, qhigh], processMissing=missing,  ifp_begin = ifptime[0],  ifp_end = ifptime[1])
+        spectrum += sum_model.spectrum
 
-        fig, ax = plt.subplots()
-        #ax.set_ylim([-1, 1])
-        #plt.yscale('log')
-        ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
-        ax.plot(xbins, sum_model.spectrum, label="w/ miss info")
-        #ax.plot(sum2.xbins, summed_spect, label="w/o info")
-        ax.legend()
+    conversion = json_file['convert_model']
+    if conversion:
+        # Declare the conversion engine by adding beta data with corresponding FPY
+        # database
+        convertmodel = ConversionEngine()
+        conv_composition = conversion['composition']
+        for fissile_istp in conv_composition:
+            print(fissile_istp)
+            name = fissile_istp['name']
+            Z = fissile_istp['Z']
+            A = fissile_istp['A']
+            istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
+            istp.LoadFissionDB(defaultDB="JEFF")
 
-        fig.savefig("235U_JEFF_quick.png")
+
+            beta_istp = BetaData(fissile_istp['conversiondb'])
+            branch_slice = fissile_istp['slice']
+            fraction = fissile_istp['fraction']
+            convertmodel.AddBetaData(beta_istp, istp, name, fraction)
+            convertmodel.VBfitbeta(name, branch_slice)
+        convert_spect, unc, cov = convertmodel.SummedSpectrum(xbins, nu_spectrum=True, cov_samp=5)
+        spectrum += convert_spect
+
+    print(spectrum)
+
+    fig, ax = plt.subplots()
+    #ax.set_ylim([-1, 1])
+    #plt.yscale('log')
+    ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
+    ax.plot(xbins, spectrum, label="w/ miss info")
+    #ax.plot(sum2.xbins, summed_spect, label="w/o info")
+    ax.legend()
+
+    fig.savefig("233U_JEFF_quick.png")
 
 
 if __name__ == "__main__":

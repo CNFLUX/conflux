@@ -721,7 +721,6 @@ if __name__ == "__main__":
     beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
     beta235s = BetaData(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
-    print(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
     beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
 
@@ -810,7 +809,6 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
     fig.savefig("bestfit_beta_compare2.png")
-
     neu235s = BetaData(os.environ["HOME"]+"/conflux/conflux/examples/U235_synth_compare.csv")
 
     new235spect = neu235s.y

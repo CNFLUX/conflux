@@ -25,20 +25,20 @@
     "time": [0, 0],
     "composition": [
       {
-        "name": "U238",
+        "name": "U233",
         "Z": 92,
-        "A": 238,
+        "A": 233,
+        "fissiondb": "JEFF",
+        "ei": 0.4,
+        "fraction": 0.90
+      },
+      {
+        "name": "Th232",
+        "Z": 90,
+        "A": 232,
         "fissiondb": "JEFF",
         "ei": 0.4,
         "fraction": 0.1
-      },
-      {
-        "name": "U235",
-        "Z": 92,
-        "A": 235,
-        "fissiondb": "JEFF",
-        "ei": 0,
-        "fraction": 0.9
       }
     ]
   },
@@ -47,18 +47,20 @@
     "composition": [
       {
         "name": "Pu239",
-        "Z": 93,
+        "Z": 94,
         "A": 239,
         "fissiondb": "JEFF",
-        "convesiondb": "$CONFLUX_DB/conversionDB/Pu_239_e_2014.csv",
+        "conversiondb": "/Users/zhang39/conflux/conflux/data/conversionDB/Pu_239_e_2014.csv",
+        "slice": 0.25,
         "fraction": 0.3
       },
       {
-        "name": "Pu239",
-        "Z": 93,
+        "name": "Pu241",
+        "Z": 94,
         "A": 241,
         "fissiondb": "JEFF",
-        "convesiondb": "$CONFLUX_DB/conversionDB/Pu_241_e_2014.csv",
+        "conversiondb": "/Users/zhang39/conflux/conflux/data/conversionDB/Pu_241_e_2014.csv",
+        "slice": 0.25,
         "fraction": 0.1
       }
     ]
