@@ -11,7 +11,11 @@ calculation:
 
 Installation:
 =============
-Execute: `pip3 install ./conflux-master`
+Execute: 
+`pip3 install ./conflux`
+In the system environment setup, add:
+`export CONFLUX_DB=</path/to/conflux>/data`,
+this will setup the nuclear databases necessary for the reactor neutrino calculation.
 
 Program structure:
 ==================
