@@ -51,15 +51,15 @@ class SumEngine(Spectrum):
     """
 
     def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
-        self.FPYlist = {} #Dictionary of Fissile Products
-        self.betaSpectraList = {} #Dictionary of beta Spectra for each Fission Product
-        self.betaUncertainty = {} #Dictionary of beta Uncertainties for each Fission Product
-        self.neutrino = neutrino # neutrino or electon spectrum
+        self.FPYlist = {}
+        self.betaSpectraList = {}
+        self.betaUncertainty = {}
+        self.neutrino = neutrino
 
-        self.xbins = xbins #Energy (in MeV)
-        self.nbin = len(xbins) #How fine or course your binning is
-        self.spectrum = np.zeros(self.nbin) #The Calculated total antineutrino/beta spectrum
-        self.uncertainty = np.zeros(self.nbin) #The Calculated total uncertainties
+        self.xbins = xbins
+        self.nbin = len(xbins)
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
 
     #Self explanatory, clears the various dictionaries associated
     #With the Summation Engine.  
