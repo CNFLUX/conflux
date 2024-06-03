@@ -51,19 +51,18 @@ class SumEngine(Spectrum):
     """
 
     def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
-        self.FPYlist = {}
-        self.betaSpectraList = {}
-        self.betaUncertainty = {}
+        self.FPYlist = {} #Dictionary of Fissile Products
+        self.betaSpectraList = {} #Dictionary of beta Spectra for each Fission Product
+        self.betaUncertainty = {} #Dictionary of beta Uncertainties for each Fission Product
         self.neutrino = neutrino # neutrino or electon spectrum
 
-        self.xbins = xbins
-        self.nbin = len(xbins)
-        self.spectrum = np.zeros(self.nbin)
-        self.uncertainty = np.zeros(self.nbin)
+        self.xbins = xbins #Energy (in MeV)
+        self.nbin = len(xbins) #How fine or course your binning is
+        self.spectrum = np.zeros(self.nbin) #The Calculated total antineutrino/beta spectrum
+        self.uncertainty = np.zeros(self.nbin) #The Calculated total uncertainties
 
-    # def __del__(self):
-    #     print("Summation model cleared")
-
+    #Self explanatory, clears the various dictionaries associated
+    #With the Summation Engine.  
     def Clear(self):
         """
             Clears out all associated dictionaries inside the SumEngine
@@ -90,12 +89,26 @@ class SumEngine(Spectrum):
             Returns:
                 None
         """
+
+        #Create copy of the fissionmodel
         inputFPY = deepcopy(fissionModel)
         for FPZAI in inputFPY.FPYlist:
+            #Check to see if the fission products in the fission model exists in the Reactor model. 
+            
+            #If they aren't in the Reactor model, add them to the reactor model, and adjust their
+            #Yield and yield error by the weight of the fission mdel.
+
             if FPZAI not in self.FPYlist:
                 self.FPYlist[FPZAI] = inputFPY.FPYlist[FPZAI]
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
+
+            
+            #If the fission product already exists in the reactor model, take the yield and yield error
+            #that this isotope has in this fission model, and add it to the yield and yield error in the 
+            #Reactor model.  
+            #Also, Add the covariance of the this fission product from the inputted fission model
+            #To the fission product in the Reactor model.  
             else:
                 self.FPYlist[FPZAI].y += inputFPY.FPYlist[FPZAI].y*W
                 self.FPYlist[FPZAI].yerr += inputFPY.FPYlist[FPZAI].yerr*W
@@ -112,9 +125,11 @@ class SumEngine(Spectrum):
 
         """
         self.sum = 0
+        #Add the yields of all Fission Products
         for FPZAI in self.FPYlist:
             self.sum += self.FPYlist[FPZAI].y
         for FPZAI in self.FPYlist:
+            #Divide the yields and errors of each fission product with the total fission yield. 
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
@@ -132,22 +147,29 @@ class SumEngine(Spectrum):
         """
 
         print("Summing beta spectra...")
+        #initialize total spectrum & uncertainty
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
+        
+        #Initialize model and Yield Uncertainties, a list of missing branches to the total
+        #Contribution, the missing yield, and the total yield. 
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
         self.missingBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
 
+        #Iterate through every fission product in the Reactor Model.        
         for FPZAI in self.FPYlist:
             # get the yield of the fission products
             thisyield = self.FPYlist[FPZAI].y
             yielderr = self.FPYlist[FPZAI].yerr
 
+            #Add the yield of each fission product to the total yield.
             self.totalYield += thisyield
 
+            #If the fission product in the reactor model is also in the Beta Spectra model, do some calculations            
             if FPZAI in betaSpectraDB.istplist:
 
                 # for IFP calculation, adjust the decay rate of the target isotope
@@ -163,6 +185,8 @@ class SumEngine(Spectrum):
                     self.missingBranch.append(FPZAI)
                     continue
 
+                #Pull the beta spectrum and the beta uncertainties, add the product of the Beta Spectra and yield
+                #To the total spectrum
                 self.betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
                 self.betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].uncertainty
                 self.spectrum += self.betaSpectraList[FPZAI]*thisyield
@@ -174,21 +198,28 @@ class SumEngine(Spectrum):
                 self.modelUnc += self.betaUncertainty[FPZAI]*thisyield
                 self.spectrumUnc = self.yieldUnc+self.modelUnc
 
+            #If the Reactor model fission product is not in the Beta models' fission product list
             # save the list of missing branches
             else:
                 self.missingCount += thisyield
                 self.missingBranch.append(FPZAI)
 
         # Uncertainty calculation
+        #Have to make a 2D Lattice of every single combination of fission products i_j        
         for i in self.FPYlist:
             for j in self.FPYlist:
+                #First check that both fission products are in the beta Spectra list
                 if i in self.betaSpectraList and j in self.betaSpectraList:
                     adjustmenti = 1
                     adjustmentj = 1
+                    #If we're doing an IFP calculation, calculate the adjustments need to be made to 
+                    #Both fission products.                    
                     if (ifp_begin < ifp_end):
                         adjustmenti = betaSpectraDB.istplist[i].decay_time_adjust(ifp_begin, ifp_end)
                         adjustmentj = betaSpectraDB.istplist[j].decay_time_adjust(ifp_begin, ifp_end)
 
+                    #Pull the yields, yeild errors, the beta Spectra, and beta Spectral uncertainty
+                    #For both fission products (i and j)                    
                     yi = self.FPYlist[i].y*adjustmenti
                     yerri = self.FPYlist[i].yerr*adjustmenti
                     fi = self.betaSpectraList[i]*adjustmenti
@@ -199,6 +230,7 @@ class SumEngine(Spectrum):
                     fj = self.betaSpectraList[j]*adjustmentj
                     ferrj = self.betaUncertainty[j]*adjustmentj
 
+                    #Carry out the uncertainty calculation                    
                     # if covariance matrix were not loaded, make cov diagonal variance
                     cov_ij = 0
                     if j not in self.FPYlist[i].cov:
