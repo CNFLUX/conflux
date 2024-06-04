@@ -53,7 +53,8 @@ class Spectrum:
             W (float): The weight of the added spectrum
             sigma_W (float): The uncertainty in the weight of the added spectrum
         Returns:
-            None        '''
+            None        
+        '''
         assert(targetSpec.xbins == self.xbins) # ensure the identical binning
         targetSpec.Norm(W, sigma_W) #Rescale the added spectrum to the current spectrum
         self.spectrum += targetSpec.spectrum #Add the target spectrum to the current spectrum
@@ -132,8 +133,11 @@ class Summed:
     Methods
     -------
     Clear():
+        Clears out all associated dictionaries inside the summed spectra
     AddBranch(branch):
+        Adds a branch object to the summed specctra
     SumSpectra():
+        Sums the spectra of all branches
     '''
     def __init__(self):
         self.ID = 0
@@ -150,20 +154,35 @@ class Summed:
             Returns:
                 None
         """
+
+        #Pretty self explanatory what these do
         self.branches = {}
         self.spectra = {}
         self.uncertainty = {}
     
     def AddBranch(self, branch):
         '''
-        Adding a branch element to the summing object
+            Adding a branch element to the summing object
+
+            Parameters:
+                branch (int): The ID of the branch you want to add to the summed spectrum
+            Returns:
+                None
         '''
         self.branches[branch.ID] = branch
     
     def SumSpectra(self):
         '''
-        Summing units together
+            Summing units together
+
+            Paremeters:
+                None
+            Returns:
+                None
         '''
+        
         spectrum = Spectrum()
+        #walk through all branch IDs in the branch dictionary
         for ZAI in self.branches:
+            #Add all the individual branch spectra to the total spectra
             spectrum.Add(self.spectra[ZAI], self.branches[ZAI])
