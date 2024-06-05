@@ -381,33 +381,68 @@ class FissionIstp:
 # class that builds a fission reactor model with dictionary of all FPYs from all
 # reactor compositions.
 class FissionModel:
+    '''
+    Attributes
+    ----------
+    FPYlist : (dictionary)
+        A dictionary of fission product yields. contains FissionIstps
+    W : (int)
+        The weight of this fission model
+
+    Methods
+    -------
+    AddContribution(isotope, Ei, fraction, d_fraction=0, IFP=False):
+        Add all the daughter fission products associated with the given isotope into the FPYlist
+    AddIstp(Z, A, fraction, isomer=0, d_frac=0.0):
+        Add a specific fission product isotope into the FPYlist
+    CustomCovariance(DBname, percent = False, rel = False):
+        Method to load a customized covariance matrix into the model
+    GetNuclide(ZAI):
+        return nuclide ZAI < (ZAI = Atomic number, Atomic mass, Isomer number)
+    SaveToFile(filename):
+        save the Fission Product yields into a CSV file.
+    DrawBranches(figname):
+        Draw the branch fractions of associated with this fission model. 
+    '''
+    
     def __init__(self, W = 1.0):
         self.FPYlist = {}
         self.W = 1.0
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0, IFP=False):
+        #Check to see if the isotope you want to add has fission products resulting
+        #From an interaction with neutrons at the specified energy        
         assert Ei in isotope.CFPY, 'Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!'
+        #Set FPYlist to the Cumulative fission product list of the inputed isotope
         FPYlist = copy.deepcopy(isotope.CFPY[Ei])
+        #If we are looking at explosions, or need the independant fission products
+        #pull the independant products from the isotope and store it in FPYLIST        
         if IFP == True:
             FPYLIST = copy.deepcopy(isotope.IFPY[Ei])
         for FPZAI in FPYlist:
-            if FPYlist[FPZAI].y == 0: continue
-            FPYlist[FPZAI].Contribute(self.W*fraction, d_frac) # add the contribution of a fission product, also modify uncertainties
-            if FPZAI not in self.FPYlist:
-                self.FPYlist[FPZAI] = FPYlist[FPZAI]
+            if FPYlist[FPZAI].y == 0: continue #If the yield for the specific fission product is 0, skip it (ZAI)
+            FPYlist[FPZAI].Contribute(self.W*fraction, d_frac) # add the contribution of a fission product
+            #and scale it by the fractional contribution of the parent isotope
+            if FPZAI not in self.FPYlist: #Check to see if the fission product is in the FPYlist
+                self.FPYlist[FPZAI] = FPYlist[FPZAI] #if it is not, add the fission product to our FPYlist
             else:
+                #If it is in the list, add the yield and error from the inputted fission product
+                #To the fission product in the model.                
                 self.FPYlist[FPZAI].y += FPYlist[FPZAI].y
                 self.FPYlist[FPZAI].yerr += FPYlist[FPZAI].yerr
+                #Also add the covariance from the inputted fission product to the fission product in the model                
                 self.FPYlist[FPZAI].AddCovariance(FPYlist[FPZAI]) # summing the covariance matrix
 
     # method that accumulates beta-decaying isotopes into the list of FPY
     def AddIstp(self, Z, A, fraction, isomer=0, d_frac = 0.0):
-        nuclide = FPNuclide(Z*10000+A*10+isomer, fraction, d_frac)
-        FPZAI = nuclide.FPZAI
+        nuclide = FPNuclide(Z*10000+A*10+isomer, fraction, d_frac) #Create a nuclide with the given 
+        #Isotopic information
+        FPZAI = nuclide.FPZAI # Generate the FPZAI number associated with the inputted isotope
         if FPZAI not in self.FPYlist:
-            self.FPYlist[FPZAI] = nuclide
+            self.FPYlist[FPZAI] = nuclide #If the nuclide is not in our model, add it to the model 
         else:
+            #If it is in the model, add the contribution and error of this isotope to the models copy of this isotope 
             self.FPYlist[FPZAI].y + nuclide.y
             self.FPYlist[FPZAI].yerr + nuclide.yerr
 
