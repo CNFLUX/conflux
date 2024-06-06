@@ -519,7 +519,7 @@ class FissionModel:
             Parameters:
                 DBname (String) : The path to the user defined covariance csv file. has the format "/path/to/file"
                 percent (boolean) : Determines whether the covarainces are relative or absolute
-                rel (boolean) : ????
+                rel (boolean) : Determines whether the product of the yields of each pair of isotopes is a value, or 1
             Returns:
                 None
         """
