@@ -151,6 +151,16 @@ class FissionIstp:
 
     # method that load xml database of FPY and save nuclide info in dictionaries.
     def LoadFissionDB(self, customDB = None, defaultDB='ENDF'):
+        """
+           Loads the fission products from a given database into the Independant and cumulative fission dictionaries in the model. 
+
+            Parameters:
+                customDB (String) : The path to a user inputed fission database. Has the form "/path/to/database
+                defualtDB (String) : The default fission database that CONFLUX will load it's data from. 
+            Returns:
+                None
+        """
+        
         DBname = customDB
         if DBname == None or not os.path.exists(DBname): #Check if the user gave a valid Database path
             DBpath = os.environ["CONFLUX_DB"]+"/fissionDB/"+defaultDB+"/"
@@ -212,6 +222,17 @@ class FissionIstp:
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
     def LoadCovariance(self, customDB = None, defaultDB='ENDF', percent=True):
+        """
+           Loads the covariance matrices from a given database into the Independant and cumulative fission dictionaries in the model. 
+
+            Parameters:
+                customDB (String) : The path to a user inputed covariance file. Has the form "/path/to/database
+                defualtDB (String) : The default covariance matrix that CONFLUX will load it's data from.
+                percent (boolean) : determines whether the covariances are relative or not. 
+            Returns:
+                None
+        """
+        
         DBpath = customDB
         #Figure out where the DB and files are in a similar method we loaded the 
         #Fission Database.
@@ -246,7 +267,7 @@ class FissionIstp:
                     #Check to see if the specific neutron energy
                     #Is in the file we are looking at
                 else:
-                    continue
+                    continue #If our matrix is not defined at a given neutron energy, skip. 
 
                 #Read through the file, pull out the relevant FPZAI number of this isotope
                 DBname = DBpath+filename
@@ -271,17 +292,16 @@ class FissionIstp:
                             i = int(col_id-z*10000-a*10)
                             key = z*10000+a+i*1000
                             keystr = ' '+str(key)
+                            
                             # if key is not found in the covaraince matrix, set
                             # value to zero
-
                             if keystr in row:
                                 self.CFPY[Ei][fpzai].cov[corrzai] = float(row[keystr])/rate
                             else:
                                 self.CFPY[Ei][fpzai].cov[corrzai] = 0.0
 
-                    # if element not found, set diagonal element to 'yerr'
                     for nuclide in self.CFPY[Ei]:
-
+                    # if element is not found in the covariance matrix, add the element into the matrix and set the diagonal element to 'yerr'
                         if nuclide not in self.CFPY[Ei][nuclide].cov:
                             self.CFPY[Ei][nuclide].cov = {otherNuclide: 0 for otherNuclide in self.CFPY[Ei]}
                             self.CFPY[Ei][nuclide].cov[nuclide] = self.CFPY[Ei][nuclide].yerr**2
@@ -291,9 +311,18 @@ class FissionIstp:
     # Method to read the prepackaged correlation csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-
     #Most of the comments will be the same for both this and for the LoadCovariance function
     def LoadCorrelation(self, customDB = None, defaultDB='ENDF'):
+        """
+           Loads the correlation matrices from a given database into the Independant and cumulative fission dictionaries in the model. 
+
+            Parameters:
+                customDB (String) : The path to a user inputed correlation file. Has the form "/path/to/database
+                defualtDB (String) : The default correlation matrix that CONFLUX will load it's data from 
+            Returns:
+                None
+        """
+        
         DBpath = customDB  #Figure out where the DB and files are in a similar method we loaded the 
         #Fission Database. 
         if DBpath == None or not os.path.exists(DBpath):
@@ -368,6 +397,15 @@ class FissionIstp:
     # Method to calculate a covariance matrix from the correlation information
     # of each fission product at a given neutron energy. 
     def CalcCovariance(self, Ei):
+        """
+            Calculates the covariance matrix from inputted correlation information
+            Parameters:
+                Ei (int) : The neutron energy that creates those fission products. Note, these
+                    are the same values as defined in the code above(thermal : 0, fast = 0.5/0.4, relativistic = 14)
+            Returns:
+                None
+        """
+        
         #Iterate over all fission nuclides inside the Cumulative fission dictionary
         for i in self.CFPY[Ei]:
             yerri = self.CFPY[Ei][i].yerr #Load the yield error of the nuclide i
@@ -411,6 +449,20 @@ class FissionModel:
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddContribution(self, isotope, Ei, fraction, d_frac=0.0, IFP=False):
+        """
+           Add the FPYs of a fission isotope into the the list of FPYs in the model 
+
+            Parameters:
+                isotope (FissionIstp) : The fission isotope whose products you want to add to the model.
+                Ei (float) : The neutron energy that is causing the fissions to occur (0.0, 0.4/0.5, 14)
+                fraction (float) : The fractional contribution that this isotope has on the overall model
+                d_frac (float) : The uncertainty in the contribution
+                IFP (boolean) : determines whether to include the independant fission products in the model
+                
+            Returns:
+                None
+        """
+
         #Check to see if the isotope you want to add has fission products resulting
         #From an interaction with neutrons at the specified energy        
         assert Ei in isotope.CFPY, 'Isotope '+str(isotope.A)+' has no such fission type with Ei = '+str(Ei)+' MeV!'
@@ -436,6 +488,19 @@ class FissionModel:
 
     # method that accumulates beta-decaying isotopes into the list of FPY
     def AddIstp(self, Z, A, fraction, isomer=0, d_frac = 0.0):
+        """
+           Adds a specific beta decaying isotope to the list of FPYs 
+
+            Parameters:
+                Z (int) : The isotopes atomic number
+                A (int) : The isotopes atomic weight
+                fraction (float) : the fractional contribution this isotope has on the model
+                isomer (int) : The isomeric number of this isotope
+                d_frac (float) : The uncertainty in the fractional contribution
+            Returns:
+                None
+        """
+        
         nuclide = FPNuclide(Z*10000+A*10+isomer, fraction, d_frac) #Create a nuclide with the given 
         #Isotopic information
         FPZAI = nuclide.FPZAI # Generate the FPZAI number associated with the inputted isotope
@@ -448,8 +513,17 @@ class FissionModel:
 
     def CustomCovariance(self, DBname, percent = False, rel = False):
         """
-        Method to load a customized covariance matrix
+           Loads a user defined covariance matrix into the model. The loading of the covariance matrix into the model
+           is very similar to the FissionIstp method LoadCovarianceDB
+
+            Parameters:
+                DBname (String) : The path to the user defined covariance csv file. has the format "/path/to/file"
+                percent (boolean) : Determines whether the covarainces are relative or absolute
+                rel (boolean) : ????
+            Returns:
+                None
         """
+
         # determine the whether the covariance are relative or absolute
         rate = 1e4 if percent else 1
         with open(DBname) as inputfile:
@@ -485,20 +559,48 @@ class FissionModel:
 
     # Get the nuclide information based on ZAI
     def GetNuclide(self, ZAI):
+        """
+            Returns the nuclide information based on its' ZAI number
+
+            Parameters:
+                ZAI (int) : The ZAI number of the nuclide
+            Returns:
+                self.FPYlist[ZAI] (FissionNuclide) : The FissionNuclide associated with that ZAI number
+
+        """
         return self.FPYlist[ZAI]
 
     # Function that save FPYs in a csv file
     def SaveToFile(self, filename):
+    """
+        A function that saves all FPYs into a CSV file for external use
+
+        Parameters:
+            filename (String) : The filename of the csv file you want to save
+        Returns:
+            None
+
+    """
+        #create a csv file and open it.
         with open(filename, 'w', newline='') as outputfile:
-            colNames = ['Z', 'A', 'I', 'Y', 'Yerr']
+            colNames = ['Z', 'A', 'I', 'Y', 'Yerr'] #Create the column names
             writer = csv.DictWriter(outputfile, fieldnames=colNames)
             writer.writeheader()
+            #iterate through all the nuclides in the FPYlist and populate the csv file with the associated information
             for FPZAI in self.FPYlist:
                 nuclide = self.FPYlist[FPZAI]
                 writer.writerow({'Z':nuclide.Z, 'A':nuclide.A, 'I':nuclide.isomer, 'Y':nuclide.y, 'Yerr':nuclide.yerr})
 
     # Draw a histogram of branch fractions
     def DrawBranches(self, figname):
+    """
+        Draw a histogram of the branch fractions for the model
+
+        Parameters:
+            figname (String) : The name of the image that will get generated
+        Returns:
+            None
+    """
         print("Drawing branches...")
         fig, ax = plt.subplots()
         alist = np.arange(50, 180, 1)
