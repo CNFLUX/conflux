@@ -572,15 +572,15 @@ class FissionModel:
 
     # Function that save FPYs in a csv file
     def SaveToFile(self, filename):
-    """
-        A function that saves all FPYs into a CSV file for external use
+        """
+            A function that saves all FPYs into a CSV file for external use
 
-        Parameters:
-            filename (String) : The filename of the csv file you want to save
-        Returns:
-            None
+            Parameters:
+                filename (String) : The filename of the csv file you want to save
+            Returns:
+                None
 
-    """
+        """
         #create a csv file and open it.
         with open(filename, 'w', newline='') as outputfile:
             colNames = ['Z', 'A', 'I', 'Y', 'Yerr'] #Create the column names
@@ -593,14 +593,14 @@ class FissionModel:
 
     # Draw a histogram of branch fractions
     def DrawBranches(self, figname):
-    """
-        Draw a histogram of the branch fractions for the model
+        """
+            Draw a histogram of the branch fractions for the model
 
-        Parameters:
-            figname (String) : The name of the image that will get generated
-        Returns:
-            None
-    """
+            Parameters:
+                figname (String) : The name of the image that will get generated
+            Returns:
+                None
+        """
         print("Drawing branches...")
         fig, ax = plt.subplots()
         alist = np.arange(50, 180, 1)
