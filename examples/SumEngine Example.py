@@ -8,7 +8,6 @@ if __name__  == "__main__":
     #---------------------------------------------------
     #Full Reactor Spectrum Using U235
 
-
     #initialize the Isotopes that you would like to use in your
     #Reaction and load them into the Database
     U235 = FissionIstp(92,235)
@@ -27,7 +26,6 @@ if __name__  == "__main__":
     result = SumEngine(xbins=np.arange(0, 15., 0.1))
     result.AddModel(model)
 
-
     #Load in the Beta Shape data and calculate the total beta shape of our reactor
     betaSpectraDB = BetaEngine(result.FPYlist.keys(), xbins=np.arange(0, 15, 0.1))
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 15.0])
@@ -35,7 +33,6 @@ if __name__  == "__main__":
     #Calculate the total reactor spectrum from the loaded shape data(betaSpectraDB)
     #And the fission Yield data (result)
     result.CalcReactorSpectrum(betaSpectraDB)
-
 
     #Draw the resulting spectra
     fig = plt.figure()

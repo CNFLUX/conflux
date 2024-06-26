@@ -294,39 +294,6 @@ class VirtualBranch:
                             best_energy = energy
                             if a > 0: best_norm = a
 
-                        # Method 2: grid search
-
-                        # leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
-                        # norm_range = np.arange(0.75, 1.25, 0.01)
-                        # for a in norm_range:
-                        #     newtest = leastfunc(a)
-                        #     # print(a, newtest)
-                        #     if (newtest < testvalue):
-                        #         testvalue = newtest
-                        #         best_energy = energy
-                        #         if norm > 0: best_norm = a*norm
-
-
-                        # fitfunc = (lambda x, c: betafunc(x, energy, c))
-                        # leastfunc = lambda c: np.sum((suby - fitfunc(subx, c))**2/suby**2)
-                        # popt, pcov = curve_fit(fitfunc, subx, suby,
-                        #                         p0 = norm, absolute_sigma=True,
-                        #                         bounds=(0, np.inf))
-                        # a = popt[0]
-                        #
-                        # newspect = norm*tempspec
-                        # print(sum(suby)/sum(tempspec))
-                        # print(sum(suby)/sum(betafunc(subx, energy, norm)))
-                        # newtest = leastfunc(a)
-                        # print(energy, newtest)
-                        # if newtest < testvalue:
-                        #     testvalue = newtest
-                        #     best_energy = energy
-                        #     if norm>0: best_norm = a
-                    # comparison = (suby/tempspec)
-                    #
-                    # comparison[comparison < 0] = np.inf
-                    # lowlimit = min(comparison)
 
                     self.contribute[xhigh] = best_norm
                     self.E0[xhigh] = best_energy
@@ -334,30 +301,6 @@ class VirtualBranch:
                     newspect = best_norm*betafunc(betadata.x, best_energy)
                     least = np.sum((suby - best_norm*betafunc(subx, best_energy))**2)
                     print(e_lower, e_upper, best_norm, best_energy, least)
-                    # print('BEST FIT', xhigh-slicesize, xhigh, best_energy, best_norm, testvalue, a)
-                    # least1 = np.sum((suby - norm*tempspec) ** 2 / subyerr ** 2)
-                    # least2 = np.sum((suby - popt[1]*self.BetaSpectrum(subx, E0=popt[0], contribute = 1)) ** 2 / subyerr ** 2)
-                    # least3 = np.sum((suby - popt[1]*newspect) ** 2 / subyerr ** 2)
-                    #
-                    # print('least1', least1)
-                    # print('least2', least2)
-                    # print('least3', least3)
-                    #
-                    # print(sum(suby)/sum(newspect)/)
-                    # # chi2 = chisquare(suby, f_exp=newspect)
-                    # print('result:', popt[0], popt[1])
-
-                    # # subtract the best fit spectrum from final_spect
-                    # fig = plt.figure()
-                    # # plt.yscale('log')
-                    # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
-                    # # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
-                    # plt.plot(betadata.x, newspect)
-                    # plt.plot(betadata.x, datacache)
-                    #
-                    # plt.errorbar(subx, suby, subyerr)
-                    # plt.pause(1)
-                    # plt.show()
 
                     # for i in range(len(betadata.x)):
                     datacache -= newspect
