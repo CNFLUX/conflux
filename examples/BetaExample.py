@@ -19,7 +19,8 @@ if __name__ == "__main__":
     index = 521331
     fig = plt.figure()
     y1 = testEngine.istplist[index].spectrum*binwidth
-    plt.errorbar(x, y1, label=str(index)+"_beta") #, yerr=testEngine.istplist[index].uncertainty)
+    print(testEngine.istplist[index].uncertainty)
+    plt.errorbar(x, y1, label=str(index)+"_beta", yerr=testEngine.istplist[index].uncertainty)
     # print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
     # testEngine.CalcBetaSpectra(nu_spectrum=False)
     # plt.errorbar(x, testEngine.istplist[531340].spectrum, yerr=testEngine.istplist[531340].uncertainty)
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     y2 = testEngine2.istplist[index].spectrum*binwidth
     print("beta/nu", sum(y1))
     plt.xlabel("E (MeV)")
-    plt.plot(x, y2, "--", label=str(index)+"_nu") #, yerr=testEngine.istplist[index].uncertainty)
+    plt.errorbar(x, y2, label=str(index)+"_nu", yerr=testEngine.istplist[index].uncertainty)
     plt.legend()
     plt.show()
 

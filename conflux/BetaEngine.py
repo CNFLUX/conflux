@@ -1,13 +1,12 @@
 import sys
 import os
-import argparse
 import numpy as np
 from scipy import special, interpolate, integrate
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
-import pkg_resources
 import timeit
+from tqdm import tqdm
 
 from conflux.Basic import *
 from conflux.bsg.Constants import *
@@ -468,7 +467,8 @@ class BetaEngine:
 
         startTiming = timeit.default_timer()
         istpCount = 0
-        for ZAI in self.istplist:
+        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra for "+str(len(self.istplist))+ " isotopes"):
+        # for ZAI in self.istplist:
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
@@ -481,11 +481,3 @@ class BetaEngine:
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
-
-if __name__ == "__main__":
-    x = np.arange(0, 10, 0.05)
-    binwidth = 1
-
-    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine()
-    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 0.1])

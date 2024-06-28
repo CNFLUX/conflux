@@ -33,6 +33,7 @@ if __name__  == "__main__":
     #Calculate the total reactor spectrum from the loaded shape data(betaSpectraDB)
     #And the fission Yield data (result)
     result.CalcReactorSpectrum(betaSpectraDB)
+    reactor_unc = result.uncertainty
 
     #Draw the resulting spectra
     fig = plt.figure()
@@ -40,7 +41,9 @@ if __name__  == "__main__":
     for FPZAI in result.betaSpectraList:
         #This is to draw out the individual branches
         plt.plot(x, result.betaSpectraList[FPZAI] * result.FPYlist[FPZAI].y)
+
     #This is the total spectrum
+    plt.errorbar(x, result.spectrum, yerr=result.uncertainty)
     plt.plot(x, result.spectrum, 'b--')
     plt.yscale('log')
     plt.xlabel("E (in MeV)", fontsize= 18)
