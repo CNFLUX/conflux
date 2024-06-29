@@ -450,7 +450,7 @@ class BetaEngine:
 
 
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True,
-                        branchErange=[0.0, 20.0]):
+                        branchErange=[0.0, 20.0], GSF=False):
         """
         Calculates beta spectra of the list of beta-decaying isotopes
 
@@ -467,17 +467,24 @@ class BetaEngine:
 
         startTiming = timeit.default_timer()
         istpCount = 0
-        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra for "+str(len(self.istplist))+ " isotopes"):
+        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes"):
         # for ZAI in self.istplist:
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-            # if len(betaIstp.branches) == 1:
-            #     print(betaIstp.name)
-            betaIstp.CalcCovariance(GSF=True)
+            betaIstp.CalcCovariance(GSF=GSF)
             betaIstp.SumSpectra(nu_spectrum)
             istpCount += 1
 
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
+
+
+if __name__ == "__main__":
+    x = np.arange(0, 10, 0.05)
+    binwidth = 1
+
+    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
+    testEngine = BetaEngine()
+    testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)

@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 from copy import deepcopy
+from tqdm import tqdm
 
 # local modules
 from conflux.Basic import *
@@ -62,7 +63,7 @@ class SumEngine(Spectrum):
         self.uncertainty = np.zeros(self.nbin)
 
     #Self explanatory, clears the various dictionaries associated
-    #With the Summation Engine.  
+    #With the Summation Engine.
     def Clear(self):
         """
             Clears out all associated dictionaries inside the SumEngine
@@ -93,8 +94,8 @@ class SumEngine(Spectrum):
         #Create copy of the fissionmodel
         inputFPY = deepcopy(fissionModel)
         for FPZAI in inputFPY.FPYlist:
-            #Check to see if the fission products in the fission model exists in the Reactor model. 
-            
+            #Check to see if the fission products in the fission model exists in the Reactor model.
+
             #If they aren't in the Reactor model, add them to the reactor model, and adjust their
             #Yield and yield error by the weight of the fission mdel.
 
@@ -103,12 +104,12 @@ class SumEngine(Spectrum):
                 self.FPYlist[FPZAI].y *= W
                 self.FPYlist[FPZAI].yerr *= W
 
-            
+
             #If the fission product already exists in the reactor model, take the yield and yield error
-            #that this isotope has in this fission model, and add it to the yield and yield error in the 
-            #Reactor model.  
+            #that this isotope has in this fission model, and add it to the yield and yield error in the
+            #Reactor model.
             #Also, Add the covariance of the this fission product from the inputted fission model
-            #To the fission product in the Reactor model.  
+            #To the fission product in the Reactor model.
             else:
                 self.FPYlist[FPZAI].y += inputFPY.FPYlist[FPZAI].y*W
                 self.FPYlist[FPZAI].yerr += inputFPY.FPYlist[FPZAI].yerr*W
@@ -129,7 +130,7 @@ class SumEngine(Spectrum):
         for FPZAI in self.FPYlist:
             self.sum += self.FPYlist[FPZAI].y
         for FPZAI in self.FPYlist:
-            #Divide the yields and errors of each fission product with the total fission yield. 
+            #Divide the yields and errors of each fission product with the total fission yield.
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
@@ -151,17 +152,17 @@ class SumEngine(Spectrum):
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
-        
+
         #Initialize model and Yield Uncertainties, a list of missing branches to the total
-        #Contribution, the missing yield, and the total yield. 
+        #Contribution, the missing yield, and the total yield.
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
         self.missingBranch = []
         self.missingCount = 0.0
         self.totalYield = 0.0
 
-        #Iterate through every fission product in the Reactor Model.        
-        for FPZAI in self.FPYlist:
+        #Iterate through every fission product in the Reactor Model.
+        for FPZAI in tqdm(self.FPYlist, desc="Summing beta/neutrino spectra for "+str(len(self.FPYlist))+ " fission products"):
             # get the yield of the fission products
             thisyield = self.FPYlist[FPZAI].y
             yielderr = self.FPYlist[FPZAI].yerr
@@ -169,7 +170,7 @@ class SumEngine(Spectrum):
             #Add the yield of each fission product to the total yield.
             self.totalYield += thisyield
 
-            #If the fission product in the reactor model is also in the Beta Spectra model, do some calculations            
+            #If the fission product in the reactor model is also in the Beta Spectra model, do some calculations
             if FPZAI in betaSpectraDB.istplist:
 
                 # for IFP calculation, adjust the decay rate of the target isotope
@@ -205,21 +206,21 @@ class SumEngine(Spectrum):
                 self.missingBranch.append(FPZAI)
 
         # Uncertainty calculation
-        #Have to make a 2D Lattice of every single combination of fission products i_j        
-        for i in self.FPYlist:
+        #Have to make a 2D Lattice of every single combination of fission products i_j
+        for i in tqdm(self.FPYlist, desc="Calculating uncertainties of "+str(len(self.FPYlist))+ " fission products"):
             for j in self.FPYlist:
                 #First check that both fission products are in the beta Spectra list
                 if i in self.betaSpectraList and j in self.betaSpectraList:
                     adjustmenti = 1
                     adjustmentj = 1
-                    #If we're doing an IFP calculation, calculate the adjustments need to be made to 
-                    #Both fission products.                    
+                    #If we're doing an IFP calculation, calculate the adjustments need to be made to
+                    #Both fission products.
                     if (ifp_begin < ifp_end):
                         adjustmenti = betaSpectraDB.istplist[i].decay_time_adjust(ifp_begin, ifp_end)
                         adjustmentj = betaSpectraDB.istplist[j].decay_time_adjust(ifp_begin, ifp_end)
 
                     #Pull the yields, yeild errors, the beta Spectra, and beta Spectral uncertainty
-                    #For both fission products (i and j)                    
+                    #For both fission products (i and j)
                     yi = self.FPYlist[i].y*adjustmenti
                     yerri = self.FPYlist[i].yerr*adjustmenti
                     fi = self.betaSpectraList[i]*adjustmenti
@@ -230,7 +231,7 @@ class SumEngine(Spectrum):
                     fj = self.betaSpectraList[j]*adjustmentj
                     ferrj = self.betaUncertainty[j]*adjustmentj
 
-                    #Carry out the uncertainty calculation                    
+                    #Carry out the uncertainty calculation
                     # if covariance matrix were not loaded, make cov diagonal variance
                     cov_ij = 0
                     if j not in self.FPYlist[i].cov:
