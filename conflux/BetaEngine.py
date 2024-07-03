@@ -283,7 +283,7 @@ class BetaIstp(Spectrum, Summed):
                 elif j != self.Q:
                     branchi.SetCovariance(branchj, 0)
 
-    def SumSpectra(self, nu_spectrum=True):
+    def SumSpectra(self, nu_spectrum=True, branchErange=[0, 20.]):
         """
         Calculate the cumulative beta/antineutrino spectrum of all branches
         Parameters:
@@ -302,6 +302,8 @@ class BetaIstp(Spectrum, Summed):
 
         # calculate the total uncertaintty and append spectra
         for E0i, branchi in self.branches.items():
+            if(E0i < branchErange[0] or E0i > branchErange[1]):
+                continue
             si = branchi.spectrum
             fi = branchi.frac
             di = branchi.sigma_frac
@@ -475,7 +477,7 @@ class BetaEngine:
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
             betaIstp.CalcCovariance(GSF=GSF)
-            betaIstp.SumSpectra(nu_spectrum)
+            betaIstp.SumSpectra(nu_spectrum, branchErange)
             istpCount += 1
 
         endTiming = timeit.default_timer()
