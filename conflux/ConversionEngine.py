@@ -13,13 +13,12 @@ from copy import deepcopy
 import timeit
 import matplotlib.pyplot as plt
 from iminuit.cost import LeastSquares
-
 from iminuit import Minuit
-
 import math
-
+from tqdm import tqdm
 
 # local modules
+from conflux.config import CONFLUX_DB
 from conflux.BetaEngine import BetaEngine, BetaBranch
 from conflux.FPYEngine import FissionModel, FissionIstp
 
@@ -113,7 +112,7 @@ class VirtualBranch:
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
-        for nuclide in fisIstp.CFPY[Ei]:
+        for nuclide in tqdm(self.fisIstp.CFPY[Ei], desc="Tallying fission products of "+str(self.fisIstp.A)):
             fpNuclide = fisIstp.CFPY[Ei][nuclide]
             if fpNuclide.y == 0: continue
             FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
@@ -197,7 +196,8 @@ class VirtualBranch:
         subyerr = [] # sublist uncertainty
         xhigh = 9
         datacache = np.copy(betadata.y) # preserve the data
-        for it, x in reversed(list(enumerate(betadata.x))):
+        fitsequence = reversed(list(enumerate(betadata.x)))
+        for it, x in tqdm(fitsequence, desc="Fitting beta spectrum with reversed sequence"):
             if x <= xhigh - slicesize or x == betadata.x[0]:
                 subx.append(x)
                 suby.append(datacache[it])
@@ -251,7 +251,6 @@ class VirtualBranch:
                     stepsize = 0.02
                     e_upper = xhigh+slicesize
                     e_lower = xhigh-slicesize/8
-                    print(subx, xhigh)
                     if math.isclose(subx[0], 9, rel_tol = 1e-6):
                         e_upper = xhigh+5
 
@@ -270,13 +269,11 @@ class VirtualBranch:
                     binwidths = betadata.x[1]-betadata.x[0]
                     full_range = np.arange(0, 20, binwidths)
 
-
                     best_energy = np.inf
                     best_norm = 0
                     testvalue = np.inf
                     a = 0
                     # find the bestfit virtual branches to the spectrum slices
-
                     for energy in np.arange(e_lower, e_upper, stepsize):
                         # print(energy)
                         full_spect = betafunc(full_range, energy)
@@ -300,9 +297,8 @@ class VirtualBranch:
 
                     newspect = best_norm*betafunc(betadata.x, best_energy)
                     least = np.sum((suby - best_norm*betafunc(subx, best_energy))**2)
-                    print(e_lower, e_upper, best_norm, best_energy, least)
+                    # print(e_lower, e_upper, best_norm, best_energy, least)
 
-                    # for i in range(len(betadata.x)):
                     datacache -= newspect
 
                     # reset cached slices
@@ -460,10 +456,7 @@ class VirtualBranch:
             The summed spectra in the form of ndarray
         """
         result = 0
-        # # print(len(self.E0))
-        # print(self.E0)
-        # print(self.contribute)
-        # datacache = np.interp(x, self.betadata.x, self.betadata.spectrum)
+
         spect_array = []
         cont_array = []
         best_array = []
@@ -661,11 +654,11 @@ if __name__ == "__main__":
     import os
 
     # Begin the calculation by sourcing the default beta data
-    beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
-    beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
+    beta235s = BetaData(CONFLUX_DB+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
 
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches

@@ -8,31 +8,23 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 
 if __name__ == "__main__":
-    x = np.arange(0, 10, 0.05)
-    binwidth = 1
+    x = np.arange(0, 1, 0.005)
+    binwidth = 0.005
 
-    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine()
+    testEngine = BetaEngine(xbins=x)
     testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 0.1])
 
-    #print(testEngine.spectralist[521340])
-    index = 521331
+    istp = 922370 #U237
+    testlist = [istp]
     fig = plt.figure()
-    y1 = testEngine.istplist[index].spectrum*binwidth
-    print(testEngine.istplist[index].uncertainty)
-    plt.errorbar(x, y1, label=str(index)+"_beta", yerr=testEngine.istplist[index].uncertainty)
-    # print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
-    # testEngine.CalcBetaSpectra(nu_spectrum=False)
-    # plt.errorbar(x, testEngine.istplist[531340].spectrum, yerr=testEngine.istplist[531340].uncertainty)
-    # print(max(testEngine.istplist[531340].spectrum), sum(testEngine.istplist[531340].spectrum))
-
 
     testEngine2 = BetaEngine(testlist, xbins=x)
-    testEngine2.CalcBetaSpectra(nu_spectrum=True)
-    y2 = testEngine2.istplist[index].spectrum*binwidth
-    print("beta/nu", sum(y1))
-    plt.xlabel("E (MeV)")
-    plt.errorbar(x, y2, label=str(index)+"_nu", yerr=testEngine.istplist[index].uncertainty)
+    testEngine2.CalcBetaSpectra(nu_spectrum=False)
+    y2 = testEngine2.istplist[istp].spectrum*binwidth
+    y2err = testEngine2.istplist[istp].uncertainty*binwidth
+    print("beta/nu", sum(y2))
+    plt.xlabel("E (keV)")
+    plt.errorbar(x/1e-3, y2, label=str(istp)+"_nu", yerr=y2err)
     plt.legend()
     plt.show()
 

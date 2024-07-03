@@ -8,6 +8,7 @@ from copy import deepcopy
 import timeit
 from tqdm import tqdm
 
+from conflux.config import CONFLUX_DB
 from conflux.Basic import *
 from conflux.bsg.Constants import *
 from conflux.bsg.SpectralFunctions import *
@@ -353,7 +354,8 @@ class BetaIstp(Spectrum, Summed):
 class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None, xbins=np.arange(0, 20, 0.1)):
         self.inputlist = inputlist
-        self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
+        # self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
+        self.defaultDB = CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"
         self.xbins = xbins
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically

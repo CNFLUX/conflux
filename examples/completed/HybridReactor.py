@@ -1,4 +1,4 @@
-from conflux.BetaEngine import BetaEngine
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
@@ -10,9 +10,9 @@ if __name__ == "__main__":
     #Load data into the simulation (Change this directory location to the location
     #Of U_235_e_2014.csv on the host machine)
     #This is the conversion Data
-    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
-    beta239 = BetaData("../../data/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData("../../data/conversionDB/Pu_241_e_2014.csv")
+    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
+    beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
     #This is the loaded Fission Data
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB()
