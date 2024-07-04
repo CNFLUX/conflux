@@ -430,7 +430,7 @@ class VirtualBranch:
 
         plt.pause(1)
         plt.show()
-        print(least, self.E0, self.contribute)
+        # print(least, self.E0, self.contribute)
 
     # function to calculate summed spectra of virtual branches
     def SumBranches(self, x, thresh = 0, nu_spectrum = False):
@@ -487,7 +487,6 @@ class VirtualBranch:
                                     + self.fblist[s]
                                         * vb_fb.BetaSpectrum(this_range, nu_spectrum))
                 norm = full_spect.sum() if s > binwidths else newspect.sum()
-                # print('e0', s, full_spect.sum()/this_spect.sum(), newspect.sum(), sum(newspect))
                 newspect /= norm*binwidths
                 # print('max', max(newspect)/max(self.bestfits[s]))
                 # print('sum', sum(newspect)/sum(self.bestfits[s]))
@@ -499,14 +498,17 @@ class VirtualBranch:
                 # plt.title('two best fit compare'+str(s))
                 # plt.plot(x, newspect)
                 # plt.plot(self.betadata.x, self.bestfits[s])
-                # plt.show()
+                # plt.show()                
 
-            elif sum(result*x) == 0:
-                return result*x
+        if len(spect_array) == 0:
+            return result*x
 
+        # print(thresh, spect_array, cont_array)
         spect_array = np.transpose(np.array(spect_array))
         cont_array = np.array(cont_array)
+
         result = np.transpose(spect_array @ cont_array)
+
         # bestfit = np.transpose(cont_array @ best_array)
         # fig = plt.figure()
         # plt.title('two best fit compare')
@@ -563,7 +565,6 @@ class ConversionEngine:
         # define the virtual branches to be fit
         vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
         vbnew.FitData(self.betadata[istp], slicesize)
-        # vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
 
     def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50):
@@ -656,7 +657,7 @@ if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData(CONFLUX_DB+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    beta235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_data_1.5_9.6.csv")
     beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
 
@@ -678,14 +679,27 @@ if __name__ == "__main__":
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
     convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
-    print(beta235s)
-    # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
-    # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
-    # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.arange(0,10, 0.01)
+    convertmodel.VBfitbeta("U235", branch_slice)
+
+    xval = np.arange(0, 10, 0.01)
+    #Something wrong with the plotting on this one
+    for i in range(0, 20):
+        print(i*0.5, sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False)))
+        if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
+            print("sth wrong i die")
+            continue
+        plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--', label='test')
+    #Plot out the raw beta data
+    plt.errorbar(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr, label='beta data')
+    #Plot out the calculated beta spectrum
+    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = False), label='beta')
+    #Plot out the calculated neutrino spectrum
+    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True), label='neutrino')
+    plt.legend()
+    plt.show()
+
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     #convertmodel.VBfitbeta("U235", branch_slice)
-    convertmodel.VBfitbeta("U235", branch_slice)
 
     final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=5)
     final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=5)
@@ -745,7 +759,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
     fig.savefig("bestfit_beta_compare2.png")
-    neu235s = BetaData(os.environ["HOME"]+"/conflux/conflux/examples/U235_synth_compare.csv")
+    neu235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_compare.csv")
 
     new235spect = neu235s.y
     diff = (final_spect1-new235spect)/new235spect

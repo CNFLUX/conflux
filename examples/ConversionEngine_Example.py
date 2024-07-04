@@ -62,10 +62,10 @@ if __name__ == "__main__":
 
 
     #Something wrong with the plotting on this one
-
-
     for i in range(0, 20):
+        print(i*0.5, convertmodel.vblist["U235"].E0, sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False)))
         if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
+            print("sth wrong i die")
             continue
         plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
     #Plot out the raw beta data
@@ -75,26 +75,27 @@ if __name__ == "__main__":
     #Plot out the calculated neutrino spectrum
     plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True), label='neutrino')
     plt.legend()
+    plt.show()
     fig.savefig("U235_conversion.png")
 
     #This next set of plots are going to be the covariance matrices for both
     #The neutrino and beta spectrum for U235. I've initialized them here, I
     #will plot them later in the code.
 
-    #beta covariance matrix
-    covmat_beta = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=False, samples=50)
-    #neutrino covariance matrix
-    covmat_nu = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=True, samples=50)
-
-
-    spectrum = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=False)
-    relativeErr = np.zeros(len(xval))
-    for i in range(len(xval)):
-        if spectrum[i] >0:
-            relativeErr[i] = np.sqrt(covmat_beta[i][i]/spectrum[i])
-
-    spectrumNu = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=True)
-    relativeErrNu = np.zeros(len(xval))
-    for i in range(len(xval)):
-        if spectrumNu[i] > 0:
-            relativeErrNu[i] = np.sqrt(covmat_nu[i][i] / spectrumNu[i])
+    # #beta covariance matrix
+    # covmat_beta = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=False, samples=50)
+    # #neutrino covariance matrix
+    # covmat_nu = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=True, samples=50)
+    #
+    #
+    # spectrum = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=False)
+    # relativeErr = np.zeros(len(xval))
+    # for i in range(len(xval)):
+    #     if spectrum[i] >0:
+    #         relativeErr[i] = np.sqrt(covmat_beta[i][i]/spectrum[i])
+    #
+    # spectrumNu = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=True)
+    # relativeErrNu = np.zeros(len(xval))
+    # for i in range(len(xval)):
+    #     if spectrumNu[i] > 0:
+    #         relativeErrNu[i] = np.sqrt(covmat_nu[i][i] / spectrumNu[i])

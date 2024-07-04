@@ -1,4 +1,4 @@
-from conflux.BetaEngine import BetaEngine
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     Pu241.LoadFissionDB()
 
     #Open up the reactor output, set Days the reactor is running
-    file = open('./timeEvolvingReactor.csv')
+    file = open(CONFLUX_DB+'/example_models/timeEvolvingReactor.csv')
     days = [0.0, 0.1, 2.0, 20.0, 100.0, 200.0, 300.0, 400.0, 600.0,
             800.0, 1000.0, 1200.0, 1400.0, 1600.0]
 

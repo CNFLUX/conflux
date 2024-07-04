@@ -40,8 +40,6 @@ if __name__ == "__main__":
     result = SumEngine()
     result.AddModel(FisModel)
 
-
-
     #This is the U238 Summation Calculation
     betaSpectraDB = BetaEngine(result.FPYlist.keys())
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])

@@ -1,5 +1,5 @@
 # local modules
-from conflux.BetaEngine import BetaEngine, BetaBranch
+from conflux.BetaEngine import BetaEngine, BetaBranch, CONFLUX_DB
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
@@ -7,8 +7,8 @@ import numpy as np
 
 if __name__ == "__main__":
     #Beta Conversion Data
-    beta235 = BetaData("../../data/conversionDB/U_235_e_2014.csv")
-    beta239 = BetaData("../../data/conversionDB/Pu_239_e_2014.csv")
+    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
+    beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
 
     U235 = FissionIstp(92, 235)
     Pu239 = FissionIstp(94, 239)
