@@ -23,6 +23,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm'],
+	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib'],
     python_requires=">=3.6",
 )
