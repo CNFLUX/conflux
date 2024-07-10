@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="conflux",
-    version="0.6.2",
+    version="0.6.3",
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",
@@ -23,6 +23,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib'],
+	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib', 'iminuit'],
     python_requires=">=3.6",
 )
