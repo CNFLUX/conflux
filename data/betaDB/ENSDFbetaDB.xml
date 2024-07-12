@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <betaDB>
+	<isotope name="Nn1" isotope="10" Q="0.782347" HL="613.9" Ex="0.0">
+		<branch fraction="1.000" sigma_frac="0.000" end_point_E="0.782" sigma_E0="0.000" dJpi="0"/>
+	</isotope>
 	<isotope name="H3" isotope="10030" Q="0.0185906" HL="388523520.0" Ex="0.0">
 		<branch fraction="1.000" sigma_frac="0.000" end_point_E="0.019" sigma_E0="0.000" dJpi="0"/>
 	</isotope>
@@ -1149,9 +1152,9 @@
 		<branch fraction="0.015" sigma_frac="0.000" end_point_E="3.623" sigma_E0="0.024" dJpi="1-,0-,1-"/>
 		<branch fraction="0.006" sigma_frac="0.000" end_point_E="3.559" sigma_E0="0.024" dJpi="1-,0-,1-"/>
 		<branch fraction="0.001" sigma_frac="0.000" end_point_E="3.123" sigma_E0="0.024" dJpi="1-,0-,1-"/>
-		<branch fraction="0.005" sigma_frac="0.000" end_point_E="2.789" sigma_E0="0.024" dJpi="0"/>
+		<branch fraction="0.005" sigma_frac="0.000" end_point_E="2.789" sigma_E0="0.024" dJpi=""/>
 		<branch fraction="0.001" sigma_frac="0.000" end_point_E="2.105" sigma_E0="0.024" dJpi="2-"/>
-		<branch fraction="0.001" sigma_frac="0.000" end_point_E="2.013" sigma_E0="0.024" dJpi="0"/>
+		<branch fraction="0.001" sigma_frac="0.000" end_point_E="2.013" sigma_E0="0.024" dJpi=""/>
 		<branch fraction="0.000" sigma_frac="0.000" end_point_E="1.967" sigma_E0="0.024" dJpi="1"/>
 		<branch fraction="0.002" sigma_frac="0.000" end_point_E="1.910" sigma_E0="0.024" dJpi="1"/>
 		<branch fraction="0.001" sigma_frac="0.000" end_point_E="1.850" sigma_E0="0.024" dJpi="0"/>
