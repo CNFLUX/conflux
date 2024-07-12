@@ -23,12 +23,12 @@ def Z_to_element():
         for row in csvreader:
             Z = int(row['Z'])
             zdict[Z] = row['Element']
-            
+
     return zdict
-    
+
 # global dictionary of element and Z
 elementdict = Z_to_element()
-    
+
 # In[0]: Prepare the class to write the output xml file
 class XMLedit:
     def __init__(self, DBname):
@@ -77,7 +77,7 @@ def ENDF6BetaDBreader(filename, xmloutput):
     record_reader = ff.FortranRecordReader('(A66,I4,I2,I3,I5)')
     DBname = filename.split('/')
     DBname_short = DBname[-1].split('.')
-    
+    print(f'Openned file {filename}')
 
     with open(filename) as inputfile:
 
@@ -107,60 +107,62 @@ def ENDF6BetaDBreader(filename, xmloutput):
 
                 # reading the HEAD of independent fission products
                 datacache += (data)
-                
-        ZA = int(datacache[0])
+        print(datacache)
+        ZA = int(datacache[0])      # isotopes za
         AWR = float(datacache[1])
-        LIS = int(datacache[2])
+        LIS = int(datacache[2])     # number of states
         LISO = int(datacache[3])    # isomer
         NST = int(datacache[4])
         NSP = int(datacache[5])
-        Z = int(ZA/1000)
-        A = int(ZA%1000)
-        ZAI = ZA*10+LISO
-        name = elementdict[Z]+str(A)
-        
-        HL = float(datacache[6])
-        dHL = float(datacache[7])
-        NC = int(datacache[10])
-        E_ = []     #average decay product energy
-        dE_ = []    #average decay product energy
-                
+        HL = float(datacache[6])    # half-life
+        dHL = float(datacache[7])   # uncertainty of half-life
+        NC = int(datacache[10])     # 2x number of decay channles
+        E_ = []     # average decay product energy
+        dE_ = []    # uncertainty of average decay product energy
+
         for i in range(12, 12+NC):
             newdata = datacache[i]
             if i%2 == 0:
+                print("e",newdata)
                 E_.append(newdata)
             else:
                 dE_.append(newdata)
-        
+
         newbegin = 12+NC
         spin = float(datacache[newbegin])
         parity = int(datacache[newbegin+1])
         NDK = int(datacache[newbegin+5])
-        
+
         newbegin += 6
+        decaymodesize = 6
         decaymode = dict.fromkeys(['RTYP','RFS','Q','dQ','BR', 'dBR',])
         for i in range(NDK):
-            decaymode['Rtype']=float(datacache[newbegin+i*newbegin])
+            print(newbegin, )
+            decaymode['Rtype']=float(datacache[newbegin+i*decaymodesize])
             if decaymode['Rtype'] != None and int(decaymode['Rtype']%1)==0 and int(decaymode['Rtype']%1)>0:
-                decaymode['Q']=float(datacache[newbegin+i*newbegin+2])
-                decaymode['dQ']=float(datacache[newbegin+i*newbegin+3])
+                decaymode['Q']=float(datacache[newbegin+i*decaymodesize+2])
+                decaymode['dQ']=float(datacache[newbegin+i*decaymodesize+3])
                 break
-        
+
         if not decaymode['Q']:
             return
-            
+
+        Z = int(ZA/1000)
+        A = int(ZA%1000)
+        ZAI = ZA*10+LISO
+        name = elementdict[Z]+str(A)
         Q = decaymode['Q']/1e6
         dQ = decaymode['dQ']/1e6
 
         # print(name, ZAI, Q, HL)
-        
+
         xmloutput.createIsotope(name, isotopeID=str(ZAI), Q=str(Q), HL=str(HL))
-        
+
         newbegin += NDK*6
-        
+
         currentline = int(newbegin/6)
         linelim = int(len(datacache)/6)
-        
+
         for i in range(currentline, linelim):
             if float(datacache[i*6]) == 0 and float(datacache[i*6+1]) == 1:
                 print(datacache[i*6:i*6+6])
@@ -170,26 +172,25 @@ def ENDF6BetaDBreader(filename, xmloutput):
                 for j in range(branches):
                     # print(datacache[newbegin+j*12:newbegin+j*12+12])
                     end_point_E = float(datacache[newbegin+j*12])/1e6
-                    sigma_E0 = float(datacache[newbegin+j*12+1])1e6
+                    sigma_E0 = float(datacache[newbegin+j*12+1])/1e6
                     NT = datacache[newbegin+j*12+4]
                     if NT != 6:
                         print("NT", NT)
                     forbidden = int(datacache[newbegin+j*12+7])
                     fraction = float(datacache[newbegin+j*12+8])
                     sigma_frac = float(datacache[newbegin+j*12+9])
-                    
+
                     xmloutput.editBranch(str(fraction), str(end_point_E),
                                         str(forbidden), sigma_frac=str(sigma_frac),
                                         sigma_E0=str(sigma_frac))
-                                            
-    xmloutput.saveXML("ENDF_betaDB.xml")
+
+    xmloutput.saveXML("ENDF_betaDB2.xml")
 
 
 
 if __name__ == "__main__":
     dirName = sys.argv[1]
     fileList = listdir(dirName)
-    #print(fileList)
     xmloutput = XMLedit(dirName)
     for filename in fileList:
         if filename.split('.')[-1] == 'endf':
