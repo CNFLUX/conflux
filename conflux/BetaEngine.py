@@ -356,6 +356,7 @@ class BetaIstp(Spectrum, Summed):
 class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None, xbins=np.arange(0, 20, 0.1)):
         self.inputlist = inputlist
+        self.istplist = {}
         # self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
         self.defaultDB = CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"
         self.xbins = xbins
@@ -363,6 +364,8 @@ class BetaEngine:
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
 
     def LoadBetaDB(self, targetDB=None):
+        """Load default or input betaDB to obtain beta decay informtion
+        """
         useInputList = True # test if the engine is defined with an inputlist
         if self.inputlist == None:
             print("Loading all beta data from the default betaDB...")
@@ -374,8 +377,6 @@ class BetaEngine:
         print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches...")
 
-        self.istplist = {}
-
         tree = ET.parse(targetDB)
         root = tree.getroot()
         for isotope in root:
@@ -384,6 +385,7 @@ class BetaEngine:
             HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
 
+            # if input list is not given, include all isotopes
             if not useInputList:
                 self.inputlist.append(ZAI)
 
@@ -426,7 +428,7 @@ class BetaEngine:
                     ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
                               ['3-', '4-'], ['4', '5']]
                     firstftypes = [-10, -11, 10]
-                    forbiddenness = 1e3
+                    forbiddenness = 5
                     for i in range(len(ftypes)):
                         for j in range(len(spin_par_changes)):
                             if spin_par_changes[j] in ftypes[i] and i < abs(forbiddenness):
@@ -483,12 +485,11 @@ class BetaEngine:
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
-
-
-if __name__ == "__main__":
-    x = np.arange(0, 10, 0.05)
-    binwidth = 1
-
-    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine()
-    testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
+# 
+# if __name__ == "__main__":
+#     x = np.arange(0, 10, 0.05)
+#     binwidth = 1
+#
+#     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
+#     testEngine = BetaEngine()
+#     testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)

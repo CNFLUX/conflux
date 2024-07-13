@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(defaultDB='JEFF')
-    U235.LoadCorrelation(defaultDB='ENDF')
+    U235.LoadCorrelation(defaultDB='JEFF')
 
     Pu239 = FissionIstp(94, 239)
     Pu239.LoadFissionDB()
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     sum1 = SumEngine(xbins = xbins)
     sum1.AddModel(model)
 
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xbins)
+    betaSpectraDB = BetaEngine(xbins=xbins)
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
