@@ -89,7 +89,7 @@ def model_setup(json_file):
 
         sum_model= SumEngine(xbins = xbins)
         sum_model.AddModel(fissionmodel, W=1)
-        betaSpectraDB = BetaEngine(sum_model.FPYlist.keys(), xbins=xbins)
+        betaSpectraDB = BetaEngine(xbins=xbins)
         betaSpectraDB.CalcBetaSpectra(nu_spectrum=nu_spec, branchErange=[qlow, qhigh])
         for istp in betaSpectraDB.istplist:
             betaIstp = betaSpectraDB.istplist[istp]

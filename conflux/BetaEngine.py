@@ -358,7 +358,7 @@ class BetaEngine:
         self.inputlist = inputlist
         self.istplist = {}
         # self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
-        self.defaultDB = CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"
+        self.defaultDB = CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
         self.xbins = xbins
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
@@ -485,11 +485,11 @@ class BetaEngine:
         endTiming = timeit.default_timer()
         nBranch = istpCount
         runTime = endTiming-startTiming
-# 
-# if __name__ == "__main__":
-#     x = np.arange(0, 10, 0.05)
-#     binwidth = 1
-#
-#     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-#     testEngine = BetaEngine()
-#     testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
+
+if __name__ == "__main__":
+    x = np.arange(0, 10, 0.05)
+    binwidth = 1
+
+    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
+    testEngine = BetaEngine()
+    testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
