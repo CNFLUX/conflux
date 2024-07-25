@@ -142,7 +142,7 @@ class SumEngine(Spectrum):
 
 #Calculate the reactor spectrum based off fission yield and beta spectra databases. Options include 
     #Processing the missing fission products, calculating the immediate fission products, and including model uncertainties in the uncertainty calculation
-    def CalcReactorSpectrum(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
+    def CalcReactorSpectrum(self, branchErange=[-1, 20.0], betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
