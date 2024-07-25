@@ -26,10 +26,18 @@ class SumEngine(Spectrum):
         A dictionary of the fission product yield (FPY) of each isotope
     betaSpectraList : dictionary
         A dictionary of the Beta Spectra of each isotope
-    betaUncertainty : int list
-        A list of the beta Uncertainty's of each isotope
+    betaUncertainty : dictionary
+        A dictionary of the beta Uncertainty's of each isotope
     neutrino : boolean
         A boolean of whether we are looking at the neutrino spectrum or beta spectrum
+    xbins : list
+        The energy scale of the Summation prediction. Default units are in MeV 
+    nbins : int
+        The number of bins inside your energy scale. More bins means finer calculations
+    spectrum : list
+        A list to store the total calculated neutrino (beta) spectrum
+    uncertainty : list    
+        A list to store the uncertainties for the neutrino (beta) spectrum
 
     Methods
     -------
@@ -40,15 +48,11 @@ class SumEngine(Spectrum):
     AddModel(fissionModel, W=1.0):
         method to add fission/non-fissile/non-equilibrium isotopes into the engine
 
-    Normalize():
+    NormalizeFP():
         Normalizes the FPY and the fission product yield Error
 
-    CalcReactorSpectrum(betaSpectraDB, binwidths=0.1, lower=-1.0, thresh=0.0, erange=20.0):
-        Calculates the neutrino Spectrum from the given database with the given energy bins and bounds
-
-    Draw(figname, summing=True, logy=True, frac=False):
-        Draws the Reactor Spectrum and saves it as a .png file.
-
+    CalcReactorSpectrum(betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
+        Calculates the neutrino Spectrum from the given database with the given energy bins and bounds. 
     """
 
     def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
@@ -115,6 +119,8 @@ class SumEngine(Spectrum):
                 self.FPYlist[FPZAI].yerr += inputFPY.FPYlist[FPZAI].yerr*W
                 self.FPYlist[FPZAI].AddCovariance(inputFPY.FPYlist[FPZAI])
 
+#Normalizes the FIssion Products in the summation engine. Normalization must occur before CalcReactorSpectrum is called
+#For the normalization to be applied.
     def NormalizeFP(self):
         """
             Normalizes the fission product yield and the Fission Percent error.
@@ -134,14 +140,18 @@ class SumEngine(Spectrum):
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
-    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1.0, 20.0], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
+#Calculate the reactor spectrum based off fission yield and beta spectra databases. Options include 
+    #Processing the missing fission products, calculating the immediate fission products, and including model uncertainties in the uncertainty calculation
+    def CalcReactorSpectrum(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
             Parameters:
                 betaSpectraDB (BetaEngine): a dictionary of the spectral information for each beta branch
-                binwidths (int): the width of the bins used in running the calculation
-                erange (int): upper limit of energy you want to run the reactor for
+                processMissing (boolean): Determines if missing fission product information is processed
+                ifp_begin (float): The start decay time for immediate fission product calculations
+                ifp_end (float): The end decay time for immediate fission product calculations
+                modelUnc (boolean): Determines if model uncertainties are included in the calculation. 
             Returns:
                 None
 
@@ -173,7 +183,7 @@ class SumEngine(Spectrum):
             #If the fission product in the reactor model is also in the Beta Spectra model, do some calculations
             if FPZAI in betaSpectraDB.istplist:
 
-                # for IFP calculation, adjust the decay rate of the target isotope
+                # for the immediate fission product calculation, adjust the decay rate of the target isotope
                 # by the rate of isotope that are decayed in the time window
                 if (ifp_begin < ifp_end):
                     adjustment = betaSpectraDB.istplist[FPZAI].decay_time_adjust(ifp_begin, ifp_end)
