@@ -69,12 +69,6 @@ if __name__ == "__main__":
     summed_model_err = sum1.modelUnc
     summed_yerr = sum1.yieldUnc
 
-    print('spectrum integral', sum1.Integral())
-    print(sum1.totalYield)
-    print(sum1.missingCount)
-    print(sum1.missingBranch)
-    #result.Clear()
-
     sum2 = SumEngine(xbins=xbins)
     sum2.AddModel(model)
     sum2.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=True)

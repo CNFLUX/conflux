@@ -164,7 +164,9 @@ class FissionIstp:
         """
 
         DBname = customDB
-        if DBname == None or not os.path.exists(DBname): #Check if the user gave a valid Database path
+        # Check if the user gave a valid Database path
+        # if there is no specified fissionDB, look for the default one
+        if DBname == None or not os.path.exists(DBname):
             DBpath = CONFLUX_DB+"/fissionDB/"+defaultDB+"/"
             if DBname != None:
                 print('Custom DB: '+ DBname + ' NOT found!')
@@ -176,12 +178,12 @@ class FissionIstp:
                 if namecache[-1] != 'xml': #if the file is not an xml file, continue
                     continue
                 if (self.DBtitle[defaultDB] not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
-                    continue #Alternatively, if the isotope is not in the list, continue
-                istpfound = True #Else, assert that the isotope is in the DB
+                    continue # Alternatively, if the isotope is not in the list, continue
+                istpfound = True # Else, assert that the isotope is in the DB
                 break
             assert(istpfound) # assert error if isotope not found in DB
 
-            DBname = DBpath+filename #this is the isotope that we found in the list.
+            DBname = DBpath+filename # this is the isotope that we found in the list.
             assert(DBname)
 
         print('Reading FPY DB: '+DBname+'...')
@@ -189,14 +191,15 @@ class FissionIstp:
         root = tree.getroot()
 
         for HEAD in root:
-            MT = HEAD.attrib['MT'] #I'm assuming this is measurement type, whether it is
-            #Individual fission products or cumulative fission products.
+            MT = HEAD.attrib['MT']
+            # "MT" indicates decay data type, designated by the ENDF-6 format
+            # In the case of fission products, there are cumulative fission
+            # fission products (CFP) and indpendent fission products (IFP)
 
-            for LIST in HEAD: #work through this particular fission isotope, pull
-                #Out the relevant branch information.
-                Ei = float(LIST.attrib['Ei'])
-                Ei /= 1e6
-                if (Ei < 0.01): Ei = 0.
+            for LIST in HEAD: # begin to read fission modes of each fissile isotope
+                Ei = float(LIST.attrib['Ei'])   # Induced neutron energy
+                Ei /= 1e6                       # convert to MeV
+                if (Ei < 0.01): Ei = 0          # simplify thermal neutron E
                 branch = int(LIST.attrib['NFPi'])
                 assert(branch == len(LIST))
                 nuclidelist = {}
@@ -211,8 +214,8 @@ class FissionIstp:
                     nuclide = FPNuclide(FPZAI, y=Y, yerr=DY)
                     nuclidelist[FPZAI] = nuclide
 
-                #Sort out this isotope and all of its' branches into either
-                #Cumulative or Independant yields.
+                # Sort out this isotope and all of its' branches into either
+                # Cumulative or Independant yields.
                 if (MT == 'CFP'):
                     self.CFPY[Ei] = nuclidelist
                 if (MT == 'IFP'):

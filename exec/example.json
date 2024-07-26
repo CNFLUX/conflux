@@ -2,7 +2,8 @@
   "spectrum": {
     "binlow": 0,
     "binhigh": 20,
-    "binwidth": 0.01
+    "binwidth": 0.1,
+    "__comment1__": "binwidth will have impact on runtime"
   },
 
   "beta_spec":{

@@ -126,8 +126,9 @@ class BetaBranch(Spectrum):
         return result*rangeCorrect
 
     # calculate the spectrum uncertainty with MC sampling
-    def SpectUncertMC(self, x, nu_spectrum=False, samples = 150):
-
+    def SpectUncertMC(self, x, nu_spectrum=False, samples = 30):
+        if self.sigma_E0 == 0:
+            return 0
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
         newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
@@ -146,7 +147,6 @@ class BetaBranch(Spectrum):
 
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False):
-
         # to prevent lower limit of the energy range < 0
         lower = self.xbins[0]
         i = 1
@@ -155,7 +155,6 @@ class BetaBranch(Spectrum):
             i += 1
         if (lower > self.E0):
             return 1
-
         # TODO make the code compatible to uneven binning
         binwidths = self.xbins[1]-self.xbins[0]
         # integrating each bin
@@ -190,7 +189,36 @@ class BetaBranch(Spectrum):
 
         return 0
 
+    def BinnedSpectrum2(self, nu_spectrum=False):
+        # to prevent lower limit of the energy range < 0
+        lower = self.xbins[0]
 
+        # if beginning of the x array is higher than the spectrum E0, skip
+        if (lower > self.E0):
+            return 1
+
+        # TODO make the code compatible to uneven binning
+        binwidths = self.xbins[1]-self.xbins[0]
+        # calculate the content and error   of each bin
+        self.spectrum = self.BetaSpectrum(self.xbins, nu_spectrum)
+        for i in range(len(self.xbins)):
+            self.uncertainty[i] = self.SpectUncertMC(self.xbins[i], nu_spectrum)
+
+        full_range = np.arange(0, 20, 0.01)
+        this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
+        full_spect = self.BetaSpectrum(full_range, nu_spectrum)
+        this_spect = self.BetaSpectrum(this_range, nu_spectrum)
+
+        # normalizing the spectrum
+        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum() if self.E0 > binwidths else self.spectrum.sum()
+
+        if self.spectrum.sum() <=0:
+            self.spectrum = np.zeros(self.nbin)
+        else:
+            self.spectrum /= norm*binwidths
+            self.uncertainty /= norm*binwidths
+
+        return 0
 # class to save isotope information, including Z A I Q and beta brances
 class BetaIstp(Spectrum, Summed):
     def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1)):
@@ -428,7 +456,7 @@ class BetaEngine:
                     ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
                               ['3-', '4-'], ['4', '5']]
                     firstftypes = [-10, -11, 10]
-                    forbiddenness = 5
+                    forbiddenness = 6
                     for i in range(len(ftypes)):
                         for j in range(len(spin_par_changes)):
                             if spin_par_changes[j] in ftypes[i] and i < abs(forbiddenness):
@@ -456,7 +484,7 @@ class BetaEngine:
 
 
     def CalcBetaSpectra(self, targetDB = None, nu_spectrum=True,
-                        branchErange=[0.0, 20.0], GSF=False):
+                        branchErange=[0.0, 20.0], GSF=False, silent=False):
         """
         Calculates beta spectra of the list of beta-decaying isotopes
 
@@ -471,20 +499,14 @@ class BetaEngine:
 
         """
 
-        startTiming = timeit.default_timer()
-        istpCount = 0
-        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes"):
-        # for ZAI in self.istplist:
+        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes", disable=silent):
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-            betaIstp.CalcCovariance(GSF=GSF)
-            betaIstp.SumSpectra(nu_spectrum, branchErange)
-            istpCount += 1
 
-        endTiming = timeit.default_timer()
-        nBranch = istpCount
-        runTime = endTiming-startTiming
+            betaIstp.CalcCovariance(GSF=GSF)
+
+            betaIstp.SumSpectra(nu_spectrum, branchErange)
 
 if __name__ == "__main__":
     x = np.arange(0, 10, 0.05)

@@ -65,6 +65,10 @@ def model_setup(json_file):
         ifp_begin = 0
         ifp_end = 0
 
+        betaSpectraDB = BetaEngine(xbins=xbins)
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=nu_spec, branchErange=[qlow, qhigh])
+        print('test finished')
+
         if IFP:
             "setting up reactor model dependent on time"
             ifptime = summation['time']
@@ -110,7 +114,6 @@ def model_setup(json_file):
             A = fissile_istp['A']
             istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
             istp.LoadFissionDB(defaultDB="JEFF")
-
 
             beta_istp = BetaData(fissile_istp['conversiondb'])
             branch_slice = fissile_istp['slice']

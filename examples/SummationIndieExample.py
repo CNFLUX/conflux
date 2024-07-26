@@ -13,7 +13,7 @@ if __name__ == "__main__":
     spectBE = [0.05, 10.05]
     width = 0.1
     model = FissionModel()
-    
+
     inputname = sys.argv[1]
     with open(inputname) as inputfile:
         reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
@@ -24,7 +24,7 @@ if __name__ == "__main__":
             Y = float(row["Y"])
             Yerr = float(row["Yerr"])
             model.AddIstp(Z, A, fraction=Y, isomer=I, d_frac = Yerr)
-            
+
     sum1 = SumEngine(binwidths=width, spectRange=spectBE)
     sum1.AddModel(model)
 
@@ -39,8 +39,7 @@ if __name__ == "__main__":
     summed_model_err = sum1.modelUnc
     summed_yerr = sum1.yieldUnc
 
-    print(sum1.totalYield)
     print(sum1.missingCount)
     print(sum1.missingBranch)
-    
+
     sum1.SaveToFile('235U_nu_jeff_indies.csv')
