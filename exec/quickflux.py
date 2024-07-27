@@ -85,9 +85,9 @@ def model_setup(json_file):
             Ei = fissile_istp['ei']
             istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
             if 'fissiondb' in fissile_istp:
-                istp.LoadFissionDB(defaultDB=fissile_istp['fissiondb'])
+                istp.LoadFissionDB(DB=fissile_istp['fissiondb'])
             if 'covariancedb' in fissile_istp:
-                istp.LoadCovarience(defaultDB=fissile_istp['covariancedb'])
+                istp.LoadCovarience(DB=fissile_istp['covariancedb'])
 
             fissionmodel.AddContribution(isotope=istp, Ei = Ei, fraction=1, IFP=IFP)
 
@@ -113,7 +113,7 @@ def model_setup(json_file):
             Z = fissile_istp['Z']
             A = fissile_istp['A']
             istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
-            istp.LoadFissionDB(defaultDB="JEFF")
+            istp.LoadFissionDB(DB="JEFF")
 
             beta_istp = BetaData(fissile_istp['conversiondb'])
             branch_slice = fissile_istp['slice']

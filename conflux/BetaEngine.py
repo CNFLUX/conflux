@@ -149,10 +149,6 @@ class BetaBranch(Spectrum):
     def BinnedSpectrum(self, nu_spectrum=False):
         # to prevent lower limit of the energy range < 0
         lower = self.xbins[0]
-        i = 1
-        while (lower<0):
-            lower=self.xbins[i]
-            i += 1
         if (lower > self.E0):
             return 1
         # TODO make the code compatible to uneven binning
@@ -166,9 +162,9 @@ class BetaBranch(Spectrum):
             thisbinwidth = abs(x_high-x_low)
             relativewidth = abs(x_high-x_low)/binwidths
             self.spectrum[k] = (thisbinwidth*relativewidth
-                                *self.BetaSpectrum((x_low+x_high)/2, nu_spectrum))
+                                *self.BetaSpectrum(x_low, nu_spectrum))
             self.uncertainty[k] = (thisbinwidth*relativewidth
-                                *self.SpectUncertMC((x_low+x_high)/2, nu_spectrum))
+                                *self.SpectUncertMC(x_low, nu_spectrum))
             if x_high == self.E0:
                 break
             lower += binwidths
@@ -189,36 +185,6 @@ class BetaBranch(Spectrum):
 
         return 0
 
-    def BinnedSpectrum2(self, nu_spectrum=False):
-        # to prevent lower limit of the energy range < 0
-        lower = self.xbins[0]
-
-        # if beginning of the x array is higher than the spectrum E0, skip
-        if (lower > self.E0):
-            return 1
-
-        # TODO make the code compatible to uneven binning
-        binwidths = self.xbins[1]-self.xbins[0]
-        # calculate the content and error   of each bin
-        self.spectrum = self.BetaSpectrum(self.xbins, nu_spectrum)
-        for i in range(len(self.xbins)):
-            self.uncertainty[i] = self.SpectUncertMC(self.xbins[i], nu_spectrum)
-
-        full_range = np.arange(0, 20, 0.01)
-        this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
-        full_spect = self.BetaSpectrum(full_range, nu_spectrum)
-        this_spect = self.BetaSpectrum(this_range, nu_spectrum)
-
-        # normalizing the spectrum
-        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum() if self.E0 > binwidths else self.spectrum.sum()
-
-        if self.spectrum.sum() <=0:
-            self.spectrum = np.zeros(self.nbin)
-        else:
-            self.spectrum /= norm*binwidths
-            self.uncertainty /= norm*binwidths
-
-        return 0
 # class to save isotope information, including Z A I Q and beta brances
 class BetaIstp(Spectrum, Summed):
     def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1)):
@@ -385,13 +351,11 @@ class BetaEngine:
     def __init__(self, inputlist=None, targetDB=None, xbins=np.arange(0, 20, 0.1)):
         self.inputlist = inputlist
         self.istplist = {}
-        # self.defaultDB = os.environ["CONFLUX_DB"]+"/betaDB/ENSDFbetaDB.xml"
-        self.defaultDB = CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
         self.xbins = xbins
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
 
-    def LoadBetaDB(self, targetDB=None):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
         useInputList = True # test if the engine is defined with an inputlist
@@ -400,8 +364,6 @@ class BetaEngine:
             self.inputlist = []
             useInputList = False
 
-        if targetDB == None:
-            targetDB = self.defaultDB
         print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches...")
 
@@ -509,9 +471,17 @@ class BetaEngine:
             betaIstp.SumSpectra(nu_spectrum, branchErange)
 
 if __name__ == "__main__":
-    x = np.arange(0, 10, 0.05)
+    x = np.arange(0, 10, 0.1)
     binwidth = 1
 
     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine()
+    testEngine = BetaEngine(xbins=x)
     testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
+
+    y2 = testEngine.istplist[390960].spectrum
+    y2err = testEngine.istplist[390960].uncertainty
+    plt.figure()
+    plt.xlabel("E (keV)")
+    plt.errorbar(x/1e-3, y2, label=str(390960)+"_nu", yerr=y2err)
+    plt.legend()
+    plt.show()

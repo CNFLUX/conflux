@@ -138,36 +138,37 @@ class FissionIstp:
 
     Methods
     -------
-    LoadFissionDB(customDB = None, defaultDB='ENDF'):
-        Function to load data from a specific fission database. customDB has format /path/to/DB. Defaults to ENDF
-    LoadCovariance(customDB = None, defaultDB='ENDF', percent=True):
-        Load the covariance matrices associated with the fission isotopes. customDB has format /path/to/DB. Defaults to ENDF
+    LoadFissionDB(DB='ENDF'):
+        Function to load data from a specific fission database. DB has format /path/to/DB. Defaults to ENDF
+    LoadCovariance(DB='ENDF', percent=True):
+        Load the covariance matrices associated with the fission isotopes. DB has format /path/to/DB. Defaults to ENDF
     """
 
-    def __init__(self, Z, A):
+    def __init__(self, Z, A, DB='ENDF'):
         self.Z = Z
         self.A = A
         self.CFPY = {}
         self.IFPY = {}
         self.DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
 
+        self.LoadFissionDB(DB=DB)
+
     # method that load xml database of FPY and save nuclide info in dictionaries.
-    def LoadFissionDB(self, customDB = None, defaultDB='ENDF'):
+    def LoadFissionDB(self, DB='ENDF'):
         """
            Loads the fission products from a given database into the Independant and cumulative fission dictionaries in the model.
 
             Parameters:
-                customDB (String) : The path to a user inputed fission database. Has the form "/path/to/database
-                defualtDB (String) : The default fission database that CONFLUX will load it's data from.
+                DB (String) : The path to a user inputed fission database. Has the form "/path/to/database
             Returns:
                 None
         """
 
-        DBname = customDB
+        DBname = DB
         # Check if the user gave a valid Database path
         # if there is no specified fissionDB, look for the default one
         if DBname == None or not os.path.exists(DBname):
-            DBpath = CONFLUX_DB+"/fissionDB/"+defaultDB+"/"
+            DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
             if DBname != None:
                 print('Custom DB: '+ DBname + ' NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')
@@ -177,11 +178,14 @@ class FissionIstp:
                 namecache = filename.split('.')
                 if namecache[-1] != 'xml': #if the file is not an xml file, continue
                     continue
-                if (self.DBtitle[defaultDB] not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+                if (self.DBtitle[DB] not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
                     continue # Alternatively, if the isotope is not in the list, continue
                 istpfound = True # Else, assert that the isotope is in the DB
                 break
-            assert(istpfound) # assert error if isotope not found in DB
+            if (not istpfound):
+                print(f"WARNING!!! Fisson DB {DBpath} {filename} not found")# assert error if isotope not found in DB
+
+                return
 
             DBname = DBpath+filename # this is the isotope that we found in the list.
             assert(DBname)
@@ -226,23 +230,22 @@ class FissionIstp:
     # Method to read the prepackaged covariance csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
-    def LoadCovariance(self, customDB = None, defaultDB='ENDF', percent=True):
+    def LoadCovariance(self, DB = 'ENDF', percent=True):
         """
            Loads the covariance matrices from a given database into the Independant and cumulative fission dictionaries in the model.
 
             Parameters:
-                customDB (String) : The path to a user inputed covariance file. Has the form "/path/to/database
-                defualtDB (String) : The default covariance matrix that CONFLUX will load it's data from.
+                DB (String) : The path to a user inputed covariance file. Has the form "/path/to/database
                 percent (boolean) : determines whether the covariances are relative or not.
             Returns:
                 None
         """
 
-        DBpath = customDB
+        DBpath = DB
         #Figure out where the DB and files are in a similar method we loaded the
         #Fission Database.
-        if DBpath == None or not os.path.exists(DBpath):
-            DBpath = CONFLUX_DB+"/fissionDB/"+defaultDB+"/"
+        if DBpath in ['JEFF', 'ENDF'] or not os.path.exists(DBpath):
+            DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
             print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
         assert(DBpath)
@@ -250,7 +253,7 @@ class FissionIstp:
         #By default, set Neutron energy to 0 (thermal), 0.5 (fast), or 14 (relativistic) << default DB is ENDF
         e_neutron = {'T': 0, 'F': 0.5, 'H': 14}
         #If JEFF is chosen, adjust the neutron energies.
-        if defaultDB=='JEFF':
+        if DB =='JEFF':
             e_neutron = {'T': 0, 'F': 0.4, 'H': 14}
         filesfound = []
         #Check for database files, and append them into a files list.
@@ -314,34 +317,34 @@ class FissionIstp:
                             self.CFPY[Ei][nuclide].cov = {otherNuclide: 0 for otherNuclide in self.CFPY[Ei]}
                             self.CFPY[Ei][nuclide].cov[nuclide] = self.CFPY[Ei][nuclide].yerr**2
 
-        assert(filesfound) # assert error if isotope not found in DB
+        if not filesfound:
+            print(f"WARNING!!! FPY covariance matrix {DBpath} {filename} not found")
 
     # Method to read the prepackaged correlation csv file
     # This function has to be called after loading the fission DB for neutrino
     # flux calcuation.
     #Most of the comments will be the same for both this and for the LoadCovariance function
-    def LoadCorrelation(self, customDB = None, defaultDB='ENDF'):
+    def LoadCorrelation(self, DB='ENDF'):
         """
            Loads the correlation matrices from a given database into the Independant and cumulative fission dictionaries in the model.
 
             Parameters:
-                customDB (String) : The path to a user inputed correlation file. Has the form "/path/to/database
-                defualtDB (String) : The default correlation matrix that CONFLUX will load it's data from
+                DB (String) : The path to a user inputed correlation file. Has the form "/path/to/database
             Returns:
                 None
         """
 
-        DBpath = customDB  #Figure out where the DB and files are in a similar method we loaded the
+        DBpath = DB  #Figure out where the DB and files are in a similar method we loaded the
         #Fission Database.
-        if DBpath == None or not os.path.exists(DBpath):
-            DBpath = CONFLUX_DB+"/fissionDB/"+defaultDB+"/"
+        if DBpath in ['JEFF', 'ENDF'] or not os.path.exists(DBpath):
+            DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
             print("Reading correlation matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
-        assert(DBpath)
+        assert DBpath, DBpath+" is not found"
         istpfound = False
         #By default, set Neutron energy to 0 (thermal), 0.5 (fast), or 14 (relativistic) << default DB is ENDF
         e_neutron = {'T': 0, 'F': 0.5, 'H': 14}
-        if defaultDB=='JEFF':  #If JEFF is chosen, adjust the neutron energies.
+        if DB=='JEFF':  #If JEFF is chosen, adjust the neutron energies.
             e_neutron = {'T': 0, 'F': 0.4, 'H': 14}
         filesfound = []
         #Check for database files, and append them into a files list.
@@ -401,7 +404,8 @@ class FissionIstp:
 
                 self.CalcCovariance(Ei) #Once you've loaded the correlation database, calculate the
                     #subsequent covariance matrix from those correlations.
-        assert(filesfound) # assert error if isotope not found in DB
+        if not filesfound:
+            print(f"WARNING!!! FPY correlation matrix {DBpath} {filename} not found")  # assert error if isotope not found in DB
 
     # Method to calculate a covariance matrix from the correlation information
     # of each fission product at a given neutron energy.
@@ -423,6 +427,9 @@ class FissionIstp:
                 yerrj = self.CFPY[Ei][j].yerr #Load the yield error of nuclide j
                 self.CFPY[Ei][i].cov[j]=yerri*corr[j]*yerrj #carry out the covariance calculation
                 #(error of i) * (correlation of j) * (error of j)
+
+    def CalcIstpBetaSpectra(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
+        print('test')
 
 
 # class that builds a fission reactor model with dictionary of all FPYs from all

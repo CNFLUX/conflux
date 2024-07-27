@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     #Initiate the Beta Isotope for the Jeff Library
     U235J = FissionIstp(92, 235)
-    U235J.LoadFissionDB(defaultDB="JEFF")
+    U235J.LoadFissionDB(DB="JEFF")
     #Initialize the fission Model, and add the U235 contribution to it
     modelJ = FissionModel()
     modelJ.AddContribution(isotope=U235J, Ei=0, fraction=1)
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     #Initialize the Beta Isotope for the ENDF Library
     U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(defaultDB="ENDF")
+    U235.LoadFissionDB(DB="ENDF")
     #Initialize the fission Model, and add the U235 contribution to it
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei=0, fraction=1)

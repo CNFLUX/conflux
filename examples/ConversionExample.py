@@ -73,7 +73,7 @@ if __name__ == "__main__":
     Pu241 = FissionIstp(94, 241)
 
     # Loading default fission product DB
-    U235.LoadFissionDB(defaultDB='JEFF')
+    U235.LoadFissionDB(DB='JEFF')
     Pu239.LoadFissionDB()
     Pu241.LoadFissionDB()
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     # The following code is to test the consistency with the synthetic beta and
     # neutrino spectrum
     U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(defaultDB='JEFF')
+    U235.LoadFissionDB(DB='JEFF')
 
     model = FissionModel()
     model.AddContribution(isotope=U235, Ei = 0, fraction=1)

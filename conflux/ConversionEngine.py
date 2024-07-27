@@ -668,7 +668,7 @@ if __name__ == "__main__":
     Pu241 = FissionIstp(94, 241)
 
     # Loading default fission product DB
-    U235.LoadFissionDB(defaultDB='JEFF')
+    U235.LoadFissionDB(DB='JEFF')
     Pu239.LoadFissionDB()
     Pu241.LoadFissionDB()
 

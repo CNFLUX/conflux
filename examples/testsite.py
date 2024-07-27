@@ -41,11 +41,11 @@ if __name__ == "__main__":
     xbins = np.arange(0, 15, 0.1)
 
     U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(defaultDB='JEFF')
-    #U235.LoadCorrelation(defaultDB='ENDF')
+    U235.LoadFissionDB(DB='JEFF')
+    #U235.LoadCorrelation(DB='ENDF')
 
     Pu239 = FissionIstp(94, 239)
-    Pu239.LoadFissionDB(defaultDB='JEFF')
+    Pu239.LoadFissionDB(DB='JEFF')
     # Pu239.LoadCorrelation()
     #U235.CalcCovariance(Ei=0)
 
