@@ -105,6 +105,7 @@ class SumEngine:
             self.FPYlist[FPZAI].y /= self.sum
             self.FPYlist[FPZAI].yerr /= self.sum
 
+    #BranchErange does nothing in this calculation. Can we get rid of it?
     def CalcReactorSpectrum(self, betaSpectraDB, binwidths=0.1, spectRange=[-1.0, 20.0], branchErange=[-1.0, 20.0], processMissing=False):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
