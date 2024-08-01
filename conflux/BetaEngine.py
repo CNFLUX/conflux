@@ -222,9 +222,15 @@ class BetaBranch(Spectrum):
         Parameters:
             x (list) : The energy range you want to calculate the spectra for
             nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
+<<<<<<< HEAD
             numass (float) : neutrino mass parameter (Set to 0 for default calculations)
         Returns:
             result*rangecorrect (list) : A range corrected Beta/neutrino spectrum
+=======
+            numass (float) : Sets neutrino mass for 
+        Returns:
+            None
+>>>>>>> f92414e (Documentation)
         """
         Parameters = deepcopy(self.Parameters)
 
@@ -548,7 +554,7 @@ class BetaEngine:
         
         self.custom_func=custom_func
 
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
         useInputList = True # test if the engine is defined with an inputlist
