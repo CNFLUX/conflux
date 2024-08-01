@@ -546,6 +546,8 @@ class BetaEngine:
         self.custom_func=custom_func
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
+        self.custom_func=custom_func
+
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
