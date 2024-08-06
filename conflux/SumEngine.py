@@ -84,7 +84,7 @@ class SumEngine(Spectrum):
         self.uncertainty = np.zeros(self.nbin)
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
-    def AddFissionIstp(self, isotope, Ei, istpname, IFP=False):
+    def AddFissionIstp(self, isotope, Ei, istpname):
         """
            Add the FPYs of a fission isotope into the the list of FPYs in the model
 
@@ -100,11 +100,7 @@ class SumEngine(Spectrum):
         """
 
         #Set FPYlist to the Cumulative fission product list of the inputed isotope
-        FPYLIST = copy.deepcopy(isotope.CFPY)
-        #If we are looking at explosions, or need the independant fission products
-        #pull the independant products from the isotope and store it in FPYLIST
-        if IFP == True:
-            FPYLIST = copy.deepcopy(isotope.IFPY)
+        FPYLIST = copy.deepcopy(isotope.FPYlist)
 
         #Check to see if the isotope you want to add has fission products resulting
         #From an interaction with neutrons at the specified energy
@@ -199,7 +195,7 @@ class SumEngine(Spectrum):
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
 
-
+        # Find common isotopes among beta decaying isotopes and fission products
         self.betaFPYlist = set(self.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys())
         self.missing_list = set(self.FPYlist.keys()) - set(betaSpectraDB.istplist.keys())
 
@@ -267,11 +263,9 @@ class SumEngine(Spectrum):
                     cov_ij = self.FPYlist[i].cov[j]
 
                 sigmay_ij = fi*cov_ij*fj
-
                 self.uncertainty += sigmay_ij
 
+        self.uncertainty = np.sqrt(self.uncertainty)
         # if allowed, add beta model uncertainty to the result
         if modelunc:
             self.uncertainty += self.modelUnc
-
-        self.uncertainty = np.sqrt(self.uncertainty)

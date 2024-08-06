@@ -8,7 +8,7 @@ import operator
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 import matplotlib.colors as colors
 
 e_fission = 3.2e-11 #joules
@@ -40,17 +40,17 @@ if __name__ == "__main__":
 
     xbins = np.arange(0, 15, 0.1)
 
-    U235 = FissionIstp(92, 235)
+    U235 = FissionIstp(92, 235, 0.4, DB='JEFF', IFPY=True)
     U235.LoadFissionDB(DB='JEFF')
     #U235.LoadCorrelation(DB='ENDF')
 
-    Pu239 = FissionIstp(94, 239)
+    Pu239 = FissionIstp(94, 239, 0.4, DB='JEFF', IFPY=True)
     Pu239.LoadFissionDB(DB='JEFF')
     # Pu239.LoadCorrelation()
     #U235.CalcCovariance(Ei=0)
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0.4, fraction=1, IFP=True)
+    model.AddContribution(isotope=U235, fraction=1)
     model.SaveToFile('FPY_235_JEFF_IFP_14MeV.csv')
     # model.AddContribution(isotope=Pu239, Ei = 0.4, fraction=1)
     # model.SaveToFile('FPY_239_JEFF_IFP.csv')
@@ -69,6 +69,8 @@ if __name__ == "__main__":
     xsec = (ibd_xsection(xbins))
     plt.figure()
     plt.plot(xbins, xsec)
+    plt.xlabel('E (MeV)')
+    plt.ylabel('IBD cross-section')
     plt.show()
 
     sum_model= SumEngine(xbins = xbins)
@@ -167,7 +169,7 @@ if __name__ == "__main__":
     cbar = plt.colorbar()
     cbar.set_label('total IBD events')
 
-    interp_func = interp2d(tonage, distance, ibd_rate, kind='linear')
+    interp_func = RectBivariateSpline(tonage, distance, ibd_rate)
     y_interp = np.logspace(0, 3, 100)
     x_interp = np.logspace(-1, 2, 100)
 
@@ -179,7 +181,7 @@ if __name__ == "__main__":
     # Plot the contour where interpolated values are equal to 1
     fig_contour = plt.contour(x_interp, y_interp, z_interp, levels=[1, 5, 10, 100], colors='red')
     x_locations = [20, 20, 20, 20]
-    plt.clabel(fig_contour, inline=1, fontsize=8, inline_spacing=1)
+    # plt.clabel(fig_contour, inline=1, fontsize=8, inline_spacing=1)
 
     # Labeling axes
     plt.xlabel('Det mass (ton)')
