@@ -26,6 +26,16 @@ from conflux.bsg.Screening import screening_potential
 
 #Function to calculate the electron spectrum from theory as a function of energy
 def electron(ebeta, p, numass=0):
+    """
+    Calculate the beta spectrum from theory as a function of energy
+    Parameters:
+        ebeta (list) : The energy of the incoming beta particle
+        p (dictionary) : A dictionary containing parameters to be used in the calculation of
+            the beta spectrum from theory
+        numass (float) : Neutrino mass parameter. Default set to 0
+    Returns:
+        result (list): The theoretical beta spectrum
+    """
     result = 0.
     W = ebeta/ELECTRON_MASS_MEV + 1
     result = (phase_space(W, numass=numass, **p, )
@@ -46,6 +56,16 @@ def electron(ebeta, p, numass=0):
 
 #Function to calculate the neutrino spectrum from theory as a function of energy
 def neutrino(enu, p, numass=0):
+    """
+    Calculate the neutrino spectrum from theory as a function of energy
+    Parameters:
+        ebeta (list) : The energy of the incoming beta particle
+        p (dictionary) : A dictionary containing parameters to be used in the calculation of
+            the neutrino spectrum from theory
+        numass (float) : Neutrino mass parameter. Default set to 0
+    Returns:
+        result (list): The theoretical neutrino spectrum
+    """
     result = 0.
     W0 = p['W0']
     Wv = W0-enu/(ELECTRON_MASS_MEV*1.0) #enu/ELECTRON_MASS_MEV + 1
@@ -202,9 +222,9 @@ class BetaBranch(Spectrum):
         Parameters:
             x (list) : The energy range you want to calculate the spectra for
             nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
-            numass (float) : Sets neutrino mass for 
+            numass (float) : neutrino mass parameter (Set to 0 for default calculations)
         Returns:
-            None
+            result*rangecorrect (list) : A range corrected Beta/neutrino spectrum
         """
         Parameters = deepcopy(self.Parameters)
 
@@ -225,6 +245,16 @@ class BetaBranch(Spectrum):
 
     # calculate the spectrum uncertainty with MC sampling
     def SpectUncertMC(self, x, nu_spectrum=False, samples = 30):
+        """
+        Calculate the beta/neutrino spectral shape uncertainty as a function of energy using Monte Carlo Sampling
+        Parameters:
+            x (list) : The energy range you want to calculate the spectra for
+            nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
+            samples (int) : The number of MC samples you want to use to calculate the Spectral Uncertainty.
+                Want to have at least 30 samples for good statistics
+        Returns:
+            np.std(fE0) (list) : A list of the uncertainty of the spectral shape
+        """
         if self.sigma_E0 == 0:
             return 0
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
@@ -248,6 +278,13 @@ class BetaBranch(Spectrum):
 
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False):
+        """
+        rebin the beta/neutrino spectrum given the energy scale for this branch
+        Parameters:
+            nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum 
+        Returns:
+            None
+        """
         # to prevent lower limit of the energy range < 0
         lower = self.xbins[0]
         if (lower > self.E0):
