@@ -12,17 +12,17 @@ from conflux.SumEngine import SumEngine
 if __name__ == "__main__":
     xbins = np.arange(0, 20, 0.1)
 
-    U235 = FissionIstp(92, 235)
-    U235.LoadFissionDB(DB='JEFF')
+    U235 = FissionIstp(92, 235, Ei = 0.4, DB='JEFF', IFPY=True)
+    U235.LoadFissionDB(Ei = 0.5)
     U235.LoadCorrelation(DB='JEFF')
 
-    Pu239 = FissionIstp(94, 239)
+    Pu239 = FissionIstp(94, 239, Ei = 0)
     Pu239.LoadFissionDB()
     Pu239.LoadCorrelation()
-    U235.CalcCovariance(Ei=0)
+    U235.CalcCovariance()
 
     model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    model.AddContribution(isotope=U235, fraction=1)
     model.SaveToFile('FPY_235_JEFF.csv')
     #model.AddContribution(isotope=Pu239, Ei = 0, fraction=0)
     #model.AddContribution(isotope=U233, Ei = 0, fraction=1)
@@ -36,10 +36,12 @@ if __name__ == "__main__":
     #betaSpectraDB = BetaEngine(newlist)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
+    U235.CalcBetaSpectra(betaSpectraDB)
+    print(U235.spectrum)
     betaDBBase = BetaEngine()
     count = 0
     newlist = []
-    for nuclide in (sorted(U235.CFPY[0].values(), key=operator.attrgetter('y'), reverse=True)):
+    for nuclide in (sorted(U235.FPYlist.values(), key=operator.attrgetter('y'), reverse=True)):
         if nuclide.FPZAI in betaDBBase.istplist:
             fig, ax = plt.subplots()
             ax.set(xlabel='E (MeV)', ylabel='variance-covariance', title='neutrino spectrum uncertainty')
