@@ -84,7 +84,7 @@ class SumEngine(Spectrum):
         self.uncertainty = np.zeros(self.nbin)
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
-    def AddFissionIstp(self, isotope, Ei, istpname):
+    def AddFissionIstp(self, isotope, istpname, count, d_count):
         """
            Add the FPYs of a fission isotope into the the list of FPYs in the model
 
@@ -99,16 +99,35 @@ class SumEngine(Spectrum):
                 None
         """
 
-        #Set FPYlist to the Cumulative fission product list of the inputed isotope
-        FPYLIST = copy.deepcopy(isotope.FPYlist)
+        for FPZAI in isotope.FPYlist:
+            #Check to see if the fission products in the fission model exists in the Reactor model.
 
-        #Check to see if the isotope you want to add has fission products resulting
-        #From an interaction with neutrons at the specified energy
-        assert Ei in FPYLIST, 'Isotope '+str(isotope.A)+' has only fission data with Ei = ('+str(list(FPYLIST.keys()))+') MeV! (input Ei = ' +str(Ei)+')'
+            #If they aren't in the Reactor model, add them to the reactor model, and adjust their
+            #Yield and yield error by the weight of the fission mdel.
 
-        FPYs = FPYLIST[Ei]
-        for FPZAI in FPYs:
-            if FPYs[FPZAI].y == 0: continue #If the yield for the specific fission product is 0, skip it (ZAI)
+            if FPZAI not in self.FPYlist:
+                self.FPYlist[FPZAI] = isotope.FPYlist[FPZAI]
+                self.FPYlist[FPZAI].y *= count
+                self.FPYlist[FPZAI].yerr *= count
+
+
+            #If the fission product already exists in the reactor model, take the yield and yield error
+            #that this isotope has in this fission model, and add it to the yield and yield error in the
+            #Reactor model.
+            #Also, Add the covariance of the this fission product from the inputted fission model
+            #To the fission product in the Reactor model.
+            else:
+                self.FPYlist[FPZAI].y += isotope.FPYlist[FPZAI].y*count
+                self.FPYlist[FPZAI].yerr += isotope.FPYlist[FPZAI].yerr*count
+                self.FPYlist[FPZAI].AddCovariance(isotope.FPYlist[FPZAI])
+
+        self.spectrum += isotope.spectrum*count
+        self.uncertainty += isotope.uncertainty*count
+
+    def AddBetaIstp(self, betaistp, istpname, count, d_count):
+
+        print('test')
+
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
