@@ -17,7 +17,7 @@ r2 = 10000**2
 fission_per_t = e_TNT/e_fission
 test_flux = 15*fission_per_t/r2 # cm^-2
 
-proton_per_cc = 1e23
+proton_per_cc = 3*1e23
 ej309_dens = 0.962 # g_per_cc
 detect_mass = 1e3 # g (e6 means ton)
 proton_count = detect_mass/ej309_dens*proton_per_cc # per 10 ton

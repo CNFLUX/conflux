@@ -12,14 +12,13 @@ from conflux.SumEngine import SumEngine
 if __name__ == "__main__":
     xbins = np.arange(0, 20, 0.1)
 
-    U235 = FissionIstp(92, 235, Ei = 0.4, DB='JEFF', IFPY=True)
+    U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=True)
     U235.LoadFissionDB(Ei = 0.5)
-    U235.LoadCorrelation(DB='JEFF')
+    U235.LoadCorrelation(DB='ENDF')
 
     Pu239 = FissionIstp(94, 239, Ei = 0)
     Pu239.LoadFissionDB()
     Pu239.LoadCorrelation()
-    U235.CalcCovariance()
 
     model = FissionModel()
     model.AddContribution(isotope=U235, fraction=1)
@@ -37,6 +36,18 @@ if __name__ == "__main__":
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
     U235.CalcBetaSpectra(betaSpectraDB)
+    Pu239.CalcBetaSpectra(betaSpectraDB)
+
+    newsum = SumEngine(xbins = xbins)
+    newsum.AddFissionIstp(U235, "U235", 100, 5)
+    fig, ax = plt.subplots()
+    ax.set_xlim([0, 10])
+    ax.set(xlabel='E (MeV)', ylabel='neutrino count')
+    ax.errorbar(newsum.xbins, newsum.spectrum, yerr=newsum.uncertainty, label="test spectrum")
+    ax.legend()
+    plt.show()
+
+
     print(U235.spectrum)
     betaDBBase = BetaEngine()
     count = 0
@@ -108,8 +119,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.plot(sum2.xbins, miss_spect-summed_spect)
-    ax.legend()
-    fig.savefig("235_239_Missing_jeff_test.png")
+    fig.savefig("235_239_Missing_jeff.png")
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

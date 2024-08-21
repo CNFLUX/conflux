@@ -486,6 +486,7 @@ class BetaEngine:
             self.inputlist = []
             useInputList = False
 
+        print(targetDB)
         print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches...")
 
