@@ -10,7 +10,7 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
-    xbins = np.arange(0, 8.25, 0.1)
+    xbins = np.arange(0, 20, 0.1)
 
     U235 = FissionIstp(92, 235)
     U235.LoadFissionDB(DB='JEFF')
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     ax.errorbar(sum2.xbins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP_linear_jeff.png")
+    fig.savefig("235U_ENDF_TOP_linear_jeff_test.png")
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -101,13 +101,13 @@ if __name__ == "__main__":
     ax.plot(sum2.xbins, miss_spect-miss_spect)
     ax.legend()
 
-    fig.savefig("235U_ENDF_Unc_jeff.png")
+    fig.savefig("235U_ENDF_Unc_jeff_test.png")
 
     fig, ax = plt.subplots()
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.plot(sum2.xbins, miss_spect-summed_spect)
     ax.legend()
-    fig.savefig("235_239_Missing_jeff.png")
+    fig.savefig("235_239_Missing_jeff_test.png")
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

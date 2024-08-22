@@ -470,7 +470,7 @@ class BetaIstp(Spectrum, Summed):
 # of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
 class BetaEngine:
-    def __init__(self, inputlist=None, targetDB=None, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
