@@ -704,15 +704,27 @@ class FissionModel:
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)
 
-# U235 = FissionIstp(92,235)
-# U235.LoadFissionDB()
-# U235.LoadCorrelation()
-#
-# U238 = FissionIstp(92,238)
-# U238.LoadFissionDB()
-# U238.LoadCorrelation()
-# # for nuclide in U235.CFPY[0.]:
-# #     print(nuclide, U235.CFPY[0.][nuclide].cov)
-#
-# model = FissionModel()
-# model.AddContribution(isotope=U238, Ei=0., fraction=1)
+if __name__ == "__main__":
+    from conflux.BetaEngine import BetaEngine
+    from conflux.SumEngine import SumEngine
+    xbins = np.arange(0, 20, 0.1)
+
+    U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=True)
+    U235.LoadFissionDB(Ei = 0.5)
+    U235.LoadCorrelation(DB='ENDF')
+
+    betaSpectraDB = BetaEngine(xbins=xbins)
+    #betaSpectraDB = BetaEngine(newlist)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+
+    U235.CalcBetaSpectra(betaSpectraDB)
+    # Pu239.CalcBetaSpectra(betaSpectraDB)
+
+    newsum = SumEngine(xbins = xbins)
+    newsum.AddFissionIstp(U235, "U235", 1, 0)
+    fig, ax = plt.subplots()
+    ax.set_xlim([0, 10])
+    ax.set(xlabel='E (MeV)', ylabel='neutrino count')
+    ax.errorbar(newsum.xbins, newsum.spectrum, yerr=newsum.uncertainty, label="test spectrum")
+    ax.legend()
+    plt.show()
