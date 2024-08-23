@@ -48,33 +48,33 @@ if __name__ == "__main__":
     plt.show()
 
 
-    print(U235.spectrum)
-    betaDBBase = BetaEngine()
-    count = 0
-    newlist = []
-    for nuclide in (sorted(U235.FPYlist.values(), key=operator.attrgetter('y'), reverse=True)):
-        if nuclide.FPZAI in betaDBBase.istplist:
-            fig, ax = plt.subplots()
-            ax.set(xlabel='E (MeV)', ylabel='variance-covariance', title='neutrino spectrum uncertainty')
-            yerr = nuclide.yerr
-            ax.plot(betaSpectraDB.xbins, yerr**2*betaSpectraDB.istplist[nuclide.FPZAI].spectrum, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" variance")
-            positive=np.zeros(len(betaSpectraDB.xbins))
-            negative=np.zeros(len(betaSpectraDB.xbins))
-            for FPZAI, frac in (sorted(nuclide.cov.items(), key=lambda item: abs(item[1]), reverse=True)):
-                if FPZAI in betaSpectraDB.istplist:
-                    if frac >0:
-                        positive += frac*betaSpectraDB.istplist[FPZAI].spectrum
-                        ax.fill_between(betaSpectraDB.xbins, positive,  positive-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
-                    else:
-                        negative += frac*betaSpectraDB.istplist[FPZAI].spectrum
-                        ax.fill_between(betaSpectraDB.xbins, negative,  negative-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
-            ax.plot(betaSpectraDB.xbins, positive+negative, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" covariance")
-            ax.legend()
-            fig.savefig(betaDBBase.istplist[nuclide.FPZAI].name+"_cov.png")
-            newlist.append(nuclide.FPZAI)
-            count += 1
-        if count == 5:
-            break
+    # print(U235.spectrum)
+    # betaDBBase = BetaEngine()
+    # count = 0
+    # newlist = []
+    # for nuclide in (sorted(U235.FPYlist.values(), key=operator.attrgetter('y'), reverse=True)):
+    #     if nuclide.FPZAI in betaDBBase.istplist:
+    #         fig, ax = plt.subplots()
+    #         ax.set(xlabel='E (MeV)', ylabel='variance-covariance', title='neutrino spectrum uncertainty')
+    #         yerr = nuclide.yerr
+    #         ax.plot(betaSpectraDB.xbins, yerr**2*betaSpectraDB.istplist[nuclide.FPZAI].spectrum, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" variance")
+    #         positive=np.zeros(len(betaSpectraDB.xbins))
+    #         negative=np.zeros(len(betaSpectraDB.xbins))
+    #         for FPZAI, frac in (sorted(nuclide.cov.items(), key=lambda item: abs(item[1]), reverse=True)):
+    #             if FPZAI in betaSpectraDB.istplist:
+    #                 if frac >0:
+    #                     positive += frac*betaSpectraDB.istplist[FPZAI].spectrum
+    #                     ax.fill_between(betaSpectraDB.xbins, positive,  positive-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
+    #                 else:
+    #                     negative += frac*betaSpectraDB.istplist[FPZAI].spectrum
+    #                     ax.fill_between(betaSpectraDB.xbins, negative,  negative-frac*betaSpectraDB.istplist[FPZAI].spectrum, alpha = 0.4)
+    #         ax.plot(betaSpectraDB.xbins, positive+negative, label=betaSpectraDB.istplist[nuclide.FPZAI].name+" covariance")
+    #         ax.legend()
+    #         fig.savefig(betaDBBase.istplist[nuclide.FPZAI].name+"_cov.png")
+    #         newlist.append(nuclide.FPZAI)
+    #         count += 1
+    #     if count == 5:
+    #         break
 
     sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = sum1.spectrum
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     ax.errorbar(sum2.xbins, summed_spect, yerr = summed_model_err, label="Beta model uncertainty")
     ax.legend()
 
-    fig.savefig("235U_ENDF_TOP_linear_jeff_test.png")
+    fig.savefig("235U_ENDF_TOP_linear_jeff_new.png")
 
     fig, ax = plt.subplots()
     ax.set_xlim([0, 10])
@@ -114,12 +114,12 @@ if __name__ == "__main__":
     ax.plot(sum2.xbins, miss_spect-miss_spect)
     ax.legend()
 
-    fig.savefig("235U_ENDF_Unc_jeff_test.png")
+    fig.savefig("235U_ENDF_Unc_jeff_new.png")
 
     fig, ax = plt.subplots()
     ax.set(xlabel='E (MeV)', ylabel='delta neutrino/decay/MeV', title='U-235 neutrino flux')
     ax.plot(sum2.xbins, miss_spect-summed_spect)
-    fig.savefig("235_239_Missing_jeff.png")
+    fig.savefig("235_239_Missing_jeff_new.png")
 
     with open("Commercial.csv", "w") as output:
         write = csv.writer(output)

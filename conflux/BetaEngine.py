@@ -337,23 +337,26 @@ class BetaIstp(Spectrum, Summed):
         """
         self.branches[branch.ID] = branch
 
-    def EditBranch(self, E0, fraction, sigma_E0 = 0., sigma_frac = 0.,
-                    forbiddenness = 0, bAc = 4.7):
+    # def EditBranch(self, E0, newE0=None, fraction=None, sigma_E0 = 0., sigma_frac = 0.,
+    #                 forbiddenness = 0, bAc = 4.7):
+    def EditBranch(self, defaultE0, **kwargs):
         """
         Add or edit branches to the isotope with analyzer's assumptions
         Parameters:
-            E0 (float): assumed end point energy of the missing branch
+            E0 (float): existing end point energy of the missing branch
+            newE0 (float): redefined end point energy of the missing branch
             fraction (float): assumed fraction of the edited branch
             sigma_E0 (float): 1-sigma error of the input E0, default as 0
             sigma_frac (float): 1-sigma error of the input franction, default as 0
         Returns:
             None
         """
-        if sigma_E0 > E0:
-            sigma_E0 = E0
-        self.branches[E0] = BetaBranch(self.Z, self.A, self.I, self.Q, E0,
-                                        sigma_E0, fraction, sigma_frac,
-                                        forbiddenness, bAc=bAc, xbins=self.xbins)
+        # if sigma_E0 > E0:
+        #     sigma_E0 = E0
+
+        for key, value in kwargs.items():
+            if hasattr(self.branches[defaultE0], key):
+                setattr(self.branches[defaultE0], key, value)
 
     def MaxBranch(self):
         """
@@ -518,8 +521,8 @@ class BetaEngine:
                 # Adding missing branches below
                 if len(isotope) < 1:
                     betaIstp.missing = True
-                    betaIstp.EditBranch(betaIstp.Q, 1)
-                    self.istplist[ZAI] = betaIstp
+                    # betaIstp.EditBranch(betaIstp.Q, E0=betaIstp.Q, fraction=1)
+                    # self.istplist[ZAI] = betaIstp
                     continue
 
                 # some isotopes contain summed branch fraction greater than 1

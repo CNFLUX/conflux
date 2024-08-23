@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 # local modules
 from conflux.Basic import *
-from conflux.BetaEngine import BetaEngine
+from conflux.BetaEngine import BetaEngine, BetaIstp
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine(Spectrum):
@@ -28,7 +28,7 @@ class SumEngine(Spectrum):
         A dictionary of the Beta Spectra of each isotope
     betaUncertainty : dictionary
         A dictionary of the beta Uncertainty's of each isotope
-    neutrino : boolean
+    nu_spectrum : boolean
         A boolean of whether we are looking at the neutrino spectrum or beta spectrum
     xbins : list
         The energy scale of the Summation prediction. Default units are in MeV
@@ -55,14 +55,15 @@ class SumEngine(Spectrum):
         Calculates the neutrino Spectrum from the given database with the given energy bins and bounds.
     """
 
-    def __init__(self, neutrino=True, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, betaSpectraDB, nu_spectrum=True):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
-        self.neutrino = neutrino
+        self.nu_spectrum = nu_spectrum
 
-        self.xbins = xbins
-        self.nbin = len(xbins)
+        self.betaDB = betaSpectraDB
+        self.xbins = self.betaDB.xbins
+        self.nbin = len(self.xbins)
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
@@ -80,24 +81,31 @@ class SumEngine(Spectrum):
         self.FPYlist = {}
         self.betaUncertainty = {}
         self.betaSpectraList = {}
+        self.countlist = {}
+        self.d_countlist = {}
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
     # method that accumulates FPYs of fission isotopes in the list of FPY
-    def AddFissionIstp(self, isotope, istpname, count, d_count):
+    def AddFissionIstp(self, isotope, istpname, count=1, d_count=0):
         """
-           Add the FPYs of a fission isotope into the the list of FPYs in the model
+           Add the spectrum of a fission isotope into the the list of FPYs in the model
 
             Parameters:
                 isotope (FissionIstp) : The fission isotope whose products you want to add to the model.
-                Ei (float) : The neutron energy that is causing the fissions to occur (0.0, 0.4/0.5, 14)
-                fraction (float) : The fractional contribution that this isotope has on the overall model
-                d_frac (float) : The uncertainty in the contribution
-                IFP (boolean) : determines whether to include the independant fission products in the model
+                istpname (str) : Provide a name of the isotope for later modification
+                count (float) : The absolute contribution that this isotope has on the overall model
+                d_count(float) : The uncertainty in the contribution
 
             Returns:
                 None
         """
+        assert isotope.xbins == self.xbins, "binning of two spectra are different"
+
+        self.betaSpectraList[istpname] = isotope.spectrum
+        self.betaUncertainty[istpname] = isotope.uncertainty
+        self.countlist[istpname] = count
+        self.d_countlist[istpname] = d_count
 
         for FPZAI in isotope.FPYlist:
             #Check to see if the fission products in the fission model exists in the Reactor model.
@@ -121,13 +129,49 @@ class SumEngine(Spectrum):
                 self.FPYlist[FPZAI].yerr += isotope.FPYlist[FPZAI].yerr*count
                 self.FPYlist[FPZAI].AddCovariance(isotope.FPYlist[FPZAI])
 
-        self.spectrum += isotope.spectrum*count
-        self.uncertainty += isotope.uncertainty*count
+        # self.spectrum += isotope.spectrum*count
+        # self.uncertainty += isotope.uncertainty*count
 
-    def AddBetaIstp(self, betaistp, istpname, count, d_count):
+    def AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
+        """
+            NEW
+            Add contribution of individual beta decaying isotope into summation
+            model
+        """
+        self.betaDB.istplist[ZAI] = betaIstp
 
-        print('test')
+        self.betaSpectraList[istpname] = betaIstp.spectrum
+        self.betaUncertainty[istpname] = betaIstp.uncertainty
+        self.countlist[istpname] = count
+        self.d_countlist[istpname] = d_count
 
+        # self.spectrum += self.betaDB.istplist[ZAI].spectrum*count
+        # self.uncertainty += self.betaDB.istplist[ZAI].spectrum*count
+
+    def EditIstp(self, istpname, count, d_count):
+        """
+            NEW TODO
+        """
+
+        self.countlist[istpname] = count
+        self.d_countlist[istpname] = d_count
+
+    def CalcReactorSpectrum(self):
+        """
+            NEW TODO
+        """
+        #initialize total spectrum & uncertainty
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
+
+        #Initialize model and Yield Uncertainties, a list of missing branches to the total
+        #Contribution, the missing yield, and the total yield.
+        self.modelUnc = np.zeros(self.nbin)
+        self.yieldUnc = np.zeros(self.nbin)
+
+        for ZAI in self.betaSpectraList.keys():
+            self.spectrum += self.betaSpectraList[ZAI]*count
+            self.uncertainty += self.betaUncertainty[ZAI]*count
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
@@ -189,7 +233,7 @@ class SumEngine(Spectrum):
 
     #Calculate the reactor spectrum based off fission yield and beta spectra databases. Options include
     #Processing the missing fission products, calculating the immediate fission products, and including model uncertainties in the uncertainty calculation
-    def CalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1, 20], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
+    def OldCalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1, 20], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
         """
             Calculates the reactor spectrum based off the fission yield database as well as
             the betaSpectra database.
@@ -215,8 +259,8 @@ class SumEngine(Spectrum):
         self.yieldUnc = np.zeros(self.nbin)
 
         # Find common isotopes among beta decaying isotopes and fission products
-        self.betaFPYlist = set(self.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys())
-        self.missing_list = set(self.FPYlist.keys()) - set(betaSpectraDB.istplist.keys())
+        self.betaFPYlist = set(self.FPYlist.keys()).intersection(self.betaDB.istplist.keys())
+        self.missing_list = set(self.FPYlist.keys()) - set(self.betaDB.istplist.keys())
 
         #Iterate through every fission product in the Reactor Model.
         for FPZAI in tqdm(self.betaFPYlist, desc="Summing beta/neutrino spectra for "+str(len(self.betaFPYlist))+ " fission products", disable=silent):
@@ -288,3 +332,41 @@ class SumEngine(Spectrum):
         # if allowed, add beta model uncertainty to the result
         if modelunc:
             self.uncertainty += self.modelUnc
+
+if __name__ == "__main__":
+    # conflux modules
+    from conflux.BetaEngine import BetaEngine
+    from conflux.FPYEngine import FissionModel, FissionIstp
+
+    xbins = np.arange(0, 20, 0.1)
+
+    U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=False)
+    U235.LoadFissionDB(Ei = 0.5)
+    U235.LoadCorrelation(DB='ENDF')
+
+    Pu239 = FissionIstp(94, 239, Ei = 0)
+    Pu239.LoadFissionDB()
+    Pu239.LoadCorrelation()
+
+    model = FissionModel()
+    model.AddContribution(isotope=U235, fraction=1)
+
+    sum1 = SumEngine(xbins = xbins)
+    sum1.AddModel(model)
+
+    betaSpectraDB = BetaEngine(xbins=xbins)
+    #betaSpectraDB = BetaEngine(newlist)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+
+    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+    summed_spect = sum1.spectrum
+    summed_err = sum1.uncertainty
+    summed_model_err = sum1.modelUnc
+    summed_yerr = sum1.yieldUnc
+
+    fig, ax = plt.subplots()
+    ax.set_xlim([0, 10])
+    ax.set(xlabel='E (MeV)', ylabel='neutrino count')
+    ax.errorbar(sum1.xbins, sum1.spectrum, yerr=sum1.uncertainty, label="test spectrum")
+    ax.legend()
+    plt.show()
