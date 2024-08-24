@@ -466,6 +466,7 @@ class FissionIstp(Spectrum, Summed):
             '''
             obsolete code
             '''
+            # TODO this uncertainty calculation is wrong
             self.yieldUnc += betaSpectraList[FPZAI]*yielderr
             self.modelUnc += betaUncertainty[FPZAI]*thisyield
 

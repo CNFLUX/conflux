@@ -59,6 +59,8 @@ class SumEngine(Spectrum):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
+        self.countlist = {}
+        self.d_countlist = {}
         self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
@@ -100,7 +102,7 @@ class SumEngine(Spectrum):
             Returns:
                 None
         """
-        assert isotope.xbins == self.xbins, "binning of two spectra are different"
+        assert len(isotope.xbins) == self.nbin, "binning of two spectra are different"
 
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
@@ -134,11 +136,12 @@ class SumEngine(Spectrum):
 
     def AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
         """
-            NEW
+            NEW TODO
             Add contribution of individual beta decaying isotope into summation
             model
         """
-        self.betaDB.istplist[ZAI] = betaIstp
+        thisZAI = betaIstp.ZAI
+        self.betaDB.istplist[thisZAI] = betaIstp
 
         self.betaSpectraList[istpname] = betaIstp.spectrum
         self.betaUncertainty[istpname] = betaIstp.uncertainty
@@ -148,7 +151,7 @@ class SumEngine(Spectrum):
         # self.spectrum += self.betaDB.istplist[ZAI].spectrum*count
         # self.uncertainty += self.betaDB.istplist[ZAI].spectrum*count
 
-    def EditIstp(self, istpname, count, d_count):
+    def EditContribution(self, istpname, count, d_count):
         """
             NEW TODO
         """
@@ -169,9 +172,19 @@ class SumEngine(Spectrum):
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
 
-        for ZAI in self.betaSpectraList.keys():
-            self.spectrum += self.betaSpectraList[ZAI]*count
-            self.uncertainty += self.betaUncertainty[ZAI]*count
+        for istp in self.betaSpectraList.keys():
+            count = self.countlist[istp]
+            d_count = self.d_countlist[istp]
+
+            relunc_a = self.betaUncertainty[istp]/self.betaSpectraList[istp]
+            relunc_b = d_count/count
+            this_spec = self.betaSpectraList[istp]*count
+            this_unc2 = (this_spec)**2*(relunc_a**2+relunc_b**2)
+
+            self.spectrum += this_spec
+            self.uncertainty += this_unc2
+
+        self.uncertainty = np.sqrt(self.uncertainty)
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
