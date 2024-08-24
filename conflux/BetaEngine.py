@@ -232,7 +232,30 @@ class BetaIstp(Spectrum, Summed):
         # if sigma_E0 > E0:
         #     sigma_E0 = E0
 
+        # setting up default values
+        sigma_E0 = 0
+        fraction = 1
+        sigma_frac = 1
+        forbiddenness = 0
+        bAc = 4.7
+
         for key, value in kwargs.items():
+            if key == 'E0':
+                defaultE0 = value
+            if key == 'sigma_E0':
+                sigma_E0 = value
+            if key == 'fraction':
+                fraction = value
+            if key == 'forbiddenness':
+                forbiddenness = value
+            if key == 'bAc':
+                bAc = value
+
+            if defaultE0 not in self.branches.keys():
+                self.branches[defaultE0] = BetaBranch(self.Z, self.A, self.I, self.Q,
+                                            defaultE0, sigma_E0, fraction, sigma_frac,
+                                            forbiddenness, bAc=bAc, xbins=self.xbins)
+
             if hasattr(self.branches[defaultE0], key):
                 setattr(self.branches[defaultE0], key, value)
 
@@ -399,8 +422,8 @@ class BetaEngine:
                 # Adding missing branches below
                 if len(isotope) < 1:
                     betaIstp.missing = True
-                    # betaIstp.EditBranch(betaIstp.Q, E0=betaIstp.Q, fraction=1)
-                    # self.istplist[ZAI] = betaIstp
+                    betaIstp.EditBranch(betaIstp.Q, E0=betaIstp.Q, fraction=1)
+                    self.istplist[ZAI] = betaIstp
                     continue
 
                 # some isotopes contain summed branch fraction greater than 1
