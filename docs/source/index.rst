@@ -9,7 +9,7 @@ CONFLUX, Calculation Of Neutrino FLUX, is a framework that allow users to calcul
 | > Summation mode
 | > Beta-conversion mode
 | > Direct measurement mode
-
+|
 The formalism is described in this manual_, while the code is published here_.
 
 .. _here: https://github.com/CNFLUX/conflux
