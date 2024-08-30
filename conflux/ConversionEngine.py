@@ -112,8 +112,8 @@ class VirtualBranch:
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
-        for nuclide in tqdm(self.fisIstp.CFPY[Ei], desc="Tallying fission products of "+str(self.fisIstp.A)):
-            fpNuclide = fisIstp.CFPY[Ei][nuclide]
+        for nuclide in tqdm(fisIstp.FPYlist, desc="Tallying fission products of "+str(self.fisIstp.A)):
+            fpNuclide = fisIstp.FPYlist[nuclide]
             if fpNuclide.y == 0: continue
             FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
 
@@ -498,7 +498,7 @@ class VirtualBranch:
                 # plt.title('two best fit compare'+str(s))
                 # plt.plot(x, newspect)
                 # plt.plot(self.betadata.x, self.bestfits[s])
-                # plt.show()                
+                # plt.show()
 
         if len(spect_array) == 0:
             return result*x
