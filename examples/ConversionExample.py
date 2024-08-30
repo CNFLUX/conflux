@@ -1,5 +1,5 @@
 # local modules
-from conflux.BetaEngine import BetaEngine, BetaBranch
+from conflux.BetaEngine import BetaEngine, BetaBranch, CONFLUX_DB
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
@@ -62,15 +62,15 @@ if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData(os.environ["HOME"]+"/conflux/conflux/U235_synth_data_1.5_9.6.csv")
+    beta235s = BetaData(CONFLUX_DB+"/example_models//U235_synth_data_1.5_9.6.csv")
     beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
 
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches
-    U235 = FissionIstp(92, 235)
-    Pu239 = FissionIstp(94, 239)
-    Pu241 = FissionIstp(94, 241)
+    U235 = FissionIstp(92, 235, Ei=0)
+    Pu239 = FissionIstp(94, 239, Ei =0)
+    Pu241 = FissionIstp(94, 241, Ei = 0)
 
     # Loading default fission product DB
     U235.LoadFissionDB(DB='JEFF')
