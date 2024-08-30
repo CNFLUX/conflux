@@ -6,9 +6,9 @@ CONFLUX Software Package
 
 CONFLUX, Calculation Of Neutrino FLUX, is a framework that allow users to calculate reactor neutrino flux with flexible and time dependent inputs of reactor models. The framework provides three different modes of neutrino flux calculation:
 
-> Summation mode |
-> Beta-conversion mode |
-> Direct measurement mode |
+| > Summation mode
+| > Beta-conversion mode
+| > Direct measurement mode
 
 The formalism is described in this manual_, while the code is published here_.
 
