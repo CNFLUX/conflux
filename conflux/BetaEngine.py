@@ -1,19 +1,25 @@
-import sys
-import os
 import numpy as np
 from scipy import special, interpolate, integrate
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
-import timeit
 from tqdm import tqdm
 
 from conflux.config import CONFLUX_DB
-from conflux.Basic import *
-from conflux.bsg.Constants import *
-from conflux.bsg.SpectralFunctions import *
-from conflux.bsg.Functions import *
-from conflux.bsg.Screening import *
+from conflux.Basic import Spectrum, Summed
+from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
+from conflux.bsg.SpectralFunctions import (phase_space, 
+                                           fermi_function, 
+                                           finite_size_L0, 
+                                           recoil_gamow_teller, 
+                                           radiative_correction, 
+                                           radiative_correction_neutrino,
+                                           recoil_Coulomb_gamow_teller,                               
+                                           atomic_screening,
+                                           shape_factor_gamow_teller,
+                                           shape_factor_unique_forbidden)
+from conflux.bsg.Functions import getEltonNuclearRadius
+from conflux.bsg.Screening import screening_potential
 
 #########################################
 # Final neutrino and antineutrino spectra
@@ -175,7 +181,8 @@ class BetaBranch(Spectrum):
         this_spect = self.BetaSpectrum(this_range, nu_spectrum)
 
         # normalizing the spectrum
-        norm = self.spectrum.sum()*full_spect.sum()/this_spect.sum() if self.E0 > binwidths else self.spectrum.sum()
+        norm = (self.spectrum.sum()*full_spect.sum()/this_spect.sum() 
+                if self.E0 > binwidths else self.spectrum.sum())
 
         if self.spectrum.sum() <=0:
             self.spectrum = np.zeros(self.nbin)
@@ -252,9 +259,17 @@ class BetaIstp(Spectrum, Summed):
                 bAc = value
 
             if defaultE0 not in self.branches.keys():
-                self.branches[defaultE0] = BetaBranch(self.Z, self.A, self.I, self.Q,
-                                            defaultE0, sigma_E0, fraction, sigma_frac,
-                                            forbiddenness, bAc=bAc, xbins=self.xbins)
+                self.branches[defaultE0] = BetaBranch(self.Z, 
+                                                      self.A, 
+                                                      self.I, 
+                                                      self.Q, 
+                                                      defaultE0, 
+                                                      sigma_E0, 
+                                                      fraction, 
+                                                      sigma_frac,
+                                                      forbiddenness,
+                                                      bAc=bAc, 
+                                                      xbins=self.xbins)
 
             if hasattr(self.branches[defaultE0], key):
                 setattr(self.branches[defaultE0], key, value)
@@ -307,9 +322,12 @@ class BetaIstp(Spectrum, Summed):
         """
         Calculate the cumulative beta/antineutrino spectrum of all branches
         Parameters:
-            nu_spectrum (boolean): Determines if you are calculating a beta spectra or a neutrino spectra
-            binwidths (float): The width of the bins used in creating your spectra
-            spectRange (list): define the upper and power bounds of the spectrum
+            nu_spectrum (boolean): 
+                Determines if you are calculating a beta spectra or a neutrino spectra
+            binwidths (float): 
+                The width of the bins used in creating your spectra
+            spectRange (list): 
+                Define the upper and power bounds of the spectrum
         Returns:
             None
         """
@@ -326,7 +344,7 @@ class BetaIstp(Spectrum, Summed):
                 continue
             si = branchi.spectrum
             fi = branchi.frac
-            di = branchi.sigma_frac
+            # di = branchi.sigma_frac
 
             branchi.BinnedSpectrum(nu_spectrum)
             self.spectrum += si*fi
@@ -334,8 +352,8 @@ class BetaIstp(Spectrum, Summed):
 
             for E0j, branchj in self.branches.items():
                 sj = branchj.spectrum
-                fj = branchi.frac
-                dj = branchj.sigma_frac
+                # fj = branchi.frac
+                # dj = branchj.sigma_frac
                 cov_bij = branchi.cov[E0j]
                 sigma_bij = si*cov_bij*sj
                 self.branchUnc += sigma_bij
@@ -478,11 +496,16 @@ class BetaEngine:
         Calculates beta spectra of the list of beta-decaying isotopes
 
         Parameters:
-            targetDB (String): the path to the betaSpectra database. if none, use the default database.
-            nu_spectrum (boolean): Determines if you are calculating a beta spectra or a neutrino spectra
-            binwidths (float): The width of the bins used in creating your spectra.
-            spectRange (list): define the upper and power bounds of the spectrum
-            branchErange (list): defind the range of interested Q values
+            targetDB (String): 
+                the path to the betaSpectra database. if none, use the default database.
+            nu_spectrum (boolean): 
+                Determines if you are calculating a beta spectra or a neutrino spectra
+            binwidths (float): 
+                The width of the bins used in creating your spectra.
+            spectRange (list): 
+                define the upper and power bounds of the spectrum
+            branchErange (list): 
+                defind the range of interested Q values
         Returns:
             None
 

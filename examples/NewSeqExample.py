@@ -1,12 +1,9 @@
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
-import operator
 
 # conflux modules
 from conflux.BetaEngine import BetaEngine, BetaIstp
-from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.FPYEngine import FissionIstp
 from conflux.SumEngine import SumEngine
 
 if __name__ == "__main__":
@@ -33,8 +30,6 @@ if __name__ == "__main__":
     U235T.LoadFissionDB()
     U235T.LoadCorrelation(DB='ENDF')
     U235T.CalcBetaSpectra(betaSpectraDB)
-
-
 
     # Define summation engine
     newsum = SumEngine(betaSpectraDB)
