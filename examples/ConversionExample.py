@@ -1,11 +1,10 @@
 # local modules
-from conflux.BetaEngine import BetaEngine, BetaBranch, CONFLUX_DB
-from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB
+from conflux.FPYEngine import FissionIstp
 from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 def HuberZavg(x, c0, c1, c2):
     return c0+c1*x+c2*x**2
@@ -60,17 +59,16 @@ def Rebin(inputx, inputy, outputx):
 # test
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
-    beta235 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/U_235_e_2014.csv")
-    # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
+    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
     beta235s = BetaData(CONFLUX_DB+"/example_models//U235_synth_data_1.5_9.6.csv")
-    beta239 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData(os.environ["CONFLUX_DB"]+"/conversionDB/Pu_241_e_2014.csv")
+    beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
+    beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
 
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches
     U235 = FissionIstp(92, 235, Ei=0)
-    Pu239 = FissionIstp(94, 239, Ei =0)
-    Pu241 = FissionIstp(94, 241, Ei = 0)
+    Pu239 = FissionIstp(94, 239, Ei=0)
+    Pu241 = FissionIstp(94, 241, Ei=0)
 
     # Loading default fission product DB
     U235.LoadFissionDB(DB='JEFF')
@@ -87,16 +85,14 @@ if __name__ == "__main__":
     # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
     # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.arange(0,10, 0.01)
+    xval = np.arange(0, 10, 0.01)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     #convertmodel.VBfitbeta("U235", branch_slice)
     convertmodel.VBfitbeta("U235", branch_slice)
 
-
     # Draw plots to test output.
     print("Drawing spectrum...")
     # Define x values of data points to be drawn in the figure
-
 
     # Setting figure parameters
     fig = plt.figure()
@@ -116,36 +112,44 @@ if __name__ == "__main__":
     plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
             thresh=1*branch_slice, nu_spectrum = True), fmt='--')
     fig.savefig("U235_convert_test.png")
-    # # Draw the original beta spectrum
-    # plt.errorbar(convertmodel.betadata["U235"].x,
-    #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
-    #     label='beta data')
-    # # Draw the summed best fit virtual beta spectrum of this calculation
-    # spectrum = convertmodel.vblist["U235"].SumBranches(xval,
-    #     nu_spectrum = False)
-    # plt.errorbar(xval, spectrum, label='best fit beta')
-    # # Draw the summed neutrino spectrum from converted best fit beta spectra
-    # spectrumNu = convertmodel.vblist["U235"].SumBranches(xval,
-    # nu_spectrum = True)
-    # plt.errorbar(xval, spectrumNu, label='neutrino')
-    # plt.legend()
-    # fig.savefig("U235_conversion_new.png")
-    #
+    
+    fig = plt.figure()
+    # Draw the original beta spectrum
+    plt.errorbar(convertmodel.betadata["U235"].x,
+        convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
+        label='beta data')
+    
+    # Draw the summed best fit virtual beta spectrum of this calculation
+    spectrum = convertmodel.vblist["U235"].SumBranches(xval,
+        nu_spectrum = False)
+    plt.errorbar(xval, spectrum, label='best fit beta')
+    # Draw the summed neutrino spectrum from converted best fit beta spectra
+    spectrumNu = convertmodel.vblist["U235"].SumBranches(xval,
+    nu_spectrum = True)
+    plt.errorbar(xval, spectrumNu, label='neutrino')
+    plt.legend()
+    fig.savefig("U235_conversion_new.png")
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=5)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=5)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, 
+                                        nu_spectrum=False, cov_samp=100)
+    print("covariance beta result", (final_cov))
 
-    # print(final_spect)
-    # print(final_spect)
-    # Calculate covariance matrix of summed best fit beta spectrum
-    covmat=convertmodel.vblist["U235"].Covariance(beta235,
-        xval, nu_spectrum = False, samples=20)
-    # Calculate covariance matrix of summed converted neutrino spectrum
-    covmat_nu=convertmodel.vblist["U235"].Covariance(beta235,
-        xval, nu_spectrum = True, samples=20)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, 
+                                            nu_spectrum=True, cov_samp=100)
+    print("covariance neutrino result", (final_cov1))
 
-    print("covariance beta result", final_cov)
-    print("covariance neutrino result", final_cov1)
+    """ Following steps are to calculate uncertainties """
+    
+    # # Calculate covariance matrix of summed best fit beta spectrum
+    # covmat=convertmodel.vblist["U235"].Covariance(beta235,
+    #     xval, nu_spectrum = False, samples=30)
+    
+    # # Calculate covariance matrix of summed converted neutrino spectrum
+    # covmat_nu=convertmodel.vblist["U235"].Covariance(beta235,
+    #     xval, nu_spectrum = True, samples=30)
+
+    
+    # Calculate the relative uncertainty
     relativeErr = np.zeros(len(xval))
     for i in range(len(final_spect)):
         if final_spect[i] > 0:
@@ -164,24 +168,18 @@ if __name__ == "__main__":
                     alpha = 0.4)
     plt.legend()
     fig.savefig("U235_errs_new.png")
-    # print(final_unc)
-    # print(final_cov)
+
     print("beta integral", sum(final_spect))
-    print("neu integral",sum(final_spect1))
+    print("neu integral", sum(final_spect1))
 
 
+    """ Following steps are to plot the best fit spectra and compare them to 
+        original spectra
+    """
+    
     newxval = np.arange(2.125, 8.375, 0.25)
     newyval = Rebin(xval, final_spect, newxval)
     newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=5)
-    # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
-    #     print(i)
-
-    # testxval = np.linspace(0,200,201)
-    # testyval = 1*testxval+2
-    # testxout = np.linspace(0,200,21)
-    # testyout = Rebin(testxval, testyval, testxout)
-    # for a in (newyval1):
-    #     print(a)
 
     fig = plt.figure()
     # plt.yscale('log')
@@ -194,9 +192,7 @@ if __name__ == "__main__":
     plt.show()
     fig.savefig("bestfit_spectra.png")
 
-    xbins = np.arange(0, 8.25, 0.1)
-
-
+    # calculating summed spectrum synthetic data as comparison
     betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     fig = plt.figure()
@@ -206,34 +202,33 @@ if __name__ == "__main__":
     plt.show()
     fig.savefig("bestfit_beta_compare.png")
 
+    """ Following steps are to compare converted neutrino spectrum to the 
+        synthetic neutrino data
+    """
+    # generate the neutrino spectrum
+    betaSpectraDB = BetaEngine(xbins=xval)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+    
     # The following code is to test the consistency with the synthetic beta and
     # neutrino spectrum
-    U235 = FissionIstp(92, 235)
+    U235 = FissionIstp(92, 235, Ei=0)
     U235.LoadFissionDB(DB='JEFF')
-
-    model = FissionModel()
-    model.AddContribution(isotope=U235, Ei = 0, fraction=1)
+    U235.LoadCorrelation(DB='JEFF')
+    U235.CalcBetaSpectra(betaSpectraDB)
 
     # Generate the summation result
-    sum1 = SumEngine(xbins = xval)
-    sum1.AddModel(model)
+    sum1 = SumEngine(betaSpectraDB)
+    sum1.AddFissionIstp(U235, "U235", 100, 0)
+    # sum all spect
+    sum1.CalcReactorSpectrum()
 
-    # generate the neutrino spectrum
-    betaSpectraDB = BetaEngine(sum1.FPYlist.keys(), xbins=xval)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
-
-    betaDBBase = BetaEngine()
-    count = 0
-    newlist = []
-
-    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
     summed_spect = sum1.spectrum
 
     file = open("U235_synth_compare.csv", "w")
     file.write("E,Ne,dNe")
     file.write("\n")
     for i in range(len(summed_spect)):
-        file.write(str(xval[i] * 1000) + " , " + str(summed_spect[i]) + ",0", file=file)
+        file.write(str(xval[i] * 1000) + " , " + str(summed_spect[i]) + ",0")
     #
     #
     file.close()

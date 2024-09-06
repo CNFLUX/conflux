@@ -1,16 +1,14 @@
 # fission product and spectra summation engine
 
 # universal modules
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
 from copy import deepcopy
 from tqdm import tqdm
 
 # local modules
-from conflux.Basic import *
-from conflux.BetaEngine import BetaEngine, BetaIstp
+from conflux.Basic import Spectrum
+from conflux.BetaEngine import BetaIstp
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine(Spectrum):

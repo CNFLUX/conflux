@@ -3,27 +3,24 @@
 # output: neutrino spectra of nuclear reactors
 
 # universal modules
-import sys
 import csv
 import numpy as np
-from scipy.optimize import curve_fit, nnls
-from scipy.stats import chisquare
-from scipy import interpolate
-from copy import deepcopy
+from copy import deepcopy, copy
 import timeit
 import matplotlib.pyplot as plt
-from iminuit.cost import LeastSquares
 from iminuit import Minuit
+from scipy.optimize import nnls
 import math
 from tqdm import tqdm
 
 # local modules
+from conflux.Basic import Spectrum
 from conflux.config import CONFLUX_DB
 from conflux.BetaEngine import BetaEngine, BetaBranch
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 # Class that reads conversion DB and form reference spectra
-class BetaData:
+class BetaData(Spectrum):
     def __init__(self, inputDB, rel_err=True):
         self.x = []
         self.y = []
@@ -62,7 +59,7 @@ class BetaData:
         self.uncertainty = np.array(self.yerr)
 
 # Class that creates virtual branch based on nuclear data
-class VirtualBranch:
+class VirtualBranch(Spectrum):
     def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}, fblist={}, wmlist={}):
         """
         Class that creates virtual branch based on nuclear data
@@ -81,18 +78,26 @@ class VirtualBranch:
             The mapping between the beta energy and customized ratio 1st order
             forbidden transition in the corresponding virtual branches
         wmlist: dictionary with float keys and float values
-            The mapping between the beta energy and weak magnatism correction of
-            corresponding virtual branches
+            The mapping between the beta energy and weak magnatism correction 
+            of corresponding virtual branches
         """
+
+        self.fisIstp = fisIstp
 
         self.Zavg = 47  # rough avg of Z across all energy
         self.Aavg = 117 # rough avg of A across all energy
-        self.Zlist = {}
+        
+        # define empty dictionary of average virtual branch key values to fill 
+        # up later
+        self.Zlist = {} 
         self.Alist = {}
         self.fblist = {}
         self.wmlist = {}
-
-        self.fisIstp = fisIstp
+        
+        self._Zlist_cp = deepcopy(Zlist)
+        self._Alist_cp = deepcopy(Alist)
+        self._fblist_cp = deepcopy(fblist)
+        self._wmlist_cp = deepcopy(wmlist)
 
         # load FPY of target fission isotope
         self.FPYlist = {}
@@ -105,14 +110,13 @@ class VirtualBranch:
         betaEngine.LoadBetaDB()
         self.istplist = betaEngine.istplist
 
-        self._Zlist_cp = deepcopy(Zlist)
-        self._Alist_cp = deepcopy(Alist)
-        self._fblist_cp = deepcopy(fblist)
-        self._wmlist_cp = deepcopy(wmlist)
+
 
     # Function to load FPY list
     def LoadFPYList(self, fisIstp, Ei = 0):
-        for nuclide in tqdm(fisIstp.FPYlist, desc="Tallying fission products of "+str(self.fisIstp.A)):
+        for nuclide in tqdm(fisIstp.FPYlist, 
+                            desc="Tallying fission products of "+
+                                str(self.fisIstp.A)):
             fpNuclide = fisIstp.FPYlist[nuclide]
             if fpNuclide.y == 0: continue
             FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
@@ -125,21 +129,50 @@ class VirtualBranch:
 
     # function to precisely calculate average Z, A value of the virtual branch
     def CalcZAavg(self, Elow, Ehigh, missing=False):
+        """
+            Calculate the average Z and A number of the slice of the 
+            virtual beta spectrum
+            
+            Parameters
+            ----------
+            Elow:  float
+                lower bondary of the spectrum energy slice
+            Ehigh: float
+                higher bondary of the spectrum energy slice
+            missing=False: bool
+                whether to count missing contributions in the beta DB
+                
+            Returns
+            -------
+            Zavg, Aavg: int
+                rounded integers of the averaged atom number
+                
+        """
         frac_sum = 0
         Afrac_sum = 0
         Zfrac_sum = 0
+        FB_sum = 0
         for ZAI in self.istplist:
             betaIstp = self.istplist[ZAI]
             if not missing and betaIstp.missing:
                 continue
-            if (betaIstp.Q >= Elow and betaIstp.Q < Ehigh
-                and ZAI in self.FPYlist):
-                frac_sum += self.FPYlist[ZAI].y
-                Afrac_sum += self.FPYlist[ZAI].y*betaIstp.A
-                Zfrac_sum += self.FPYlist[ZAI].y*betaIstp.Z
+            if (betaIstp.Q >= Elow and betaIstp.Q < Ehigh and
+                ZAI in self.FPYlist):
+                betaFP = self.FPYlist[ZAI]
+                frac_sum += betaFP.y
+                Afrac_sum += betaFP.y*betaIstp.A
+                Zfrac_sum += betaFP.y*betaIstp.Z
+                
+                # tallying forbidden branches of a beta decay isotope
+                for e0, branch in betaIstp.branches.items():
+                    if branch.forbiddenness != 0:
+                        FB_sum += branch.frac*betaFP.y
+                
+        # Calculate the average
         Aavg = round(Afrac_sum/frac_sum)
         Zavg = round(Zfrac_sum/frac_sum)
-        return Zavg, Aavg
+        FBavg = FB_sum/frac_sum
+        return Zavg, Aavg, FBavg
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
@@ -161,7 +194,7 @@ class VirtualBranch:
         if norm:
             full_spect = virtualbeta.BetaSpectrum(full_range, nu_spectrum)
             normalize = full_spect.sum()
-            #normalize = new_spect.sum()*full_spect.sum()/this_spect.sum() if E0 > binwidths else new_spect.sum()
+            # normalize = new_spect.sum()*full_spect.sum()/this_spect.sum() if E0 > binwidths else new_spect.sum()
             # print("test", this_spect.sum()/full_spect.sum())
 
         new_spect /= normalize*binwidths
@@ -197,7 +230,8 @@ class VirtualBranch:
         xhigh = 9
         datacache = np.copy(betadata.y) # preserve the data
         fitsequence = reversed(list(enumerate(betadata.x)))
-        for it, x in tqdm(fitsequence, desc="Fitting beta spectrum with reversed sequence"):
+        for it, x in tqdm(fitsequence, 
+                          desc="Fitting beta spectrum with reversed sequence"):
             if x <= xhigh - slicesize or x == betadata.x[0]:
                 subx.append(x)
                 suby.append(datacache[it])
@@ -205,12 +239,14 @@ class VirtualBranch:
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx):
                     # setup the virtual isotope properties
+                    # find the average Z and A values by interpolating the 
+                    # user-given Zlist and Alist
                     if self._Zlist_cp:
                         Zavg = round(np.interp(xhigh-slicesize/2,
                                                 list(self._Zlist_cp.keys()),
                                                 list(self._Zlist_cp.values())))
                     else:
-                        Zavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
+                        Zavg, _, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
                     if xhigh not in self.Zlist:
                         self.Zlist[xhigh] = Zavg
 
@@ -219,7 +255,7 @@ class VirtualBranch:
                                                 list(self._Alist_cp.keys()),
                                                 list(self._Alist_cp.values())))
                     else:
-                        _, Aavg = self.CalcZAavg(xhigh-slicesize, xhigh)
+                        _, Aavg, _ = self.CalcZAavg(xhigh-slicesize, xhigh)
                     if xhigh not in self.Alist:
                         self.Alist[xhigh] = Aavg
 
@@ -228,7 +264,8 @@ class VirtualBranch:
                                             list(self._fblist_cp.keys()),
                                             list(self._fblist_cp.values())))
                     else:
-                        fbratio = 0.0
+                        _, _, fbratio = self.CalcZAavg(xhigh-slicesize, xhigh)
+                        
                     if xhigh not in self.fblist:
                         self.fblist[xhigh] = 0.0
 
@@ -255,16 +292,16 @@ class VirtualBranch:
                         e_upper = xhigh+5
 
                     betafunc = (lambda x, e:
-                                ((1-fbratio)*(self.BetaSpectrum(x, e, 1,
-                                                                Zavg=Zavg,
-                                                                Aavg=Aavg,
-                                                                forbiddenness=0,
-                                                                bAc=wm))
-                                + fbratio*(self.BetaSpectrum(x, e, 1,
-                                                                Zavg=Zavg,
-                                                                Aavg=Aavg,
-                                                                forbiddenness=1,
-                                                                bAc=wm))))
+                                ((1-fbratio)*
+                                 (self.BetaSpectrum(x, e, 1, Zavg=Zavg,
+                                                    Aavg=Aavg,
+                                                    forbiddenness=0,
+                                                    bAc=wm))
+                                + fbratio*(self.BetaSpectrum(x, e, 1, 
+                                                             Zavg=Zavg, 
+                                                             Aavg=Aavg,
+                                                             forbiddenness=1,
+                                                             bAc=wm))))
 
                     binwidths = betadata.x[1]-betadata.x[0]
                     full_range = np.arange(0, 20, binwidths)
@@ -279,7 +316,10 @@ class VirtualBranch:
                         full_spect = betafunc(full_range, energy)
                         norm = full_spect.sum()
 
-                        leastfunc = lambda c: np.sum((suby - c*betafunc(subx, energy)/norm/binwidths)**2/suby**2)
+                        leastfunc = lambda c: np.sum((suby - 
+                                                      c*betafunc(subx, energy)/
+                                                      norm/binwidths)**2/
+                                                     suby**2)
                         m1 = Minuit(leastfunc, c = 1)
 
                         m1.migrad()
@@ -296,7 +336,7 @@ class VirtualBranch:
                     self.E0[xhigh] = best_energy
 
                     newspect = best_norm*betafunc(betadata.x, best_energy)
-                    least = np.sum((suby - best_norm*betafunc(subx, best_energy))**2)
+                    # least = np.sum((suby - best_norm*betafunc(subx, best_energy))**2)
                     # print(e_lower, e_upper, best_norm, best_energy, least)
 
                     datacache -= newspect
@@ -408,9 +448,7 @@ class VirtualBranch:
 
             # find the minimum within the randomized end point energy groups
             leastfunc = np.sqrt(np.sum((new_spect - 1)**2))
-
-            # TODO: There is one problem, the least square found by NNLS does
-            # not produce least value in a separated calculation
+            
             if least>rnorm:
                 least = rnorm
                 bestnorm = a
@@ -422,14 +460,14 @@ class VirtualBranch:
         self.E0 = dict(zip(xhigh, beste0))
         self.bestfits =  dict(zip(xhigh, bestspectra))
         # subtract the best fit spectrum from final_spect
-        fig = plt.figure()
-        # plt.yscale('log')
-        # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
-        # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
-        plt.plot(betadata.x, new_spect - 1)
+        # plt.figure()
+        # # plt.yscale('log')
+        # # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
+        # # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
+        # plt.plot(betadata.x, new_spect - 1)
 
-        plt.pause(1)
-        plt.show()
+        # plt.pause(1)
+        # plt.show()
         # print(least, self.E0, self.contribute)
 
     # function to calculate summed spectra of virtual branches
@@ -479,13 +517,13 @@ class VirtualBranch:
                 full_range = np.arange(0, 20, binwidths)
                 this_range = np.arange(x[0], x[-1], 0.01)
                 full_spect = vb.frac * ((1-self.fblist[s])
-                                        * vb.BetaSpectrum(full_range, nu_spectrum)
-                                    + self.fblist[s]
-                                        * vb_fb.BetaSpectrum(full_range, nu_spectrum))
+                                    * vb.BetaSpectrum(full_range, nu_spectrum)
+                                + self.fblist[s]
+                                    * vb_fb.BetaSpectrum(full_range, nu_spectrum))
                 this_spect = vb.frac * ((1-self.fblist[s])
-                                        * vb.BetaSpectrum(this_range, nu_spectrum)
-                                    + self.fblist[s]
-                                        * vb_fb.BetaSpectrum(this_range, nu_spectrum))
+                                    * vb.BetaSpectrum(this_range, nu_spectrum)
+                                + self.fblist[s]
+                                    * vb_fb.BetaSpectrum(this_range, nu_spectrum))
                 norm = full_spect.sum() if s > binwidths else newspect.sum()
                 newspect /= norm*binwidths
                 # print('max', max(newspect)/max(self.bestfits[s]))
@@ -519,32 +557,39 @@ class VirtualBranch:
 
         return result
 
-    def Covariance(self, betadata, x, samples = 500, thresh = 0,
+    def Covariance(self, betadata, x, samples = 50, thresh = 0,
                    nu_spectrum = True):
         result = []
-        print('Calculating covariance matrix...')
+        print(f'Calculating covariance matrix with {samples} MC samples...')
         startTiming = timeit.default_timer()
 
-        for i in range(0, samples):
+        plt.figure()   # TODO comment me
+        vbbuffer = copy(self)   # TODO comment me
+        vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
+        y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
+        for i in tqdm(range(0, samples)):
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
                 if toy.y[it] < 0: toy.y[it] = 0
 
-            vbnew = deepcopy(self)
+            vbnew = copy(self)
             vbnew.FitData(toy, vbnew.slicesize)
+            y = vbnew.SumBranches(x, thresh, nu_spectrum)
+            plt.plot(x, (y-y0), color='red') # TODO comment me
+            plt.ylim((-0.05, 0.05))
 
-            result.append(vbnew.SumBranches(x, thresh, nu_spectrum))
+            result.append(y)
+        plt.show() # TODO comment me
         endTiming = timeit.default_timer()
         runTime = endTiming-startTiming
-        print("Finished calculating covairance matrix of "
-              + str(samples) + " samples.")
-        print("Processing time: "+str(runTime)+" seconds")
+        print(f"Finished calculating covairance matrix of {samples} samples.")
+        print(f"Processing time: {runTime} seconds")
         return np.cov(np.transpose(result))
 
 # Class that search for best fit vertual branch and calculate total neutrino
 # flux
-class ConversionEngine:
+class ConversionEngine(Spectrum):
     def __init__(self):
         self.betadata = {}
         self.fission_frac = {}
@@ -567,9 +612,9 @@ class ConversionEngine:
         vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
 
-    def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50):
+    def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=20):
         """
-        SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50)
+        SummedSpectrum(self, x, nu_spectrum=True, cov_samp=20)
 
         Function to sum all best fit spectra calculated in the conversion engine
 
@@ -595,14 +640,15 @@ class ConversionEngine:
             The covariance matrix of the of the spectrum on given energy bin
         """
         # Determine whether to calculate the covariance matrix
-        calc_cov = cov_samp >= 50
+        calc_cov = cov_samp >= 20
         # Define the function outputs
         nbins_x = len(x)
-        spectrum = np.zeros(nbins_x)
-        uncertainty = np.zeros(nbins_x)
-        covariance = np.zeros((nbins_x, nbins_x))
+        self.spectrum = np.zeros(nbins_x)
+        self.uncertainty = np.zeros(nbins_x)
+        self.covariance = np.zeros((nbins_x, nbins_x))
 
-        # Summing all fissile isotopes spectra and uncertainties
+        # Summing all fissile isotopes spectra and uncertainties by looping 
+        # through all virtual branches
         for istp in self.betadata:
             this_frac = self.fission_frac[istp]
             this_vb = self.vblist[istp]
@@ -610,24 +656,24 @@ class ConversionEngine:
 
             # Summing spectra with respect to the fraction of fissile isotope
             new_spect = this_vb.SumBranches(x, nu_spectrum=nu_spectrum)
-            spectrum += this_frac*new_spect
+            self.spectrum += this_frac*new_spect
 
             # Calculate covariance matrix
             new_cov = np.zeros((nbins_x, nbins_x))
             if calc_cov:
-                new_cov = (calc_cov
-                            *this_vb.Covariance(self.betadata[istp], x=x,
+                new_cov = (this_vb.Covariance(self.betadata[istp], x=x,
                                                 samples=cov_samp,
                                                 nu_spectrum=nu_spectrum))
+            # Propagating the uncertainty of fraction and spectra
             sqratio1 = new_cov/this_frac**2 if this_frac!=0 else 0
-            sqratio2 = np.where(new_spect>0, this_dfrac**2/new_spect, 0)
+            sqratio2 = np.where(new_spect>0, this_dfrac**2/new_spect**2, 0)
             new_cov = sqratio1 + np.identity(nbins_x) * sqratio2
-            covariance += new_cov
+            self.covariance += new_cov
 
         # Get the sqrt diagonal of summed covariance matrix as the uncertainty
         # at each energy bin.
-        uncertainty = np.sqrt(covariance.diagonal().copy())
-        return spectrum, uncertainty, covariance
+        self.uncertainty = np.sqrt(self.covariance.diagonal().copy())
+        return self.spectrum, self.uncertainty, self.covariance
 
 def HuberZavg(x, c0, c1, c2):
     return c0+c1*x+c2*x**2
@@ -640,19 +686,20 @@ def rebin(data, bins):
     chunk_size = len(data) // num_points
 
     # Reshape the data into chunks and calculate the average for each chunk
-    averaged_data = np.mean(data[:num_points * chunk_size].reshape((num_points, -1)), axis=1)
+    averaged_data = np.mean(data[:num_points * 
+                                 chunk_size].reshape((num_points, -1)), 
+                            axis=1)
 
     return averaged_data
 
 # testing script
 if __name__ == "__main__":
-    from conflux.BetaEngine import BetaEngine, BetaBranch
+    from conflux.BetaEngine import BetaBranch
     from conflux.FPYEngine import FissionModel, FissionIstp
     from conflux.SumEngine import SumEngine
     # from conflux.ConversionEngine import ConversionEngine, BetaData
     import matplotlib.pyplot as plt
-    import numpy as np
-    import os
+
 
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
@@ -663,9 +710,9 @@ if __name__ == "__main__":
 
     # Define isotopic fission yield DB to calculate average atom numbers of
     # virtual branches
-    U235 = FissionIstp(92, 235)
-    Pu239 = FissionIstp(94, 239)
-    Pu241 = FissionIstp(94, 241)
+    U235 = FissionIstp(92, 235, Ei=0)
+    Pu239 = FissionIstp(94, 239, Ei=0)
+    Pu241 = FissionIstp(94, 241, Ei=0)
 
     # Loading default fission product DB
     U235.LoadFissionDB(DB='JEFF')
@@ -684,29 +731,52 @@ if __name__ == "__main__":
     xval = np.arange(0, 10, 0.01)
     #Something wrong with the plotting on this one
     for i in range(0, 20):
-        print(i*0.5, sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False)))
-        if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
+        print(i*0.5, 
+              sum(convertmodel.vblist["U235"].SumBranches(xval, 
+                                                          thresh =i*0.5, 
+                                                          nu_spectrum = False)))
+        if not sum(convertmodel.vblist["U235"].SumBranches(xval, 
+                                                           thresh =i*0.5, 
+                                                           nu_spectrum = False))>=0:
             print("sth wrong i die")
             continue
-        plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--', label='test')
+        plt.errorbar(xval, 
+                     convertmodel.vblist["U235"].SumBranches(xval, 
+                                                            thresh =i*0.5, 
+                                                            nu_spectrum = False), 
+                     fmt='--', label='test')
     #Plot out the raw beta data
-    plt.errorbar(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr, label='beta data')
+    plt.errorbar(convertmodel.betadata["U235"].x, 
+                 convertmodel.betadata["U235"].y, 
+                 convertmodel.betadata["U235"].yerr, label='beta data')
     #Plot out the calculated beta spectrum
-    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = False), label='beta')
+    plt.errorbar(xval, 
+                 convertmodel.vblist["U235"].SumBranches(xval, 
+                                                         nu_spectrum = False), 
+                 label='beta')
     #Plot out the calculated neutrino spectrum
-    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True), label='neutrino')
+    plt.errorbar(xval, 
+                 convertmodel.vblist["U235"].SumBranches(xval, 
+                                                         nu_spectrum = True), 
+                 label='neutrino')
     plt.legend()
     plt.show()
 
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     #convertmodel.VBfitbeta("U235", branch_slice)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, nu_spectrum=False, cov_samp=5)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, nu_spectrum=True, cov_samp=5)
+    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, 
+                                                                    nu_spectrum=False, 
+                                                                    cov_samp=20)
+    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, 
+                                                                       nu_spectrum=True, 
+                                                                       cov_samp=20)
 
     newxval = np.arange(2.125, 8.375, 0.25)
     # newyval = Rebin(xval, final_spect, newxval)
-    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=5)
+    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, 
+                                                                   nu_spectrum=True, 
+                                                                   cov_samp=5)
     # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
     #     print(i)
 
@@ -728,7 +798,9 @@ if __name__ == "__main__":
     # plt.show()
     # fig.savefig("bestfit_spectra.png")
 
-    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    betaspect = np.interp(xval, 
+                          convertmodel.betadata["U235"].x, 
+                          convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     fig = plt.figure()
     plt.title('Beta fit beta residual')
@@ -743,7 +815,9 @@ if __name__ == "__main__":
     plt.show()
     fig.savefig("bestfit_beta_compare.png")
 
-    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    betaspect = np.interp(xval, 
+                          convertmodel.betadata["U235"].x, 
+                          convertmodel.betadata["U235"].y)
     diff = (final_spect-betaspect)/betaspect
     print('leastsquare', sum(diff[xval<=9]**2))
     fig = plt.figure()
@@ -752,7 +826,9 @@ if __name__ == "__main__":
     plt.xlim([0, 10])
     plt.plot(xval, final_spect, label='bestfit beta')
     plt.plot(xval, betaspect, label='beta data')
-    plt.plot(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, 'o')
+    plt.plot(convertmodel.betadata["U235"].x, 
+             convertmodel.betadata["U235"].y, 
+             'o')
 
     plt.xlabel('Beta E (MeV)')
     plt.ylabel('Residual')
