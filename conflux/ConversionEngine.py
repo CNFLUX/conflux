@@ -564,20 +564,20 @@ class VirtualBranch(Spectrum):
         startTiming = timeit.default_timer()
 
         plt.figure()   # TODO comment me
-        vbbuffer = copy(self)   # TODO comment me
+        vbbuffer = deepcopy(self)   # TODO comment me
         vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
         y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
-        for i in tqdm(range(0, samples)):
+        for i in (range(0, samples)):
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
                 toy.y[it] = np.random.normal(toy.y[it], toy.yerr[it])
                 if toy.y[it] < 0: toy.y[it] = 0
 
-            vbnew = copy(self)
+            vbnew = deepcopy(self)
             vbnew.FitData(toy, vbnew.slicesize)
             y = vbnew.SumBranches(x, thresh, nu_spectrum)
-            plt.plot(x, (y-y0), color='red') # TODO comment me
-            plt.ylim((-0.05, 0.05))
+            plt.plot(x, (y-y0)/y0, color='red') # TODO comment me
+            plt.ylim((-0.2, 0.2))
 
             result.append(y)
         plt.show() # TODO comment me
@@ -725,7 +725,7 @@ if __name__ == "__main__":
     # database
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
-    convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
+    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
     convertmodel.VBfitbeta("U235", branch_slice)
 
     xval = np.arange(0, 10, 0.01)

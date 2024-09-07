@@ -141,7 +141,8 @@ class BetaBranch(Spectrum):
         A method to standardize the binning of all generated spectra. 
     """
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
-                forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1)):
+                forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
+                custom_func=None):
         self.ID = E0
 
         self.Z = Z
@@ -163,6 +164,8 @@ class BetaBranch(Spectrum):
         self.forbiddenness = forbiddenness
         #Add the parameters of this branch to a dictionary to be passed onto one of the
         #functions that generates spectra from theory (See neutrino/electron above)
+        
+        self.custom_func = custom_func
         self.Parameters = {
             'Z': Z,
             'A': A,
@@ -231,6 +234,9 @@ class BetaBranch(Spectrum):
             function = lambda x: neutrino(x, Parameters, numass=numass)
         else:
             function = lambda x: electron(x, Parameters, numass=numass)
+            
+        if (self.custom_func!=None):
+            function = lambda x: self.custom_func(x, Parameters, numass=numass)
 
         result = function(x)
         result = np.nan_to_num(result, nan=0.0)
@@ -258,6 +264,9 @@ class BetaBranch(Spectrum):
             function = lambda x: neutrino(x, newParameters)
         else:
             function = lambda x: electron(x, newParameters)
+            
+        if (self.custom_func!=None):
+            function = lambda x: self.custom_func(x, newParameters)
 
         fE0 = function(x)
         fE0 = np.nan_to_num(fE0, nan=0.0)
@@ -344,17 +353,21 @@ class BetaIstp(Spectrum, Summed):
         """
         self.branches[branch.ID] = branch
 
-    # def EditBranch(self, E0, newE0=None, fraction=None, sigma_E0 = 0., sigma_frac = 0.,
-    #                 forbiddenness = 0, bAc = 4.7):
+
     def EditBranch(self, defaultE0, **kwargs):
         """
         Add or edit branches to the isotope with analyzer's assumptions
         Parameters:
-            E0 (float): existing end point energy of the missing branch
-            newE0 (float): redefined end point energy of the missing branch
-            fraction (float): assumed fraction of the edited branch
-            sigma_E0 (float): 1-sigma error of the input E0, default as 0
-            sigma_frac (float): 1-sigma error of the input franction, default as 0
+            E0 (float): 
+                existing end point energy of the missing branch
+            newE0 (float): 
+                redefined end point energy of the missing branch
+            fraction (float): 
+                assumed fraction of the edited branch
+            sigma_E0 (float): 
+                1-sigma error of the input E0, default as 0
+            sigma_frac (float): 
+                1-sigma error of the input franction, default as 0
         Returns:
             None
         """
@@ -379,6 +392,8 @@ class BetaIstp(Spectrum, Summed):
                 forbiddenness = value
             if key == 'bAc':
                 bAc = value
+            if key == 'custom_func':
+                bAc = custom_func
 
             if defaultE0 not in self.branches.keys():
                 self.branches[defaultE0] = BetaBranch(self.Z, 
@@ -391,7 +406,8 @@ class BetaIstp(Spectrum, Summed):
                                                       sigma_frac,
                                                       forbiddenness,
                                                       bAc=bAc, 
-                                                      xbins=self.xbins)
+                                                      xbins=self.xbins,
+                                                      custom_func=custom_func)
 
             if hasattr(self.branches[defaultE0], key):
                 setattr(self.branches[defaultE0], key, value)
@@ -410,8 +426,8 @@ class BetaIstp(Spectrum, Summed):
         Calculate the covaraince matrix for all the beta branches of this
         isotope
         Parameters:
-            GSF (boolean): determine whether to calculate covaraince matrix with
-            ground state feeding
+            GSF (boolean): determine whether to calculate covaraince matrix 
+            with ground state feeding
         Returns:
             None
         """
@@ -445,7 +461,8 @@ class BetaIstp(Spectrum, Summed):
         Calculate the cumulative beta/antineutrino spectrum of all branches
         Parameters:
             nu_spectrum (boolean): 
-                Determines if you are calculating a beta spectra or a neutrino spectra
+                Determines if you are calculating a beta spectra or a neutrino 
+                spectra
             binwidths (float): 
                 The width of the bins used in creating your spectra
             spectRange (list): 
@@ -510,16 +527,22 @@ class BetaIstp(Spectrum, Summed):
         else:
             return 1
 
-# BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra
-# of all tallied branches
+# BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
+# spectra of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
 class BetaEngine:
-    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, 
+                 inputlist=None, 
+                 targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
+                 xbins=np.arange(0, 20, 0.1),
+                 custom_func=None):
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
+        
+        self.custom_func=custom_func
 
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
@@ -588,7 +611,8 @@ class BetaEngine:
                     forbiddenness = 6
                     for i in range(len(ftypes)):
                         for j in range(len(spin_par_changes)):
-                            if spin_par_changes[j] in ftypes[i] and i < abs(forbiddenness):
+                            if (spin_par_changes[j] in ftypes[i] and 
+                                i < abs(forbiddenness)):
                                 forbiddenness = -i
                                 if i == 1:
                                     forbiddenness = firstftypes[j]
@@ -605,7 +629,8 @@ class BetaEngine:
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
                                             sigma_frac, forbiddenness,
-                                            xbins=self.xbins)
+                                            xbins=self.xbins
+                                            custom_func=self.custom_func)
                     betaIstp.AddBranch(betaBranch)
 
                 if betaIstp.branches:
