@@ -24,7 +24,18 @@ from conflux.bsg.Screening import screening_potential
 #########################################
 # Final neutrino and antineutrino spectra
 
+#Function to calculate the electron spectrum from theory as a function of energy
 def electron(ebeta, p, numass=0):
+    """
+    Calculate the beta spectrum from theory as a function of energy
+    Parameters:
+        ebeta (list) : The energy of the incoming beta particle
+        p (dictionary) : A dictionary containing parameters to be used in the calculation of
+            the beta spectrum from theory
+        numass (float) : Neutrino mass parameter. Default set to 0
+    Returns:
+        result (list): The theoretical beta spectrum
+    """
     result = 0.
     W = ebeta/ELECTRON_MASS_MEV + 1
     result = (phase_space(W, numass=numass, **p, )
@@ -43,7 +54,18 @@ def electron(ebeta, p, numass=0):
 
     return result
 
+#Function to calculate the neutrino spectrum from theory as a function of energy
 def neutrino(enu, p, numass=0):
+    """
+    Calculate the neutrino spectrum from theory as a function of energy
+    Parameters:
+        ebeta (list) : The energy of the incoming beta particle
+        p (dictionary) : A dictionary containing parameters to be used in the calculation of
+            the neutrino spectrum from theory
+        numass (float) : Neutrino mass parameter. Default set to 0
+    Returns:
+        result (list): The theoretical neutrino spectrum
+    """
     result = 0.
     W0 = p['W0']
     Wv = W0-enu/(ELECTRON_MASS_MEV*1.0) #enu/ELECTRON_MASS_MEV + 1
@@ -64,6 +86,60 @@ def neutrino(enu, p, numass=0):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
+    """
+    A class to save isotopic branch information
+    ...
+
+    Attributes
+    ----------
+    Z : int
+        The Atomic number of the isotope whose Beta branch information you want to record
+    A : int
+        The Atomic mass number of the isotope whose branch information you want to record
+    I : int
+        The isomeric number of the Beta Branch whose information you want to record
+    Q : float
+        The Q-value of the Beta Branch whose information you want to record
+    ZAI : int
+        A generated "Tag" that identifies this Beta Branch. It's format is ZZAAI, or ZZAAAI, depending on the atomic mass of the isotope
+    xbins : list
+        A list of energy bins for this Beta Branch. Helps determine how fine or coarse the resulting spectrum will be
+    nbin : int
+        The number of bins that this branch will have. 
+    spectrum : list
+        A list to record the spectral information of this Beta Branch
+    uncertainty : list
+        A list to record the uncertainties in the spectral information of this Beta Branch
+    E0 : float
+        The End-point energy of the isotope whose branch information we want to record
+    sigma_E0 : float
+        The uncertainty in the endpoint energy of this isotope
+    frac : float
+        The fraction that this branch contributes to the total isotopic spectrum
+    sigma_frac : float
+        The uncertainty in the branch contribution
+    forbiddenness : int
+        The forbiddenness of this branch decay
+    Parameters : dictionary
+        A dictionary to store all the branch information. Allows other classes to easily access branch information
+    corr : dictionary
+        A dictionary to store the correlations between branches. The keys of the dictionary are the endpoint energies of the isotope
+    cov : dictionary
+        A dictionary to store the covariances between branches. Like the correlation dictionary, the keys are the endpoint energies of the isotope
+    
+    Methods
+    -------
+    Display():
+        Displays vital Branch information to the terminal
+    SetCovariance(otherBranch, correlation):
+        Set the covariance of this branch and all other branches
+    BetaSpectrum(x, nu_spectrum=False, numass=0):
+        Calculate the spectral shape of this branch as a function of energy from theory
+    SpectUncertMC(x, nu_spectrum=False, samples = 30):
+        Calculate the uncertainties in the spectral shape using Monte Carlo sampling
+    BinnedSpectrum(nu_spectrum=False):
+        A method to standardize the binning of all generated spectra. 
+    """
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
                 custom_func=None):
@@ -88,6 +164,9 @@ class BetaBranch(Spectrum):
         self.forbiddenness = forbiddenness
         
         self.custom_func = custom_func
+        #Add the parameters of this branch to a dictionary to be passed onto one of the
+        #functions that generates spectra from theory (See neutrino/electron above)
+
         self.Parameters = {
             'Z': Z,
             'A': A,
@@ -102,23 +181,51 @@ class BetaBranch(Spectrum):
         }
 
         self.corr = {E0:1}  # correlation with other branches of the same isotope
-        self.cov = {E0:self.sigma_frac**2}
+        self.cov = {E0:self.sigma_frac**2} #Set the covariance diagonal element to the square of the branch fraction uncertainty
 
     # display the vital info of branch
     def Display(self):
+        """
+        Display vital branch info
+        Parameters:
+            None
+        Returns:
+            None
+        """
+        #A little self explanatory as to what's happening
         print("Branch E0 = " + str(self.E0)+ "+\-" + str(self.sigma_E0)
             + ", frac = " + str(self.frac) + "+\-"+str(self.sigma_frac))
 
-    # set correlation of this branch fraction and all another branches
+    # set correlation between this branch and the other branch
     def SetCovariance(self, otherBranch, correlation):
+        """
+        Set the correlation and covariances between this branch and the other branch
+        Parameters:
+            otherBranch (BetaBranch) : The other branch whose correlation and covariance you want to calculate
+            correlation (float) : The correlation between the two branches
+        Returns:
+            None
+        """
+        #If the endpoint energy between the two branches is the same, do nothing
         if self.E0 == otherBranch.E0:
             return
+        #Otherwise, set the correlation of the other branch at that endpoint energy to the correlation of this branch
         self.corr[otherBranch.E0] = correlation
+        #Also, calculate the covariance of the other branch from the fractoinal uncertainties of the two branches and their correlation
         self.cov[otherBranch.E0] = (self.sigma_frac * correlation
                                     * otherBranch.sigma_frac)
 
     # beta spectrum shape as function of energy
     def BetaSpectrum(self, x, nu_spectrum=False, numass=0):
+        """
+        Calculate the beta/neutrino spectral shape as a function of energy
+        Parameters:
+            x (list) : The energy range you want to calculate the spectra for
+            nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
+            numass (float) : neutrino mass parameter (Set to 0 for default calculations)
+        Returns:
+            result*rangecorrect (list) : A range corrected Beta/neutrino spectrum
+        """
         Parameters = deepcopy(self.Parameters)
 
         # prevent out-of-range (> Q value)variable to create insane results
@@ -138,6 +245,16 @@ class BetaBranch(Spectrum):
 
     # calculate the spectrum uncertainty with MC sampling
     def SpectUncertMC(self, x, nu_spectrum=False, samples = 30):
+        """
+        Calculate the beta/neutrino spectral shape uncertainty as a function of energy using Monte Carlo Sampling
+        Parameters:
+            x (list) : The energy range you want to calculate the spectra for
+            nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
+            samples (int) : The number of MC samples you want to use to calculate the Spectral Uncertainty.
+                Want to have at least 30 samples for good statistics
+        Returns:
+            np.std(fE0) (list) : A list of the uncertainty of the spectral shape
+        """
         if self.sigma_E0 == 0:
             return 0
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
@@ -161,6 +278,13 @@ class BetaBranch(Spectrum):
 
     # bined beta spectrum
     def BinnedSpectrum(self, nu_spectrum=False):
+        """
+        rebin the beta/neutrino spectrum given the energy scale for this branch
+        Parameters:
+            nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum 
+        Returns:
+            None
+        """
         # to prevent lower limit of the energy range < 0
         lower = self.xbins[0]
         if (lower > self.E0):
@@ -409,11 +533,15 @@ class BetaIstp(Spectrum, Summed):
 # spectra of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
 class BetaEngine:
+<<<<<<< HEAD
     def __init__(self, 
                  inputlist=None, 
                  targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
+=======
+    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
+>>>>>>> 22d40f6 (change default betadb calling procedure)
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
