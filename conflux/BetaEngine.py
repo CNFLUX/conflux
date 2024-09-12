@@ -256,6 +256,7 @@ class BetaIstp(Spectrum, Summed):
         fraction = 1
         sigma_frac = 1
         forbiddenness = 0
+        custom_func = None
         bAc = 4.7
 
         for key, value in kwargs.items():
@@ -270,7 +271,7 @@ class BetaIstp(Spectrum, Summed):
             if key == 'bAc':
                 bAc = value
             if key == 'custom_func':
-                bAc = custom_func
+                custom_func = custom_func
 
             if defaultE0 not in self.branches.keys():
                 self.branches[defaultE0] = BetaBranch(self.Z, 
@@ -416,10 +417,11 @@ class BetaEngine:
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
+        self.custom_func=custom_func
+
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-        self.custom_func=custom_func
 
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
@@ -506,7 +508,7 @@ class BetaEngine:
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
                                             sigma_frac, forbiddenness,
-                                            xbins=self.xbins
+                                            xbins=self.xbins,
                                             custom_func=self.custom_func)
                     betaIstp.AddBranch(betaBranch)
 
