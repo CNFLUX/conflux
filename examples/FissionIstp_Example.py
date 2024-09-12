@@ -34,7 +34,7 @@ if __name__ == "__main__":
     #U235.LoadCovariance(DBpath = "path/to/Database")
     U235.LoadCovariance()
     #U235.LoadCorrelation(DBpath = "path/to/Database")
-    U235.LoadCorrelation()
+    #U235.LoadCorrelation()
 
     #Now that I've gotten all my data, it's time to calculate the covariance matrix. This is
     #Saved in the CFPY dictionary, and I can then use that specific dictionary to
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
 
     #U235.CalcCovariance(Ei=5)
-    U235.CalcCovariance(Ei=0)
+    #U235.CalcCovariance(Ei=0)
 
 
     #This last little block of code writes the covariance matrix out to a csv file that can
@@ -62,4 +62,4 @@ if __name__ == "__main__":
             rowcontent[''] = i
             writer.writerow(rowcontent)
 
-    print("I'm donw writing out the covariance matrix!")
+    print("I'm done writing out the covariance matrix!")

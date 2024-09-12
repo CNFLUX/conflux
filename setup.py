@@ -5,11 +5,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="conflux",
-    version="0.3.0",
+    version="0.7.0",
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",
-    long_description=["README.md"],
+    long_description="README.md",
     long_description_content_type="text/markdown",
     url="https://lc.llnl.gov/bitbucket/projects/CFX/repos/conflux/browse",
     project_urls={
@@ -23,6 +23,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-	install_requires=['numpy', 'scipy'],
+	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib', 'iminuit', 'fortranformat'],
     python_requires=">=3.6",
 )

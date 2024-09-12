@@ -8,15 +8,24 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 
 if __name__ == "__main__":
-    testlist = [390960, 390961, 521340, 531340]
-    testEngine = BetaEngine(testlist)
-    testEngine.CalcBetaSpectra(nu_spectrum=True)
-    #print(testEngine.spectralist[521340])
+    x = np.arange(0, 1, 0.005)
+    binwidth = 0.005
 
+    testEngine = BetaEngine(xbins=x)
+    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 0.1])
+
+    istp = 922370 #U237
+    testlist = [istp]
     fig = plt.figure()
-    x = np.linspace(0, 20, 200)
-    plt.errorbar(x, testEngine.spectralist[390960], yerr=testEngine.uncertaintylist[390961])
-    #plt.draw()
-    fig.savefig("errorbartest.png")
 
-    #testbeta = BetaBranch(1, 3, 1.0, 0, )
+    testEngine2 = BetaEngine(testlist, xbins=x)
+    testEngine2.CalcBetaSpectra(nu_spectrum=False)
+    y2 = testEngine2.istplist[istp].spectrum*binwidth
+    y2err = testEngine2.istplist[istp].uncertainty*binwidth
+    print("beta/nu", sum(y2))
+    plt.xlabel("E (keV)")
+    plt.errorbar(x/1e-3, y2, label=str(istp)+"_nu", yerr=y2err)
+    plt.legend()
+    plt.show()
+
+    # print(testEngine2.istplist[index].branches)
