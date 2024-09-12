@@ -258,6 +258,7 @@ class BetaIstp(Spectrum, Summed):
         forbiddenness = 0
         custom_func = None
         bAc = 4.7
+        custom_func = None
 
         for key, value in kwargs.items():
             if key == 'E0':
@@ -418,7 +419,6 @@ class BetaEngine:
         self.istplist = {}
         self.xbins = xbins
         self.custom_func=custom_func
-
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
