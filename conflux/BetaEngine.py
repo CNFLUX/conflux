@@ -544,14 +544,8 @@ class BetaEngine:
         self.istplist = {}
         self.xbins = xbins
         self.custom_func=custom_func
-<<<<<<< HEAD
-=======
-
->>>>>>> 9fd7e69 (conversion engine cleanup)
-
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
