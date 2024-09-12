@@ -548,7 +548,7 @@ class BetaEngine:
         
         self.custom_func=custom_func
 
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB.xml"):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
         useInputList = True # test if the engine is defined with an inputlist
