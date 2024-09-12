@@ -544,6 +544,10 @@ class BetaEngine:
         self.istplist = {}
         self.xbins = xbins
         self.custom_func=custom_func
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9fd7e69 (conversion engine cleanup)
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
