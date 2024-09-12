@@ -540,6 +540,11 @@ class BetaEngine:
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
 
+        self.inputlist = inputlist
+        self.istplist = {}
+        self.xbins = xbins
+        self.custom_func=custom_func
+
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
 
