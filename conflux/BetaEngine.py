@@ -222,15 +222,9 @@ class BetaBranch(Spectrum):
         Parameters:
             x (list) : The energy range you want to calculate the spectra for
             nu_spectrum (boolean) : Determines if the calculated spectra is a neutrino or beta spectrum
-<<<<<<< HEAD
             numass (float) : neutrino mass parameter (Set to 0 for default calculations)
         Returns:
             result*rangecorrect (list) : A range corrected Beta/neutrino spectrum
-=======
-            numass (float) : Sets neutrino mass for 
-        Returns:
-            None
->>>>>>> ca7d0fc (fix conflicts)
         """
         Parameters = deepcopy(self.Parameters)
 
