@@ -76,7 +76,7 @@ if __name__ == "__main__":
     Pu241.LoadFissionDB()
 
     # Define the size of energy slice
-    branch_slice = 0.25
+    branch_slice = 0.50
     # Declare the conversion engine by adding beta data with corresponding FPY
     # database
     convertmodel = ConversionEngine()
