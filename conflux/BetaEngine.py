@@ -380,7 +380,6 @@ class BetaIstp(Spectrum, Summed):
         fraction = 1
         sigma_frac = 1
         forbiddenness = 0
-        custom_func = None
         bAc = 4.7
         custom_func = None
 
@@ -540,6 +539,8 @@ class BetaEngine:
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
 
+    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
+
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
@@ -547,6 +548,7 @@ class BetaEngine:
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
         self.custom_func=custom_func
+
 
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
