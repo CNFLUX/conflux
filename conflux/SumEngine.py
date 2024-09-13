@@ -7,8 +7,13 @@ from copy import deepcopy
 from tqdm import tqdm
 
 # local modules
+<<<<<<< HEAD
 from conflux.Basic import Spectrum
 from conflux.BetaEngine import BetaIstp
+=======
+from conflux.Basic import *
+from conflux.BetaEngine import BetaEngine, BetaIstp
+>>>>>>> d3a21a3 (new sequence example)
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine(Spectrum):
@@ -57,8 +62,11 @@ class SumEngine(Spectrum):
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
+<<<<<<< HEAD
         self.countlist = {}
         self.d_countlist = {}
+=======
+>>>>>>> d3a21a3 (new sequence example)
         self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
@@ -100,7 +108,11 @@ class SumEngine(Spectrum):
             Returns:
                 None
         """
+<<<<<<< HEAD
         assert len(isotope.xbins) == self.nbin, "binning of two spectra are different"
+=======
+        assert isotope.xbins == self.xbins, "binning of two spectra are different"
+>>>>>>> d3a21a3 (new sequence example)
 
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
@@ -134,12 +146,20 @@ class SumEngine(Spectrum):
 
     def AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
         """
+<<<<<<< HEAD
             NEW TODO
             Add contribution of individual beta decaying isotope into summation
             model
         """
         thisZAI = betaIstp.ZAI
         self.betaDB.istplist[thisZAI] = betaIstp
+=======
+            NEW
+            Add contribution of individual beta decaying isotope into summation
+            model
+        """
+        self.betaDB.istplist[ZAI] = betaIstp
+>>>>>>> d3a21a3 (new sequence example)
 
         self.betaSpectraList[istpname] = betaIstp.spectrum
         self.betaUncertainty[istpname] = betaIstp.uncertainty
@@ -149,7 +169,11 @@ class SumEngine(Spectrum):
         # self.spectrum += self.betaDB.istplist[ZAI].spectrum*count
         # self.uncertainty += self.betaDB.istplist[ZAI].spectrum*count
 
+<<<<<<< HEAD
     def EditContribution(self, istpname, count, d_count):
+=======
+    def EditIstp(self, istpname, count, d_count):
+>>>>>>> d3a21a3 (new sequence example)
         """
             NEW TODO
         """
@@ -170,6 +194,7 @@ class SumEngine(Spectrum):
         self.modelUnc = np.zeros(self.nbin)
         self.yieldUnc = np.zeros(self.nbin)
 
+<<<<<<< HEAD
         for istp in self.betaSpectraList.keys():
             count = self.countlist[istp]
             d_count = self.d_countlist[istp]
@@ -183,6 +208,15 @@ class SumEngine(Spectrum):
             self.uncertainty += this_unc2
 
         self.uncertainty = np.sqrt(self.uncertainty)
+=======
+        for ZAI in self.betaSpectraList.keys():
+            self.spectrum += self.betaSpectraList[ZAI]*count
+            self.uncertainty += self.betaUncertainty[ZAI]*count
+<<<<<<< HEAD
+>>>>>>> d3a21a3 (new sequence example)
+=======
+>>>>>>> 1e3c2ad (new sequence example)
+>>>>>>> 9339f61 (new sequence example)
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):

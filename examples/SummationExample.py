@@ -47,7 +47,6 @@ if __name__ == "__main__":
     ax.legend()
     plt.show()
 
-
     # print(U235.spectrum)
     # betaDBBase = BetaEngine()
     # count = 0

@@ -166,7 +166,7 @@ class BetaBranch(Spectrum):
         self.custom_func = custom_func
         #Add the parameters of this branch to a dictionary to be passed onto one of the
         #functions that generates spectra from theory (See neutrino/electron above)
-
+        
         self.Parameters = {
             'Z': Z,
             'A': A,
@@ -538,18 +538,13 @@ class BetaEngine:
                  targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
-
-    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
-
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
         self.custom_func=custom_func
+
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-        self.custom_func=custom_func
-
-
     def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
         """Load default or input betaDB to obtain beta decay informtion
         """
