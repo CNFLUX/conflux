@@ -83,7 +83,7 @@ def model_setup(json_file):
             Z = fissile_istp['Z']
             A = fissile_istp['A']
             Ei = fissile_istp['ei']
-            istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
+            istp = FissionIstp(Z, A, Ei)
             if 'fissiondb' in fissile_istp:
                 istp.LoadFissionDB(DB=fissile_istp['fissiondb'])
             if 'covariancedb' in fissile_istp:

@@ -30,8 +30,8 @@ def electron(ebeta, p, numass=0):
     Calculate the beta spectrum from theory as a function of energy
     Parameters:
         ebeta (list) : The energy of the incoming beta particle
-        p (dictionary) : A dictionary containing parameters to be used in the calculation of
-            the beta spectrum from theory
+        p (dictionary) : A dictionary containing parameters to be used in the 
+            calculation of the beta spectrum from theory
         numass (float) : Neutrino mass parameter. Default set to 0
     Returns:
         result (list): The theoretical beta spectrum
@@ -60,8 +60,8 @@ def neutrino(enu, p, numass=0):
     Calculate the neutrino spectrum from theory as a function of energy
     Parameters:
         ebeta (list) : The energy of the incoming beta particle
-        p (dictionary) : A dictionary containing parameters to be used in the calculation of
-            the neutrino spectrum from theory
+        p (dictionary) : A dictionary containing parameters to be used in the 
+        calculation of the neutrino spectrum from theory
         numass (float) : Neutrino mass parameter. Default set to 0
     Returns:
         result (list): The theoretical neutrino spectrum
@@ -93,39 +93,51 @@ class BetaBranch(Spectrum):
     Attributes
     ----------
     Z : int
-        The Atomic number of the isotope whose Beta branch information you want to record
+        The Atomic number of the isotope whose Beta branch information you want 
+        to record
     A : int
-        The Atomic mass number of the isotope whose branch information you want to record
+        The Atomic mass number of the isotope whose branch information you want 
+        to record
     I : int
-        The isomeric number of the Beta Branch whose information you want to record
+        The isomeric number of the Beta Branch whose information you want to 
+        record
     Q : float
         The Q-value of the Beta Branch whose information you want to record
     ZAI : int
-        A generated "Tag" that identifies this Beta Branch. It's format is ZZAAI, or ZZAAAI, depending on the atomic mass of the isotope
+        A generated "Tag" that identifies this Beta Branch. It's format is 
+        ZZAAI, or ZZAAAI, depending on the atomic mass of the isotope
     xbins : list
-        A list of energy bins for this Beta Branch. Helps determine how fine or coarse the resulting spectrum will be
+        A list of energy bins for this Beta Branch. Helps determine how fine or 
+        coarse the resulting spectrum will be
     nbin : int
         The number of bins that this branch will have. 
     spectrum : list
         A list to record the spectral information of this Beta Branch
     uncertainty : list
-        A list to record the uncertainties in the spectral information of this Beta Branch
+        A list to record the uncertainties in the spectral information of this 
+        Beta Branch
     E0 : float
-        The End-point energy of the isotope whose branch information we want to record
+        The End-point energy of the isotope whose branch information we want to 
+        record
     sigma_E0 : float
         The uncertainty in the endpoint energy of this isotope
     frac : float
-        The fraction that this branch contributes to the total isotopic spectrum
+        The fraction that this branch contributes to the total isotopic s
+        pectrum
     sigma_frac : float
         The uncertainty in the branch contribution
     forbiddenness : int
         The forbiddenness of this branch decay
     Parameters : dictionary
-        A dictionary to store all the branch information. Allows other classes to easily access branch information
+        A dictionary to store all the branch information. Allows other classes 
+        to easily access branch information
     corr : dictionary
-        A dictionary to store the correlations between branches. The keys of the dictionary are the endpoint energies of the isotope
+        A dictionary to store the correlations between branches. The keys of 
+        the dictionary are the endpoint energies of the isotope
     cov : dictionary
-        A dictionary to store the covariances between branches. Like the correlation dictionary, the keys are the endpoint energies of the isotope
+        A dictionary to store the covariances between branches. Like the 
+        correlation dictionary, the keys are the endpoint energies of the 
+        isotope
     
     Methods
     -------
@@ -134,9 +146,11 @@ class BetaBranch(Spectrum):
     SetCovariance(otherBranch, correlation):
         Set the covariance of this branch and all other branches
     BetaSpectrum(x, nu_spectrum=False, numass=0):
-        Calculate the spectral shape of this branch as a function of energy from theory
+        Calculate the spectral shape of this branch as a function of energy 
+        from theory
     SpectUncertMC(x, nu_spectrum=False, samples = 30):
-        Calculate the uncertainties in the spectral shape using Monte Carlo sampling
+        Calculate the uncertainties in the spectral shape using Monte Carlo 
+        sampling
     BinnedSpectrum(nu_spectrum=False):
         A method to standardize the binning of all generated spectra. 
     """
@@ -181,7 +195,7 @@ class BetaBranch(Spectrum):
         }
 
         self.corr = {E0:1}  # correlation with other branches of the same isotope
-        self.cov = {E0:self.sigma_frac**2} #Set the covariance diagonal element to the square of the branch fraction uncertainty
+        self.cov = {E0:self.sigma_frac**2} # Set the covariance diagonal element to the square of the branch fraction uncertainty
 
     # display the vital info of branch
     def Display(self):
@@ -645,9 +659,11 @@ class BetaEngine:
 
         Parameters:
             targetDB (String): 
-                the path to the betaSpectra database. if none, use the default database.
+                the path to the betaSpectra database. if none, use the default 
+                database.
             nu_spectrum (boolean): 
-                Determines if you are calculating a beta spectra or a neutrino spectra
+                Determines if you are calculating a beta spectra or a neutrino 
+                spectra
             binwidths (float): 
                 The width of the bins used in creating your spectra.
             spectRange (list): 
