@@ -539,8 +539,6 @@ class BetaEngine:
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
 
-    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
-
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
