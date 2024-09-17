@@ -599,6 +599,27 @@ class ConversionEngine(Spectrum):
 
     # load the beta spectrum measurement
     def AddBetaData(self, betadata, fisIstp, name, frac, dfrac=0):
+        """
+        Add beta spectrum data as fitting reference
+
+        Parameters
+        ----------
+        betadata : TYPE
+            DESCRIPTION.
+        fisIstp : TYPE
+            DESCRIPTION.
+        name : TYPE
+            DESCRIPTION.
+        frac : TYPE
+            DESCRIPTION.
+        dfrac : TYPE, optional
+            DESCRIPTION. The default is 0.
+
+        Returns
+        -------
+        None.
+
+        """
         self.betadata[name] = betadata
         self.fission_frac[name] = frac
         self.fission_dfrac[name] = dfrac
@@ -650,8 +671,8 @@ class ConversionEngine(Spectrum):
         # Summing all fissile isotopes spectra and uncertainties by looping 
         # through all virtual branches
         for istp in self.betadata:
-            this_frac = self.fission_frac[istp]
             this_vb = self.vblist[istp]
+            this_frac = self.fission_frac[istp]
             this_dfrac = self.fission_dfrac[istp]
 
             # Summing spectra with respect to the fraction of fissile isotope

@@ -552,6 +552,7 @@ class BetaEngine:
                  targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
+
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
