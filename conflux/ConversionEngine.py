@@ -22,11 +22,27 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 # Class that reads conversion DB and form reference spectra
 class BetaData(Spectrum):
     def __init__(self, inputDB, rel_err=True):
+        """
+        Declaration the object of the BetaData class 
+
+        Parameters
+        ----------
+        inputDB : string
+            The file name of the beta spectrum data to fit against.
+        rel_err : bool, optional
+            Clarify if the uncertainty in the data is relative. The default is 
+            True.
+
+        Returns
+        -------
+        None.
+
+        """
         self.x = []
         self.y = []
         self.yerr = []
         self.inputDB = inputDB
-        self.LoadConversionDB(inputDB)
+        self.LoadConversionDB(inputDB, rel_err)
         self.spectrum = np.array(self.y)
         self.uncertainty = np.array(self.yerr)
 
@@ -113,11 +129,22 @@ class VirtualBranch(Spectrum):
 
 
     # Function to load FPY list
-    def LoadFPYList(self, fisIstp, Ei = 0):
-        for nuclide in tqdm(fisIstp.FPYlist, 
+    def LoadFPYList(self):
+        """
+        Load the fission product yield of the fissile isotope. This is to
+        calculate the average atom numbers of the energy slices.
+        
+
+        Yields
+        ------
+        None.
+
+        """
+
+        for nuclide in tqdm(self.fisIstp.FPYlist, 
                             desc="Tallying fission products of "+
                                 str(self.fisIstp.A)):
-            fpNuclide = fisIstp.FPYlist[nuclide]
+            fpNuclide = self.fisIstp.FPYlist[nuclide]
             if fpNuclide.y == 0: continue
             FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
 
@@ -671,7 +698,7 @@ class ConversionEngine(Spectrum):
         # Summing all fissile isotopes spectra and uncertainties by looping 
         # through all virtual branches
         for istp in self.betadata:
-            this_vb = self.vblist[istp]
+            this_vb = self.vblist[istp] 
             this_frac = self.fission_frac[istp]
             this_dfrac = self.fission_dfrac[istp]
 
