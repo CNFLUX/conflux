@@ -47,6 +47,21 @@ class BetaData(Spectrum):
         self.uncertainty = np.array(self.yerr)
 
     def LoadConversionDB(self, inputDB, rel_err=True):
+        """
+        Load the beta spectrum data for fitting
+
+        Parameters
+        ----------
+        inputDB : str
+            The file name of the beta spectrum data.
+        rel_err : bool, optional
+            DESCRIPTION. The default is True.
+
+        Returns
+        -------
+        None.
+
+        """
         self.x = []
         self.y = []
         self.yerr = []
@@ -204,6 +219,36 @@ class VirtualBranch(Spectrum):
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
                     nu_spectrum=False, forbiddenness=0, bAc=4.7, norm=True):
+        """
+        
+
+        Parameters
+        ----------
+        x : TYPE
+            DESCRIPTION.
+        E0 : TYPE
+            DESCRIPTION.
+        contribute : TYPE
+            DESCRIPTION.
+        Zavg : TYPE, optional
+            DESCRIPTION. The default is None.
+        Aavg : TYPE, optional
+            DESCRIPTION. The default is None.
+        nu_spectrum : TYPE, optional
+            DESCRIPTION. The default is False.
+        forbiddenness : TYPE, optional
+            DESCRIPTION. The default is 0.
+        bAc : TYPE, optional
+            DESCRIPTION. The default is 4.7.
+        norm : TYPE, optional
+            DESCRIPTION. The default is True.
+
+        Returns
+        -------
+        new_spect : TYPE
+            DESCRIPTION.
+
+        """
         if Zavg is None:
             Zavg = self.Zavg
         if Aavg is None:
