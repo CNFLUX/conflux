@@ -2,59 +2,36 @@
 # input: dictionary of fission fractions, with {'ZA', fission_fraction}
 # output: dictionary of fission yield isotopes, with {'ZA', isotope_fraction}
 
-# universal modules
-import sys
+"""Public modules."""
 import os
 import csv
-import copy
+from copy import deepcopy
 import numpy as np
 from os import listdir
-import xml
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
-import pkg_resources
 from tqdm import tqdm
 
+"""Conflux modules."""
 from conflux.config import CONFLUX_DB
-from conflux.Basic import *
-
+from conflux.Basic import Spectrum, Summed
 
 # this class saves nuclide info of fission products
 class FPNuclide:
     """
-    Class to handle all the Fission Nuclide Information.
+    Class to save all fission product nuclides and their information.
+    
+    :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
+    :type FPZAI: int
+    :param y: The yeild of the fission product
+    :type y: float
+    :param yerr: The uncertainty of yield
+    :type yerr: float
 
-    ...
-
-    Attributes
-    ----------
-    Z : (int)
-        Atomic number of your nuclide
-    A : (int)
-        atomic mass of your nuclide
-    N : (int)
-        Neutron count in your nuclide
-    isomer : (int)
-        The isomer number of your nuclide
-    FPZAI : (dictionary)
-        Fission Product dictionary for this nuclide. Is denoted with it's ZAI number
-    y : (float)
-        The yield of the specific nuclide
-    cov : (dictionary)
-        The covariance matrix for the specific nuclide
-    corr : (dictionary)
-        The correlation matrix for the specific nuclide
-    yerr : (float)
-        The yield error for this specific nuclide
-
-    Methods
-    -------
-    Contribute(fraction, d_fraction=0):
-        Adds the fission yield of a specific branch to the overall fission yield
-    AddCovariance(newNuclide):
-        Add the covariance matrices of different nuclides together
     """
+    
     def __init__(self, FPZAI, y, yerr):
+
         self.Z = int(FPZAI/10000)
         self.A = int((FPZAI-self.Z*10000)/10)
         self.N = self.A-self.Z
@@ -68,17 +45,16 @@ class FPNuclide:
     # Method that add fission yield of this branch to total fission yield.
     # When use_corr == True, assume correlation matrix is loaded, calculate a
     # new covariance matrix.
-    def Contribute(self, fraction, d_fraction=0, use_corr = False):
+    def Contribute(self, fraction, d_fraction=0):
         """
-           Adds the fission yield of this branch to the total fission yield
+        Add the fission yield of this nuclide to the total fission yield (called by the obsolete FissionModel class).
+        
+        :param fraction: The fractional contribution of this fission product to the overall reactor model
+        :type fraction: float
+        :param d_fraction: uncertainty of fraction, defaults to 0
+        :type d_fraction: TYPE, optional
 
-            Parameters:
-                fraction (float) : The fractional contribution of this nuclide to the overall yield
-                d_fraction (float) : the uncertainty in the fractional contribution of this nuclide
-            Returns:
-                None
         """
-
         #
         # if use_corr:
         #     assert self.corr, "Correlation matrix was not loaded!"
@@ -103,12 +79,11 @@ class FPNuclide:
     # Method to add covariance matrices together
     def AddCovariance(self, newNuclide):
         """
-            Adds covariance matrices together
+        Add covariance relative to another fission product.
+        
+        :param newNuclide: another fission product
+        :type newNuclide: :class:`conflux.FPYEngine.FPNuclide`
 
-            Parameters:
-                newNuclide (FPNuclide) : The nuclide whose covariance matrix you want to add to this one.
-            Returns:
-                None
         """
         # print("Added FPY covaraince matrix")
         for key in newNuclide.cov:
@@ -143,9 +118,26 @@ class FissionIstp(Spectrum, Summed):
         Function to load data from a specific fission database. DB has format /path/to/DB. Defaults to ENDF
     LoadCovariance(DB='ENDF', percent=True):
         Load the covariance matrices associated with the fission isotopes. DB has format /path/to/DB. Defaults to ENDF
+    CalcBetaSpectra(betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
+        Calculate the beta/neutrino spectrum to 
     """
 
     def __init__(self, Z, A, Ei, DB='ENDF', IFPY=False):
+        """
+        Construct the FissionIstp class. Load the fissionDB when constructed.
+        
+        :param Z: The Atomic number of the isotope 
+        :type Z: int
+        :param A: The Atomic mass number of the isotope 
+        :type A: int
+        :param Ei: The incident neutron energy to ignite fission
+        :type Ei: float
+        :param DB: filename or names of default databases, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :type DB: string, optional
+        :param IFPY: Determine whether to calculate independent fission product yields, defaults to False
+        :type IFPY: bool, optional
+
+        """
         self.Z = Z
         self.A = A
         self.Ei = Ei
@@ -158,15 +150,17 @@ class FissionIstp(Spectrum, Summed):
     # method that load xml database of FPY and save nuclide info in dictionaries.
     def LoadFissionDB(self, Ei=None, DB='ENDF'):
         """
-           Loads the fission products from a given database into the Independant and cumulative fission dictionaries in the model.
-
-            Parameters:
-                DB (String) : The path to a user inputed fission database. Has the form "/path/to/database
-            Returns:
-                None
+        Load fission product yeilds with given incident neutron energy.
+        
+        :param Ei: The incident neutron energy to ignite fission
+        :type Ei: float
+        :param DB: filename or names of default fission product databases, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :type DB: string, optional
+        
         """
-
-        if Ei != None: self.Ei = Ei
+        if Ei != None: 
+            self.Ei = Ei
+            self.FPYlist = {}
         DBname = DB
         # Check if the user gave a valid Database path
         # if there is no specified fissionDB, look for the default one
@@ -240,15 +234,14 @@ class FissionIstp(Spectrum, Summed):
     # flux calcuation.
     def LoadCovariance(self, DB = 'ENDF', percent=True):
         """
-           Loads the covariance matrices from a given database into the Independant and cumulative fission dictionaries in the model.
+        Read the prepackaged covariance csv file and calculate covariance matrix of fission product yields. This function should only be called after loading the fission DB for neutrino.
+        
+        :param DB: filename or names of default covariance of fission product, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :type DB: string, optional
+        :param percent: let the function know whether the value in the data is percentage or fractional, defaults to True
+        :type percent: bool, optional
 
-            Parameters:
-                DB (String) : The path to a user inputed covariance file. Has the form "/path/to/database
-                percent (boolean) : determines whether the covariances are relative or not.
-            Returns:
-                None
         """
-
         DBpath = DB
         #Figure out where the DB and files are in a similar method we loaded the
         #Fission Database.
@@ -257,7 +250,6 @@ class FissionIstp(Spectrum, Summed):
             print("Reading covariance matrices in: "+DBpath+"...")
         fileList = listdir(DBpath)
         assert(DBpath)
-        istpfound = False
         #By default, set Neutron energy to 0 (thermal), 0.5 (fast), or 14 (relativistic) << default DB is ENDF
         e_neutron = {'T': 0, 'F': 0.5, 'H': 14}
         #If JEFF is chosen, adjust the neutron energies.
@@ -273,7 +265,8 @@ class FissionIstp(Spectrum, Summed):
             #     continue
             if ("cov" not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
                 continue
-            print("Filename is ", filename)
+        
+            print(f"Filename is {filename}")
             filesfound.append(filename)
 
         # determine the whether the covariance are relative or absolute
@@ -329,12 +322,11 @@ class FissionIstp(Spectrum, Summed):
     #Most of the comments will be the same for both this and for the LoadCovariance function
     def LoadCorrelation(self, DB='ENDF'):
         """
-           Loads the correlation matrices from a given database into the Independant and cumulative fission dictionaries in the model.
+        Read the prepackaged correlation csv file and calculate covariance matrix of fission product yields. This function should only be called after loading the fission DB for neutrino.
+        
+        :param DB: filename or names of default correlation of fission product, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :type DB: string, optional
 
-            Parameters:
-                DB (String) : The path to a user inputed correlation file. Has the form "/path/to/database
-            Returns:
-                None
         """
 
         DBpath = DB  #Figure out where the DB and files are in a similar method we loaded the
@@ -408,12 +400,7 @@ class FissionIstp(Spectrum, Summed):
     # Method to calculate a covariance matrix from the correlation information
     # of each fission product at a given neutron energy.
     def CalcCovariance(self):
-        """
-            Calculates the covariance matrix from inputted correlation information
-            Returns:
-                None
-        """
-
+        """Calculate the covariance matrix from inputted correlation information. This function is automatically called by :meth:`conflux.FPYEngine.FissionIsotope.LoadCovariance`."""
         #Iterate over all fission nuclides inside the Cumulative fission dictionary
         for i in self.FPYlist:
             yerri = self.FPYlist[i].yerr #Load the yield error of the nuclide i
@@ -426,7 +413,23 @@ class FissionIstp(Spectrum, Summed):
                 #(error of i) * (correlation of j) * (error of j)
 
     def CalcBetaSpectra(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
+        """
+        Calculate the summed beta/neutrino spectrum of this fission isotope.
+        
+        :param betaSpectraDB: the input beta engine that already calculated beta spectra from a given beta database
+        :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
+        :param processMissing: Determine whether to include assummed spectrum calculated for missing branches in the beta database, defaults to False
+        :type processMissing: bool, optional
+        :param ifp_begin: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to 0
+        :type ifp_begin: float, optional
+        :param ifp_end: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to 0
+        :type ifp_end: float, optional
+        :param modelunc: Determine whether to include beta modeling uncertainty, defaults to True
+        :type modelunc: bool, optional
+        :param silent: whether to disable the tqdm output, defaults to False
+        :type silent: bool, optional
 
+        """
         self.xbins = betaSpectraDB.xbins
         nbins = len(self.xbins)
         betaSpectraList = {}
@@ -452,7 +455,7 @@ class FissionIstp(Spectrum, Summed):
 
             # for IFP calculation, adjust the decay rate of the target isotope
             # by the rate of isotope that are decayed in the time window
-            if (ifp_begin < ifp_end):
+            if (self.IFPY and ifp_begin < ifp_end):
                 adjustment = betaSpectraDB.istplist[FPZAI].decay_time_adjust(ifp_begin, ifp_end)
                 thisyield *= adjustment
                 yielderr *= adjustment
@@ -514,6 +517,8 @@ class FissionIstp(Spectrum, Summed):
 # reactor compositions.
 class FissionModel:
     '''
+    Build a fission reactor model with dictionary of all FPYs from all added `FissionIstp`s. (maybe obsolete)
+    
     Attributes
     ----------
     FPYlist : (dictionary)
@@ -558,7 +563,7 @@ class FissionModel:
         """
 
         #Set FPYlist to the Cumulative fission product list of the inputed isotope
-        FPYs = copy.deepcopy(isotope.FPYlist)
+        FPYs = deepcopy(isotope.FPYlist)
 
         for FPZAI in FPYs:
             if FPYs[FPZAI].y == 0: continue #If the yield for the specific fission product is 0, skip it (ZAI)

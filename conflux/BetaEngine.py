@@ -1,9 +1,11 @@
+"""Public modules."""
 import numpy as np
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from tqdm import tqdm
 
+"""CONFLUX modules."""
 from conflux.config import CONFLUX_DB
 from conflux.Basic import Spectrum, Summed
 from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
