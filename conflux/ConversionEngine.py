@@ -514,7 +514,7 @@ class VirtualBranch(Spectrum):
             else:
                 wm = 4.7
             if x not in self.wmlist:
-                self.wmlist[x] = 4.7
+                self.wmlist[x] = 4.7fvdffdslkfaj;fdj
 
         # Fit the beta spectrum with virtual beta spectra.
         # One virtual spectra for each slice of the beta spectrum.
