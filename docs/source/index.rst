@@ -4,17 +4,14 @@
 CONFLUX Software Package
 ========================
 
-CONFLUX, Calculation Of Neutrino FLUX, is a framework that allow users to calculate reactor neutrino flux with flexible and time dependent inputs of reactor models. The framework provides three different modes of neutrino flux calculation:
+CONFLUX, Calculation Of Neutrino FLUX, is a framework that allows users to calculate reactor neutrino flux and uncertainties with flexible and time dependent inputs of reactor models. It uses the most up-to-date Nuclear libraries, as well as a robust Beta spectrum shape generator to create a neutrino spectrum.
 
-|  Summation mode
-|  Beta-conversion mode
-|  Direct measurement mode
-|
-The formalism is described in this publication_, while the code is published here_.
+The formalism is described in this publication_, while the code is published here_. Finally, this manual_ should be used as a general reference for how to use the framework.
 
+.. _publication:
+.. _here: https://github.com/CNFLUX/conflux/tree/master
+.. _manual: https://conflux.readthedocs.io/en/latest/
 
-.. _publication: www.google.com 
-.. _here: https://github.com/CNFLUX/conflux
 
 Installation & Basic execution
 ------------
