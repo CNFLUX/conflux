@@ -52,6 +52,15 @@ Databases
 
 ENDF/JEFF
 ---------
+ENDF and JEFF are Nuclear Databases containing Fission Yields of Individual Fission Isotopes. Either can be selected in the calculation by specificying which Database in the ``Default_DB`` variable where required.
+Some key notes on the parsed data include 
+- HEAD AWR
+- FissionZA : This is an identifier for this specific Isotope, combining both its' atomic number and mass.
+- LE
+- MT : Determines whether that specific set of data is an Indpendant Yield ``IFP`` or a Cumulative Yield ``CFP``
+- Ei : This is the incident neutron energy that causes the fission. Value can either be 0 (thermal), 0.5 (fast), or 14 (relativistic)
+- Ii
+- NFPI
 
 
 .. literalinclude:: ENDF_example.txt
