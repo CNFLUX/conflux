@@ -380,6 +380,7 @@ class BetaIstp(Spectrum, Summed):
         fraction = 1
         sigma_frac = 1
         forbiddenness = 0
+        custom_func = None
         bAc = 4.7
         custom_func = None
 
@@ -533,19 +534,11 @@ class BetaIstp(Spectrum, Summed):
 # spectra of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
 class BetaEngine:
-<<<<<<< HEAD
     def __init__(self, 
                  inputlist=None, 
                  targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None):
-=======
-    def __init__(self, inputlist=None, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", xbins=np.arange(0, 20, 0.1)):
->>>>>>> 22d40f6 (change default betadb calling procedure)
-        self.inputlist = inputlist
-        self.istplist = {}
-        self.xbins = xbins
-        self.custom_func=custom_func
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
