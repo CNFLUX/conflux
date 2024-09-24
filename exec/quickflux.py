@@ -54,8 +54,7 @@ def model_setup(json_file):
     if 'rxpower' in json_file:
         rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['unit']]
 
-    # Calculate reactor composition with summation mode
-
+    # Calculate fissile isotopes with summation mode
     if 'sum_model' in json_file:
         summation = json_file['sum_model']
         qlow = summation['qlow']          # select the lower limit of the beta q values
@@ -65,46 +64,54 @@ def model_setup(json_file):
         ifp_begin = 0
         ifp_end = 0
 
+        # Loading the beta spectrum data base and calculate beta spectra
         betaSpectraDB = BetaEngine(xbins=xbins)
-        betaSpectraDB.CalcBetaSpectra(nu_spectrum=nu_spec, branchErange=[qlow, qhigh])
-        print('test finished')
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=nu_spec, 
+                                      branchErange=[qlow, qhigh])
+        sum_model = SumEngine(betaSpectraDB)
 
+
+        # Determine whether to calculate independent fission yield
         if IFP:
             "setting up reactor model dependent on time"
             ifptime = summation['time']
 
-        # prepare a summation model
-        fissionmodel = FissionModel()
         #if 'fission_db' in json_file:
-
+        
+        # loading fission istps in the model
         sum_composition = summation['composition']
         for fissile_istp in sum_composition:
             name = fissile_istp['name']
             Z = fissile_istp['Z']
             A = fissile_istp['A']
             Ei = fissile_istp['ei']
-            istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
+            istp = FissionIstp(Z, A, Ei, DB=fissile_istp['fissiondb'])
             if 'fissiondb' in fissile_istp:
                 istp.LoadFissionDB(DB=fissile_istp['fissiondb'])
             if 'covariancedb' in fissile_istp:
-                istp.LoadCovarience(DB=fissile_istp['covariancedb'])
+                istp.LoadCovariance(DB=fissile_istp['covariancedb'])
+            else:
+                istp.LoadCovariance(DB=fissile_istp['fissiondb'])
+            istp.CalcBetaSpectra(betaSpectraDB, 
+                                 processMissing=missing, 
+                                 ifp_begin = ifp_begin, 
+                                 ifp_end = ifp_end)
 
-            fissionmodel.AddContribution(isotope=istp, Ei = Ei, fraction=1, IFP=IFP)
-
-        sum_model= SumEngine(xbins = xbins)
-        sum_model.AddModel(fissionmodel, W=1)
-        betaSpectraDB = BetaEngine(xbins=xbins)
-        betaSpectraDB.CalcBetaSpectra(nu_spectrum=nu_spec, branchErange=[qlow, qhigh])
+            count = fissile_istp['count']
+            d_count = 0 if 'd_count' not in fissile_istp else fissile_istp["d_count"]
+            sum_model.AddFissionIstp(istp, name, count, d_count)
+            
         for istp in betaSpectraDB.istplist:
             betaIstp = betaSpectraDB.istplist[istp]
             print(betaIstp.Q)
-        sum_model.CalcReactorSpectrum(betaSpectraDB, branchErange=[qlow, qhigh], processMissing=missing,  ifp_begin = ifptime[0],  ifp_end = ifptime[1])
+        sum_model.CalcReactorSpectrum()
         spectrum += sum_model.spectrum
 
+    # calculate the neutrino spectra with 
     conversion = json_file['convert_model']
     if conversion:
-        # Declare the conversion engine by adding beta data with corresponding FPY
-        # database
+        # Declare the conversion engine by adding beta data with corresponding 
+        # FPY database
         convertmodel = ConversionEngine()
         conv_composition = conversion['composition']
         for fissile_istp in conv_composition:
@@ -112,7 +119,8 @@ def model_setup(json_file):
             name = fissile_istp['name']
             Z = fissile_istp['Z']
             A = fissile_istp['A']
-            istp = FissionIstp(fissile_istp['Z'], fissile_istp['A'])
+            Ei = 0
+            istp = FissionIstp(Z, A, Ei)
             istp.LoadFissionDB(DB="JEFF")
 
             beta_istp = BetaData(fissile_istp['conversiondb'])
@@ -120,7 +128,9 @@ def model_setup(json_file):
             fraction = fissile_istp['fraction']
             convertmodel.AddBetaData(beta_istp, istp, name, fraction)
             convertmodel.VBfitbeta(name, branch_slice)
-        convert_spect, unc, cov = convertmodel.SummedSpectrum(xbins, nu_spectrum=True, cov_samp=5)
+        convert_spect, unc, cov = convertmodel.SummedSpectrum(xbins, 
+                                                              nu_spectrum=True, 
+                                                              cov_samp=5)
         spectrum += convert_spect
 
     print(spectrum)
@@ -128,7 +138,9 @@ def model_setup(json_file):
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
-    ax.set(xlabel='E (MeV)', ylabel='neutrino/decay/MeV', title='U-235 neutrino flux')
+    ax.set(xlabel='E (MeV)', 
+           ylabel='neutrino/decay/MeV', 
+           title='U-235 neutrino flux')
     ax.plot(xbins, spectrum, label="w/ miss info")
     #ax.plot(sum2.xbins, summed_spect, label="w/o info")
     ax.legend()

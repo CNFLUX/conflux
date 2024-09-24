@@ -35,6 +35,13 @@ def element_to_Z():
                 zdict[row[1]] = row[0]
     return zdict
 
+# check if a string contain any element in a list
+def contains_any(string, elements):
+    for element in elements:
+        if element in string:
+            return True
+    return False
+
 # global dictionary of element and Z
 elementdict = element_to_Z()
 
@@ -251,7 +258,6 @@ class DecayBranch:
         self.forbidden = line[77:79].strip() if not line[77:79].isspace() else "0"
 
 def ENSDFbeta(fileList):
-
     xmloutput = XMLedit()
     for filename in tqdm(fileList):
         inputfile = open(dirName+filename, "r", errors='replace')
@@ -269,8 +275,12 @@ def ENSDFbeta(fileList):
 
             # find parent isotope of beta decay (ignore other types of decay)
             MT = line[5:8]      # Check datatype
-            betatag = "B- DECAY"
-            if MT == "   " and betatag in line and "2B- DECAY" not in line:
+            betatag = ["B- DECAY", 
+                       "B-N DECAY", 
+                       "B-2N DECAY", 
+                       "B-P DECAY",
+                       "B-_ DECAY"]
+            if MT == "   " and contains_any(line, betatag) and "2B- DECAY" not in line:
                 lastline = line
                 betabool = True
 
@@ -322,7 +332,7 @@ def ENSDFbeta(fileList):
                     lastline = line
                     #print(lastline)
 
-    xmloutput.saveXML("ENSDFbetaDB2.xml")
+    xmloutput.saveXML("ENSDFbetaDB3.xml")
 
     return 0
 

@@ -5,7 +5,7 @@
 # universal modules
 import csv
 import numpy as np
-from copy import deepcopy, copy
+from copy import deepcopy
 import timeit
 import matplotlib.pyplot as plt
 from iminuit import Minuit
@@ -21,16 +21,63 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 
 # Class that reads conversion DB and form reference spectra
 class BetaData(Spectrum):
+    """
+    A class to save the beta spectrum data to be converted in the computer memory.
+
+    ...
+
+    Attributes
+    ----------
+
+    x : list
+        A list of the x-axis bins
+    y : list
+        A list of the y-axis values (bin content)
+    yerr : list
+        A list of the errors on the y-axis (bin error)
+    inputDB : str
+        The filename where the spectrum data is saved
+    spectrum : :class:`numpy.array`
+        An array to store the full beta spectrum
+    uncertainty : :class:`numpy.array`
+        An array to store the full beta spectrum uncertainty
+
+
+    Methods
+    -------
+
+    LoadConversionDB(self, inputDB, rel_err=True):
+        Load the beta spectrum data
+    """
+    
     def __init__(self, inputDB, rel_err=True):
+        """
+        Construct the BetaData class.
+        
+        :param inputDB: The file name of the beta spectrum data to fit against.
+        :type inputDB: str
+        :param rel_err: Indicate whether the uncertainty of the data is relative (True) or absolute (False), defaults to True
+        :type rel_err: bool, optional
+
+        """
         self.x = []
         self.y = []
         self.yerr = []
         self.inputDB = inputDB
-        self.LoadConversionDB(inputDB)
+        self.LoadConversionDB(inputDB, rel_err)
         self.spectrum = np.array(self.y)
         self.uncertainty = np.array(self.yerr)
 
     def LoadConversionDB(self, inputDB, rel_err=True):
+        """
+        Load the beta spectrum data.
+        
+        :param inputDB: The file name of the beta spectrum data to fit against.
+        :type inputDB: str
+        :param rel_err: Indicate whether the uncertainty of the data is relative (True) or absolute (False), defaults to True
+        :type rel_err: bool, optional
+
+        """
         self.x = []
         self.y = []
         self.yerr = []
@@ -58,30 +105,59 @@ class BetaData(Spectrum):
         self.spectrum = np.array(self.y)
         self.uncertainty = np.array(self.yerr)
 
-# Class that creates virtual branch based on nuclear data
 class VirtualBranch(Spectrum):
+    """
+    A class that creates virtual branch with customized end-point energy and virtual nuclide summarized from nuclides with the similar end-point energy based on nuclear data, and fit the virtual branch against a reference beta spectrum.
+
+    ...
+
+    Attributes
+    ----------
+    fisIstp : :class:`conflux.FPYEngine.FissionIstp`
+        The corresponding fission isotope to fit against. This isotope provides nuclear data to generate a virtual nuclide for the virtual branch.
+    FPYlist : dict
+        A dictionary of fission product yields of the input fission isotope
+    contribute : list
+        Best fit contributions of vitual branches
+    E0 : list
+        Best fit end-point energies of virtual branches
+    slicesize : float
+        The size the energy slices for virtual branch fitting
+    Zlist : dict
+        A dictionary of Z numbers of the virtual nuclide calculated for each virtual branch of corresponding energy slice (end-point energy)
+    Alist : dict
+        A dictionary of A numbers of the virtual nuclide calculated for each virtual branch of corresponding energy slice (end-point energy)
+    fblist : dict
+        A dictionary of forbidden transition fractions of each virtual branch of corresponding energy slice (end-point energy)
+    wmlist : dict
+        A dictionary of weak magnetism correction factor of each virtual branch of corresponding energy slice (end-point energy)
+
+    Methods
+    -------
+    LoadFPYList(self):
+        Load the fission products of the input fission isotope
+    CalcZAavg(self, Elow, Ehigh, missing=False):
+        
+    """
+    
     def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}, fblist={}, wmlist={}):
         """
-        Class that creates virtual branch based on nuclear data
-
-        Parameters
-        ----------
-        fisIstp : FissionIstp
-            input fission isotope model to calculate average atom number
-        Ei: float
-            incedent neutron energy that triggers the fission
-        Zlist: dictionary with float keys and float values
-            The mapping between the beta energy and input average Z number
-        Alist: dictionary with float keys and float values
-            The mapping between the beta energy and input average A number
-        fblist: dictionary with float keys and float values
-            The mapping between the beta energy and customized ratio 1st order
-            forbidden transition in the corresponding virtual branches
-        wmlist: dictionary with float keys and float values
-            The mapping between the beta energy and weak magnatism correction 
-            of corresponding virtual branches
+        Construct the VirtualBranch class.
+        
+        :param fisIstp: The corresponding fission isotope to fit against. This isotope provides nuclear data to generate a virtual nuclide for the virtual branch.
+        :type fisIstp: :class:`conflux.FPYEngine.FissionIstp`
+        :param Ei: incedent neutron energy that triggers the fission, defaults to 0
+        :type Ei: float, optional
+        :param Zlist: The mapping between the beta energy and input average Z number, defaults to {}
+        :type Zlist: dict, optional
+        :param Alist: The mapping between the beta energy and input average A number, defaults to {}
+        :type Alist: dict, optional
+        :param fblist: The mapping between the beta energy and customized ratio 1st order forbidden transition in the corresponding virtual branches, defaults to {}
+        :type fblist: dict, optional
+        :param wmlist: The mapping between the beta energy and weak magnatism correction of corresponding virtual branches, defaults to {}
+        :type wmlist: dict, optional
+        
         """
-
         self.fisIstp = fisIstp
 
         self.Zavg = 47  # rough avg of Z across all energy
@@ -113,11 +189,12 @@ class VirtualBranch(Spectrum):
 
 
     # Function to load FPY list
-    def LoadFPYList(self, fisIstp, Ei = 0):
-        for nuclide in tqdm(fisIstp.FPYlist, 
+    def LoadFPYList(self):
+        """Load the fission product yield of the fissile isotope. This is to calculate the average atom numbers of the energy slices."""
+        for nuclide in tqdm(self.fisIstp.FPYlist, 
                             desc="Tallying fission products of "+
                                 str(self.fisIstp.A)):
-            fpNuclide = fisIstp.FPYlist[nuclide]
+            fpNuclide = self.fisIstp.FPYlist[nuclide]
             if fpNuclide.y == 0: continue
             FPZAI = int(fpNuclide.Z*10000 + fpNuclide.A*10 + fpNuclide.isomer)
 
@@ -127,26 +204,18 @@ class VirtualBranch(Spectrum):
                 self.FPYlist[FPZAI].y += fpNuclide.y
                 self.FPYlist[FPZAI].yerr += fpNuclide.yerr
 
-    # function to precisely calculate average Z, A value of the virtual branch
     def CalcZAavg(self, Elow, Ehigh, missing=False):
         """
-            Calculate the average Z and A number of the slice of the 
-            virtual beta spectrum
-            
-            Parameters
-            ----------
-            Elow:  float
-                lower bondary of the spectrum energy slice
-            Ehigh: float
-                higher bondary of the spectrum energy slice
-            missing=False: bool
-                whether to count missing contributions in the beta DB
-                
-            Returns
-            -------
-            Zavg, Aavg: int
-                rounded integers of the averaged atom number
-                
+        Calculate the average Z and A number of the slice of the virtual beta spectrum.
+        
+        :param Elow: lower bondary of the spectrum energy slice
+        :type Elow: float
+        :param Ehigh: igher bondary of the spectrum energy slice
+        :type Ehigh: float
+        :param missing: whether to count missing contributions in the beta DB, defaults to False
+        :type missing: bool, optional
+
+
         """
         frac_sum = 0
         Afrac_sum = 0
@@ -177,6 +246,29 @@ class VirtualBranch(Spectrum):
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
                     nu_spectrum=False, forbiddenness=0, bAc=4.7, norm=True):
+        """
+        Calculate the theoretical beta/neutrino spectrum shape.
+        
+        :param x: Energy of the beta/neutrino (x values)
+        :type x: float
+        :param E0: End-point energy of the spectrum
+        :type E0: float
+        :param contribute: The normalization or contribution of this spectrum to the summed entire beta spectrum 
+        :type contribute: float
+        :param Zavg: The Z number of the vitual nuclide for a virtual branch beta spectrum calculation, defaults to None
+        :type Zavg: int, optional
+        :param Aavg: The Z number of the vitual nuclide for a virtual branch beta spectrum calculation, defaults to None
+        :type Aavg: int, optional
+        :param nu_spectrum: whether to calculate neutrino (True) or beta (False) spectrum, defaults to False
+        :type nu_spectrum: bool, optional
+        :param forbiddenness: type of forbidden/allowed transitions , defaults to 0
+        :type forbiddenness: int, optional
+        :param bAc: Weak magnetism correction factor, defaults to 4.7
+        :type bAc: float, optional
+        :param norm: Whether to normalize the beta spectrum integral to 1, defaults to True
+        :type norm: bool, optional
+
+        """
         if Zavg is None:
             Zavg = self.Zavg
         if Aavg is None:
@@ -194,15 +286,12 @@ class VirtualBranch(Spectrum):
         if norm:
             full_spect = virtualbeta.BetaSpectrum(full_range, nu_spectrum)
             normalize = full_spect.sum()
-            # normalize = new_spect.sum()*full_spect.sum()/this_spect.sum() if E0 > binwidths else new_spect.sum()
-            # print("test", this_spect.sum()/full_spect.sum())
 
         new_spect /= normalize*binwidths
-        # print("again", sum(new_spect))
         return new_spect
 
     # function that fit the reference beta spectrum with virtual brances
-    def FitData(self, betadata, slicesize):
+    def FitData(self, betadata, slicesize=0.5):
         """
         Fits the reference beta spectrum with virtual brances data.
 
@@ -212,13 +301,12 @@ class VirtualBranch(Spectrum):
         virtual branch spectrum is subtracted from the reference data to let the
         next virtual branch to fit the updated spectrum in the consequential
         energy slice.
+        
+        :param betadata: The input BetaData object that provides the reference beta spectrum to fit.
+        :type betadata: :class:`conflux.ConversionEngine.BetaData`
+        :param slicesize: The size of the energy range, should be greater than 0.2 (MeV) and smaller than 2 (MeV), defaults to 0.5
+        :type slicesize: float 
 
-        Parameters
-        ----------
-        betadata : array
-        slicesize : float
-            The size of the energy range, should be greater than 0.2 (MeV) and
-            smaller than 2 (MeV)
         """
         self.contribute = {}
         self.E0 = {}
@@ -352,8 +440,18 @@ class VirtualBranch(Spectrum):
                 suby.append(datacache[it])
                 subyerr.append(betadata.uncertainty[it])
 
-    # TODO: revisit the NNLS fitter by changing the selection strat of the energy slice
     def FitDataNNLS(self, betadata, slicesize, seeds=2000):
+        """
+        Fit virtual beta branches to the input beta data using the :meth:`scipy.optimize.nnls` method (maybe obsolete).
+        
+        :param betadata: The input BetaData object that provides the reference beta spectrum to fit.
+        :type betadata: :class:`conflux.ConversionEngine.BetaData`
+        :param slicesize: The size of the energy range, should be greater than 0.2 (MeV) and smaller than 2 (MeV), defaults to 0.5
+        :type slicesize: float 
+        :param seeds: number of MC samples for this calculation, defaults to 2000
+        :type seeds: int, optional
+
+        """
         self.contribute = {}
         self.E0 = {}
         self.betadata = betadata
@@ -459,39 +557,22 @@ class VirtualBranch(Spectrum):
         self.contribute = dict(zip(xhigh, bestnorm))
         self.E0 = dict(zip(xhigh, beste0))
         self.bestfits =  dict(zip(xhigh, bestspectra))
-        # subtract the best fit spectrum from final_spect
-        # plt.figure()
-        # # plt.yscale('log')
-        # # plt.ylim([-1.5*max(abs(suby)), 1.5*max(abs(suby))])
-        # # plt.errorbar(betadata.x, betadata.spectrum, betadata.uncertainty)
-        # plt.plot(betadata.x, new_spect - 1)
-
-        # plt.pause(1)
-        # plt.show()
-        # print(least, self.E0, self.contribute)
 
     # function to calculate summed spectra of virtual branches
     def SumBranches(self, x, thresh = 0, nu_spectrum = False):
         """
-        SumBranches(self, x, thresh = 0, nu_spectrum = True)
+        Sum the best fit vitual branch spectra to form the best fit beta/neutrino model spectrum.
+        
+        :param x: energy of the particle (the x value of spectrum)
+        :type x: ndarray
+        :param thresh: Overrides the threshold. If threhold > 0, only add branch whose
+            energy range is above the threshold, defaults to 0
+        :type thresh: float, optional
+        :param nu_spectrum: whether to calculate neutrino (True) or beta (False) spectrum, defaults to False
+        :type nu_spectrum: bool, optional
+        :return: summed spectrum
+        :rtype: ndarray
 
-        Function to calculate summed spectra of virtual branches
-
-        Parameters
-        ----------
-        x : ndarray
-            The array of x values of the spectrum
-        thresh: float
-            Overrides the threshold. If threhold > 0, only add branch whose
-            energy range is above the threshold
-        nu_spectrum: bool
-            Overrides the nu_spectrum boolean, detemining whether to sum
-            neutrino spectra or beta spectra
-
-        Returns
-        -------
-        result: ndarray
-            The summed spectra in the form of ndarray
         """
         result = 0
 
@@ -515,15 +596,15 @@ class VirtualBranch(Spectrum):
 
                 binwidths = x[1]-x[0]
                 full_range = np.arange(0, 20, binwidths)
-                this_range = np.arange(x[0], x[-1], 0.01)
+                # this_range = np.arange(x[0], x[-1], 0.01)
                 full_spect = vb.frac * ((1-self.fblist[s])
                                     * vb.BetaSpectrum(full_range, nu_spectrum)
                                 + self.fblist[s]
                                     * vb_fb.BetaSpectrum(full_range, nu_spectrum))
-                this_spect = vb.frac * ((1-self.fblist[s])
-                                    * vb.BetaSpectrum(this_range, nu_spectrum)
-                                + self.fblist[s]
-                                    * vb_fb.BetaSpectrum(this_range, nu_spectrum))
+                # this_spect = vb.frac * ((1-self.fblist[s])
+                #                     * vb.BetaSpectrum(this_range, nu_spectrum)
+                #                 + self.fblist[s]
+                #                     * vb_fb.BetaSpectrum(this_range, nu_spectrum))
                 norm = full_spect.sum() if s > binwidths else newspect.sum()
                 newspect /= norm*binwidths
                 # print('max', max(newspect)/max(self.bestfits[s]))
@@ -559,14 +640,32 @@ class VirtualBranch(Spectrum):
 
     def Covariance(self, betadata, x, samples = 50, thresh = 0,
                    nu_spectrum = True):
+        """
+        Calculate the covariance of the conversion/fitting result by creating MC samples of beta data with varied bin content from the original spectrum within its uncertainty.
+        
+        :param betadata: The input BetaData object that provides the reference beta spectrum to fit.
+        :type betadata: :class:`conflux.ConversionEngine.BetaData`
+        :param x: energy of the particle (the x value of spectrum)
+        :type x: ndarray
+        :param samples: the amount of MC samples, defaults to 50
+        :type samples: int, optional
+        :param thresh: Overrides the threshold. If threhold > 0, only add branch whose
+            energy range is above the threshold, defaults to 0
+        :type thresh: float, optional
+        :param nu_spectrum: whether to calculate neutrino (True) or beta (False) spectrum, defaults to True
+        :type nu_spectrum: bool, optional
+        :return: the covariance matrix of the virtual branch fitting or conversion result
+        :rtype: ndarray
+
+        """
         result = []
         print(f'Calculating covariance matrix with {samples} MC samples...')
         startTiming = timeit.default_timer()
 
-        plt.figure()   # TODO comment me
-        vbbuffer = deepcopy(self)   # TODO comment me
-        vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
-        y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
+        # plt.figure()   # TODO comment me
+        # vbbuffer = deepcopy(self)
+        # vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
+        # y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
         for i in (range(0, samples)):
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
@@ -576,21 +675,54 @@ class VirtualBranch(Spectrum):
             vbnew = deepcopy(self)
             vbnew.FitData(toy, vbnew.slicesize)
             y = vbnew.SumBranches(x, thresh, nu_spectrum)
-            plt.plot(x, (y-y0)/y0, color='red') # TODO comment me
-            plt.ylim((-0.2, 0.2))
+            # plt.plot(x, (y-y0)/y0, color='red') # TODO comment me
+            # plt.ylim((-0.2, 0.2))
 
             result.append(y)
-        plt.show() # TODO comment me
+        # plt.show() # TODO comment me
         endTiming = timeit.default_timer()
         runTime = endTiming-startTiming
         print(f"Finished calculating covairance matrix of {samples} samples.")
         print(f"Processing time: {runTime} seconds")
         return np.cov(np.transpose(result))
 
-# Class that search for best fit vertual branch and calculate total neutrino
-# flux
 class ConversionEngine(Spectrum):
+    """
+    Class that search for best fit vertual branch and sum the converted total neutrino flux.
+
+    ...
+
+    Attributes
+    ----------
+    betadata : dict
+        A dictionary of beta spectra of fission isotopes 
+    fission_frac : dict
+        A dictionary of the fission isotope fractions
+    fission_dfrac : dict
+        A dictionary of the fission isotope fraction uncertainties
+    fisIstp : dict
+        A dictionary of the fission isotope in the conversion model
+    vblist: dict
+        A dictionary of the virtual branches
+    spectrum : :class:`numpy.array`
+        An array to store the full beta spectrum
+    uncertainty : :class:`numpy.array`
+        An array to store the full beta spectrum uncertainty
+    covariance : :class:`numpy.array`
+        The covariance matrix of the best fit spectrum or converted spectrum
+
+    Methods
+    -------
+    AddBetaData(self, betadata, fisIstp, name, frac, dfrac=0):
+        Add beta spectrum data as fitting reference into the dictionaries
+    VBfitbeta(self, istp, slicesize = 0.5, Ei = 0, Zlist={}, Alist={}):
+        Let vitual branches to fit against beta data with user chosen slice size.
+    SummedSpectrum(self, x, nu_spectrum=True, cov_samp=20):
+        Function to sum all best fit spectra calculated in the conversion engine.
+    """
+    
     def __init__(self):
+        """Construct the ConversionEngine class."""
         self.betadata = {}
         self.fission_frac = {}
         self.fission_dfrac = {}
@@ -599,37 +731,59 @@ class ConversionEngine(Spectrum):
 
     # load the beta spectrum measurement
     def AddBetaData(self, betadata, fisIstp, name, frac, dfrac=0):
+        """
+        Add beta spectrum data as fitting reference into the dictionaries.
+
+        :param betadata: The input BetaData object that provides the reference beta spectrum to fit.
+        :type betadata: :class:`conflux.ConversionEngine.BetaData`
+        :param istp: The corresponding fission isotope to fit against. This isotope provides nuclear data to generate a virtual nuclide for the virtual branch.
+        :type istp: :class:`conflux.FPYEngine.FissionIstp`
+        :param istp: The unique name of the fission isotope and spectrum that will be fitted.
+        :type istp: str
+        :param frac: The fraction of the fission isotope in the conversion model
+        :type frac: float
+        :param d_frac: The fraction uncertainty of the fission isotope in the conversion model
+        :type d_frac: float
+
+        """
         self.betadata[name] = betadata
         self.fission_frac[name] = frac
         self.fission_dfrac[name] = dfrac
         self.fisIstp[name] = fisIstp
 
-    # Function that lets VB to fit against beta data with user chosen slice size
     def VBfitbeta(self, istp, slicesize = 0.5, Ei = 0, Zlist={}, Alist={}):
+        """
+        Let vitual branches to fit against beta data with user chosen slice size.
+            
+        :param istp: The corresponding fission isotope to fit against. This isotope provides nuclear data to generate a virtual nuclide for the virtual branch.
+        :type istp: :class:`conflux.FPYEngine.FissionIstp`
+        :param slicesize: The size of the energy range, should be greater than 0.2 (MeV) and smaller than 2 (MeV), defaults to 0.5
+        :type slicesize: float 
+        :param Ei: incedent neutron energy that triggers the fission, defaults to 0
+        :type Ei: float, optional
+        :param Zlist: The mapping between the beta energy and input average Z number, defaults to {}
+        :type Zlist: dict, optional
+        :param Alist: The mapping between the beta energy and input average A number, defaults to {}
+        :type Alist: dict, optional
+
+        """
         assert istp in self.betadata
         # define the virtual branches to be fit
         vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
         vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
 
-    def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=20):
+    def SummedSpectrum(self, x, nu_spectrum=True, cov_samp=50):
         """
-        SummedSpectrum(self, x, nu_spectrum=True, cov_samp=20)
-
-        Function to sum all best fit spectra calculated in the conversion engine
-
-        Parameters
-        ----------
-        x : ndarray
-            The array of x values of the spectrum
-        nu_spectrum: bool
-            Overrides the nu_spectrum boolean, detemining whether to sum
-            neutrino spectra or beta spectra
-        cov_samp: int
-            The number of MC samples to calculate the covariance matrix. If the
-            sample number is below 50, calculation of covariance matrix will be
-            skipped.
-
+        Sum all best fit  or converted spectra calculated in the conversion engine based on the fractions and uncertainties.
+        
+        :param x: Particle energy (x values of the specrrum)
+        :type x: ndarray
+        :param nu_spectrum: whether to calculate beta (False) or netutrino (True) spectrum, defaults to True
+        :type nu_spectrum: bool, optional
+        :param cov_samp: the amount of MC samples for covariance matrix calculation, defaults to 50
+        :type cov_samp: int, optional
+        
         Returns
         -------
         spectrum: ndarray
@@ -638,6 +792,7 @@ class ConversionEngine(Spectrum):
             The uncertainty array of the summed spectrum
         covariance: ndarray
             The covariance matrix of the of the spectrum on given energy bin
+
         """
         # Determine whether to calculate the covariance matrix
         calc_cov = cov_samp >= 20
@@ -650,8 +805,8 @@ class ConversionEngine(Spectrum):
         # Summing all fissile isotopes spectra and uncertainties by looping 
         # through all virtual branches
         for istp in self.betadata:
+            this_vb = self.vblist[istp] 
             this_frac = self.fission_frac[istp]
-            this_vb = self.vblist[istp]
             this_dfrac = self.fission_dfrac[istp]
 
             # Summing spectra with respect to the fraction of fissile isotope
@@ -694,7 +849,6 @@ def rebin(data, bins):
 
 # testing script
 if __name__ == "__main__":
-    from conflux.BetaEngine import BetaBranch
     from conflux.FPYEngine import FissionModel, FissionIstp
     from conflux.SumEngine import SumEngine
     # from conflux.ConversionEngine import ConversionEngine, BetaData

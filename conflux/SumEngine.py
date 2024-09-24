@@ -8,12 +8,12 @@ from tqdm import tqdm
 
 # local modules
 from conflux.Basic import Spectrum
-from conflux.BetaEngine import BetaIstp
+from conflux.BetaEngine import BetaIstp, BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine(Spectrum):
     """
-    A Class to carry out the Summation (Ab-initio) Mode
+    A Class to carry out the summation of reactor antineutrino/beta spectrum by adding the spectra of fission and beta decaying isotopes based on their contributions in the model. The contributions is expected to be provided by the users.
 
     ...
 
@@ -43,8 +43,11 @@ class SumEngine(Spectrum):
     Clear():
         Clears all dictionaries associated with the SumEngine
 
-    AddModel(fissionModel, W=1.0):
-        method to add fission/non-fissile/non-equilibrium isotopes into the engine
+    AddFissionIstp(self, isotope, istpname, count=1, d_count=0):
+        method to add the spectra of fission isotopes into the engine
+    
+    AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
+        method to add the spectra of non-fissile/non-equilibrium isotopes into the engine
 
     NormalizeFP():
         Normalizes the FPY and the fission product yield Error
@@ -54,11 +57,21 @@ class SumEngine(Spectrum):
     """
 
     def __init__(self, betaSpectraDB, nu_spectrum=True):
+        """
+        Construct the SummationEngine class. The function read an input BetaEngine object that already calculated the beta spectra.
+        
+        :param betaSpectraDB: A calculated database of beta/neutrino spectra to sum from. The object should only be called after running the :meth:`conflux.BetaEngine.BetaEngine.CalcBetaSpectra` function
+        :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
+        :param nu_spectrum: Determine whether to calculate neutrino spectrum, defaults to True
+        :type nu_spectrum: bool, optional
+
+        """
         self.FPYlist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
         self.countlist = {}
         self.d_countlist = {}
+
         self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
@@ -71,12 +84,11 @@ class SumEngine(Spectrum):
     #With the Summation Engine.
     def Clear(self):
         """
-            Clears out all associated dictionaries inside the SumEngine
+        Clear out all associated dictionaries inside the SumEngine for recalculation.
+        
+        :return: DESCRIPTION
+        :rtype: TYPE
 
-            Parameters:
-                None
-            Returns:
-                None
         """
         self.FPYlist = {}
         self.betaUncertainty = {}
@@ -89,18 +101,21 @@ class SumEngine(Spectrum):
     # method that accumulates FPYs of fission isotopes in the list of FPY
     def AddFissionIstp(self, isotope, istpname, count=1, d_count=0):
         """
-           Add the spectrum of a fission isotope into the the list of FPYs in the model
+        Add the spectrum of a fission isotope into the the list of FPYs in this SumEngine model.
+        
+        :param isotope: A fission isotope object after running :meth:`conflux.FPYEngine.FissionIstp.CalcBetaSpectra` so the spectrum of the fission isotope can be saved for the summation.
+        :type isotope: :class:`conflux.FPYEngine.FissionIstp`
+        :param istpname: A unique name assigned to the fission isotope. The name is required to be unique for editting the isotope, instead of redefining the SumEngine model.
+        :type istpname: str
+        :param count: The counting of total fissions, allowed to be float for fractional calculation, defaults to 1
+        :type count: float, optional
+        :param d_count: The uncertainty of the counting, defaults to 0
+        :type d_count: float, optional
 
-            Parameters:
-                isotope (FissionIstp) : The fission isotope whose products you want to add to the model.
-                istpname (str) : Provide a name of the isotope for later modification
-                count (float) : The absolute contribution that this isotope has on the overall model
-                d_count(float) : The uncertainty in the contribution
-
-            Returns:
-                None
         """
         assert len(isotope.xbins) == self.nbin, "binning of two spectra are different"
+        assert istpname not in self.betaSpectraList.keys(), f"{istpname} already exists in the model, please set a different name"
+
 
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
@@ -129,14 +144,19 @@ class SumEngine(Spectrum):
                 self.FPYlist[FPZAI].yerr += isotope.FPYlist[FPZAI].yerr*count
                 self.FPYlist[FPZAI].AddCovariance(isotope.FPYlist[FPZAI])
 
-        # self.spectrum += isotope.spectrum*count
-        # self.uncertainty += isotope.uncertainty*count
-
     def AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
         """
-            NEW TODO
-            Add contribution of individual beta decaying isotope into summation
-            model
+        Add the spectrum of a non-fissile beta decaying isotope into the the list of FPYs in this SumEngine model. NOTE: User can only expect the beta/neutrino spectrum of this individual beta decay, no decay chaine following this decay will be added.
+        
+        :param isotope: A beta isotope object after running :meth:`conflux.BetaEngine.BetaEngine.CalcBetaSpectra` so the spectrum of the fission isotope can be saved for the summation. If the object is a customized beta/neutrino source, one must add and calculate it in self.betaDB before calling it in this function. 
+        :type isotope: :class:`conflux.BetaEngine.BetaIstp`
+        :param istpname: A unique name assigned to this isotope. The name is required to be unique for editting the isotope, instead of redefining the SumEngine model.
+        :type istpname: str
+        :param count: The counting of total decay, allowed to be float for fractional calculation, defaults to 1
+        :type count: float, optional
+        :param d_count: The uncertainty of the counting, defaults to 0
+        :type d_count: float, optional
+
         """
         thisZAI = betaIstp.ZAI
         self.betaDB.istplist[thisZAI] = betaIstp
@@ -146,21 +166,25 @@ class SumEngine(Spectrum):
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
 
-        # self.spectrum += self.betaDB.istplist[ZAI].spectrum*count
-        # self.uncertainty += self.betaDB.istplist[ZAI].spectrum*count
 
     def EditContribution(self, istpname, count, d_count):
         """
-            NEW TODO
-        """
+        Edit the count and d_count parameters of a fissile isotope or beta isotope that is already added into this SumEngine model.
+        
+        :param istpname: The UNIQUE name of the isotope assigned when the isotope was added to this SumEngine model.
+        :type istpname: str
+        :param count: The to-be-updated counting of total decay, allowed to be float for fractional calculation, defaults to 1
+        :type count: float, optional
+        :param d_count: The uncertainty of the counting, defaults to 0
+        :type d_count: float, optional
+    
 
+        """
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
 
     def CalcReactorSpectrum(self):
-        """
-            NEW TODO
-        """
+        """Summing all spectra of the added isotopes based on their count and d_count values. Running this function will update the spectrum and uncertainty, if already calculated."""
         #initialize total spectrum & uncertainty
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
@@ -184,10 +208,11 @@ class SumEngine(Spectrum):
 
         self.uncertainty = np.sqrt(self.uncertainty)
 
+
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
         """
-            Adds a reactor model to the summation engine.
+            Adds a reactor model to the summation engine. (maybe obsolete)
 
             Parameters:
                 fissionModel (FissionModel): A Fission Model containing the fission/non-fissile/non-equilibrium isotopes
@@ -246,8 +271,7 @@ class SumEngine(Spectrum):
     #Processing the missing fission products, calculating the immediate fission products, and including model uncertainties in the uncertainty calculation
     def OldCalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1, 20], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
         """
-            Calculates the reactor spectrum based off the fission yield database as well as
-            the betaSpectra database.
+            Calculates the reactor spectrum based off the fission yield database as well as the betaSpectra database. (maybe obsolete)
             Parameters:
                 betaSpectraDB (BetaEngine): a dictionary of the spectral information for each beta branch
                 processMissing (boolean): Determines if missing fission product information is processed
