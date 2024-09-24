@@ -119,52 +119,59 @@ def neutrino(enu, p, numass=0):
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    """
-    A class to save isotopic branch information.
-    
-    :param Z: The Atomic number of the isotope whose Beta branch information you want to record
-    :type Z: int
-    :param A: The Atomic mass number of the isotope whose branch information you want to record
-    :type A: int
-    :param I: The isomeric number of the Beta Branch whose information you want to record
-    :type I: int
-    :param Q: The Q-value of the Beta Branch whose information you want to record. Unit: MeV
-    :type Q: float
-    :param E0: The End-point energy of the isotope whose branch information we want to record
-    :type E0: float
-    :param sigma_E0: The uncertainty of the end-point energy
-    :type sigma_E0: float
-    :param frac: The fraction that this branch contributes to the total isotopic spectrum
-    :type frac: float
-    :param sigma_frac: The uncertainty of the fraction
-    :type sigma_frac: float
-    :param forbiddenness: The forbidden transition type, defaults to 0 (allowed transition)
-    :type forbiddenness: int, optional
-    :param bAc: The weak magnetic correction parameter, defaults to 4.7
-    :type bAc: float, optional
-    :param xbins: the spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)
-    :type xbins: :class:`numpy.array`, optional
-    :param custom_func: customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None
-    :type custom_func: `method`, optional
-    
-    """
-
+    """A class to save isotopic branch information."""
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
                 custom_func=None):
-        """The constructor method."""
-        self.ID = E0 # each branch of an isotope has unique end-point energy
+        """
+        A class to save isotopic branch information.
+        
+        :param Z: The Atomic number of the isotope whose Beta branch information you want to record
+        :type Z: int
+        :param A: The Atomic mass number of the isotope whose branch information you want to record
+        :type A: int
+        :param I: The isomeric number of the Beta Branch whose information you want to record
+        :type I: int
+        :param Q: The Q-value of the Beta Branch whose information you want to record. Unit: MeV
+        :type Q: float
+        :param E0: The End-point energy of the isotope whose branch information we want to record
+        :type E0: float
+        :param sigma_E0: The uncertainty of the end-point energy
+        :type sigma_E0: float
+        :param frac: The fraction that this branch contributes to the total isotopic spectrum
+        :type frac: float
+        :param sigma_frac: The uncertainty of the fraction
+        :type sigma_frac: float
+        :param forbiddenness: The forbidden transition type, defaults to 0 (allowed transition)
+        :type forbiddenness: int, optional
+        :param bAc: The weak magnetic correction parameter, defaults to 4.7
+        :type bAc: float, optional
+        :param xbins: the spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)
+        :type xbins: :class:`numpy.array`, optional
+        :param custom_func: customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None
+        :type custom_func: `method`, optional
+        
+        """
+        
+        self.ID = E0
+        """The identity of each beta branch, each branch of an isotope has unique end-point energy"""
 
         self.Z = Z
+        """The Atomic number of the mother isotope"""
         self.A = A
+        """The Atomic mass of the mother isotope"""
         self.I = I
+        """The isomeric state this decay mode"""
         self.Q = Q
+        """Q value of the decay"""
         self.ZAI=Z*1e4+A*10+I
+        """The unique identity of the isotope (ZAI = Z*1e4+A*10+I)"""
 
         self.xbins = xbins
-        self.nbin = len(xbins)
-        self.spectrum = np.zeros(self.nbin)
-        self.uncertainty = np.zeros(self.nbin)
+        """The particle energy (MeV), or x values of the spectrum"""
+        self._nbin = len(xbins)
+        self.spectrum = np.zeros(self._nbin)
+        self.uncertainty = np.zeros(self._nbin)
 
         self.E0 = E0
         self.sigma_E0 = sigma_E0
@@ -302,7 +309,7 @@ class BetaBranch(Spectrum):
         # TODO make the code compatible to uneven binning
         binwidths = self.xbins[1]-self.xbins[0]
         # integrating each bin
-        for k in range(0, self.nbin):
+        for k in range(0, self._nbin):
             x_low = lower
             x_high = lower+binwidths
             if x_high > self.E0:
@@ -327,7 +334,7 @@ class BetaBranch(Spectrum):
                 if self.E0 > binwidths else self.spectrum.sum())
 
         if self.spectrum.sum() <=0:
-            self.spectrum = np.zeros(self.nbin)
+            self.spectrum = np.zeros(self._nbin)
         else:
             self.spectrum /= norm*binwidths
             self.uncertainty /= norm*binwidths
@@ -360,9 +367,9 @@ class BetaIstp(Spectrum, Summed):
         self.HL = HL
 
         self.xbins = xbins
-        self.nbin = len(xbins)
-        self.spectrum = np.zeros(self.nbin)
-        self.uncertainty = np.zeros(self.nbin)
+        self._nbin = len(xbins)
+        self.spectrum = np.zeros(self._nbin)
+        self.uncertainty = np.zeros(self._nbin)
 
         self.Z = Z
         self.A = A
@@ -496,11 +503,11 @@ class BetaIstp(Spectrum, Summed):
         :type branchErange: two-element list, optional
 
         """
-        self.spectrum=np.zeros(self.nbin)
-        self.uncertainty=np.zeros(self.nbin)
-        self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
-        self.branchUnc=np.zeros(self.nbin)
-        self.totalUnc=np.zeros(self.nbin)
+        self.spectrum=np.zeros(self._nbin)
+        self.uncertainty=np.zeros(self._nbin)
+        self.spectUnc=np.zeros(self._nbin) # theoretical uncertainty
+        self.branchUnc=np.zeros(self._nbin)
+        self.totalUnc=np.zeros(self._nbin)
 
         # calculate the total uncertaintty and append spectra
         for E0i, branchi in self.branches.items():
@@ -715,18 +722,18 @@ class BetaEngine:
 
             betaIstp.SumSpectra(nu_spectrum, branchErange)
 
-if __name__ == "__main__":
-    x = np.arange(0, 10, 0.1)
-    binwidth = 1
+# if __name__ == "__main__":
+#     x = np.arange(0, 10, 0.1)
+#     binwidth = 1
 
-    testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-    testEngine = BetaEngine(xbins=x)
-    testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
+#     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
+#     testEngine = BetaEngine(xbins=x)
+#     testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
 
-    y2 = testEngine.istplist[390960].spectrum
-    y2err = testEngine.istplist[390960].uncertainty
-    plt.figure()
-    plt.xlabel("E (keV)")
-    plt.errorbar(x/1e-3, y2, label=str(390960)+"_nu", yerr=y2err)
-    plt.legend()
-    plt.show()
+#     y2 = testEngine.istplist[390960].spectrum
+#     y2err = testEngine.istplist[390960].uncertainty
+#     plt.figure()
+#     plt.xlabel("E (keV)")
+#     plt.errorbar(x/1e-3, y2, label=str(390960)+"_nu", yerr=y2err)
+#     plt.legend()
+#     plt.show()

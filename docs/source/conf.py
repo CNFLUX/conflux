@@ -5,16 +5,20 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../'))
 
 project = 'CONFLUX'
 copyright = '2024, Xianyi Zhang'
 author = 'Xianyi Zhang'
-release = '0.6'
+release = '0.7'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = ['autoapi.extension']
+autoapi_dirs = ['../../conflux']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -26,3 +30,4 @@ language = 'python3'
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+

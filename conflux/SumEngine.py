@@ -368,40 +368,40 @@ class SumEngine(Spectrum):
         if modelunc:
             self.uncertainty += self.modelUnc
 
-if __name__ == "__main__":
-    # conflux modules
-    from conflux.BetaEngine import BetaEngine
-    from conflux.FPYEngine import FissionModel, FissionIstp
+# if __name__ == "__main__":
+#     # conflux modules
+#     from conflux.BetaEngine import BetaEngine
+#     from conflux.FPYEngine import FissionModel, FissionIstp
 
-    xbins = np.arange(0, 20, 0.1)
+#     xbins = np.arange(0, 20, 0.1)
 
-    U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=False)
-    U235.LoadFissionDB(Ei = 0.5)
-    U235.LoadCorrelation(DB='ENDF')
+#     U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=False)
+#     U235.LoadFissionDB(Ei = 0.5)
+#     U235.LoadCorrelation(DB='ENDF')
 
-    Pu239 = FissionIstp(94, 239, Ei = 0)
-    Pu239.LoadFissionDB()
-    Pu239.LoadCorrelation()
+#     Pu239 = FissionIstp(94, 239, Ei = 0)
+#     Pu239.LoadFissionDB()
+#     Pu239.LoadCorrelation()
 
-    model = FissionModel()
-    model.AddContribution(isotope=U235, fraction=1)
+#     model = FissionModel()
+#     model.AddContribution(isotope=U235, fraction=1)
 
-    sum1 = SumEngine(xbins = xbins)
-    sum1.AddModel(model)
+#     sum1 = SumEngine(xbins = xbins)
+#     sum1.AddModel(model)
 
-    betaSpectraDB = BetaEngine(xbins=xbins)
-    #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+#     betaSpectraDB = BetaEngine(xbins=xbins)
+#     #betaSpectraDB = BetaEngine(newlist)
+#     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
-    sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
-    summed_spect = sum1.spectrum
-    summed_err = sum1.uncertainty
-    summed_model_err = sum1.modelUnc
-    summed_yerr = sum1.yieldUnc
+#     sum1.CalcReactorSpectrum(betaSpectraDB, branchErange=[0.0, 20.0], processMissing=False)
+#     summed_spect = sum1.spectrum
+#     summed_err = sum1.uncertainty
+#     summed_model_err = sum1.modelUnc
+#     summed_yerr = sum1.yieldUnc
 
-    fig, ax = plt.subplots()
-    ax.set_xlim([0, 10])
-    ax.set(xlabel='E (MeV)', ylabel='neutrino count')
-    ax.errorbar(sum1.xbins, sum1.spectrum, yerr=sum1.uncertainty, label="test spectrum")
-    ax.legend()
-    plt.show()
+#     fig, ax = plt.subplots()
+#     ax.set_xlim([0, 10])
+#     ax.set(xlabel='E (MeV)', ylabel='neutrino count')
+#     ax.errorbar(sum1.xbins, sum1.spectrum, yerr=sum1.uncertainty, label="test spectrum")
+#     ax.legend()
+#     plt.show()

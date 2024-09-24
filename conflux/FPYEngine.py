@@ -96,31 +96,7 @@ class FPNuclide:
 
 # Class that counts fission products of a specified fission isotope
 class FissionIstp(Spectrum, Summed):
-    """
-    Class to handle all the Fission Nuclide Information.
-
-    ...
-
-    Attributes
-    ----------
-    Z : (int)
-        Atomic number of your nuclide
-    A : (int)
-        Atomic mass of your nuclide
-    FPYlist : (dictionary)
-        Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}
-    DBTitle : (dictionary)
-        Dictionary of the two fission databases included in CONFLUX (can be downloaded using the file in the aux folder)
-
-    Methods
-    -------
-    LoadFissionDB(DB='ENDF'):
-        Function to load data from a specific fission database. DB has format /path/to/DB. Defaults to ENDF
-    LoadCovariance(DB='ENDF', percent=True):
-        Load the covariance matrices associated with the fission isotopes. DB has format /path/to/DB. Defaults to ENDF
-    CalcBetaSpectra(betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
-        Calculate the beta/neutrino spectrum to 
-    """
+    """Class to handle all the Fission Nuclide Information."""
 
     def __init__(self, Z, A, Ei, DB='ENDF', IFPY=False):
         """
@@ -138,12 +114,18 @@ class FissionIstp(Spectrum, Summed):
         :type IFPY: bool, optional
 
         """
-        self.Z = Z
+        self.Z = Z 
+        """Atomic number of your nuclide"""
         self.A = A
+        """Atomic mass of your nuclide"""
         self.Ei = Ei
+        """The incident neutron energy to ignite fission"""
         self.IFPY=IFPY
+        """Whether to calculate independent fission product yields"""
         self.FPYlist = {}
+        """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
         self.DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
+        """Dictionary of the two fission databases included in CONFLUX (can be downloaded using the file in the aux folder)"""
 
         self.LoadFissionDB(Ei=self.Ei, DB=DB)
 
@@ -709,27 +691,27 @@ class FissionModel:
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)
 
-if __name__ == "__main__":
-    from conflux.BetaEngine import BetaEngine
-    from conflux.SumEngine import SumEngine
-    xbins = np.arange(0, 20, 0.1)
+# if __name__ == "__main__":
+#     from conflux.BetaEngine import BetaEngine
+#     from conflux.SumEngine import SumEngine
+#     xbins = np.arange(0, 20, 0.1)
 
-    U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=True)
-    U235.LoadFissionDB(Ei = 0.5)
-    U235.LoadCorrelation(DB='ENDF')
+#     U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=True)
+#     U235.LoadFissionDB(Ei = 0.5)
+#     U235.LoadCorrelation(DB='ENDF')
 
-    betaSpectraDB = BetaEngine(xbins=xbins)
-    #betaSpectraDB = BetaEngine(newlist)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
+#     betaSpectraDB = BetaEngine(xbins=xbins)
+#     #betaSpectraDB = BetaEngine(newlist)
+#     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 
-    U235.CalcBetaSpectra(betaSpectraDB)
-    # Pu239.CalcBetaSpectra(betaSpectraDB)
+#     U235.CalcBetaSpectra(betaSpectraDB)
+#     # Pu239.CalcBetaSpectra(betaSpectraDB)
 
-    newsum = SumEngine(xbins = xbins)
-    newsum.AddFissionIstp(U235, "U235", 1, 0)
-    fig, ax = plt.subplots()
-    ax.set_xlim([0, 10])
-    ax.set(xlabel='E (MeV)', ylabel='neutrino count')
-    ax.errorbar(newsum.xbins, newsum.spectrum, yerr=newsum.uncertainty, label="test spectrum")
-    ax.legend()
-    plt.show()
+#     newsum = SumEngine(xbins = xbins)
+#     newsum.AddFissionIstp(U235, "U235", 1, 0)
+#     fig, ax = plt.subplots()
+#     ax.set_xlim([0, 10])
+#     ax.set(xlabel='E (MeV)', ylabel='neutrino count')
+#     ax.errorbar(newsum.xbins, newsum.spectrum, yerr=newsum.uncertainty, label="test spectrum")
+#     ax.legend()
+#     plt.show()
