@@ -29,15 +29,48 @@ as well as a graphical representation of the calculation is provided below.
 
 .. image:: Summation_figure.png
 
+Conversion
+----------
+
+Conversion mode converts an inputted beta spectrum of some fissile isotope and converts it into a neutrino spectrum by fitting it with ``virtual branches`` that approximate neutrino decay branches. Packaged beta databases lack corrections for non-equilibrium fission products,
+however one can use the Summation calculation with prior knowledge of the modeled reactor to work around this. See also ``synth_data.py``. A block diagram of how the mode works, as well as a graphical representation of the calculation is provided below.
+
+.. image:: Conversion_block.jpg
+
+.. image:: Conversion_figure.jpg
 
 
+Direct Experimental Measurement
+-------------------------------
 
+This is a planned prediction mode that will be implemented at a later date. More on how the calculation will be carried out can be seen here_.
 
-
+.. _here: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.128.081801
 
 Databases
+=========
+
+ENDF/JEFF
 ---------
 
 
+.. literalinclude:: ENDF_example.txt
+
+ENSDF
+-----
+
+.. literalinclude:: ENSDF_example.txt
+
+
+FYCOM
+-----
+
+Conversion Libraries
+--------------------
+
+
+
+
+
 Beta Spectrum Generator
------------------------
+=======================
