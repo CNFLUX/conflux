@@ -37,7 +37,7 @@ however one can use the Summation calculation with prior knowledge of the modele
 
 .. image:: Conversion_block.jpg
 
-.. image:: Conversion_figure.jpg
+.. image:: Conversion_figure.png
 
 
 Direct Experimental Measurement
