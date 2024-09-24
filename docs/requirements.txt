@@ -4,3 +4,4 @@ matplotlib
 iminuit
 tqdm
 fortranformat
+sphinx-autoapi
