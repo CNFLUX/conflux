@@ -1,0 +1,16 @@
+<betaDB>
+	<isotope name="H3" isotope="10030" Q="0.0185906" HL="388523520.0" Ex="0.0">
+		<branch fraction="1.000" sigma_frac="0.000" end_point_E="0.019" sigma_E0="0.000" dJpi="0"/>
+	</isotope>
+	<isotope name="He6" isotope="20060" Q="3.5078" HL="0.8067000000000001" Ex="0.0">
+		<branch fraction="1.000" sigma_frac="0.000" end_point_E="3.508" sigma_E0="0.001" dJpi="1"/>
+	</isotope>
+	<isotope name="He8" isotope="20080" Q="10.651" HL="0.1191" Ex="0.0">
+		<branch fraction="0.840" sigma_frac="0.010" end_point_E="9.671" sigma_E0="0.008" dJpi="1"/>
+		<branch fraction="0.160" sigma_frac="0.000" end_point_E="7.571" sigma_E0="0.007" dJpi="1"/>
+		<branch fraction="0.160" sigma_frac="0.000" end_point_E="5.501" sigma_E0="0.007" dJpi="1"/>
+		<branch fraction="0.009" sigma_frac="0.001" end_point_E="0.981" sigma_E0="0.007" dJpi="1"/>
+	</isotope>
+	<isotope name="Li8" isotope="30080" Q="16.00516" HL="0.8399" Ex="0.0">
+		<branch fraction="1.000" sigma_frac="0.000" end_point_E="12.975" sigma_E0="0.010" dJpi="0"/>
+	</isotope>
