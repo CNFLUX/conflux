@@ -17,6 +17,7 @@ release = '0.7'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+extensions = ['sphinx.ext.autodoc']
 extensions = ['autoapi.extension']
 autoapi_dirs = ['../../conflux']
 
