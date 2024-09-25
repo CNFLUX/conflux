@@ -153,9 +153,10 @@ class BetaBranch(Spectrum):
         
         """
         
+        Spectrum.__init__(self, xbins)
+        
         self.ID = E0
         """The identity of each beta branch, each branch of an isotope has unique end-point energy"""
-
         self.Z = Z
         """The Atomic number of the mother isotope"""
         self.A = A
@@ -166,12 +167,6 @@ class BetaBranch(Spectrum):
         """Q value of the decay"""
         self.ZAI=Z*1e4+A*10+I
         """The unique identity of the isotope (ZAI = Z*1e4+A*10+I)"""
-
-        self.xbins = xbins
-        """The particle energy (MeV), or x values of the spectrum"""
-        self._nbin = len(xbins)
-        self.spectrum = np.zeros(self._nbin)
-        self.uncertainty = np.zeros(self._nbin)
 
         self.E0 = E0
         self.sigma_E0 = sigma_E0
@@ -309,7 +304,7 @@ class BetaBranch(Spectrum):
         # TODO make the code compatible to uneven binning
         binwidths = self.xbins[1]-self.xbins[0]
         # integrating each bin
-        for k in range(0, self._nbin):
+        for k in range(0, self.nbin):
             x_low = lower
             x_high = lower+binwidths
             if x_high > self.E0:
@@ -334,7 +329,7 @@ class BetaBranch(Spectrum):
                 if self.E0 > binwidths else self.spectrum.sum())
 
         if self.spectrum.sum() <=0:
-            self.spectrum = np.zeros(self._nbin)
+            self.spectrum = np.zeros(self.nbin)
         else:
             self.spectrum /= norm*binwidths
             self.uncertainty /= norm*binwidths
@@ -362,14 +357,11 @@ class BetaIstp(Spectrum, Summed):
     
     def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1)):
         """Constructor method."""
+        Spectrum.__init__(self, xbins)
+        
         self.ZAI=Z*1e4+A*10+I # unique ID of a isotope
         self.ID = self.ZAI
         self.HL = HL
-
-        self.xbins = xbins
-        self._nbin = len(xbins)
-        self.spectrum = np.zeros(self._nbin)
-        self.uncertainty = np.zeros(self._nbin)
 
         self.Z = Z
         self.A = A
@@ -503,11 +495,11 @@ class BetaIstp(Spectrum, Summed):
         :type branchErange: two-element list, optional
 
         """
-        self.spectrum=np.zeros(self._nbin)
-        self.uncertainty=np.zeros(self._nbin)
-        self.spectUnc=np.zeros(self._nbin) # theoretical uncertainty
-        self.branchUnc=np.zeros(self._nbin)
-        self.totalUnc=np.zeros(self._nbin)
+        self.spectrum=np.zeros(self.nbin)
+        self.uncertainty=np.zeros(self.nbin)
+        self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
+        self.branchUnc=np.zeros(self.nbin)
+        self.totalUnc=np.zeros(self.nbin)
 
         # calculate the total uncertaintty and append spectra
         for E0i, branchi in self.branches.items():

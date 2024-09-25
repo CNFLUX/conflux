@@ -2,47 +2,19 @@ import numpy as np
 import csv
 
 class Spectrum:
-    """
-    A general class of a spectrum to initialize, add, and modify the object
-
-    ...
+    """A general class of a spectrum to initialize, add, and modify the object."""
     
-    Attributes
-    ----------
-    
-    xbins : list
-        Energy scale of the spectrum
-    nbin : int
-        The number of energy bins for the spectrum
-    spectrum : list
-        A list containing the calculated spectrum
-    uncertainty : list
-        A list containing the uncertainty of the calculated spectrum
-    integral : float
-        The integral of the spectrum
-    
-    Methods
-    -------
-    
-    Add(self, tragetSpec, W=1, sigma_W=0):
-        Add a target spectrum to the current spectrum with some weight (and weight uncertainty)
-    Norm(self, W, sigma_W = 0):
-        Scale the spectrum by some weight factor
-    Integral(self):
-        The absolute integral of the spectrum
-    SaveToFile(self, filename):
-        Self explanatory, save the spectrum, uncertainty, and energy to a file
-
-    """
     def __init__(self, xbins=np.arange(0, 20, 0.1)):
-        """
-        initializer
-        """
         self.xbins = xbins
+        """The particle energy (MeV), or x values of the spectrum"""
         self.nbin = len(xbins)
+        """Size of the spectrum array"""
         self.spectrum = np.zeros(self.nbin)
+        """Contents of the spectrum"""
         self.uncertainty = np.zeros(self.nbin)
+        """Spectrum content uncertainties"""
         self.integral = 0
+        """Integral of spectrum"""
         
     def Add(self, targetSpec, W=1, sigma_W = 0):
         '''

@@ -16,83 +16,6 @@ from tqdm import tqdm
 from conflux.config import CONFLUX_DB
 from conflux.Basic import Spectrum, Summed
 
-# this class saves nuclide info of fission products
-class FPNuclide:
-    """
-    Class to save all fission product nuclides and their information.
-    
-    :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
-    :type FPZAI: int
-    :param y: The yeild of the fission product
-    :type y: float
-    :param yerr: The uncertainty of yield
-    :type yerr: float
-
-    """
-    
-    def __init__(self, FPZAI, y, yerr):
-
-        self.Z = int(FPZAI/10000)
-        self.A = int((FPZAI-self.Z*10000)/10)
-        self.N = self.A-self.Z
-        self.isomer = int(FPZAI-self.Z*10000-self.A*10)
-        self.FPZAI = FPZAI
-        self.y = y
-        self.cov = {}
-        self.corr = {}
-        self.yerr = yerr
-
-    # Method that add fission yield of this branch to total fission yield.
-    # When use_corr == True, assume correlation matrix is loaded, calculate a
-    # new covariance matrix.
-    def Contribute(self, fraction, d_fraction=0):
-        """
-        Add the fission yield of this nuclide to the total fission yield (called by the obsolete FissionModel class).
-        
-        :param fraction: The fractional contribution of this fission product to the overall reactor model
-        :type fraction: float
-        :param d_fraction: uncertainty of fraction, defaults to 0
-        :type d_fraction: TYPE, optional
-
-        """
-        #
-        # if use_corr:
-        #     assert self.corr, "Correlation matrix was not loaded!"
-        #     self.cov = {}
-        #     for element in self.corr:
-        #         self.cov
-
-        # Adding the fission fraction uncertainty and fission yield uncertainty together
-        self.yerr = self.y*fraction*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
-        # force yeild uncertainty to equal 0, when yeild is zero
-        self.yerr = np.nan_to_num(self.yerr, nan=0.0)
-
-        # Also scale the covariance matrix.
-        for key in self.cov:
-            if key == self.FPZAI:
-                self.cov[key] = self.y*fraction*np.sqrt((self.cov[key]/self.y)**2 + (d_fraction/fraction**2))
-            else:
-                self.cov[key] *= fraction
-
-        self.y *= fraction  # multiply fission yield with fission fraction
-
-    # Method to add covariance matrices together
-    def AddCovariance(self, newNuclide):
-        """
-        Add covariance relative to another fission product.
-        
-        :param newNuclide: another fission product
-        :type newNuclide: :class:`conflux.FPYEngine.FPNuclide`
-
-        """
-        # print("Added FPY covaraince matrix")
-        for key in newNuclide.cov:
-            if key not in self.cov:
-                self.cov[key] = newNuclide.cov[key]
-            else:
-                self.cov[key] += newNuclide.cov[key]
-
-            #if key == self.FPZAI: print(key, self.cov[key])
 
 # Class that counts fission products of a specified fission isotope
 class FissionIstp(Spectrum, Summed):
@@ -495,6 +418,85 @@ class FissionIstp(Spectrum, Summed):
             self.uncertainty += self.modelUnc**2
 
         self.uncertainty = np.sqrt(self.uncertainty)
+        
+# this class saves nuclide info of fission products
+class FPNuclide:
+    """
+    Class to save all fission product nuclides and their information.
+    
+    :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
+    :type FPZAI: int
+    :param y: The yeild of the fission product
+    :type y: float
+    :param yerr: The uncertainty of yield
+    :type yerr: float
+
+    """
+    
+    def __init__(self, FPZAI, y, yerr):
+
+        self.Z = int(FPZAI/10000)
+        self.A = int((FPZAI-self.Z*10000)/10)
+        self.N = self.A-self.Z
+        self.isomer = int(FPZAI-self.Z*10000-self.A*10)
+        self.FPZAI = FPZAI
+        self.y = y
+        self.cov = {}
+        self.corr = {}
+        self.yerr = yerr
+
+    # Method that add fission yield of this branch to total fission yield.
+    # When use_corr == True, assume correlation matrix is loaded, calculate a
+    # new covariance matrix.
+    def Contribute(self, fraction, d_fraction=0):
+        """
+        Add the fission yield of this nuclide to the total fission yield (called by the obsolete FissionModel class).
+        
+        :param fraction: The fractional contribution of this fission product to the overall reactor model
+        :type fraction: float
+        :param d_fraction: uncertainty of fraction, defaults to 0
+        :type d_fraction: TYPE, optional
+
+        """
+        #
+        # if use_corr:
+        #     assert self.corr, "Correlation matrix was not loaded!"
+        #     self.cov = {}
+        #     for element in self.corr:
+        #         self.cov
+
+        # Adding the fission fraction uncertainty and fission yield uncertainty together
+        self.yerr = self.y*fraction*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
+        # force yeild uncertainty to equal 0, when yeild is zero
+        self.yerr = np.nan_to_num(self.yerr, nan=0.0)
+
+        # Also scale the covariance matrix.
+        for key in self.cov:
+            if key == self.FPZAI:
+                self.cov[key] = self.y*fraction*np.sqrt((self.cov[key]/self.y)**2 + (d_fraction/fraction**2))
+            else:
+                self.cov[key] *= fraction
+
+        self.y *= fraction  # multiply fission yield with fission fraction
+
+    # Method to add covariance matrices together
+    def AddCovariance(self, newNuclide):
+        """
+        Add covariance relative to another fission product.
+        
+        :param newNuclide: another fission product
+        :type newNuclide: :class:`conflux.FPYEngine.FPNuclide`
+
+        """
+        # print("Added FPY covaraince matrix")
+        for key in newNuclide.cov:
+            if key not in self.cov:
+                self.cov[key] = newNuclide.cov[key]
+            else:
+                self.cov[key] += newNuclide.cov[key]
+
+            #if key == self.FPZAI: print(key, self.cov[key])
+
 # class that builds a fission reactor model with dictionary of all FPYs from all
 # reactor compositions.
 class FissionModel:

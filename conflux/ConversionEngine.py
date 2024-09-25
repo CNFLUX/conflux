@@ -847,163 +847,163 @@ def rebin(data, bins):
 
     return averaged_data
 
-# testing script
-if __name__ == "__main__":
-    from conflux.FPYEngine import FissionModel, FissionIstp
-    from conflux.SumEngine import SumEngine
-    # from conflux.ConversionEngine import ConversionEngine, BetaData
-    import matplotlib.pyplot as plt
+# # testing script
+# if __name__ == "__main__":
+#     from conflux.FPYEngine import FissionModel, FissionIstp
+#     from conflux.SumEngine import SumEngine
+#     # from conflux.ConversionEngine import ConversionEngine, BetaData
+#     import matplotlib.pyplot as plt
 
 
-    # Begin the calculation by sourcing the default beta data
-    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
-    # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
-    beta235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_data_1.5_9.6.csv")
-    beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
-    beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
+#     # Begin the calculation by sourcing the default beta data
+#     beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
+#     # beta2351 = BetaData("./data/conversionDB/Synthetic_235_beta.csv")
+#     beta235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_data_1.5_9.6.csv")
+#     beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
+#     beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
 
-    # Define isotopic fission yield DB to calculate average atom numbers of
-    # virtual branches
-    U235 = FissionIstp(92, 235, Ei=0)
-    Pu239 = FissionIstp(94, 239, Ei=0)
-    Pu241 = FissionIstp(94, 241, Ei=0)
+#     # Define isotopic fission yield DB to calculate average atom numbers of
+#     # virtual branches
+#     U235 = FissionIstp(92, 235, Ei=0)
+#     Pu239 = FissionIstp(94, 239, Ei=0)
+#     Pu241 = FissionIstp(94, 241, Ei=0)
 
-    # Loading default fission product DB
-    U235.LoadFissionDB(DB='JEFF')
-    Pu239.LoadFissionDB()
-    Pu241.LoadFissionDB()
+#     # Loading default fission product DB
+#     U235.LoadFissionDB(DB='JEFF')
+#     Pu239.LoadFissionDB()
+#     Pu241.LoadFissionDB()
 
-    # Define the size of energy slice
-    branch_slice = 0.25
-    # Declare the conversion engine by adding beta data with corresponding FPY
-    # database
-    convertmodel = ConversionEngine()
-    # Add beta spectra and fission products to the conversion engine
-    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
-    convertmodel.VBfitbeta("U235", branch_slice)
+#     # Define the size of energy slice
+#     branch_slice = 0.25
+#     # Declare the conversion engine by adding beta data with corresponding FPY
+#     # database
+#     convertmodel = ConversionEngine()
+#     # Add beta spectra and fission products to the conversion engine
+#     convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
+#     convertmodel.VBfitbeta("U235", branch_slice)
 
-    xval = np.arange(0, 10, 0.01)
-    #Something wrong with the plotting on this one
-    for i in range(0, 20):
-        print(i*0.5, 
-              sum(convertmodel.vblist["U235"].SumBranches(xval, 
-                                                          thresh =i*0.5, 
-                                                          nu_spectrum = False)))
-        if not sum(convertmodel.vblist["U235"].SumBranches(xval, 
-                                                           thresh =i*0.5, 
-                                                           nu_spectrum = False))>=0:
-            print("sth wrong i die")
-            continue
-        plt.errorbar(xval, 
-                     convertmodel.vblist["U235"].SumBranches(xval, 
-                                                            thresh =i*0.5, 
-                                                            nu_spectrum = False), 
-                     fmt='--', label='test')
-    #Plot out the raw beta data
-    plt.errorbar(convertmodel.betadata["U235"].x, 
-                 convertmodel.betadata["U235"].y, 
-                 convertmodel.betadata["U235"].yerr, label='beta data')
-    #Plot out the calculated beta spectrum
-    plt.errorbar(xval, 
-                 convertmodel.vblist["U235"].SumBranches(xval, 
-                                                         nu_spectrum = False), 
-                 label='beta')
-    #Plot out the calculated neutrino spectrum
-    plt.errorbar(xval, 
-                 convertmodel.vblist["U235"].SumBranches(xval, 
-                                                         nu_spectrum = True), 
-                 label='neutrino')
-    plt.legend()
-    plt.show()
+#     xval = np.arange(0, 10, 0.01)
+#     #Something wrong with the plotting on this one
+#     for i in range(0, 20):
+#         print(i*0.5, 
+#               sum(convertmodel.vblist["U235"].SumBranches(xval, 
+#                                                           thresh =i*0.5, 
+#                                                           nu_spectrum = False)))
+#         if not sum(convertmodel.vblist["U235"].SumBranches(xval, 
+#                                                            thresh =i*0.5, 
+#                                                            nu_spectrum = False))>=0:
+#             print("sth wrong i die")
+#             continue
+#         plt.errorbar(xval, 
+#                      convertmodel.vblist["U235"].SumBranches(xval, 
+#                                                             thresh =i*0.5, 
+#                                                             nu_spectrum = False), 
+#                      fmt='--', label='test')
+#     #Plot out the raw beta data
+#     plt.errorbar(convertmodel.betadata["U235"].x, 
+#                  convertmodel.betadata["U235"].y, 
+#                  convertmodel.betadata["U235"].yerr, label='beta data')
+#     #Plot out the calculated beta spectrum
+#     plt.errorbar(xval, 
+#                  convertmodel.vblist["U235"].SumBranches(xval, 
+#                                                          nu_spectrum = False), 
+#                  label='beta')
+#     #Plot out the calculated neutrino spectrum
+#     plt.errorbar(xval, 
+#                  convertmodel.vblist["U235"].SumBranches(xval, 
+#                                                          nu_spectrum = True), 
+#                  label='neutrino')
+#     plt.legend()
+#     plt.show()
 
-    Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
-    #convertmodel.VBfitbeta("U235", branch_slice)
+#     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
+#     #convertmodel.VBfitbeta("U235", branch_slice)
 
-    final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, 
-                                                                    nu_spectrum=False, 
-                                                                    cov_samp=20)
-    final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, 
-                                                                       nu_spectrum=True, 
-                                                                       cov_samp=20)
+#     final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, 
+#                                                                     nu_spectrum=False, 
+#                                                                     cov_samp=20)
+#     final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, 
+#                                                                        nu_spectrum=True, 
+#                                                                        cov_samp=20)
 
-    newxval = np.arange(2.125, 8.375, 0.25)
-    # newyval = Rebin(xval, final_spect, newxval)
-    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, 
-                                                                   nu_spectrum=True, 
-                                                                   cov_samp=5)
-    # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
-    #     print(i)
+#     newxval = np.arange(2.125, 8.375, 0.25)
+#     # newyval = Rebin(xval, final_spect, newxval)
+#     newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, 
+#                                                                    nu_spectrum=True, 
+#                                                                    cov_samp=5)
+#     # for i in convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True):
+#     #     print(i)
 
-    # testxval = np.linspace(0,200,201)
-    # testyval = 1*testxval+2
-    # testxout = np.linspace(0,200,21)
-    # testyout = Rebin(testxval, testyval, testxout)
-    # for a in (newyval1):
-    #     print(a)
+#     # testxval = np.linspace(0,200,201)
+#     # testyval = 1*testxval+2
+#     # testxout = np.linspace(0,200,21)
+#     # testyout = Rebin(testxval, testyval, testxout)
+#     # for a in (newyval1):
+#     #     print(a)
 
-    # fig = plt.figure()
-    # # plt.yscale('log')
-    # plt.errorbar(convertmodel.betadata["U235"].x,
-    #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
-    #     label='beta data')
-    # plt.plot(newxval, newyval1, label='neutrino rebined')
-    # plt.plot(xval, final_spect1, label='best fit neutrino')
-    # plt.legend()
-    # plt.show()
-    # fig.savefig("bestfit_spectra.png")
+#     # fig = plt.figure()
+#     # # plt.yscale('log')
+#     # plt.errorbar(convertmodel.betadata["U235"].x,
+#     #     convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
+#     #     label='beta data')
+#     # plt.plot(newxval, newyval1, label='neutrino rebined')
+#     # plt.plot(xval, final_spect1, label='best fit neutrino')
+#     # plt.legend()
+#     # plt.show()
+#     # fig.savefig("bestfit_spectra.png")
 
-    betaspect = np.interp(xval, 
-                          convertmodel.betadata["U235"].x, 
-                          convertmodel.betadata["U235"].y)
-    diff = (final_spect-betaspect)/betaspect
-    fig = plt.figure()
-    plt.title('Beta fit beta residual')
-    plt.ylim([-0.1, 0.1])
-    plt.xlim([2,9])
-    plt.plot(xval, diff)
-    # plt.plot(xval, betaspect)
-    # plt.plot(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, 'o')
+#     betaspect = np.interp(xval, 
+#                           convertmodel.betadata["U235"].x, 
+#                           convertmodel.betadata["U235"].y)
+#     diff = (final_spect-betaspect)/betaspect
+#     fig = plt.figure()
+#     plt.title('Beta fit beta residual')
+#     plt.ylim([-0.1, 0.1])
+#     plt.xlim([2,9])
+#     plt.plot(xval, diff)
+#     # plt.plot(xval, betaspect)
+#     # plt.plot(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, 'o')
 
-    plt.xlabel('Beta E (MeV)')
-    plt.ylabel('Residual')
-    plt.show()
-    fig.savefig("bestfit_beta_compare.png")
+#     plt.xlabel('Beta E (MeV)')
+#     plt.ylabel('Residual')
+#     plt.show()
+#     fig.savefig("bestfit_beta_compare.png")
 
-    betaspect = np.interp(xval, 
-                          convertmodel.betadata["U235"].x, 
-                          convertmodel.betadata["U235"].y)
-    diff = (final_spect-betaspect)/betaspect
-    print('leastsquare', sum(diff[xval<=9]**2))
-    fig = plt.figure()
-    plt.title('Beta and neutrino spectra')
-    plt.yscale('log')
-    plt.xlim([0, 10])
-    plt.plot(xval, final_spect, label='bestfit beta')
-    plt.plot(xval, betaspect, label='beta data')
-    plt.plot(convertmodel.betadata["U235"].x, 
-             convertmodel.betadata["U235"].y, 
-             'o')
+#     betaspect = np.interp(xval, 
+#                           convertmodel.betadata["U235"].x, 
+#                           convertmodel.betadata["U235"].y)
+#     diff = (final_spect-betaspect)/betaspect
+#     print('leastsquare', sum(diff[xval<=9]**2))
+#     fig = plt.figure()
+#     plt.title('Beta and neutrino spectra')
+#     plt.yscale('log')
+#     plt.xlim([0, 10])
+#     plt.plot(xval, final_spect, label='bestfit beta')
+#     plt.plot(xval, betaspect, label='beta data')
+#     plt.plot(convertmodel.betadata["U235"].x, 
+#              convertmodel.betadata["U235"].y, 
+#              'o')
 
-    plt.xlabel('Beta E (MeV)')
-    plt.ylabel('Residual')
-    plt.legend()
-    plt.show()
-    fig.savefig("bestfit_beta_compare2.png")
-    neu235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_compare.csv")
+#     plt.xlabel('Beta E (MeV)')
+#     plt.ylabel('Residual')
+#     plt.legend()
+#     plt.show()
+#     fig.savefig("bestfit_beta_compare2.png")
+#     neu235s = BetaData(CONFLUX_DB+"/example_models/U235_synth_compare.csv")
 
-    new235spect = neu235s.y
-    diff = (final_spect1-new235spect)/new235spect
-    final_spect1_avg = rebin(final_spect1, 40)
-    new235spect_avg = rebin(new235spect, 40)
-    xval_avg = rebin(xval, 40)
-    diff_avg = (final_spect1_avg-new235spect_avg)/new235spect_avg
-    fig = plt.figure()
-    plt.title("converted neutrino compared to synthetic neutrino spectrum")
-    plt.ylim([-0.2, 0.2])
-    plt.xlim([2,9])
-    plt.plot(xval, diff)
-    plt.plot(xval_avg, diff_avg)
-    plt.xlabel('E (MeV)')
-    plt.ylabel('Residual')
-    plt.show()
-    fig.savefig("bestfit_neu_compare.png")
+#     new235spect = neu235s.y
+#     diff = (final_spect1-new235spect)/new235spect
+#     final_spect1_avg = rebin(final_spect1, 40)
+#     new235spect_avg = rebin(new235spect, 40)
+#     xval_avg = rebin(xval, 40)
+#     diff_avg = (final_spect1_avg-new235spect_avg)/new235spect_avg
+#     fig = plt.figure()
+#     plt.title("converted neutrino compared to synthetic neutrino spectrum")
+#     plt.ylim([-0.2, 0.2])
+#     plt.xlim([2,9])
+#     plt.plot(xval, diff)
+#     plt.plot(xval_avg, diff_avg)
+#     plt.xlabel('E (MeV)')
+#     plt.ylabel('Residual')
+#     plt.show()
+#     fig.savefig("bestfit_neu_compare.png")
