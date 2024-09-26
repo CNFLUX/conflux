@@ -769,7 +769,7 @@ class ConversionEngine(Spectrum):
         """
         assert istp in self.betadata
         # define the virtual branches to be fit
-        vbnew = VirtualBranch(self.fisIstp[istp], Ei, Zlist, Alist)
+        vbnew = VirtualBranch(self.fisIstp[istp], Zlist, Alist)
         vbnew.FitData(self.betadata[istp], slicesize)
         self.vblist[istp] = vbnew
 
