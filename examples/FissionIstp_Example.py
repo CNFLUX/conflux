@@ -1,65 +1,48 @@
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionIstp, FissionModel
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
 
-    #Here, I've initialized U-235. Note that my atomic number
-    #Must come before my mass number
-    U235 = FissionIstp(92,235)
+    # This is an example for the Fission Isotope class inside the FPYEngine.py file
+    # The spectrum of the fission isotope must be calculated before adding it to the reactor model.
 
-    #After I've loaded up the Isotope that I want to look at, there's a couple of
-    #Things that I can do with it. Let's try and calculate the covariance matrix for
-    #U235.
+    #Initially, I set an energy range for my calculation. In this case, 0 - 10 MeV with 100 keV bins.
 
-    #Here, I am initializing the fission database data for U235 and storing it into
-    #The cumulative Fission Yield (CFPY) and Independant Fission Yield (IFPY) dictionaries
-    #That are associated with the U235 FissionIstp object. Do note as well, that with both
-    #LoadFissionDB, LoadCovariance, and LoadCorrelation, you need not use the pre-packaged
-    #Databases that we've provided. If you have a database of your own, simply pass the
-    #location of the database as a string argument for the function.
+    e = np.arange(0., 10., 0.1)
 
-
-    #U235.LoaddFissionDB(DBpath = "path/to/Database")
-    U235.LoadFissionDB()
-
-    #Once I've loaded up my fission data, I'll also go ahead and load up the Covariance and
-    #Correlation data. Note, that to load up the Correlation and Cumulative Fission data, I
-    #Must call LoadFissionDB() first, otherwise loading up these two data files will not work.
-    #Also note that the information from both of these Databases is going to be stored inside
-    #Your CFPY dictionary, with an associated 'key' for the data.
-
-
-    #U235.LoadCovariance(DBpath = "path/to/Database")
+    #Here, I've initialized U-235. Note, my atomic number comes before my mass number, and I need to 
+    #Specify an incident neutron energy, which is the energy of the neutron that causes the fission
+    #Ei can be 0 (thermal), 0.5 (fast), or 14 (relativistic). Note, if I use JEFF, then fast neutrons 
+    #Are defined with Ei=0.4 instead of Ei=0.5
+    U235 = FissionIstp(92,235, Ei=0)
+    
+    #After I've initialized my Fission isotope, I can go ahead and load in the correlation and covariance
+    #Information of the isotope.
+    U235.LoadCorrelation()
     U235.LoadCovariance()
-    #U235.LoadCorrelation(DBpath = "path/to/Database")
-    #U235.LoadCorrelation()
 
-    #Now that I've gotten all my data, it's time to calculate the covariance matrix. This is
-    #Saved in the CFPY dictionary, and I can then use that specific dictionary to
-    #manipulate/look at my covariance matrix. Note that the argument that I pass into
-    #CalcCovariance is the neutron energy, with 0 = thermal, 5 = fast, and 14 = ultra-relativistic
-    #Neutrons
+    #One thing to note, I can calculate the spectrum of each beta branch that comes out of this fission
+    #isotope. However, in order to do that, I will need a Beta Database, which I can create by intializing
+    #A Beta Engine. For more information about that, please look at BetaEngine_Example.py
 
+    #Initialize the beta engine with the energy range I've defined above, and calculate the beta spectra
+    #in the given branch Erange.
+    BetaEngineDB = BetaEngine(xbins = e)
+    BetaEngineDB.CalcBetaSpectra(branchErange=[0,10])
 
-    #U235.CalcCovariance(Ei=5)
-    #U235.CalcCovariance(Ei=0)
+    #Next, I use this BetaEngine to calculate the Spectra for U235. By default, the calculation will
+    #Only look at Cumulative fission products. However, one can also calculate the independant fission
+    #products in a given time range by passing integer values to the "ifp_begin" and "ifp_end" variables.
+    U235.CalcBetaSpectra(BetaEngineDB, processMissing=True)
 
-
-    #This last little block of code writes the covariance matrix out to a csv file that can
-    #Then be manipulated later.
-    with open('cov_235_U_processed.csv', 'w', newline='') as csvoutput:
-        fieldnames = ['']
-        #Note here the fact that we're looking at CFPY[0]. If we had changed our
-        #Neutron energy to say 5, then it would become CFPY[5]
-        for i in U235.CFPY[0]:
-            fieldnames.append(i)
-        writer = csv.DictWriter(csvoutput, fieldnames=fieldnames)
-        writer.writeheader()
-        for i in U235.CFPY[0]:
-            rowcontent = U235.CFPY[0][i].cov
-            rowcontent[''] = i
-            writer.writerow(rowcontent)
-
-    print("I'm done writing out the covariance matrix!")
+    #Lastly, I will go ahead and plot each individual beta branch in this fission isotope
+    fig = plt.plot()
+    for FPZAI in set(U235.FPYlist.keys()).intersection(BetaEngineDB.istplist.keys()):
+        individualBranch = U235.FPYlist[FPZAI].y * BetaEngineDB.istplist[FPZAI].spectrum
+        plt.plot(e, individualBranch)
+    plt.yscale('log')
+    plt.savefig("IndividualBranches.png")

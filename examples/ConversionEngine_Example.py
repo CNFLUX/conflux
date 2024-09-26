@@ -14,18 +14,24 @@ if __name__ == "__main__":
     #(change this to the local directory for U_235_e_2014.csv)
     betaU235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
 
+    #I am also going to intialize my energy range, in this case 0 MeV to 10 MeV with 
+    #100 keV bins
+
+    e = np.arange(0, 10., 0.1)
+
     #Next, just to make sure the data looks good, we're going to print out the
     #error and the yield.
-
     # for i in range(len(betaU235.y)):
     #     print("Yield:",betaU235.y[i],"Error:",  betaU235.yerr[i])
 
-    #Now, we'll load up the Fission isotope data for U-235.
-
-    U235 = FissionIstp(92,235)
+    #Now, we'll load up the Fission isotope data for U-235, with an incident neutron energy
+    #of 0 (thermal), and load the correlation information as well.
+    U235 = FissionIstp(92,235, Ei=0)
     U235.LoadFissionDB()
+    U235.LoadCorrelation()
 
-    print("Check One")
+    #Next, I need to calculate the spectral shape for all the products of U235, so I will load
+    #up a beta engine and calculate that before moving onto the conversion engine step
 
     #Now I'm going to initialize the conversion Engine, and add the U235 Fission
     #and beta information into it. Note that the first variable needs to be the
@@ -35,67 +41,91 @@ if __name__ == "__main__":
     #convertModel.AddBetaData(BetaData, FissionIstp, str name, int frac)
     convertmodel.AddBetaData(betaU235, U235, "U235", 1.0)
 
-    #Finally, we fit virtual beta branches to the beta spectra data with a user
-    #Defined slice size (Default slice size is 0.5). Here I've chosen a slice size of
-    #1.0
-    xval = np.arange(0.,10.0, 0.05)
-
-
+    #Finally, we fit virtual beta branches to the inputted fission isotope with
+    #a slice size of 0.5 (500keV, which is the default). Note also, that
+    #My parameter is a string of the inputted fission isotope, not the isotope
+    #Itself. Be careful when adding this parameter.
     convertmodel.VBfitbeta("U235")
 
-    print("Check Three")
-    # Everything above here is the conversion  mode calculation. Once I've done the
-    # Calculation, I need to extract the data and plot it/visualize/represent it.
-    # All plotting and data-visualization will be below.
+    #Now, since I've only added one fission isotope to my conversion model, I do not
+    #Need to call the below function. I can infact calculate the spectrum as I have in
+    #The plotting section and be done. However, in calculations that require multiple
+    #Fission isotopes to be added, it is better to call SummedSpectra to calculate the total
+    #spectrum, uncertainty, and covariance matrices for the entire model, not just an
+    #individual Fission isotope
+    conSpec, conUnc, conCov = convertmodel.SummedSpectrum(e, nu_spectrum=True, cov_samp=5)
 
+
+    #Now, I will start plotting.
     fig = plt.figure()
 
-
-
     #Below I'm going to plot out the total neutrino and beta spectrum, as well as
-    #print out all the virtual branches as well. I've also gone ahead and plotted
-    #Out the beta data as well.
+    #print out all the virtual branches as well.
     plt.yscale('log')
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
-    #Plot out the model branches
 
 
-    #Something wrong with the plotting on this one
+    #This for loop is to plot out the individual beta branches of this reaction.
     for i in range(0, 20):
-        print(i*0.5, convertmodel.vblist["U235"].E0, sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False)))
-        if not sum(convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False))>0:
-            print("sth wrong i die")
+        #This checks to see if the sum of all the virtual branches is positive. If it is not, then skip
+        if not sum(convertmodel.vblist["U235"].SumBranches(e, thresh =i*0.5, nu_spectrum = False))>0:
             continue
-        plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, thresh =i*0.5, nu_spectrum = False), fmt='--')
-    #Plot out the raw beta data
+        #Otherwise, plot out this branch by summing all the virtual beta branches whose energy range is above
+        #the threshold.
+        plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, thresh =i*0.5, nu_spectrum = False),fmt='--')
+    
+    #Here, I plot out the raw beta data
     plt.errorbar(convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr, label='beta data')
+    
     #Plot out the calculated beta spectrum
-    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = False), label='beta')
+    plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, nu_spectrum = False), label='beta')
     #Plot out the calculated neutrino spectrum
-    plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum = True), label='neutrino')
+    plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, nu_spectrum = True), label='neutrino')
     plt.legend()
-    plt.show()
     fig.savefig("U235_conversion.png")
 
-    #This next set of plots are going to be the covariance matrices for both
-    #The neutrino and beta spectrum for U235. I've initialized them here, I
-    #will plot them later in the code.
+    #Note, I am going to plot out the converted spectrum that we got from SummedSpectra, and will show that it's the
+    #Exact same as if I called SumBranches from the last plt.errorbar call above.
 
-    # #beta covariance matrix
-    # covmat_beta = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=False, samples=50)
-    # #neutrino covariance matrix
-    # covmat_nu = convertmodel.vblist["U235"].Covariance(betaU235, xval, nu_spectrum=True, samples=50)
-    #
-    #
-    # spectrum = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=False)
-    # relativeErr = np.zeros(len(xval))
-    # for i in range(len(xval)):
-    #     if spectrum[i] >0:
-    #         relativeErr[i] = np.sqrt(covmat_beta[i][i]/spectrum[i])
-    #
-    # spectrumNu = convertmodel.vblist["U235"].SumBranches(xval, nu_spectrum=True)
-    # relativeErrNu = np.zeros(len(xval))
-    # for i in range(len(xval)):
-    #     if spectrumNu[i] > 0:
-    #         relativeErrNu[i] = np.sqrt(covmat_nu[i][i] / spectrumNu[i])
+    plt.clf()
+    plt.errorbar(e, conSpec, yerr = conUnc, label = "SummedSpec", fmt = "--")
+    plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, nu_spectrum = True), label='SumBranches')
+    plt.legend()
+    fig.savefig("comparison.png")
+
+
+    #This calculates the errors of our conversion calcualtion, with 50 samples.
+    #I generate a covariance matrix for both the betas and the neutrinos
+    covmat = convertmodel.vblist["U235"].Covariance(betaU235, e, nu_spectrum=False, samples=50)
+    covmat_nu = convertmodel.vblist["U235"].Covariance(betaU235, e, nu_spectrum=True, samples=50)
+
+    #Here, I calculate the beta spectrum, and then calculate the relative errors of it from the
+    #Covariance matrices I generated above.
+    spectrumBeta = convertmodel.vblist["U235"].SumBranches(e, nu_spectrum=False)
+    relativeErr = np.zeros(len(e))
+    for i in range(len(spectrumBeta)):
+        if spectrumBeta[i] > 0:
+            relativeErr[i] = np.sqrt(covmat[i][i]) / spectrumBeta[i]
+
+
+    #Here, I calculate the neutrino spectrum, and then calculate the relative errors of it from the
+    #Covariance matrices I generated above.
+    spectrumNu = convertmodel.vblist["U235"].SumBranches(e, nu_spectrum=True)
+    relativeErrNu = np.zeros(len(e))
+    for i in range(len(spectrumNu)):
+        if spectrumNu[i] > 0:
+            relativeErrNu[i] = np.sqrt(covmat_nu[i][i]) / spectrumNu[i]
+
+
+    #Finally, the rest of this is plotting the relative errors for both the betas and the neutrinos for our given
+    #Energy range
+    fig = plt.figure()
+    plt.ylim([-.3, .3])
+    plt.fill_between(e, relativeErr, -relativeErr, label='beta', alpha=0.4)
+    plt.fill_between(e, relativeErrNu, -relativeErrNu, label='neutrino', alpha=0.4)
+    plt.legend()
+    name = "U235_errors.png"
+    fig.savefig(name)
+
+    plt.close()

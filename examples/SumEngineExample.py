@@ -8,73 +8,71 @@ if __name__  == "__main__":
     #---------------------------------------------------
     #Full Reactor Spectrum Using U235
 
+    #Set the energy scale of the reaction we want to run. In this case,
+    #the calculation is being set from 0 MeV-15 MeV with 100keV bins
+
+    e = np.arange(0, 15., 0.1)
+
     #initialize the Isotopes that you would like to use in your
-    #Reaction and load them into the Database
-    U235 = FissionIstp(92,235)
+    #Reaction and load them into the Database. Here, remember that the
+    #first parameter is the Z#, the second is the A#, and the third is
+    #Ei, or the incident energy of the neutron that causes fission (0 - Thermal, .5 - Fast, 14 - relativistic)
+    U235 = FissionIstp(92,235, Ei= 0)
     U235.LoadFissionDB()
     #Load up the Correlation data, and calculate the Covariance matrix (both are done by calling LoadCorrelation).
     #Must be done after loading up the Fission Data
     U235.LoadCorrelation()
 
-    #Initialize the model you'd like to work with, and add the isotope
-    #into the model
-    model = FissionModel()
-    model.AddContribution(isotope=U235, Ei=0, fraction=0.9)
-
-    #Initialize the type of engine you want to run (The Summation engine in our case)
-    #And then add the specific model to that engine
-    result = SumEngine(xbins=np.arange(0, 15., 0.1))
-    result.AddModel(model)
-
-    #Load in the Beta Shape data and calculate the total beta shape of our reactor
-    betaSpectraDB = BetaEngine(result.FPYlist.keys(), xbins=np.arange(0, 15, 0.1))
+    #Next, load in a BetaEngine and calculate the spectral shapes of all fission branches. This is
+    #now our Beta Spectra Database, that we will input into our fission model. Also note, branchErange
+    #is the range of branch endpoint energies we want to look at. For this example, 
+    #We are setting the endpoint energy range from 0MeV to 15 MeV
+    betaSpectraDB = BetaEngine(xbins = e)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 15.0])
 
-    #initialize the Isotopes that you would like to use in your
-    #Reaction and load them into the Database
-    Pu239 = FissionIstp(92,235)
-    Pu239.LoadFissionDB()
-    #Load up the Correlation data, and calculate the Covariance matrix (both are done by calling LoadCorrelation).
-    #Must be done after loading up the Fission Data
-    Pu239.LoadCorrelation()
+    #I will quickly calculate the beta spectrum of U235. I have to calculate the U235 spectrum before calculating the
+    #Total spectrum. If I add multiple isotopes to the Summation Engine, I will need each isotopes individual
+    #Spectrum to be able to calcualte the total spectrum. I will get an error if I do not do this step before
+    #Trying to add the isotope to the SummationEngine
+    U235.CalcBetaSpectra(betaSpectraDB=betaSpectraDB)
 
-    #Initialize the model you'd like to work with, and add the isotope
-    #into the model
-    model = FissionModel()
-    model.AddContribution(isotope=Pu239, Ei=0, fraction=0.1)
+    #Finally, we are going to load up a summation engine, with the Beta Spectra Database that we just
+    #Calculated as an input. As a default, the Summation engine calculates the neutrino specturm,
+    #But there is an option to select the beta-spectrum instead.
+    SummationEngine = SumEngine(betaSpectraDB= betaSpectraDB, nu_spectrum=True)
 
-    #Initialize the type of engine you want to run (The Summation engine in our case)
-    #And then add the specific model to that engine
-    result = SumEngine(xbins=np.arange(0, 15., 0.1))
-    result.AddModel(model)
+    #I will also go ahead and load in the Fission Isotope I initialized at the beginning of this example into
+    #The Summation Engine. Note the parameters, I add the fission Isotope, the name of the fission Isotope, as
+    #Well as how many times I've added that isotope into our summation engine. In this case, I've added it 3 times
+    SummationEngine.AddFissionIstp(U235, "U235", count = 1)
 
-    #Load in the Beta Shape data and calculate the total beta shape of our reactor
-    betaSpectraDB = BetaEngine(result.FPYlist.keys(), xbins=np.arange(0, 15, 0.1))
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 15.0])
+    #Finally, I will be calculating the neutrino spectrum for a pure U235 reactor by calling the CalcReactorSpectrum()
+    #Function. 
+    SummationEngine.CalcReactorSpectrum()
 
-    #Calculate the total reactor spectrum from the loaded shape data(betaSpectraDB)
-    #And the fission Yield data (result)
-    result.CalcReactorSpectrum(betaSpectraDB)
-    reactor_unc = result.uncertainty
+    #And here I will pull out the uncertainties and spectrum from my reactor engine, to plot the spectrum and uncertainties.
+    spectrum = SummationEngine.spectrum
+    uncertainty = SummationEngine.uncertainty
 
-    #Draw the resulting spectra
+    #Draw the SummationEngineing spectra
     fig = plt.figure()
-    x = result.xbins
-    for FPZAI in result.betaSpectraList:
-        #This is to draw out the individual branches
-        plt.plot(x, result.betaSpectraList[FPZAI] * result.FPYlist[FPZAI].y)
 
-    #This is the total spectrum
-    plt.errorbar(x, result.spectrum, yerr=result.uncertainty)
-    plt.plot(x, result.spectrum, 'b--')
+
+    #Here, I am plotting all the individual beta branches that make up the totality of the
+    #Reactor spectrum. It is a good visualization of what the "ab-initio" method does when
+    #Making it's neutrino prediction
+    for FPZAI in set(SummationEngine.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys()):
+        individualBranch = SummationEngine.FPYlist[FPZAI].y * betaSpectraDB.istplist[FPZAI].spectrum
+        plt.plot(e, individualBranch)
+
+
+
+    #This is the plotting of the total spectrum
+    plt.errorbar(e, SummationEngine.spectrum, yerr=uncertainty)
+    plt.plot(e, spectrum, 'b--')
     plt.yscale('log')
     plt.xlabel("E (in MeV)", fontsize= 18)
     plt.ylabel("neutrinos/MeV/Fission", fontsize = 18)
     plt.title("U235 Neutrino Spectrum", fontsize=20)
     fig.savefig("U235 - Neutrino Spectrum")
 
-
-    # #Finally, print out all the beta branches that didn't go into creating this spectrum.
-    # #Each branch is represented in their FPZAI form.
-    # for i in result.missingBranch:
-    #     print(i)
