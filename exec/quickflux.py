@@ -120,7 +120,7 @@ def model_setup(json_file):
             
         for istp in betaSpectraDB.istplist:
             betaIstp = betaSpectraDB.istplist[istp]
-            print(betaIstp.Q)
+            
         sum_model.CalcReactorSpectrum()
         spectrum += sum_model.spectrum
 
@@ -132,7 +132,6 @@ def model_setup(json_file):
         convertmodel = ConversionEngine()
         conv_composition = conversion['composition']
         for fissile_istp in conv_composition:
-            print(fissile_istp)
             name = fissile_istp['name']
             Z = fissile_istp['Z']
             A = fissile_istp['A']
