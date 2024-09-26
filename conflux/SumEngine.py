@@ -7,11 +7,11 @@ from copy import deepcopy
 from tqdm import tqdm
 
 # local modules
-from conflux.Basic import Spectrum
+from conflux.Basic import Spectrum, Summed
 from conflux.BetaEngine import BetaIstp, BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
-class SumEngine(Spectrum):
+class SumEngine(Spectrum, Summed):
     """
     A Class to carry out the summation of reactor antineutrino/beta spectrum by adding the spectra of fission and beta decaying isotopes based on their contributions in the model. The contributions is expected to be provided by the users.
 
@@ -75,10 +75,8 @@ class SumEngine(Spectrum):
         self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
-        self.xbins = self.betaDB.xbins
-        self.nbin = len(self.xbins)
-        self.spectrum = np.zeros(self.nbin)
-        self.uncertainty = np.zeros(self.nbin)
+        
+        Spectrum.__init__(self, xbins=self.betaDB.xbins)
 
     #Self explanatory, clears the various dictionaries associated
     #With the Summation Engine.
@@ -212,7 +210,7 @@ class SumEngine(Spectrum):
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine
     def AddModel(self, fissionModel, W=1.0):
         """
-            Adds a reactor model to the summation engine. (maybe obsolete)
+            Adds a reactor model to the summation engine. (obsolete)
 
             Parameters:
                 fissionModel (FissionModel): A Fission Model containing the fission/non-fissile/non-equilibrium isotopes
@@ -271,7 +269,7 @@ class SumEngine(Spectrum):
     #Processing the missing fission products, calculating the immediate fission products, and including model uncertainties in the uncertainty calculation
     def OldCalcReactorSpectrum(self, betaSpectraDB, branchErange=[-1, 20], processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
         """
-            Calculates the reactor spectrum based off the fission yield database as well as the betaSpectra database. (maybe obsolete)
+            Calculates the reactor spectrum based off the fission yield database as well as the betaSpectra database. (obsolete)
             Parameters:
                 betaSpectraDB (BetaEngine): a dictionary of the spectral information for each beta branch
                 processMissing (boolean): Determines if missing fission product information is processed

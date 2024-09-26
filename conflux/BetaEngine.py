@@ -122,6 +122,7 @@ class BetaBranch(Spectrum):
     """A class to save isotopic branch information."""
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
+                numass = 0,
                 custom_func=None):
         """
         A class to save isotopic branch information.
@@ -407,7 +408,6 @@ class BetaIstp(Spectrum, Summed):
         fraction = 1
         sigma_frac = 1
         forbiddenness = 0
-        custom_func = None
         bAc = 4.7
         custom_func = None
 

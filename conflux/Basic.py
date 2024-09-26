@@ -111,8 +111,8 @@ class Summed:
     SumSpectra():
         Sums the spectra of all branches
     '''
-    def __init__(self):
-        self.ID = 0
+    def __init__(self, ID):
+        self.ID = ID
         self.branches = {}
         self.spectra = {}
         self.uncertainty = {}

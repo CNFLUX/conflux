@@ -140,7 +140,7 @@ class VirtualBranch(Spectrum):
         
     """
     
-    def __init__(self, fisIstp, Ei = 0, Zlist={}, Alist={}, fblist={}, wmlist={}):
+    def __init__(self, fisIstp, Zlist={}, Alist={}, fblist={}, wmlist={}):
         """
         Construct the VirtualBranch class.
         
@@ -178,7 +178,7 @@ class VirtualBranch(Spectrum):
         # load FPY of target fission isotope
         self.FPYlist = {}
         if (not self.FPYlist):
-            self.LoadFPYList(fisIstp, Ei)
+            self.LoadFPYList(fisIstp)
 
         # load FPY of target fission isotope
         betaEngine = BetaEngine(self.FPYlist)

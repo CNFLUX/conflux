@@ -16,6 +16,16 @@ JtoMeV = 6.242e12
 rxunits = {"MW": 1e6*JtoMeV, "GW": 1e9*JtoMeV}
 
 def read_json_file(json_file_path):
+    """
+    Reader of the jasonfile
+    
+    :param json_file_path: filename
+    :type json_file_path: string
+    :return: data
+    :rtype: dict
+
+    """
+    
     try:
         # Read JSON data from the specified file path
         with open(json_file_path, "r") as file:
@@ -29,7 +39,14 @@ def read_json_file(json_file_path):
         return None
 
 def model_setup(json_file):
+    """
+    Function to read items from the json file to setup a model and make run the
+    calculation. 
+    
+    :param json_file: the input json data
+    :type json_file: dict
 
+    """
     # Setup spectrum range and binning
     xbins = np.arange(0, 20, 0.1)
     if 'spectrum' in json_file:
@@ -133,8 +150,6 @@ def model_setup(json_file):
                                                               cov_samp=5)
         spectrum += convert_spect
 
-    print(spectrum)
-
     fig, ax = plt.subplots()
     #ax.set_ylim([-1, 1])
     #plt.yscale('log')
@@ -160,5 +175,6 @@ if __name__ == "__main__":
     # Read JSON data from the specified file
     data = read_json_file(input_json)
 
+    print(type(data))
     xbins = model_setup(data)
     print(xbins)

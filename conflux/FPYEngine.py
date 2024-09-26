@@ -335,18 +335,14 @@ class FissionIstp(Spectrum, Summed):
         :type silent: bool, optional
 
         """
-        self.xbins = betaSpectraDB.xbins
-        nbins = len(self.xbins)
+        Spectrum.__init__(self, xbins=betaSpectraDB.xbins)
         betaSpectraList = {}
         betaUncertainty = {}
-        #initialize total spectrum & uncertainty
-        self.spectrum = np.zeros(nbins)
-        self.uncertainty = np.zeros(nbins)
 
         #Initialize model and Yield Uncertainties, a list of missing branches to the total
         #Contribution, the missing yield, and the total yield.
-        self.modelUnc = np.zeros(nbins)
-        self.yieldUnc = np.zeros(nbins)
+        self.modelUnc = np.zeros(self.nbin)
+        self.yieldUnc = np.zeros(self.nbin)
 
         # Find common isotopes among beta decaying isotopes and fission products
         self.betaFPYlist = set(self.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys())
