@@ -6,64 +6,62 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 if __name__ == "__main__":
-    #Load all the data into the simulation
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
-    beta241 = BetaData("../data/conversionDB/Pu_241_e_2014.csv")
-    beta239 = BetaData("../data/conversionDB/Pu_239_e_2014.csv")
-    U235 = FissionIstp(92, 235)
-    Pu239 = FissionIstp(94, 239)
-    Pu241 = FissionIstp(94, 241)
+    #This is an example to calculate the spectrum of a unique reactor type
+    #Using only the Summation Engine. To see how the summation and conversion
+    #Engine can be used side-by-side, please see HybridModelExample.py
+
+    #Initialize FissionIstps U235, Pu239, and Pu241 with an incident
+    # neutron energy of 0. Load their databases and their covariances as well.
+
+    U235 = FissionIstp(92,235, 0)
     U235.LoadFissionDB()
+    U235.LoadCorrelation()
+
+    Pu239 = FissionIstp(94,239, 0)
     Pu239.LoadFissionDB()
+    Pu239.LoadCorrelation()
+
+    Pu241 = FissionIstp(94,241, 0)
     Pu241.LoadFissionDB()
+    Pu241.LoadCorrelation()
 
+    #I will also go ahead and define my energy range to be from 0 to 15 MeV with
+    #100 keV bins
 
-    #Summation culation
-    FisModel = FissionModel()
-    FisModel.AddContribution(isotope=U235, Ei=0, fraction=0.25)
-    FisModel.AddContribution(isotope=Pu239, Ei=0, fraction=0.65)
-    FisModel.AddContribution(isotope=Pu241, Ei=0, fraction=0.1)
+    e = np.arange(0.,15.,0.1)
 
-    SumEngine = SumEngine()
-    SumEngine.AddModel(FisModel)
-    BetaSpectraDB = BetaEngine(SumEngine.FPYlist.keys())
-    BetaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+    #I will go ahead and load up a BetaEngine to Calculate my beta shapes, and
+    #Then I will Calculate the BetaSpectra of each of my individual fissionIstps
 
-    SumEngine.CalcReactorSpectrum(BetaSpectraDB)
+    BetaEngineDB = BetaEngine(xbins=e)
+    BetaEngineDB.CalcBetaSpectra(branchErange=[0., 15])
 
-    #Conversion Calculation
-    ConvertModel = ConversionEngine()
-    ConvertModel.AddBetaData(beta235, U235, "U235", frac = 0.25)
-    ConvertModel.AddBetaData(beta239, Pu239, "Pu239", frac = 0.65)
-    ConvertModel.AddBetaData(beta241, Pu241, "Pu241", frac = 0.10)
-    ConvertModel.VBfitbeta("U235")
-    ConvertModel.VBfitbeta("Pu239")
-    ConvertModel.VBfitbeta("Pu241")
+    U235.CalcBetaSpectra(BetaEngineDB)
+    Pu239.CalcBetaSpectra(BetaEngineDB)
+    Pu241.CalcBetaSpectra(BetaEngineDB)
 
-    #Plotting
+    #Next, I will initialize a Summation engine and add all my Fission Isotopes to it
 
-    fig = plt.figure()
-    convertX = np.linspace(0., 10., 200)
-    totalY, uncertainty, covariance = ConvertModel.SummedSpectrum(convertX)
-    # convert235Y = ConvertModel.vblist["U235"].SumBranches(convertX, nu_spectrum = True)
-    # convert239Y = ConvertModel.vblist["Pu239"].SumBranches(convertX, nu_spectrum= True)
-    # convert241Y = ConvertModel.vblist["Pu241"].SumBranches(convertX, nu_spectrum=True)
-    SumX = SumEngine.xbins
-    SumY = SumEngine.spectrum
+    SummationEngine = SumEngine(BetaEngineDB)
+    SummationEngine.AddFissionIstp(U235, "U235", count = 1)
+    SummationEngine.AddFissionIstp(Pu239, "Pu239", count = 1)
+    SummationEngine.AddFissionIstp(Pu241, "Pu241", count = 1)
 
-    # plt.plot(convertX, convert235Y, label="conversion mode 235")
-    # plt.plot(convertX, convert239Y, label="conversion mode 239")
-    # plt.plot(convertX, convert241Y, label="conversion mode 241")
+    #Finally, I will go ahead and calculate the total reactor spectrum. Note, that because
+    #Of my count number, each of these fission isotopes will contribute the same amount
+    #To the total spectrum
 
-    plt.plot(SumX, totalY, label="Conversion")
-    plt.plot(SumX, SumY, label="Summation")
-    plt.yscale('log')
-    plt.legend()
-    plt.title("Novel Reactor Type (0.25 U235, 0.65 Pu239, 0.1 Pu241)")
-    fig.savefig("Novel_Reactor.png")
-    plt.close()
+    SummationEngine.CalcReactorSpectrum()
 
+    #Finally, I want to plot all of this, so I will do that below.
 
-    print("This worked")
+    Spectrum = SummationEngine.spectrum
+    Uncertainty = SummationEngine.uncertainty
 
-    # 65 % Pu239,0.25 U235, 0.10 Pu241
+    fig = plt.plot()
+    plt.errorbar(e, Spectrum, Uncertainty, label="Total Spectrum")
+    plt.yscale("log")
+    plt.xlabel("Energy (in MeV)")
+    plt.ylabel("Spectrum (neutrinos/MeV/Fission)")
+
+    plt.savefig("NovelReactor.png")
