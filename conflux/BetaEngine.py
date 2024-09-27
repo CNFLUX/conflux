@@ -120,6 +120,36 @@ def neutrino(enu, p, numass=0):
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
     """A class to save isotopic branch information."""
+    
+    ID : float
+    """ The identity of each beta branch, each branch of an isotope has unique end-point energy"""
+    Z: int
+    """The Atomic number of the mother isotope"""
+    A: int
+    """The Atomic mass of the mother isotope"""
+    I: int
+    """The isomeric state this decay mode"""
+    Q: float
+    """Q value of the decay (MeV)"""
+    ZAI: int
+    """The unique identity of the isotope (ZAI = Z*1e4+A*10+I)"""
+    E0: float
+    """End-point energy of this branch, unique for each individual beta-unstable isotope"""
+    sigma_E0: float
+    """Uncertainty of the end-point energy"""
+    frac: float
+    """The fraction of this branch to the entire decay."""
+    sigma_frac: float
+    """The uncertaintry of the branching fraction."""
+    forbiddenness: int
+    """Type of forbiddeness """
+    Parameters: dict
+    """Beta decay function parameters"""
+    corr: dict 
+    """Correlation vector of this beta decay branch to other branches of the same isotope"""
+    cov: dict 
+    """Covariance vector of this beta decay branch with other branches of the same isotope"""
+    
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
                 numass = 0,
@@ -157,17 +187,11 @@ class BetaBranch(Spectrum):
         Spectrum.__init__(self, xbins)
         
         self.ID = E0
-        """The identity of each beta branch, each branch of an isotope has unique end-point energy"""
         self.Z = Z
-        """The Atomic number of the mother isotope"""
         self.A = A
-        """The Atomic mass of the mother isotope"""
         self.I = I
-        """The isomeric state this decay mode"""
         self.Q = Q
-        """Q value of the decay"""
         self.ZAI=Z*1e4+A*10+I
-        """The unique identity of the isotope (ZAI = Z*1e4+A*10+I)"""
 
         self.E0 = E0
         self.sigma_E0 = sigma_E0

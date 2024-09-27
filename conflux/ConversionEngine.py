@@ -146,8 +146,6 @@ class VirtualBranch(Spectrum):
         
         :param fisIstp: The corresponding fission isotope to fit against. This isotope provides nuclear data to generate a virtual nuclide for the virtual branch.
         :type fisIstp: :class:`conflux.FPYEngine.FissionIstp`
-        :param Ei: incedent neutron energy that triggers the fission, defaults to 0
-        :type Ei: float, optional
         :param Zlist: The mapping between the beta energy and input average Z number, defaults to {}
         :type Zlist: dict, optional
         :param Alist: The mapping between the beta energy and input average A number, defaults to {}
@@ -178,15 +176,13 @@ class VirtualBranch(Spectrum):
         # load FPY of target fission isotope
         self.FPYlist = {}
         if (not self.FPYlist):
-            self.LoadFPYList(fisIstp)
+            self.LoadFPYList()
 
         # load FPY of target fission isotope
         betaEngine = BetaEngine(self.FPYlist)
 
         betaEngine.LoadBetaDB()
         self.istplist = betaEngine.istplist
-
-
 
     # Function to load FPY list
     def LoadFPYList(self):
@@ -578,15 +574,15 @@ class VirtualBranch(Spectrum):
 
         spect_array = []
         cont_array = []
-        best_array = []
+        # best_array = []
         for s in self.E0:
             if s > thresh: # if thresh > 0, look at spectra in selected region
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
-                                frac=1, I=0, Q = self.E0[s],
+                                frac=1-self.fblist[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
                                 forbiddenness=0, bAc=self.wmlist[s])
                 vb_fb = BetaBranch(self.Zlist[s], self.Alist[s],
-                                frac=1, I=0, Q = self.E0[s],
+                                frac=self.fblist[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
                                 forbiddenness=1, bAc=self.wmlist[s])
                 newspect = vb.frac * ((1-self.fblist[s])
@@ -724,13 +720,13 @@ class ConversionEngine(Spectrum):
     def __init__(self):
         """Construct the ConversionEngine class."""
         self.betadata = {}
-        self.fission_frac = {}
-        self.fission_dfrac = {}
+        self.fission_count = {}
+        self.fission_dcount = {}
         self.fisIstp = {}
         self.vblist = {}
 
     # load the beta spectrum measurement
-    def AddBetaData(self, betadata, fisIstp, name, frac, dfrac=0):
+    def AddBetaData(self, betadata, fisIstp, name, count, d_count=0):
         """
         Add beta spectrum data as fitting reference into the dictionaries.
 
@@ -740,18 +736,18 @@ class ConversionEngine(Spectrum):
         :type istp: :class:`conflux.FPYEngine.FissionIstp`
         :param istp: The unique name of the fission isotope and spectrum that will be fitted.
         :type istp: str
-        :param frac: The fraction of the fission isotope in the conversion model
-        :type frac: float
-        :param d_frac: The fraction uncertainty of the fission isotope in the conversion model
-        :type d_frac: float
+        :param count: The fraction of the fission isotope in the conversion model
+        :type count: float
+        :param d_count: The fraction uncertainty of the fission isotope in the conversion model
+        :type d_count: float
 
         """
         self.betadata[name] = betadata
-        self.fission_frac[name] = frac
-        self.fission_dfrac[name] = dfrac
+        self.fission_count[name] = count
+        self.fission_dcount[name] = d_count
         self.fisIstp[name] = fisIstp
 
-    def VBfitbeta(self, istp, slicesize = 0.5, Ei = 0, Zlist={}, Alist={}):
+    def VBfitbeta(self, istp, slicesize = 0.5, Zlist={}, Alist={}):
         """
         Let vitual branches to fit against beta data with user chosen slice size.
             
@@ -759,8 +755,6 @@ class ConversionEngine(Spectrum):
         :type istp: :class:`conflux.FPYEngine.FissionIstp`
         :param slicesize: The size of the energy range, should be greater than 0.2 (MeV) and smaller than 2 (MeV), defaults to 0.5
         :type slicesize: float 
-        :param Ei: incedent neutron energy that triggers the fission, defaults to 0
-        :type Ei: float, optional
         :param Zlist: The mapping between the beta energy and input average Z number, defaults to {}
         :type Zlist: dict, optional
         :param Alist: The mapping between the beta energy and input average A number, defaults to {}
@@ -806,12 +800,12 @@ class ConversionEngine(Spectrum):
         # through all virtual branches
         for istp in self.betadata:
             this_vb = self.vblist[istp] 
-            this_frac = self.fission_frac[istp]
-            this_dfrac = self.fission_dfrac[istp]
+            this_count = self.fission_count[istp]
+            this_dcount = self.fission_dcount[istp]
 
             # Summing spectra with respect to the fraction of fissile isotope
             new_spect = this_vb.SumBranches(x, nu_spectrum=nu_spectrum)
-            self.spectrum += this_frac*new_spect
+            self.spectrum += this_count*new_spect
 
             # Calculate covariance matrix
             new_cov = np.zeros((nbins_x, nbins_x))
@@ -820,8 +814,8 @@ class ConversionEngine(Spectrum):
                                                 samples=cov_samp,
                                                 nu_spectrum=nu_spectrum))
             # Propagating the uncertainty of fraction and spectra
-            sqratio1 = new_cov/this_frac**2 if this_frac!=0 else 0
-            sqratio2 = np.where(new_spect>0, this_dfrac**2/new_spect**2, 0)
+            sqratio1 = new_cov/this_count**2 if this_count!=0 else 0
+            sqratio2 = np.where(new_spect>0, this_dcount**2/new_spect**2, 0)
             new_cov = sqratio1 + np.identity(nbins_x) * sqratio2
             self.covariance += new_cov
 
