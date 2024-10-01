@@ -60,8 +60,13 @@ if __name__ == "__main__":
 
     fig = plt.plot()
     plt.errorbar(e, Spectrum, Uncertainty, label="Total Spectrum")
+    plt.errorbar(e, U235.spectrum, U235.uncertainty, label = "U235 spec", fmt="--")
+    plt.errorbar(e, Pu239.spectrum, Pu239.uncertainty, label = "Pu239 spec", fmt="--")
+    plt.errorbar(e, Pu241.spectrum, Pu241.uncertainty, label = "Pu241 spec", fmt="--")
+
+
     plt.yscale("log")
     plt.xlabel("Energy (in MeV)")
     plt.ylabel("Spectrum (neutrinos/MeV/Fission)")
-
+    plt.legend()
     plt.savefig("NovelReactor.png")

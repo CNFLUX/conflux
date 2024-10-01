@@ -4,59 +4,45 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    #I am creating a list of isotopes that I will parse into the
-    #Beta Engine. Here, I am using the format ZAI, where
-    #the first two numbers will be the atomic number (Z)
-    #The second three numbers will be the mass number (A),
-    #And the last number is the ____ (I)
+    # This is the example to run the Beta Engine. The Beta Engine
+    # Holds all the spectral shape data of our reaction. As such,
+    # I only need to calculate it once (Twice, if I'm switching between
+    # Neutrino and Beta spectra). 
 
-    #This list contains Y-96, Te-134, and I-134
-    isoList = {390960:'Y-96', 521340:'Te-134', 531340:'I-134'}
+    # I'll also go ahead and define an energy range for my calculations
+    # In this case, it's from 0 to 8 MeV with 100 keV bins
+    e = np.arange(0, 8., 0.1)
 
-    #Here, I am initializing the Beta Engine with my list of isotopes.
-    #Note that this is only an example for this specific engine. If you go to
-    #the FullReacSpec_SumEngine_Example, you'll see that we initialize the
-    #BetaEngine with a specific set of isotopes based off our fission yield engine,
-    #whose isotopes we can find in the fissionDB folder.
-    Engine = BetaEngine(isoList)
-    #Engine.LoadBetaDB()
-
-    #You'll notice, if you've looked in the BetaEngine source file, that I haven't
-    #specifically used a function to load the Beta Spectrum database. That's because
-    #I call the LoadBetaDB function at the beginning of CalcBetaSpectra.
-    #You can also change up the range of branches you want to look at. Here, I've
-    #set the range from 0MeV to 10MeV
-    #Engine.CalcBetaSpectra(self, targetDB = None, nu_spectrum=True,branchErange=[0.0, 20.0])
-    Engine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 10.0])
-
-    #Now that we've calculated the Beta Spectrum, we can plot our spectrum
-    #Note that we've saved our spectra in a dictionary, and to access the spectrum
-    #We need to know the specific 'key' for each item. Thankfully, the 'keys' to our
-    #dictionary are the isotopes that we used as the input to initialize the betaEngine
-    #The spectrum is saved inside the 'spectrum' dictionary, and the spectrum uncertainty
-    #information is saved inside the 'spectUnc'.
+    # I'll also start by initializing my BetaEngine with the given energy range
+    BetaEngineDB = BetaEngine(xbins = e)
 
 
-    #Here, I'm going to plot out the Beta Spectrum for I-134 and save it as Te-134.png
+    # Once I've loaded a BetaEngine, I can go ahead and load the beta data
+    # Needed to do these calculations. I can adjust the database I use for
+    # the nuclear information by specifying a :targetDB" that is not default
+    # When loading the Beta database.
+    BetaEngineDB.LoadBetaDB()
 
-    isotope = 531340
-    isoname = isoList[isotope]
-    fig = plt.figure()
-    x = np.linspace(0,20,200)
-    #plt.errorbar(x, Engine.spectralist[521340], yerr=Engine.spectUncList[521340])
-    # print(Engine.istplist[isotope].spectrum)
-    # print(Engine.istplist[isotope].spectUnc)
-    plt.plot(x, Engine.istplist[isotope].spectrum)
-    plt.fill_between(x, Engine.istplist[isotope].spectrum+Engine.istplist[isotope].spectUnc, Engine.istplist[isotope].spectrum-Engine.istplist[isotope].spectUnc, alpha=.5, linewidth=0)
-    fig.savefig(isoname+"s.png")
-    fig = plt.figure()
-    plt.fill_between(x, Engine.istplist[isotope].spectrum+Engine.istplist[isotope].branchUnc, Engine.istplist[isotope].spectrum-Engine.istplist[isotope].branchUnc, alpha=.5, linewidth=0)
-    fig.savefig(isoname+"b.png")
-    fig = plt.figure()
-    plt.fill_between(x, Engine.istplist[isotope].spectrum+Engine.istplist[isotope].totalUnc, Engine.istplist[isotope].spectrum-Engine.istplist[isotope].totalUnc, alpha=.5, linewidth=0)
-    fig.savefig(isoname+"u.png")
+    # Finally, I can calculate the beta spectrum of all isotopes inside my 
+    # Target Database. I specify a branchErange, which adjusts what isotopes
+    # my engine will calculate shapes for (isotopes whose branches have endpoint
+    # energies that fall outside the range will not have their beta shapes calculated)
+    # Also note, I can again calculate the spectra for neutrinos as well as betas
+    BetaEngineDB.CalcBetaSpectra(branchErange=[0,8], nu_spectrum=True)
 
-    #Finally, some last minute information. If you did happen to print out the istplist inside
-    # The BetaEngine, you'll have noticed that there are 4 entries instead of 3. This is
-    #Because I-134 has an additional isomer, which is noted in istplist as 531431 instead
-    #of 531430
+    # Each BetaEngine has a dictionary of beta isotopes, which is where the spectral information
+    # is stored. That means, I can iterate through the list of Beta Isotopes, and pick one
+    # That I want to plot, or look at more spectral information of. Again, each isotope
+    # has a unique FPZAI number. See FissionIstp_Example.py for more information.
+    for FPZAI in BetaEngineDB.istplist:
+        print(BetaEngineDB.istplist[FPZAI].ID, BetaEngineDB.istplist[FPZAI].name)
+
+
+    # I will also go ahead and plot the spectra and uncertainties of Boron 13 using its'
+    # Unique FPZAI number.
+    BoronSpectra = BetaEngineDB.istplist[551410].spectrum
+    BoronUnc = BetaEngineDB.istplist[551410].uncertainty
+    fig = plt.plot()
+    plt.errorbar(BetaEngineDB.xbins, BoronSpectra, BoronUnc, label="Cesium Spectra")
+    plt.legend()
+    plt.savefig("CesiumSpec.png")
