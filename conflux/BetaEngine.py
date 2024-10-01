@@ -551,8 +551,7 @@ class BetaIstp(Spectrum, Summed):
 
 
         self.branchUnc = np.sqrt(self.branchUnc)
-        totalUnc = np.sqrt(totalUnc)
-        self.uncertainty = self.totalUnc
+        self.uncertainty = np.sqrt(totalUnc)
 
     def Display(self):
         """Display vital isotope property and branch information."""
