@@ -372,8 +372,8 @@ class FissionIstp(Spectrum, Summed):
             '''
             obsolete code
             '''
-            self.yieldUnc += betaSpectraList[FPZAI]*yielderr
-            self.modelUnc += betaUncertainty[FPZAI]*thisyield
+            # self.yieldUnc += betaSpectraList[FPZAI]*yielderr
+            # self.modelUnc += betaUncertainty[FPZAI]*thisyield
 
         # Uncertainty calculation
         #Have to make a 2D Lattice of every single combination of fission products i_j
@@ -408,13 +408,18 @@ class FissionIstp(Spectrum, Summed):
                     cov_ij = self.FPYlist[i].cov[j]
                 
                 variance_ij = fi*fj*cov_ij
+                self.yieldUnc += variance_ij
+                
                 if i==j and modelunc:
                     variance_ij += yi**2*ferri**2
-                
-                self.uncertainty += variance_ij
+                    self.modelUnc += yi**2*ferri**2
 
+                self.uncertainty += variance_ij
+                
+        self.yieldUnc = np.sqrt(self.yieldUnc)
+        self.modelUnc = np.sqrt(self.modelUnc)
         self.uncertainty = np.sqrt(self.uncertainty)
-        
+                
 # this class saves nuclide info of fission products
 class FPNuclide:
     """

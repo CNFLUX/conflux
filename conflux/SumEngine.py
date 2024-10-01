@@ -46,6 +46,8 @@ class SumEngine(Spectrum, Summed):
         self.FPYlist = {}
         self.istplist = {}
         self.betaSpectraList = {}
+        self.modelUncList = {}
+        self.yieldUncList = {}
         self.betaUncertainty = {}
         self.countlist = {}
         self.d_countlist = {}
@@ -70,6 +72,8 @@ class SumEngine(Spectrum, Summed):
         self.FPYlist = {}
         self.istplist = {}
         self.betaUncertainty = {}
+        self.modelUncList = {}
+        self.yieldUncList = {}
         self.betaSpectraList = {}
         self.countlist = {}
         self.d_countlist = {}
@@ -98,6 +102,8 @@ class SumEngine(Spectrum, Summed):
         self.istplist[istpname]=(isotope.id)
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
+        self.yieldUncList[istpname] = isotope.yieldUnc
+        self.modelUncList[istpname] = isotope.modelUnc
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
         self.covariance[istpname] = {}
@@ -143,7 +149,8 @@ class SumEngine(Spectrum, Summed):
         """
         thisZAI = betaIstp.ZAI
         self.betaDB.istplist[thisZAI] = betaIstp
-
+        self.yieldUncList[istpname] = 0
+        self.modelUncList[istpname] = betaIstp.uncertainty
         self.betaSpectraList[istpname] = betaIstp.spectrum
         self.betaUncertainty[istpname] = betaIstp.uncertainty
         self.countlist[istpname] = count
@@ -188,6 +195,8 @@ class SumEngine(Spectrum, Summed):
             d_counti = self.d_countlist[istp]
             fi = self.betaSpectraList[istp]
             ferri = self.betaUncertainty[istp]
+            merri = self.modelUncList[istp]
+            yerri = self.yieldUncList[istp]
 
             relunc_a = ferri/fi
             relunc_b = d_counti/counti
@@ -200,17 +209,21 @@ class SumEngine(Spectrum, Summed):
             
             for istp2 in self.betaSpectraList.keys():
                 fj = self.betaSpectraList[istp2]
-                ferrj = self.betaUncertainty[istp2]
-                countj = self.countlist[istp2]
                 cov_ij = self.covariance[istp][istp2]
-                relative_cov_ij = cov_ij/(counti*countj)
-                relative_betaunc = ferri*ferrj/(fi*fj)
-                sigmay_ij = fi*cov_ij*fj
+
+                variance_ij = fi*cov_ij*fj
+                
+                self.yieldUnc += variance_ij
+
                 if istp==istp2:
-                    sigmay_ij += counti**2*ferri**2
-                    
-                self.uncertainty += sigmay_ij
+                    variance_ij += counti**2*ferri**2
+                    self.yieldUnc += counti**2*yerri**2
+                    self.modelUnc += counti**2*merri**2
+                
+                self.uncertainty += variance_ij
         
+        self.yieldUnc = np.sqrt(self.yieldUnc)
+        self.modelUnc = np.sqrt(self.modelUnc)
         self.uncertainty = np.sqrt(self.uncertainty)
         
     def CustomCovariance(self, DBname, percent = False, rel = False):
@@ -410,8 +423,8 @@ class SumEngine(Spectrum, Summed):
                 else:
                     cov_ij = self.FPYlist[i].cov[j]
 
-                sigmay_ij = fi*cov_ij*fj
-                self.uncertainty += sigmay_ij
+                variance_ij = fi*cov_ij*fj
+                self.uncertainty += variance_ij
 
         self.uncertainty = np.sqrt(self.uncertainty)
         # if allowed, add beta model uncertainty to the result
