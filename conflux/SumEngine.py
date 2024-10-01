@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from tqdm import tqdm
+import csv
 
 # local modules
 from conflux.Basic import Spectrum, Summed
@@ -12,50 +13,26 @@ from conflux.BetaEngine import BetaIstp, BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 
 class SumEngine(Spectrum, Summed):
-    """
-    A Class to carry out the summation of reactor antineutrino/beta spectrum by adding the spectra of fission and beta decaying isotopes based on their contributions in the model. The contributions is expected to be provided by the users.
+    """Class to carry out the summation of reactor antineutrino/beta spectrum by adding the spectra of fission and beta decaying isotopes based on their contributions in the model. The contributions is expected to be provided by the users."""
 
-    ...
+    FPYlist: dict
+    """Dictionary to save fission product yields in the summation model"""
+    istplist: dict
+    """Dictionary to save all fissile and non-fissile isotope that directly contribute in the summation model"""
+    betaSpectraList: dict
+    """Dictionary of the spectra of all fissile and non-fissile isotope that directly contribute in the summation model"""
+    betaUncertainty: dict
+    """Dictionary of the spectrum uncertainty of all fissile and non-fissile isotope that directly contribute in the summation model"""
+    countlist: dict
+    """Dictionary of contribution (decay accoungting or fractional) of all fissile and non-fissile isotope that directly contribute in the summation model"""
+    d_countlist: dict
+    """Dictionary of contribution incertainty of all fissile and non-fissile isotope that directly contribute in the summation model"""
+    nu_spectrum: bool
+    """Whether to calculate neutrino (True) or beta (False) spectrum. default to True"""
 
-    Attributes
-    ----------
-
-    FPYlist : dictionary
-        A dictionary of the fission product yield (FPY) of each isotope
-    betaSpectraList : dictionary
-        A dictionary of the Beta Spectra of each isotope
-    betaUncertainty : dictionary
-        A dictionary of the beta Uncertainty's of each isotope
-    nu_spectrum : boolean
-        A boolean of whether we are looking at the neutrino spectrum or beta spectrum
-    xbins : list
-        The energy scale of the Summation prediction. Default units are in MeV
-    nbins : int
-        The number of bins inside your energy scale. More bins means finer calculations
-    spectrum : list
-        A list to store the total calculated neutrino (beta) spectrum
-    uncertainty : list
-        A list to store the uncertainties for the neutrino (beta) spectrum
-
-    Methods
-    -------
-
-    Clear():
-        Clears all dictionaries associated with the SumEngine
-
-    AddFissionIstp(self, isotope, istpname, count=1, d_count=0):
-        method to add the spectra of fission isotopes into the engine
+    betaDB: BetaEngine
+    """Calculated database of beta/neutrino spectra to sum from. The object should only be called after running the :meth:`conflux.BetaEngine.BetaEngine.CalcBetaSpectra` function"""
     
-    AddBetaIstp(self, betaIstp, istpname, count=1, d_count=0):
-        method to add the spectra of non-fissile/non-equilibrium isotopes into the engine
-
-    NormalizeFP():
-        Normalizes the FPY and the fission product yield Error
-
-    CalcReactorSpectrum(betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True):
-        Calculates the neutrino Spectrum from the given database with the given energy bins and bounds.
-    """
-
     def __init__(self, betaSpectraDB, nu_spectrum=True):
         """
         Construct the SummationEngine class. The function read an input BetaEngine object that already calculated the beta spectra.
@@ -67,6 +44,7 @@ class SumEngine(Spectrum, Summed):
 
         """
         self.FPYlist = {}
+        self.istplist = {}
         self.betaSpectraList = {}
         self.betaUncertainty = {}
         self.countlist = {}
@@ -75,8 +53,9 @@ class SumEngine(Spectrum, Summed):
         self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
+        self.covariance = {}
         
-        Spectrum.__init__(self, xbins=self.betaDB.xbins)
+        Spectrum.__init__(self, xbins = self.betaDB.xbins)
 
     #Self explanatory, clears the various dictionaries associated
     #With the Summation Engine.
@@ -89,10 +68,12 @@ class SumEngine(Spectrum, Summed):
 
         """
         self.FPYlist = {}
+        self.istplist = {}
         self.betaUncertainty = {}
         self.betaSpectraList = {}
         self.countlist = {}
         self.d_countlist = {}
+        self.covariance = {}
         self.spectrum = np.zeros(self.nbin)
         self.uncertainty = np.zeros(self.nbin)
 
@@ -114,11 +95,15 @@ class SumEngine(Spectrum, Summed):
         assert len(isotope.xbins) == self.nbin, "binning of two spectra are different"
         assert istpname not in self.betaSpectraList.keys(), f"{istpname} already exists in the model, please set a different name"
 
-
+        self.istplist[istpname]=(isotope.id)
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
+        self.covariance[istpname] = {}
+        for key in self.covariance:
+            self.covariance[key][istpname] = d_count**2 if key==istpname else 0
+            self.covariance[istpname][key] = d_count**2 if key==istpname else 0
 
         for FPZAI in isotope.FPYlist:
             #Check to see if the fission products in the fission model exists in the Reactor model.
@@ -163,7 +148,10 @@ class SumEngine(Spectrum, Summed):
         self.betaUncertainty[istpname] = betaIstp.uncertainty
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
-
+        self.covariance[istpname] = {}
+        for key in self.covariance:
+            self.covariance[key][istpname] = d_count**2 if key==istpname else 0
+            self.covariance[istpname][key] = d_count**2 if key==istpname else 0
 
     def EditContribution(self, istpname, count, d_count):
         """
@@ -180,6 +168,9 @@ class SumEngine(Spectrum, Summed):
         """
         self.countlist[istpname] = count
         self.d_countlist[istpname] = d_count
+        for key in self.covariance:
+            self.covariance[key][istpname] = d_count**2 
+            self.covariance[istpname][key] = d_count**2 
 
     def CalcReactorSpectrum(self):
         """Summing all spectra of the added isotopes based on their count and d_count values. Running this function will update the spectrum and uncertainty, if already calculated."""
@@ -193,18 +184,79 @@ class SumEngine(Spectrum, Summed):
         self.yieldUnc = np.zeros(self.nbin)
 
         for istp in self.betaSpectraList.keys():
-            count = self.countlist[istp]
-            d_count = self.d_countlist[istp]
+            counti = self.countlist[istp]
+            d_counti = self.d_countlist[istp]
+            fi = self.betaSpectraList[istp]
+            ferri = self.betaUncertainty[istp]
 
-            relunc_a = self.betaUncertainty[istp]/self.betaSpectraList[istp]
-            relunc_b = d_count/count
-            this_spec = self.betaSpectraList[istp]*count
-            this_unc2 = (this_spec)**2*(relunc_a**2+relunc_b**2)
+            relunc_a = ferri/fi
+            relunc_b = d_counti/counti
+            fi = self.betaSpectraList[istp]
+            ferri = self.betaUncertainty[istp]
+            # di = (fi*counti)**2*(reluc_a**2+relunc_b**2)
 
-            self.spectrum += this_spec
-            self.uncertainty += this_unc2
-
+            self.spectrum += fi*counti
+            # self.uncertainty += di
+            
+            for istp2 in self.betaSpectraList.keys():
+                fj = self.betaSpectraList[istp2]
+                ferrj = self.betaUncertainty[istp2]
+                countj = self.countlist[istp2]
+                cov_ij = self.covariance[istp][istp2]
+                relative_cov_ij = cov_ij/(counti*countj)
+                relative_betaunc = ferri*ferrj/(fi*fj)
+                sigmay_ij = fi*cov_ij*fj
+                if istp==istp2:
+                    sigmay_ij += counti**2*ferri**2
+                    
+                self.uncertainty += sigmay_ij
+        
         self.uncertainty = np.sqrt(self.uncertainty)
+        
+    def CustomCovariance(self, DBname, percent = False, rel = False):
+        """
+           Loads a user defined covariance matrix into the model. The loading of the covariance matrix into the model
+           is very similar to the FissionIstp method LoadCovarianceDB
+
+            Parameters:
+                DBname (String) : The path to the user defined covariance csv file. has the format "/path/to/file"
+                percent (boolean) : Determines whether the covarainces are relative or absolute
+                rel (boolean) : Determines whether the product of the yields of each pair of isotopes is a value, or 1
+            Returns:
+                None
+        """
+
+        # determine the whether the covariance are relative or absolute
+        rate = 1e4 if percent else 1
+        with open(DBname) as inputfile:
+            reader = csv.DictReader(inputfile, dialect='excel', delimiter=',')
+
+            for row in reader:
+                row_id = int(row[''])
+                z = int(row_id/10000)
+                i = int(row_id%10)
+                a = int((row_id-z*10000-i*1000)/10)
+                zai = z*10000+a*10+i
+                # keystr = str(key)
+
+                # run through isotopes in saved in the model
+                for istpname in self.istplist:
+                    if self.istplist[istpname] != zai:
+                        continue
+                    y1 = self.count(istpname)
+                    
+                    # find correlated model in the covariance matrix
+                    for corristp in self.istplist:    
+                        col_ids = self.istplist(corristp)
+                        
+                        for col_id in col_ids:
+                        
+                            if str(col_id) not in row:
+                                continue 
+                            y2 = self.count(corristp)
+                            y_prod = (y1*y2)**rel #multiply with y1 and y2 if relative covariance is given
+                            self.covariance[istpname][col_id] = y_prod*float(row[str(col_id)])/rate
+                            self.covariance[col_id][istpname] = y_prod*float(row[str(istpname)])/rate
 
 
     # method to add fission/non-fissile/non-equilibrium isotopes into the engine

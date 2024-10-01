@@ -1,7 +1,7 @@
 {
   "spectrum": {
     "binlow": 0,
-    "binhigh": 20,
+    "binhigh": 8,
     "binwidth": 0.2,
     "__comment1__": "binwidth will have impact on runtime"
   },
@@ -30,6 +30,7 @@
         "Z": 92,
         "A": 235,
         "fissiondb": "JEFF",
+        "covariancedb": "JEFF",
         "ei": 0.4,
         "count": 100,
         "dcount": 10

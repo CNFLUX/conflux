@@ -41,6 +41,8 @@ class FissionIstp(Spectrum, Summed):
         """Atomic number of your nuclide"""
         self.A = A
         """Atomic mass of your nuclide"""
+        self.id = Z*1e4+A*10
+        """Unique ID of the fissile isotope"""
         self.Ei = Ei
         """The incident neutron energy to ignite fission"""
         self.IFPY=IFPY
@@ -389,13 +391,13 @@ class FissionIstp(Spectrum, Summed):
                 #For both fission products (i and j)
                 yi = self.FPYlist[i].y*adjustmenti
                 yerri = self.FPYlist[i].yerr*adjustmenti
-                fi = betaSpectraList[i]*adjustmenti
-                ferri = betaUncertainty[i]*adjustmenti
+                fi = betaSpectraList[i]
+                ferri = betaUncertainty[i]
 
                 yj = self.FPYlist[j].y*adjustmentj
                 # yerrj = self.FPYlist[j].yerr*adjustmentj
-                fj = betaSpectraList[j]*adjustmentj
-                ferrj = betaUncertainty[j]*adjustmentj
+                fj = betaSpectraList[j]
+                # ferrj = betaUncertainty[j]
 
                 #Carry out the uncertainty calculation
                 # if covariance matrix were not loaded, make cov diagonal variance
@@ -404,14 +406,12 @@ class FissionIstp(Spectrum, Summed):
                     cov_ij = yerri*yerri if i == j else 0
                 else:
                     cov_ij = self.FPYlist[i].cov[j]
-
-                sigmay_ij = fi*cov_ij*fj
-
-                self.uncertainty += sigmay_ij
-
-        # if allowed, add beta model uncertainty to the result
-        if modelunc:
-            self.uncertainty += self.modelUnc**2
+                
+                variance_ij = fi*fj*cov_ij
+                if i==j and modelunc:
+                    variance_ij += yi**2*ferri**2
+                
+                self.uncertainty += variance_ij
 
         self.uncertainty = np.sqrt(self.uncertainty)
         

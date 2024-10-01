@@ -121,7 +121,7 @@ def neutrino(enu, p, numass=0):
 class BetaBranch(Spectrum):
     """A class to save isotopic branch information."""
     
-    ID : float
+    id : float
     """ The identity of each beta branch, each branch of an isotope has unique end-point energy"""
     Z: int
     """The Atomic number of the mother isotope"""
@@ -186,7 +186,7 @@ class BetaBranch(Spectrum):
         
         Spectrum.__init__(self, xbins)
         
-        self.ID = E0
+        self.id = E0
         self.Z = Z
         self.A = A
         self.I = I
@@ -385,7 +385,7 @@ class BetaIstp(Spectrum, Summed):
         Spectrum.__init__(self, xbins)
         
         self.ZAI=Z*1e4+A*10+I # unique ID of a isotope
-        self.ID = self.ZAI
+        self.id = self.ZAI
         self.HL = HL
 
         self.Z = Z
@@ -405,7 +405,7 @@ class BetaIstp(Spectrum, Summed):
 
 
         """
-        self.branches[branch.ID] = branch #branch.ID is the endpoint energy
+        self.branches[branch.id] = branch #branch.id is the endpoint energy
 
 
     def EditBranch(self, defaultE0, **kwargs):
@@ -523,7 +523,7 @@ class BetaIstp(Spectrum, Summed):
         self.uncertainty=np.zeros(self.nbin)
         self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
         self.branchUnc=np.zeros(self.nbin)
-        self.totalUnc=np.zeros(self.nbin)
+        totalUnc=np.zeros(self.nbin)
 
         # calculate the total uncertaintty and append spectra
         for E0i, branchi in self.branches.items():
@@ -545,13 +545,13 @@ class BetaIstp(Spectrum, Summed):
                 sigma_bij = si*cov_bij*sj
                 self.branchUnc += sigma_bij
                 if (E0i==E0j):
-                    self.totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij
+                    totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij
                 else:
-                    self.totalUnc += sigma_bij
+                    totalUnc += sigma_bij
 
 
         self.branchUnc = np.sqrt(self.branchUnc)
-        self.totalUnc = np.sqrt(self.totalUnc)
+        totalUnc = np.sqrt(totalUnc)
         self.uncertainty = self.totalUnc
 
     def Display(self):
@@ -712,7 +712,23 @@ class BetaEngine:
                 if betaIstp.branches:
                     self.istplist[ZAI] = betaIstp
 
+    def GetBetaIstp(self, Z, A, I=0):
+        """
+        Get the BetaIstp object by giving the ZAI number
+        
+        :param Z: Proton number of the isotope
+        :type Z: int
+        :param A: Atomic mass number of the isotope
+        :type A: int
+        :param I: the Ith isomeric state, defaults to 0
+        :type I: int, optional
+        :return: the specified beta isotope object
+        :rtype: :class:`conflux.BetaEngine.BetaIstp`
 
+        """
+        ZAI = Z*1e4+A*10+I
+        return self.istplist[ZAI]
+        
     def CalcBetaSpectra(self, nu_spectrum=True,
                         branchErange=[0.0, 20.0], GSF=False, silent=False):
         """

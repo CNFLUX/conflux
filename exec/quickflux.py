@@ -193,6 +193,18 @@ def buildmodel(json_file):
     ax.legend()
 
     fig.savefig("233U_JEFF_quick.png")
+    
+    fig, ax = plt.subplots()
+    #ax.set_ylim([-1, 1])
+    #plt.yscale('log')
+    ax.set(xlabel='E (MeV)', 
+           ylabel='neutrino/decay/MeV', 
+           title='U-233 neutrino flux')
+    ax.plot(xbins, uncertainty/spectrum, label="w/ miss info")
+    #ax.plot(sum2.xbins, summed_spect, label="w/o info")
+    ax.legend()
+
+    fig.savefig("233U_JEFF_quick_unc.png")
 
 
 if __name__ == "__main__":
