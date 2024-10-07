@@ -1,3 +1,4 @@
+from conflux.config import CONFLUX_DB
 from conflux.FPYEngine import FissionIstp
 from conflux.ConversionEngine import ConversionEngine, BetaData, VirtualBranch
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     #specify the path where the data is located in the function.
     #betaU235 = BetaData("path/to/file")
     #(change this to the local directory for U_235_e_2014.csv)
-    betaU235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    betaU235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
 
     #I am also going to intialize my energy range, in this case 0 MeV to 10 MeV with 
     #100 keV bins
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     #a slice size of 0.5 (500keV, which is the default). Note also, that
     #My parameter is a string of the inputted fission isotope, not the isotope
     #Itself. Be careful when adding this parameter.
-    convertmodel.VBfitbeta("U235")
+    convertmodel.VBfitbeta("U235", slicesize=0.5)
 
     #Now, since I've only added one fission isotope to my conversion model, I do not
     #Need to call the below function. I can infact calculate the spectrum as I have in
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     #Fission isotopes to be added, it is better to call SummedSpectra to calculate the total
     #spectrum, uncertainty, and covariance matrices for the entire model, not just an
     #individual Fission isotope
-    conSpec, conUnc, conCov = convertmodel.SummedSpectrum(e, nu_spectrum=True, cov_samp=5)
+    conSpec, conUnc, conCov = convertmodel.SummedSpectrum(e, nu_spectrum=True, cov_samp=50)
 
 
     #Now, I will start plotting.
@@ -99,6 +100,7 @@ if __name__ == "__main__":
     #I generate a covariance matrix for both the betas and the neutrinos
     covmat = convertmodel.vblist["U235"].Covariance(betaU235, e, nu_spectrum=False, samples=50)
     covmat_nu = convertmodel.vblist["U235"].Covariance(betaU235, e, nu_spectrum=True, samples=50)
+    print(covmat_nu)
 
     #Here, I calculate the beta spectrum, and then calculate the relative errors of it from the
     #Covariance matrices I generated above.

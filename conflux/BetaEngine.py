@@ -450,6 +450,7 @@ class BetaIstp(Spectrum, Summed):
                 custom_func = custom_func
 
             if defaultE0 not in self.branches.keys():
+                # TODO need to remove  the original E0 when a new E0 is given
                 self.branches[defaultE0] = BetaBranch(self.Z, 
                                                       self.A, 
                                                       self.I, 

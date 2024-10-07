@@ -1,5 +1,5 @@
 # local modules
-from conflux.BetaEngine import BetaEngine, CONFLUX_DB
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB, BetaBranch
 from conflux.FPYEngine import FissionIstp
 from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
@@ -60,7 +60,7 @@ def Rebin(inputx, inputy, outputx):
 if __name__ == "__main__":
     # Begin the calculation by sourcing the default beta data
     beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
-    beta235s = BetaData(CONFLUX_DB+"/example_models//U235_synth_data_1.5_9.6.csv")
+    beta235s = BetaData("./U235_synth_data_1.5_9.6.csv")
     beta239 = BetaData(CONFLUX_DB+"/conversionDB/Pu_239_e_2014.csv")
     beta241 = BetaData(CONFLUX_DB+"/conversionDB/Pu_241_e_2014.csv")
 
@@ -76,16 +76,16 @@ if __name__ == "__main__":
     Pu241.LoadFissionDB()
 
     # Define the size of energy slice
-    branch_slice = 0.50
+    branch_slice = 0.25
     # Declare the conversion engine by adding beta data with corresponding FPY
     # database
     convertmodel = ConversionEngine()
     # Add beta spectra and fission products to the conversion engine
-    convertmodel.AddBetaData(beta235, U235, "U235", 1.0)
+    convertmodel.AddBetaData(beta235s, U235, "U235", 1.0)
     # convertmodel.AddBetaData(beta239, Pu239, "Pu239", 1.0)
     # convertmodel.AddBetaData(beta241, Pu241, "Pu241", 1.0)
     # Do virtual branch fitting with the defined virtual branch energy range
-    xval = np.arange(0, 10, 0.01)
+    xval = np.arange(0, 10, 0.02)
     Zlist = dict(zip(xval, HuberZavg(xval, 49, -0.4, -0.084)))
     #convertmodel.VBfitbeta("U235", branch_slice)
     convertmodel.VBfitbeta("U235", branch_slice)
@@ -99,18 +99,35 @@ if __name__ == "__main__":
     # plt.yscale('log')
     plt.xlim([2, 10])
     plt.yscale('log')
+    plt.ylim([1e-5, 10])
     plt.xlabel("E (MeV)")
     plt.ylabel("(electron/neutrino)/fission/MeV")
 
     # Draw the spectra of all vertual branches
-    for i in range(0, 40):
-        if (sum(convertmodel.vblist["U235"].SumBranches(xval,
-                thresh=i*branch_slice, nu_spectrum = False))<=0):
-            continue
+    vbfitter = convertmodel.vblist["U235"]
+    vbspec = np.zeros(len(xval))
+    binwidths = xval[1]-xval[0]
+    for s in vbfitter.E0:
+        vbcont = vbfitter.contribute[s]
+        vbranch = BetaBranch(vbfitter.Zlist[s], 
+                                     vbfitter.Alist[s],
+                                     frac=1-vbfitter.fblist[s], 
+                                     I=0, 
+                                     Q = vbfitter.E0[s],
+                                     E0=vbfitter.E0[s], 
+                                     sigma_E0=0, 
+                                     sigma_frac=0,
+                                     forbiddenness=0, 
+                                     bAc=vbfitter.wmlist[s])
+        spec = vbranch.BetaSpectrum(xval, nu_spectrum=False)
+        spec = spec/(sum(spec)*binwidths)
+        vbspec += vbcont * spec
+        plt.plot(xval, vbspec, "--")
+        
     plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
-            thresh=1*branch_slice, nu_spectrum = False), fmt='--')
+            thresh=1*branch_slice, nu_spectrum = False), label = "best-fit beta")
     plt.errorbar(xval, convertmodel.vblist["U235"].SumBranches(xval,
-            thresh=1*branch_slice, nu_spectrum = True), fmt='--')
+            thresh=1*branch_slice, nu_spectrum = True), label = "converted_neutrino")
     fig.savefig("U235_convert_test.png")
     
     fig = plt.figure()
@@ -119,7 +136,7 @@ if __name__ == "__main__":
         convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
         label='beta data')
     
-    # Draw the summed best fit virtual beta spectrum of this calculation
+    # Draw the summed best fit virtual beta spectrum of this calculation 
     spectrum = convertmodel.vblist["U235"].SumBranches(xval,
         nu_spectrum = False)
     plt.errorbar(xval, spectrum, label='best fit beta')
@@ -131,12 +148,12 @@ if __name__ == "__main__":
     fig.savefig("U235_conversion_new.png")
 
     final_spect, final_unc, final_cov = convertmodel.SummedSpectrum(xval, 
-                                        nu_spectrum=False, cov_samp=100)
+                                        nu_spectrum=False, cov_samp=50)
     print("covariance beta result", (final_cov))
 
     final_spect1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(xval, 
-                                            nu_spectrum=True, cov_samp=100)
-    print("covariance neutrino result", (final_cov1))
+                                            nu_spectrum=True, cov_samp=50)
+    print("covariance neutrino result", final_spect1, "\n", (final_cov1))
 
     """ Following steps are to calculate uncertainties """
     
@@ -162,49 +179,16 @@ if __name__ == "__main__":
 
     fig = plt.figure()
     plt.ylim([-.5, .5])
-    plt.fill_between(xval, relativeErr, -relativeErr, label='beta',
+    plt.fill_between(xval[0:], relativeErr[0:], -relativeErr[0:], label='beta',
                     alpha = 0.4)
-    plt.fill_between(xval, relativeErrNu, -relativeErrNu, label='neutrino',
+    plt.fill_between(xval[0:], relativeErrNu[0:], -relativeErrNu[0:], label='neutrino',
                     alpha = 0.4)
     plt.legend()
     fig.savefig("U235_errs_new.png")
 
     print("beta integral", sum(final_spect))
     print("neu integral", sum(final_spect1))
-
-
-    """ Following steps are to plot the best fit spectra and compare them to 
-        original spectra
-    """
     
-    newxval = np.arange(2.125, 8.375, 0.25)
-    newyval = Rebin(xval, final_spect, newxval)
-    newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=5)
-
-    fig = plt.figure()
-    # plt.yscale('log')
-    plt.errorbar(convertmodel.betadata["U235"].x,
-        convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
-        label='beta data')
-    plt.plot(newxval, newyval1, label='neutrino rebined')
-    plt.plot(xval, final_spect1, label='best fit neutrino')
-    plt.legend()
-    plt.show()
-    fig.savefig("bestfit_spectra.png")
-
-    # calculating summed spectrum synthetic data as comparison
-    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
-    diff = (final_spect-betaspect)/betaspect
-    fig = plt.figure()
-    plt.ylim([-0.1, 0.1])
-    plt.xlim([2, 9])
-    plt.plot(xval, diff)
-    plt.show()
-    fig.savefig("bestfit_beta_compare.png")
-
-    """ Following steps are to compare converted neutrino spectrum to the 
-        synthetic neutrino data
-    """
     # generate the neutrino spectrum
     betaSpectraDB = BetaEngine(xbins=xval)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
@@ -218,26 +202,82 @@ if __name__ == "__main__":
 
     # Generate the summation result
     sum1 = SumEngine(betaSpectraDB)
-    sum1.AddFissionIstp(U235, "U235", 100, 0)
+    sum1.AddFissionIstp(U235, "U235", 1, 0)
     # sum all spect
     sum1.CalcReactorSpectrum()
 
     summed_spect = sum1.spectrum
 
-    file = open("U235_synth_compare.csv", "w")
-    file.write("E,Ne,dNe")
-    file.write("\n")
-    for i in range(len(summed_spect)):
-        file.write(str(xval[i] * 1000) + " , " + str(summed_spect[i]) + ",0")
-    #
-    #
-    file.close()
 
-    #
-    diff = (final_spect1-summed_spect)/summed_spect
+    """ Following steps are to plot the best fit spectra and compare them to 
+        original spectra
+    """
+    
+    # newxval = np.arange(2.125, 8.375, 0.25)
+    # newyval = Rebin(xval, final_spect, newxval)
+    # newyval1, final_unc1, final_cov1 = convertmodel.SummedSpectrum(newxval, nu_spectrum=True, cov_samp=5)
+
     fig = plt.figure()
-    plt.ylim([-0.3, 0.3])
+    # plt.yscale('log')
+    plt.errorbar(convertmodel.betadata["U235"].x,
+        convertmodel.betadata["U235"].y, convertmodel.betadata["U235"].yerr,
+        label='synthetic beta')
+    plt.plot(xval, final_spect, label="best fit beta")
+    plt.plot(xval, summed_spect, label='synthetic neutrino')
+    plt.plot(xval, final_spect1, label='best fit neutrino')
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel("decay/fission/MeV")
+
+    plt.legend()
+    fig.savefig("bestfit_spectra.png")
+
+    # calculating summed spectrum synthetic data as comparison
+    betaspect = np.interp(xval, convertmodel.betadata["U235"].x, convertmodel.betadata["U235"].y)
+    diff = (final_spect-betaspect)/betaspect
+    fig = plt.figure()
+    plt.ylim([-0.1, 0.1])
     plt.xlim([2, 9])
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel("Relative difference")
     plt.plot(xval, diff)
     plt.show()
-    fig.savefig("synthetic_compare.png")
+    fig.savefig("bestfit_beta_compare.png")
+    
+    # Finally, the rest of this is plotting the relative errors for both the betas and the neutrinos for our given
+    # Energy range
+    relativeErr = final_unc/final_spect
+    print(final_unc)
+    relativeErrNu = final_unc1/final_spect1
+    print(relativeErr, relativeErrNu)
+    fig = plt.figure()
+    plt.ylim([-.3, .3])
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel("Relative uncertainty")
+    plt.fill_between(xval, -relativeErr, relativeErr, label='beta', alpha=0.4)
+    plt.fill_between(xval, -relativeErrNu, relativeErrNu, label='neutrino', alpha=0.4)
+    plt.legend()
+    name = "U235_errors.png"
+    fig.savefig(name)
+
+    """ Following steps are to compare converted neutrino spectrum to the 
+        synthetic neutrino data
+    """
+    diff1 = (final_spect1-summed_spect)/summed_spect*100
+    fig = plt.figure()
+    plt.ylim([-10, 10])
+    plt.ylabel("Relative difference (\%)")
+    plt.xlim([2, 9])
+    plt.xlabel("Energy (MeV)")
+    plt.plot(xval, diff*100, label="best-fit beta")
+    plt.plot(xval, diff1, label="converted neutrino")
+    plt.legend()
+    fig.savefig("huber_compare.png")
+
+    # file = open("U235_synth_compare.csv", "w")
+    # file.write("E,Ne,dNe")
+    # file.write("\n")
+    # for i in range(len(summed_spect)):
+    #     file.write(str(xval[i] * 1000) + " , " + str(summed_spect[i]) + ",0")
+    # #
+    # #
+    # file.close()
