@@ -46,3 +46,16 @@ if __name__ == "__main__":
         plt.plot(e, individualBranch)
     plt.yscale('log')
     plt.savefig("IndividualBranches.png")
+
+    #I can also go ahead and pull out the covariance information for the Cumulative Fission Products associated
+    #With U235.
+    with open('cov_235_U_processed.csv', 'w', newline='') as csvoutput:
+        fieldnames = ['']
+        for i in U235.CFPY[0]:
+            fieldnames.append(i)
+        writer = csv.DictWriter(csvoutput, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in U235.CFPY[0]:
+            rowcontent = U235.CFPY[0][i].cov
+            rowcontent[''] = i
+            writer.writerow(rowcontent)    
