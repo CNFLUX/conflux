@@ -386,8 +386,15 @@ class VirtualBranch(Spectrum):
                                                              Aavg=Aavg,
                                                              forbiddenness=1,
                                                              bAc=wm))))
-
-                    binwidths = betadata.x[1]-betadata.x[0]
+                    #Scale the binwidths of our energy scale from keV to Mev
+                    if(1000 > betadata.x[1]-betadata.x[0] > 1):
+                        binwidths = (betadata.x[1]-betadata.x[0])/1e3
+                    #Scale the binwidths of our energy scale from eV to MeV
+                    elif(100000 > betadata.x[1]-betadata.x[0] > 1000):
+                        binwidths = (betadata.x[1]-betadata.x[0]) / 1e6
+                    #Get the binwidths in MeV
+                    else:
+                        binwidths = betadata.x[1]-betadata.x[0]
                     full_range = np.arange(0, 20, binwidths)
 
                     best_energy = np.inf
