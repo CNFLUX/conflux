@@ -22,7 +22,7 @@ def ferm(ebeta, p, numass = 0):
 
 if __name__ == "__main__":
     #First, initialize energy range
-    e = np.arange(0., 8, 0.1)
+    e = np.arange(0., 10, .1)
 
     #Next, I am going to initialize a beta engine with one Beta Isotope, and
     #Pull the Beta Isotope from the engine after I've loaded the beta data. 
@@ -51,7 +51,9 @@ if __name__ == "__main__":
     # spectrum, 'sigma_frac' is the uncertainty in the fractional contribution, and 'sigma_E0'
     # is the uncertainty in the endpoint energy of this branch.
     parameters = {'fraction' : 0.1, 'sigma_E0' : 0.01, 'sigma_frac' : 0.01}
-    Cs141.EditBranch(defaultE0 = 5.244, kwargs =  parameters)
+    parameters1 = {'E0' : 6.2}
+    Cs141.EditBranch(defaultE0 = 5.206, kwargs =  parameters1)
+    print(Cs141.branches.keys())
     #I also go ahead and recalculate the covariances of all branches, since I just edited the spectrum
     #To add a branch that did not previously exist.
     Cs141.CalcCovariance()
@@ -71,8 +73,9 @@ if __name__ == "__main__":
     Cs141.branches.pop(5.244)
     #And here I change All the branches forbiddenness to 0. 
     for i in Cs141.branches:
-        if Cs141.branches[i].forbiddenness != 1:
-            Cs141.EditBranch(defaultE0 = i, forbiddenness = 1)
+        if Cs141.branches[i].forbiddenness != 0:
+            print(Cs141.branches[i].forbiddenness)
+            Cs141.EditBranch(defaultE0 = i, forbiddenness = 0)
     Cs141.CalcCovariance()
     Cs141.SumSpectra(nu_spectrum=False, branchErange=[0,8])
 
@@ -93,6 +96,13 @@ if __name__ == "__main__":
             Cs141.EditBranch(defaultE0 = i, forbiddenness = 0)
 
     #Switch the default beta shape function with a custom function I've defined up top.
+    #First, I will go ahead and pull all the isotopic information from my ENSDFbetaDB2 again, and
+    # create a fresh copy of the Cs141 isotope from the DB, since I want to start this last calculation
+    # off with a fresh BetaIstp That has not been edited.
+    BetaDB.LoadBetaDB()
+    BetaDB.CalcBetaSpectra(nu_spectrum=False, branchErange=[0,8])
+    Cs141 = BetaDB.istplist[551410]
+
     for i in Cs141.branches:
         Cs141.EditBranch(defaultE0 = i, custom_func = ferm)
     #Then I go ahead and Calculate my beta spectrum, since I have edited branches, and save the resulting
@@ -104,14 +114,14 @@ if __name__ == "__main__":
     #And finally, I can go ahead and plot all of this, and save it in a file
 
     fig = plt.figure()
+    print((forbidSpec-origSpec)/origSpec)
 
-    plt.errorbar(e, EndSpec, yerr=EndUnc, label="Endpoint edited Spectrum")
-    plt.errorbar(e, forbidSpec, yerr=forbidUnc, label="Forbiddenness edited")
-    plt.errorbar(e, fermiSpec, yerr = fermiUnc, label="beta function edited")
-    plt.errorbar(e, origSpec,yerr=origUnc, label="Vanilla Spectrum")
-    plt.ylabel("Beta Spectrum")
+    plt.errorbar(e, (EndSpec-origSpec)/origSpec, yerr=EndUnc, label="Endpoint edited Spectrum")
+    plt.errorbar(e, (forbidSpec-origSpec)/origSpec, yerr=forbidUnc, label="Forbiddenness edited")
+    plt.errorbar(e, (fermiSpec-origSpec)/origSpec, yerr = fermiUnc, label="beta function edited")
+    plt.errorbar(e, (origSpec-origSpec)/origSpec,yerr=origUnc, label="Vanilla Spectrum")
+    plt.ylim(-1, 1)
+    plt.ylabel("neutrino Spectrum")
     plt.xlabel("Energy (in MeV)")
     plt.legend()
     plt.savefig("Beta_spectrum_changing_params.png")
-    plt.yscale("log")
-    plt.savefig("Beta_Spectrum_changing_params_log.png")
