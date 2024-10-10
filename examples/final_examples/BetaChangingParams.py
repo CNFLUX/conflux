@@ -34,10 +34,10 @@ if __name__ == "__main__":
     #Calculated. This is because Cs141 has 2 isomeric states to calculate. We differentiate
     #The two with the last digit of the isotopes FPZAI number. Hence, the original isotope
     #is 551410, and the first isomeric state is 551411
-    BetaDB = BetaEngine(inputlist = [551410], xbins = e)
+    BetaDB = BetaEngine(inputlist = [942410], xbins = e)
     BetaDB.LoadBetaDB()
     BetaDB.CalcBetaSpectra(nu_spectrum=False, branchErange=[0,8])
-    Cs141 = BetaDB.istplist[551410]
+    Cs141 = BetaDB.istplist[942410]
 
     #I also go ahead and save the original spectrum and uncertainty before making any edits
     #To my theoretical model.
@@ -70,7 +70,8 @@ if __name__ == "__main__":
     # #I will recalculate the covariances for my spectrum and then save the resulting spectrum
     
     #Here I remove the branch I just added
-    Cs141.branches.pop(5.244)
+    print(Cs141.branches.keys())
+    # Cs141.branches.pop(5.244)
     #And here I change All the branches forbiddenness to 0. 
     for i in Cs141.branches:
         if Cs141.branches[i].forbiddenness != 0:
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     # off with a fresh BetaIstp That has not been edited.
     BetaDB.LoadBetaDB()
     BetaDB.CalcBetaSpectra(nu_spectrum=False, branchErange=[0,8])
-    Cs141 = BetaDB.istplist[551410]
+    Cs141 = BetaDB.istplist[942410]
 
     for i in Cs141.branches:
         Cs141.EditBranch(defaultE0 = i, custom_func = ferm)

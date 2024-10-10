@@ -86,8 +86,9 @@ class BetaData(Spectrum):
             for row in inputreader:
                 E = float(row["E"])
                 # convert from keV to MeV
-                if E > 100:
-                   E /= 1000.
+                if E > 20:
+                    print(f"Energy unit is MeV by default, 20 MeV is too large! Changing it to keV scale")
+                    E /= 1000.
 
                 # convert relative uncertainty in percentage to absolute
                 # uncertainty
@@ -317,9 +318,10 @@ class VirtualBranch(Spectrum):
         for it, x in tqdm(fitsequence, 
                           desc="Fitting beta spectrum with reversed sequence"):
             if x <= xhigh - slicesize or x == betadata.x[0]:
-                subx.append(x)
-                suby.append(datacache[it])
-                subyerr.append(betadata.yerr[it])
+                if x > 0:
+                    subx.append(x)
+                    suby.append(datacache[it])
+                    subyerr.append(betadata.yerr[it])
                 # when the sublist is filled in this slice, do fitting
                 if len(subx)>1 and len(suby) == len(subx):
                     # setup the virtual isotope properties
