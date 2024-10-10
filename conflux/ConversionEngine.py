@@ -665,10 +665,10 @@ class VirtualBranch(Spectrum):
         print(f'Calculating covariance matrix with {samples} MC samples...')
         startTiming = timeit.default_timer()
 
-        plt.figure()   # TODO comment me
-        vbbuffer = deepcopy(self)
-        vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
-        y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
+        # plt.figure()   # TODO comment me
+        # vbbuffer = deepcopy(self)
+        # vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
+        # y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
         for i in (range(0, samples)):
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
@@ -678,15 +678,15 @@ class VirtualBranch(Spectrum):
             vbnew = deepcopy(self)
             vbnew.FitData(toy, vbnew.slicesize)
             y = vbnew.SumBranches(x, thresh, nu_spectrum)
-            plt.plot(x, (y-y0)/y0*100, color='red') # TODO comment me
-            plt.ylim((-20, 20))
-            plt.ylabel("Relative difference to mean")
-            plt.xlabel("E (MeV)")
-            for s in y:
-                if np.isnan(s):
-                    print(y)
+            # plt.plot(x, (y-y0)/y0*100, color='red') # TODO comment me
+            # plt.ylim((-20, 20))
+            # plt.ylabel("Relative difference to mean")
+            # plt.xlabel("E (MeV)")
+            # for s in y:
+            #     if np.isnan(s):
+            #         print(y)
             result.append(y)
-        plt.savefig("conversion_MC.png") # TODO comment me     
+        # plt.savefig("conversion_MC.png") # TODO comment me     
         endTiming = timeit.default_timer()
         runTime = endTiming-startTiming
         print(f"Finished calculating covairance matrix of {samples} samples.")

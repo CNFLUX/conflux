@@ -84,6 +84,8 @@ if __name__ == "__main__":
     #Plot out the calculated neutrino spectrum
     plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, nu_spectrum = True), label='neutrino')
     plt.legend()
+    plt.xlabel("E (MeV)")
+    plt.ylabel("(beta\neutrino)/fission/MeV")
     fig.savefig("U235_conversion.png")
 
     #Note, I am going to plot out the converted spectrum that we got from SummedSpectra, and will show that it's the
@@ -123,9 +125,12 @@ if __name__ == "__main__":
     #Finally, the rest of this is plotting the relative errors for both the betas and the neutrinos for our given
     #Energy range
     fig = plt.figure()
-    plt.ylim([-.3, .3])
-    plt.fill_between(e, relativeErr, -relativeErr, label='beta', alpha=0.4)
-    plt.fill_between(e, relativeErrNu, -relativeErrNu, label='neutrino', alpha=0.4)
+    plt.ylim([-20, 20])
+    plt.xlabel("E (MeV)")
+    plt.ylabel("Relative uncertainty (\%)")
+
+    plt.fill_between(e, relativeErr*100, -relativeErr*100, label='beta', alpha=0.4)
+    plt.fill_between(e, relativeErrNu*100, -relativeErrNu*100, label='neutrino', alpha=0.4)
     plt.legend()
     name = "U235_errors.png"
     fig.savefig(name)
