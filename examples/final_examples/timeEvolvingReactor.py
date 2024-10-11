@@ -17,11 +17,11 @@ if __name__ == "__main__":
     Pu241 = FissionIstp(94, 241, Ei=0)
     Pu241.LoadFissionDB()
 
-    e = np.arange(0,20., 0.5)
+    e = np.arange(0,15., 0.1)
 
     #Load up the BetaSpectrum, and Calculate the beta spectrum for our fission products.
     betaSpectraDB = BetaEngine(xbins=e)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0,15])
     U235.CalcBetaSpectra(betaSpectraDB)
     U238.CalcBetaSpectra(betaSpectraDB)
     Pu239.CalcBetaSpectra(betaSpectraDB)
@@ -43,7 +43,11 @@ if __name__ == "__main__":
     print(next(csvreader))
 
     step = 0
-    fig = plt.plot()
+    fig, (ax1, ax2) = plt.subplots(2)
+
+    days = []
+    ratio_to_day_0 = []
+
     #Next, I iterate through the lines in the csv file
     for row in csvreader:
         #Figure out what day we are doing the calculation for
@@ -53,10 +57,10 @@ if __name__ == "__main__":
         total = 0
         #This is to skip over certain days inside our reactor, so that
         #We do simulation calculations for only specific days
-        if step != 0 and step != 13 and step != 7 and step != 4 and step != 10:
-            print("We are skipping over the information from " + str(step) + " Days after the reactor was turned on")
-            step += 1
+        if name != 0 and name != 20.0 and name != 300 and name != 800 and name != 1400:
             continue
+
+        print(row)
         percentage = []
         #This is to figure out the isotope fractions from the raw inputed data.
         for num in range(len(row)):
@@ -84,15 +88,18 @@ if __name__ == "__main__":
         #Plot the spectrum at the current timestep
         sumX = SummationEngine.xbins
         sumY = SummationEngine.spectrum
+        days.append(name)
+        ratio_to_day_0.append(sum(sumY))
         Labelmaker = "Reactor on for " + str(name) + " days"
-        plt.plot(sumX, sumY, label = Labelmaker)
+        ax1.plot(sumX, sumY, label = Labelmaker)
         step += 1
 
     #Plotting
-    plt.yscale('log')
-    plt.legend()
-    plt.xlabel("E (in MeV)")
-    plt.ylabel("neutrinos/MeV/Fission")
+    ax1.legend()
+    ax1.set(xlabel="E (in MeV)", ylabel=r"${\nu}_e/MeV/Fission$")
+    for i in range(len(ratio_to_day_0)):
+        ratio_to_day_0[i] = ratio_to_day_0[i]/ratio_to_day_0[0]
+    ax2.plot(days, ratio_to_day_0, 'bo')
+    ax2.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$" )
 
     plt.savefig("TimeEvolution")
-    print("This is working as intended")
