@@ -19,7 +19,7 @@ if __name__  == "__main__":
                      yerr = BetaSpecificEngine.istplist[i].uncertainty, label = BetaSpecificEngine.istplist[i].name)
         
     plt.xlabel("Energy (MeV)")
-    plt.ylabel(r"$e^-/MeV/Fission$")
+    plt.ylabel("neutrino/MeV")
     plt.legend()
     plt.savefig("Specific_Neutrino_Spectrum.pdf")
 
