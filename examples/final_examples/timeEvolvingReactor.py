@@ -3,11 +3,14 @@ from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
+import pandas as pd
 
 if __name__ == "__main__":
     # Load in the Fission Data for our fissile isotopes.
     # Also load up the energy range array
+    
+    df = pd.read_csv(CONFLUX_DB+'/example_models/timeEvolvingReactor.csv')
+    
     U235 = FissionIstp(92, 235, Ei=0)
     U235.LoadFissionDB()
     U238 = FissionIstp(92, 238, Ei=0.5)
@@ -18,6 +21,7 @@ if __name__ == "__main__":
     Pu241.LoadFissionDB()
 
     e = np.arange(0,15., 0.1)
+    binwidth = e[1]-e[0]
 
     #Load up the BetaSpectrum, and Calculate the beta spectrum for our fission products.
     betaSpectraDB = BetaEngine(xbins=e)
@@ -35,71 +39,45 @@ if __name__ == "__main__":
     SummationEngine.AddFissionIstp(Pu241, "Pu241", count = 0)
 
     #Next, Open up the reactor output file that contains the % - fissile contribution
-    file = open(CONFLUX_DB+'/example_models/timeEvolvingReactor.csv')
+    df = pd.read_csv(CONFLUX_DB+'/example_models/timeEvolvingReactor.csv')
 
     #read out the first line which should be the isotope names that are being fed into our simulation
     #As well as the # of Days (This is the Header)
-    csvreader = csv.reader(file)
-    print(next(csvreader))
 
-    step = 0
     fig, (ax1, ax2) = plt.subplots(2)
 
     days = []
     ratio_to_day_0 = []
 
     #Next, I iterate through the lines in the csv file
-    for row in csvreader:
+    for index, row in df.iterrows():
         #Figure out what day we are doing the calculation for
-        name = float(row[0])
-        #Initialize an array for the storage of our raw fraction data.
-        raw = []
-        total = 0
-        #This is to skip over certain days inside our reactor, so that
-        #We do simulation calculations for only specific days
-        if name != 0 and name != 20.0 and name != 300 and name != 800 and name != 1400:
+        name = (row["Days"])
+        # We do simulation calculations for only specific days
+        if name not in [0.1, 20, 300, 800, 1400]:
             continue
-
-        print(row)
-        percentage = []
-        #This is to figure out the isotope fractions from the raw inputed data.
-        for num in range(len(row)):
-            #Skip over the first column of data, which containes the number of days after reactor on
-            if (num == 0):
-                continue
-            else:
-                total += float(row[num])
-                raw.append(float(row[num]))
-        for num in raw:
-            per = num / total
-            #Check for if our percentage is 0, change it to something extremely small
-            if (per == 0):
-                per = .00000000000000000000000001
-            percentage.append(per)
 
         #Edit the fractional contribution from each fissile isotope, and then calculate the 
         #Total Reactor spectrum.
-        SummationEngine.EditContribution(istpname="U235", count = percentage[0], d_count = 0)
-        SummationEngine.EditContribution(istpname="U238", count = percentage[1], d_count = 0)
-        SummationEngine.EditContribution(istpname="Pu239", count = percentage[2], d_count = 0)
-        SummationEngine.EditContribution(istpname="Pu241", count = percentage[3], d_count = 0)
+        SummationEngine.EditContribution(istpname="U235", count = row["U235"], d_count = 0)
+        SummationEngine.EditContribution(istpname="U238", count = row["U238"], d_count = 0)
+        SummationEngine.EditContribution(istpname="Pu239", count = row["Pu239"], d_count = 0)
+        SummationEngine.EditContribution(istpname="Pu241", count = row["Pu241"], d_count = 0)
         SummationEngine.CalcReactorSpectrum()
 
         #Plot the spectrum at the current timestep
         sumX = SummationEngine.xbins
         sumY = SummationEngine.spectrum
         days.append(name)
-        ratio_to_day_0.append(sum(sumY))
+        ratio_to_day_0.append(sum(sumY)*binwidth)
         Labelmaker = "Reactor on for " + str(name) + " days"
         ax1.plot(sumX, sumY, label = Labelmaker)
-        step += 1
 
     #Plotting
     ax1.legend()
-    ax1.set(xlabel="E (in MeV)", ylabel=r"${\nu}_e/MeV/Fission$")
-    for i in range(len(ratio_to_day_0)):
-        ratio_to_day_0[i] = ratio_to_day_0[i]/ratio_to_day_0[0]
-    ax2.plot(days, ratio_to_day_0, 'bo')
-    ax2.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$" )
+    ax1.set(xlabel="E (MeV)", ylabel="neurtino/MeV")
+    ax2.plot(days, np.array(ratio_to_day_0)/ratio_to_day_0[0]*100, 'bo')
+    ax2.set_xscale('log')
+    ax2.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$ (%)" )
 
-    plt.savefig("TimeEvolution")
+    plt.savefig("time_dependent_neutrino_flux.pdf")

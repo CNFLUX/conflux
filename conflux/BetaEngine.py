@@ -22,6 +22,8 @@ from conflux.bsg.SpectralFunctions import (phase_space,
 from conflux.bsg.Functions import getEltonNuclearRadius
 from conflux.bsg.Screening import screening_potential
 
+
+
 #########################################
 # Final neutrino and antineutrino spectra
 
@@ -744,7 +746,7 @@ class BetaEngine:
         :type silent: bool, optional
 
         """
-
+    
         for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes", disable=silent):
             betaIstp = self.istplist[ZAI]
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
