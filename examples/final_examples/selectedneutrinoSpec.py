@@ -16,11 +16,11 @@ if __name__  == "__main__":
 
     for i in BetaSpecificEngine.istplist:
         plt.errorbar(e, BetaSpecificEngine.istplist[i].spectrum, 
-                     yerr = BetaSpecificEngine.istplist[i].uncertainty, label = str(i))
+                     yerr = BetaSpecificEngine.istplist[i].uncertainty, label = BetaSpecificEngine.istplist[i].name)
         
     plt.xlabel("Energy (MeV)")
     plt.ylabel(r"$e^-/MeV/Fission$")
     plt.legend()
-    plt.savefig("Specific_Neutrino_Spectrum.png")
+    plt.savefig("Specific_Neutrino_Spectrum.pdf")
 
     #Will need to create individual beta isotopes with the neutrino param set to True
