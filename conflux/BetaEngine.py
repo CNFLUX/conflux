@@ -1,7 +1,6 @@
 """Public modules."""
 import numpy as np
 import xml.etree.ElementTree as ET
-import matplotlib.pyplot as plt
 from copy import deepcopy
 from tqdm import tqdm
 
@@ -71,6 +70,8 @@ def electron(ebeta, p, numass=0):
     else:
         result *= shape_factor_unique_forbidden(W, **p)
 
+    result = np.nan_to_num(result, nan=0.0)
+    
     return result
 
 #Function to calculate the neutrino spectrum from theory as a function of energy
@@ -117,6 +118,8 @@ def neutrino(enu, p, numass=0):
         result *= shape_factor_gamow_teller(Wv, **p)
     else:
         result *= shape_factor_unique_forbidden(Wv, **p)
+        
+    result = np.nan_to_num(result, nan=0.0)
     return result
 
 # BetaBranch class to save the isotopic information
@@ -145,6 +148,10 @@ class BetaBranch(Spectrum):
     """The uncertaintry of the branching fraction."""
     forbiddenness: int
     """Type of forbiddeness """
+    numass: float
+    """neutrno mass (MeV), by default 0"""
+    mixing: float
+    """mixing of nonzero neutrino mass, by default 0"""
     Parameters: dict
     """Beta decay function parameters"""
     corr: dict 
@@ -154,8 +161,7 @@ class BetaBranch(Spectrum):
     
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
-                numass = 0,
-                custom_func=None):
+                numass = 0, mixing = 0, custom_func=None):
         """
         A class to save isotopic branch information.
         
@@ -201,6 +207,9 @@ class BetaBranch(Spectrum):
         self.sigma_frac = sigma_frac
 
         self.forbiddenness = forbiddenness
+        
+        self.numass = numass
+        self.mixing = mixing
         
         self.custom_func = custom_func
         #Add the parameters of this branch to a dictionary to be passed onto one of the
@@ -250,7 +259,7 @@ class BetaBranch(Spectrum):
                                     * otherBranch.sigma_frac)
 
     # beta spectrum shape as function of energy
-    def BetaSpectrum(self, e, nu_spectrum=False, numass=0):
+    def BetaSpectrum(self, e, nu_spectrum=False):
         """
         Calculate the beta/neutrino spectral shape as a function of energy.
         
@@ -270,15 +279,18 @@ class BetaBranch(Spectrum):
         rangeCorrect = e <= self.E0
 
         if (nu_spectrum == True):
-            function = lambda e: neutrino(e, Parameters, numass=numass)
+            function = lambda e: ((1-self.mixing)*neutrino(e, Parameters)
+                                  +self.mixing*neutrino(e, Parameters, numass=self.numass))
         else:
-            function = lambda e: electron(e, Parameters, numass=numass)
+            function = lambda e: ((1-self.mixing)*electron(e, Parameters)
+                                  +self.mixing*electron(e, Parameters, numass=self.numass))
             
         if (self.custom_func!=None):
-            function = lambda e: self.custom_func(e, Parameters, numass=numass)
+            function = lambda e: ((1-self.mixing)*self.custom_func(e, Parameters)
+                                  +self.mixing*self.custom_func(e, Parameters, numass=self.numass))
 
         result = function(e)
-        result = np.nan_to_num(result, nan=0.0)
+        
         return result*rangeCorrect
 
     # calculate the spectrum uncertainty with MC sampling
@@ -303,12 +315,15 @@ class BetaBranch(Spectrum):
         newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
 
         if (nu_spectrum == True):
-            function = lambda e: neutrino(e, newParameters)
+            function = lambda e: ((1-self.mixing)*neutrino(e, newParameters)
+                                  +self.mixing*neutrino(e, newParameters, numass=self.numass))
         else:
-            function = lambda e: electron(e, newParameters)
+            function = lambda e: ((1-self.mixing)*electron(e, newParameters)
+                                  +self.mixing*electron(e, newParameters, numass=self.numass))
             
         if (self.custom_func!=None):
-            function = lambda e: self.custom_func(e, newParameters)
+            function = lambda e: ((1-self.mixing)*self.custom_func(e, newParameters)
+                                  +self.mixing*self.custom_func(e, newParameters, numass=self.numass))
 
         fE0 = function(e)
         fE0 = np.nan_to_num(fE0, nan=0.0)
@@ -382,7 +397,7 @@ class BetaIstp(Spectrum, Summed):
     :type xbins: numpy.array, optional
     """
     
-    def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1), numass=0, mixing=0):
         """Constructor method."""
         Spectrum.__init__(self, xbins)
         
@@ -397,6 +412,9 @@ class BetaIstp(Spectrum, Summed):
         self.name = name
         self.missing=False
         self.branches = {}
+        
+        self.numass = numass
+        self.mixing = mixing
 
     def AddBranch(self, branch):
         """
@@ -464,7 +482,9 @@ class BetaIstp(Spectrum, Summed):
                                                       forbiddenness,
                                                       bAc=bAc, 
                                                       xbins=self.xbins,
-                                                      custom_func=custom_func)
+                                                      custom_func=custom_func,
+                                                      numass=self.numass,
+                                                      mixing=self.mixing)
 
             if hasattr(self.branches[defaultE0], key):
                 setattr(self.branches[defaultE0], key, value)
@@ -608,12 +628,17 @@ class BetaEngine:
                  inputlist=None, 
                  targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml",
                  xbins=np.arange(0, 20, 0.1),
-                 custom_func=None):
+                 custom_func=None,
+                 numass=0,
+                 mixing=0):
         """Constructor method."""
         self.inputlist = inputlist
         self.istplist = {}
         self.xbins = xbins
         self.custom_func=custom_func
+        
+        self.numass = numass
+        self.mixing = mixing
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
@@ -708,7 +733,9 @@ class BetaEngine:
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
                                             sigma_frac, forbiddenness,
                                             xbins=self.xbins,
-                                            custom_func=self.custom_func)
+                                            custom_func=self.custom_func,
+                                            numass=self.numass,
+                                            mixing=self.mixing)
                     betaIstp.AddBranch(betaBranch)
 
                 if betaIstp.branches:
@@ -756,18 +783,20 @@ class BetaEngine:
 
             betaIstp.SumSpectra(nu_spectrum, branchErange)
 
-# if __name__ == "__main__":
-#     x = np.arange(0, 10, 0.1)
-#     binwidth = 1
+import matplotlib.pyplot as plt
 
-#     testlist = [390960, 390961, 521331, 531371, 922390, 932390]
-#     testEngine = BetaEngine(xbins=x)
-#     testEngine.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20], GSF=False)
+if __name__ == "__main__":
+    x = np.arange(0, 50e-3, 1e-4)
+    binwidth = 1
 
-#     y2 = testEngine.istplist[390960].spectrum
-#     y2err = testEngine.istplist[390960].uncertainty
-#     plt.figure()
-#     plt.xlabel("E (keV)")
-#     plt.errorbar(x/1e-3, y2, label=str(390960)+"_nu", yerr=y2err)
-#     plt.legend()
-#     plt.show()
+    testlist = [942410]
+    testEngine = BetaEngine(testlist, xbins=x, numass=5e-3, mixing=0.5)
+    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 20], GSF=False)
+
+    y2 = testEngine.istplist[942410].spectrum
+    y2err = testEngine.istplist[942410].uncertainty
+    
+    plt.xlabel("E (keV)")
+    plt.errorbar(x/1e-3, y2, label=str(942410)+"_nu", yerr=y2err)
+    plt.legend()
+    plt.show()

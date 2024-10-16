@@ -45,7 +45,7 @@ if __name__ == "__main__":
         individualBranch = U235.FPYlist[FPZAI].y * BetaEngineDB.istplist[FPZAI].spectrum
         plt.plot(e, individualBranch)
     plt.yscale('log')
-    plt.savefig("IndividualBranches.png")
+    plt.savefig("IndividualBranches.pdf")
 
     #I can also go ahead and pull out the covariance information for the Cumulative Fission Products associated
     #With U235.

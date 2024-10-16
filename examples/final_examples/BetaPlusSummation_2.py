@@ -17,7 +17,7 @@ if __name__ == "__main__":
     U235.CalcBetaSpectra(betaSpectraDB)
     ConvertModel = ConversionEngine()
     ConvertModel.AddBetaData(beta235, U235, "U235", 1)
-    ConvertModel.VBfitbeta(istp="U235")
+    ConvertModel.VBfitbeta(istp="U235", slice = 0.25)
     ConvSpec, ConvUnc, ConvCov = ConvertModel.SummedSpectrum(e)
     SummationEngine = SumEngine(betaSpectraDB)
     SummationEngine.AddFissionIstp(U235, "U235", count = 1)
@@ -28,20 +28,35 @@ if __name__ == "__main__":
     totalSpec = np.zeros(len(e))
     totalUnc = np.zeros(len(e))
     for i in range(0, 19):
-        totalSpec[i] = ConvSpec[i] + SummationEngine.spectrum[i]
-        totalUnc[i] = ConvUnc[i] + SummationEngine.uncertainty[i]
-    for i in range(19, 81):
         totalSpec[i] = SummationEngine.spectrum[i]
-        totalUnc[i]  = SummationEngine.uncertainty[i]
-    for i in range(81, len(e)):
-        totalSpec[i] = ConvSpec[i] + SummationEngine.spectrum
-        totalUnc[i] = ConvUnc[i] + SummationEngine.uncertainty
+        totalUnc[i] = SummationEngine.uncertainty[i]
+    for i in range(19, 76):
+        totalSpec[i] = ConvSpec[i] 
+        totalUnc[i]  = ConvUnc[i]
+    for i in range(76, len(e)):
+        totalSpec[i] = SummationEngine.spectrum[i]
+        totalUnc[i] = SummationEngine.uncertainty[i]
+        
+
 
     fig = plt.plot()    
-    plt.errorbar(e, totalSpec, totalUnc, fmt="-r",label="Total Spectrum")
-    plt.errorbar(e, SummationEngine.spectrum, SummationEngine.uncertainty, fmt="--", color = "blue", label = "Summation Spectrum")
-    plt.errorbar(e, ConvSpec, ConvUnc, fmt=".g", label="Conversion Spectrum")
-    plt.xlabel("Energy (in MeV)")
-    plt.ylabel(r"${\nu}_e/MeV/Fission)$")
+    plt.errorbar(e, SummationEngine.spectrum, SummationEngine.uncertainty, fmt="-.", color = "blue", label = "Summation")
+    plt.errorbar(e, ConvSpec, ConvUnc, fmt=".g", label="Conversion")
+    plt.errorbar(e, totalSpec, totalUnc, fmt="-r",label="Combined")
+    plt.yscale("log")
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel("neutrino/MeV/Fission)$")
+    plt.ylim([1e-6, 10])
     plt.legend()
-    plt.savefig("Low_High_added.png")
+
+    # Define the x-coordinates for the vertical lines
+    line_xs = [19, 76]
+    
+    # Add vertical lines that stop at the data points
+    for line_x in line_xs:
+        # Find the corresponding y-value
+        y_value = totalSpec[line_x]
+        plt.plot([e[line_x], e[line_x]], [0, y_value], color='k', linestyle='--')
+
+
+    plt.savefig("Low_High_added.pdf")
