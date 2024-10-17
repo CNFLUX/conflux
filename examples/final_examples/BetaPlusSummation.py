@@ -1,5 +1,5 @@
-from conflux.BetaEngine import BetaEngine
-from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB
+from conflux.FPYEngine import FissionIstp
 from conflux.SumEngine import SumEngine
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     #Load data into the simulation (Change this directory location to the location
     #Of U_235_e_2014.csv on the host machine, which is in the data folder)
-    betaU235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    betaU235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")    
     U235 = FissionIstp(92, 235, Ei = 0)
     U235.LoadFissionDB()
     U235.LoadCorrelation()
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     #This is the conversion calculation. Initialize the Conversion model, add the U235 beta data and
     #fissile data to the model, and then fit virtual beta branches to the data.
     ConvertModel = ConversionEngine()
-    ConvertModel.AddBetaData(betaU235, U235, "U235", frac = 1)
+    ConvertModel.AddBetaData(betaU235, U235, "U235", count = 1)
     ConvertModel.VBfitbeta("U235")
 
     
@@ -51,25 +51,37 @@ if __name__ == "__main__":
     #spectrum. I do this for the uncertainties as well
     TotalY = []
     TotalUnc = []
-    for i in range(0,18):
+    for i in range(0,19):
         TotalY.append(SumSpec[i])
         TotalUnc.append(SumUnc[i])
-    for i in range(18, 80):
+    for i in range(19, 76):
         TotalY.append(convertSpec[i])
         TotalUnc.append(convertUnc[i])
-    for i in range(80, 200):
+    for i in range(75, len(e)):
         TotalY.append(SumSpec[i])
         TotalUnc.append(SumUnc[i])
 
 
 
     #Finally, I Plot the data and save it as a hybrid model
-    plt.errorbar(e, convertSpec, yerr = convertUnc, label="conversion mode")
-    plt.errorbar(e, SumSpec, yerr = SumUnc, label="summation mode")
-    plt.errorbar(e, TotalY, yerr = TotalUnc, fmt = "--", ecolor = "pink", label="Hybrid")
-    plt.yscale('log')
-    plt.xlabel("Energy (in MeV)")
-    plt.ylabel("Spectrum (neutrinos/MeV/fission)")
+    fig = plt.plot()    
+    plt.errorbar(e, SummationEngine.spectrum, SummationEngine.uncertainty, fmt="-.", color = "blue", label = "Summation")
+    plt.errorbar(e, convertSpec, convertUnc, fmt=".g", label="Conversion")
+    plt.errorbar(e, TotalY, TotalUnc, fmt="-r",label="Combined")
+    plt.yscale("log")
+    plt.xlabel("Energy (MeV)")
+    plt.ylabel("neutrino/MeV/Fission)$")
+    plt.ylim([1e-6, 10])
     plt.legend()
-    fig.savefig("Hybrid_Model.png")
-    plt.close()
+
+    # Define the x-coordinates for the vertical lines
+    line_xs = [19, 76]
+    
+    # Add vertical lines that stop at the data points
+    for line_x in line_xs:
+        # Find the corresponding y-value
+        y_value = TotalY[line_x]
+        plt.plot([e[line_x], e[line_x]], [0, y_value], color='k', linestyle='--')
+
+
+    plt.savefig("Low_High_added.pdf")
