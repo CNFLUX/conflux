@@ -65,8 +65,6 @@ class BetaData(Spectrum):
         self.yerr = []
         self.inputDB = inputDB
         self.LoadConversionDB(inputDB, rel_err)
-        self.spectrum = np.array(self.y)
-        self.uncertainty = np.array(self.yerr)
 
     def LoadConversionDB(self, inputDB, rel_err=True):
         """
@@ -100,9 +98,11 @@ class BetaData(Spectrum):
                 self.x.append(E)
                 self.y.append(y)
                 self.yerr.append(yerr)
+                
         self.x = np.array(self.x)
         self.y = np.array(self.y)
         self.yerr = np.array(self.yerr)
+        Spectrum.__init__(self, self.x)
         self.spectrum = np.array(self.y)
         self.uncertainty = np.array(self.yerr)
 
@@ -579,7 +579,7 @@ class VirtualBranch(Spectrum):
         :rtype: ndarray
 
         """
-        result = 0
+        Spectrum.__init__(self, xbins=x)
 
         spect_array = []
         cont_array = []
@@ -618,30 +618,17 @@ class VirtualBranch(Spectrum):
                 spect_array.append(newspect)
                 cont_array.append(self.contribute[s])
                 # best_array.append(self.bestfits[s])
-                # fig = plt.figure()
-                # plt.title('two best fit compare'+str(s))
-                # plt.plot(x, newspect)
-                # plt.plot(self.betadata.x, self.bestfits[s])
-                # plt.show()
 
         if len(spect_array) == 0:
-            return result*x
+            return self.spectrum*x
 
         # print(thresh, spect_array, cont_array)
         spect_array = np.transpose(np.array(spect_array))
         cont_array = np.array(cont_array)
 
-        result = np.transpose(spect_array @ cont_array)
+        self.spectrum = np.transpose(spect_array @ cont_array)
 
-        # bestfit = np.transpose(cont_array @ best_array)
-        # fig = plt.figure()
-        # plt.title('two best fit compare')
-        # plt.plot(x, result)
-        # plt.plot(self.betadata.x, bestfit)
-        # plt.show()
-
-
-        return result
+        return self.spectrum
 
     def Covariance(self, betadata, x, samples = 50, thresh = 0,
                    nu_spectrum = True):
@@ -693,7 +680,10 @@ class VirtualBranch(Spectrum):
         runTime = endTiming-startTiming
         print(f"Finished calculating covairance matrix of {samples} samples.")
         print(f"Processing time: {runTime} seconds")
-        return np.cov(np.transpose(result))
+        
+        covariance = np.cov(np.transpose(result))
+        self.uncertainty = np.sqrt(covariance.diagonal())
+        return covariance
 
 class ConversionEngine(Spectrum):
     """
@@ -804,9 +794,8 @@ class ConversionEngine(Spectrum):
         # Determine whether to calculate the covariance matrix
         calc_cov = cov_samp >= 20
         # Define the function outputs
+        Spectrum.__init__(self, xbins=x)
         nbins_x = len(x)
-        self.spectrum = np.zeros(nbins_x)
-        self.uncertainty = np.zeros(nbins_x)
         self.covariance = np.zeros((nbins_x, nbins_x))
 
         # Summing all fissile isotopes spectra and uncertainties by looping 

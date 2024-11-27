@@ -22,6 +22,7 @@ from conflux.bsg.Functions import getEltonNuclearRadius
 from conflux.bsg.Screening import screening_potential
 
 
+import matplotlib.pyplot as plt
 
 #########################################
 # Final neutrino and antineutrino spectra
@@ -64,7 +65,14 @@ def electron(ebeta, p, numass=0):
             *recoil_Coulomb_gamow_teller(W, **p)
             *atomic_screening(W, **p)
             )
-
+    
+    # plt.figure()
+    # print("allowed", shape_factor_gamow_teller(W, **p)/shape_factor_unique_forbidden(W, **p))
+    # plt.plot(result*shape_factor_gamow_teller(W, **p), label = "allowed")
+    # plt.plot(result*shape_factor_unique_forbidden(W, **p), label = "forbid")
+    # plt.legend()
+    # plt.show()
+    
     if p['L'] == 0:
         result *= shape_factor_gamow_teller(W, **p)
     else:
@@ -145,7 +153,7 @@ class BetaBranch(Spectrum):
     frac: float
     """The fraction of this branch to the entire decay."""
     sigma_frac: float
-    """The uncertaintry of the branching fraction."""
+    """The uncertainty of the branching fraction."""
     forbiddenness: int
     """Type of forbiddeness """
     numass: float
@@ -208,6 +216,8 @@ class BetaBranch(Spectrum):
 
         self.forbiddenness = forbiddenness
         
+        self.bAc = bAc
+        
         self.numass = numass
         self.mixing = mixing
         
@@ -216,18 +226,18 @@ class BetaBranch(Spectrum):
         #functions that generates spectra from theory (See neutrino/electron above)
         
         self.Parameters = {
-            'Z': Z,
-            'A': A,
-            'W0': E0/ELECTRON_MASS_MEV + 1,
-            'R': getEltonNuclearRadius(A) * 1e-15 / NATURAL_LENGTH,
-            'L': forbiddenness,
+            'Z': self.Z,
+            'A': self.A,
+            'W0': self.E0/ELECTRON_MASS_MEV + 1,
+            'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
+            'L': self.forbiddenness,
             'c': 1.0,
-            'b': bAc*A,
+            'b': self.bAc*self.A,
             'd': 0.0,
             'Lambda': 0.0,
-            'l': screening_potential(Z)
+            'l': screening_potential(self.Z)
         }
-
+        
         self.corr = {E0:1}  # correlation with other branches of the same isotope
         self.cov = {E0:self.sigma_frac**2} # Set the covariance diagonal element to the square of the branch fraction uncertainty
 
@@ -236,7 +246,22 @@ class BetaBranch(Spectrum):
         """Display vital branch info."""
         #A little self explanatory as to what's happening
         print("Branch E0 = " + str(self.E0)+ "+\-" + str(self.sigma_E0)
-            + ", frac = " + str(self.frac) + "+\-"+str(self.sigma_frac))
+            + ", frac = " + str(self.frac) + "+\-"+str(self.sigma_frac)
+            + f", forbiddenness = {self.forbiddenness}")
+        
+    def UpdateParams(self):
+        self.Parameters= {
+            'Z': self.Z,
+            'A': self.A,
+            'W0': self.E0/ELECTRON_MASS_MEV + 1,
+            'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
+            'L': self.forbiddenness,
+            'c': 1.0,
+            'b': self.bAc*self.A,
+            'd': 0.0,
+            'Lambda': 0.0,
+            'l': screening_potential(self.Z)
+        }
 
     # set correlation between this branch and the other branch
     def SetCovariance(self, otherBranch, correlation):
@@ -273,23 +298,35 @@ class BetaBranch(Spectrum):
         :rtype: float
 
         """
-        Parameters = deepcopy(self.Parameters)
-
+        self.Parameters = {
+            'Z': self.Z,
+            'A': self.A,
+            'W0': self.E0/ELECTRON_MASS_MEV + 1,
+            'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
+            'L': self.forbiddenness,
+            'c': 1.0,
+            'b': self.bAc*self.A,
+            'd': 0.0,
+            'Lambda': 0.0,
+            'l': screening_potential(self.Z)
+        }
+ 
         # prevent out-of-range (> Q value)variable to create insane results
         rangeCorrect = e <= self.E0
 
         if (nu_spectrum == True):
-            function = lambda e: ((1-self.mixing)*neutrino(e, Parameters)
-                                  +self.mixing*neutrino(e, Parameters, numass=self.numass))
+            function = lambda e: ((1-self.mixing)*neutrino(e, self.Parameters)
+                                  +self.mixing*neutrino(e, self.Parameters, numass=self.numass))
         else:
-            function = lambda e: ((1-self.mixing)*electron(e, Parameters)
-                                  +self.mixing*electron(e, Parameters, numass=self.numass))
+            function = lambda e: ((1-self.mixing)*electron(e, self.Parameters)
+                                  +self.mixing*electron(e, self.Parameters, numass=self.numass))
             
         if (self.custom_func!=None):
-            function = lambda e: ((1-self.mixing)*self.custom_func(e, Parameters)
-                                  +self.mixing*self.custom_func(e, Parameters, numass=self.numass))
+            function = lambda e: ((1-self.mixing)*self.custom_func(e, self.Parameters)
+                                  +self.mixing*self.custom_func(e, self.Parameters, numass=self.numass))
 
         result = function(e)
+        result = np.nan_to_num(result, nan=0.0)
         
         return result*rangeCorrect
 
@@ -401,7 +438,7 @@ class BetaIstp(Spectrum, Summed):
         """Constructor method."""
         Spectrum.__init__(self, xbins)
         
-        self.ZAI=Z*1e4+A*10+I # unique ID of a isotope
+        self.ZAI=int(Z*1e4+A*10+I) # unique ID of a isotope
         self.id = self.ZAI
         self.HL = HL
 
@@ -446,17 +483,22 @@ class BetaIstp(Spectrum, Summed):
         """
         # if sigma_E0 > E0:
         #     sigma_E0 = E0
+        branchexist = defaultE0 in self.branches.keys()
 
         # setting up default values
-        sigma_E0 = 0
-        fraction = 1
-        sigma_frac = 1
-        forbiddenness = 0
+        sigma_E0 = self.branches[defaultE0].sigma_E0 if branchexist else 0
+        fraction = self.branches[defaultE0].frac if branchexist else 0
+        sigma_frac = self.branches[defaultE0].sigma_frac if branchexist else 0
+        forbiddenness = self.branches[defaultE0].forbiddenness if branchexist else 0
         bAc = 4.7
-        custom_func = None
+        custom_func = self.branches[defaultE0].custom_func if branchexist else None
 
         for key, value in kwargs.items():
-            if key == 'E0':
+            if key == 'E0': 
+                # when E0 is given, replace the default E0
+                if branchexist: 
+                    del self.branches[defaultE0]
+                    branchexist = False
                 defaultE0 = value
             if key == 'sigma_E0':
                 sigma_E0 = value
@@ -469,7 +511,7 @@ class BetaIstp(Spectrum, Summed):
             if key == 'custom_func':
                 custom_func = custom_func
 
-            if defaultE0 not in self.branches.keys():
+            if not branchexist:
                 # TODO need to remove  the original E0 when a new E0 is given
                 self.branches[defaultE0] = BetaBranch(self.Z, 
                                                       self.A, 
@@ -486,8 +528,9 @@ class BetaIstp(Spectrum, Summed):
                                                       numass=self.numass,
                                                       mixing=self.mixing)
 
-            if hasattr(self.branches[defaultE0], key):
+            elif hasattr(self.branches[defaultE0], key):
                 setattr(self.branches[defaultE0], key, value)
+                self.branches[defaultE0].UpdateParams()
 
     def MaxBranch(self):
         """
@@ -600,11 +643,78 @@ class BetaIstp(Spectrum, Summed):
         counting to the end of the counting.
         if no argument is given, return 1
         '''
-        # print(self.name, self.HL)
         if begin < end:
             return 2**(-begin/self.HL)-2**(-end/self.HL)
         else:
             return 1
+    
+    def daughterZAI(self, gen):
+        """
+        Indicate the decay daughter.
+        
+        :return: The ZAI of the decay daughter
+        :rtype: int
+
+        """
+        Z = self.Z+gen
+        A = self.A
+        I = 0
+        ZAI = Z*1e4+A*10+I
+        return ZAI
+    
+    def decay_rate(self, t, HLs):
+        """
+        Calculate the decay rate of different generations in a decay chain. 
+        The list HLs contains all half lives of the this isotope and parents and grand parents. 
+        Only calculate the decay rate of calculate this generation. 
+        
+        :param t: time as the variable of the rate calculation
+        :type t: float
+        :param HLs: a list of half lives of the decays, in the order from parents to daughters
+        :type HLs: list(int)
+        :return: decay rate at the time t
+        :rtype: float
+
+        """
+        rate = 1
+        for HL in HLs:
+            rate *= 1-2**(-t/HL)
+        return rate
+    
+    def CalcDecayChain(self, betaSpectraDB, begin=0, end=0):
+        """
+        Calculate the total spectrum of a beta-decay chain in a selected window
+        
+        :param betaSpectraDB: the spectrum database that saves all relavant spectra
+        :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
+        :param begin: begining of the window, unit is second, defaults to 0
+        :type begin: float, optional
+        :param end: end of the window, unit is second, defaults to 0
+        :type end: float, optional
+        :return: summed, decay rate adjusted spectrum and uncertainty in the calculated window
+        :rtype: :class:`numpy.array`
+
+        """
+        generation = 0
+        HLs = []
+        self.decay_chain_spectrum = np.zeros(len(betaSpectraDB.xbins))
+        self.decay_chain_uncertainty = np.zeros(len(betaSpectraDB.xbins))
+        
+        # Look for the decay daughters, if they are also beta-unstable, continue to the next generation
+        while self.daughterZAI(generation) in betaSpectraDB.istplist.keys():
+            currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
+            HLs.append(currentistp.HL)
+            
+            delta_rate = self.decay_rate(end, HLs)-self.decay_rate(begin, HLs) # decay rate in current window
+            self.decay_chain_spectrum += delta_rate*currentistp.spectrum
+            self.decay_chain_uncertainty += (delta_rate*currentistp.uncertainty)**2
+            
+            generation += 1
+            
+        self.decay_chain_uncertainty = np.sqrt(self.decay_chain_uncertainty)
+        
+        return self.decay_chain_spectrum, self.decay_chain_uncertainty
+        
 
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
 # spectra of all tallied branches
@@ -642,21 +752,25 @@ class BetaEngine:
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml", missingBranch = 3):
         """
         Load default or input betaDB to obtain beta decay informtion. A customed DB must follow the same format as the default DB.
         
         :param targetDB: The file name of beta decay data base, defaults to CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
         :type targetDB: str, optional
+        :param missingBranch: Determine how many branches there are in a missing isotope, defaults to 3
+        :type missingBranch: int, optional
 
         """
+        # empty the existing isotope list before filling loading the DB
+        self.istplist= {}
+        
         useInputList = True # test if the engine is defined with an inputlist
         if self.inputlist == None:
             print("Loading all beta data from the default betaDB...")
             self.inputlist = []
             useInputList = False
 
-        print(targetDB)
         print("Searching DB: "+targetDB+"...")
         print("Loading spectra of beta branches...")
 
@@ -664,6 +778,7 @@ class BetaEngine:
         root = tree.getroot()
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
+            if ZAI == 10: continue # ignoring single neutrons
             Q = float(isotope.attrib['Q'])
             HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
@@ -671,6 +786,7 @@ class BetaEngine:
             # if input list is not given, include all isotopes
             if not useInputList:
                 self.inputlist.append(ZAI)
+            
 
             if (ZAI in self.inputlist):
                 Z = int(ZAI/10000)
@@ -688,7 +804,10 @@ class BetaEngine:
                 # Adding missing branches below
                 if len(isotope) < 1:
                     betaIstp.missing = True
-                    betaIstp.EditBranch(betaIstp.Q, E0=betaIstp.Q, fraction=1)
+                    for i in range(missingBranch):
+                        misfrac = 1./missingBranch
+                        misE0 = betaIstp.Q/missingBranch*(i+1)
+                        betaIstp.EditBranch(misE0, E0=misE0, fraction=misfrac)
                     self.istplist[ZAI] = betaIstp
                     continue
 
@@ -705,9 +824,11 @@ class BetaEngine:
                     if E0<=0:
                         continue
                     sigma_E0 = float(branch.attrib['sigma_E0'])
-                    spin_par_changes = (branch.attrib['dJpi'])
+                    spin_par_changes = [n.strip() for n in branch.attrib['dJpi'].split(',')]
+                    # spin_par_changes = str(branch.attrib['dJpi'])
 
-                    # converting spin change to forbidden types
+                    # converting spin change to forbidden rransition types
+                    # if spin_par_change contain '-', it means parity changed
                     ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
                               ['3-', '4-'], ['4', '5']]
                     firstftypes = [-10, -11, 10]
@@ -718,7 +839,8 @@ class BetaEngine:
                                 i < abs(forbiddenness)):
                                 forbiddenness = -i
                                 if i == 1:
-                                    forbiddenness = firstftypes[j]
+                                    # TODO need to add specific type for the first order non-unique transition
+                                    forbiddenness = firstftypes[i]
                                 elif spin_par_changes[j] == ftypes[i][-1]:
                                     forbiddenness = i
 
@@ -728,7 +850,6 @@ class BetaEngine:
                     sigma_frac = float(branch.attrib['sigma_frac'])
                     if fracsum > 1:
                         fraction /= fracsum
-                        sigma_frac /= fracsum
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
                                             sigma_frac, forbiddenness,
@@ -782,21 +903,3 @@ class BetaEngine:
             betaIstp.CalcCovariance(GSF=GSF)
 
             betaIstp.SumSpectra(nu_spectrum, branchErange)
-
-import matplotlib.pyplot as plt
-
-if __name__ == "__main__":
-    x = np.arange(0, 50e-3, 1e-4)
-    binwidth = 1
-
-    testlist = [942410]
-    testEngine = BetaEngine(testlist, xbins=x, numass=5e-3, mixing=0.5)
-    testEngine.CalcBetaSpectra(nu_spectrum=False, branchErange=[0.0, 20], GSF=False)
-
-    y2 = testEngine.istplist[942410].spectrum
-    y2err = testEngine.istplist[942410].uncertainty
-    
-    plt.xlabel("E (keV)")
-    plt.errorbar(x/1e-3, y2, label=str(942410)+"_nu", yerr=y2err)
-    plt.legend()
-    plt.show()

@@ -44,7 +44,7 @@ if __name__ == "__main__":
     ConvertModel.VBfitbeta(istp="U235")
     ConvertModel.VBfitbeta(istp="Pu239")
     ConvertModel.VBfitbeta(istp="Pu241")
-    ConvSpec, ConvUnc, ConvCov = ConvertModel.SummedSpectrum(e, cov_samp=30)
+    ConvSpec, ConvUnc, ConvCov = ConvertModel.SummedSpectrum(e, cov_samp=1)
 
 
     #Now that I'm done with the conversion calculation, let me focus on the summation engine
@@ -66,12 +66,12 @@ if __name__ == "__main__":
     #Finally, I go ahead and plot my individual engine spectra, as well as the total reactor spectrum, complete
     #With calculated uncertainties.
     fig = plt.figure()
-    plt.errorbar(e[18:150],y[18:150], yerr = SummationEngine.uncertainty[18:150] + ConvUnc[18:150], label = "total combined spectrum")
-    plt.errorbar(e[18:150], ConvSpec[18:150], yerr = ConvUnc[18:150], label = "Conversion Spectrum")
-    plt.errorbar(e[18:150], SummationEngine.spectrum[18:150],yerr = SummationEngine.uncertainty[18:150], label = "U238 Sum Spectrum")
+    plt.errorbar(e[0:150],y[0:150], yerr = SummationEngine.uncertainty[0:150] + ConvUnc[0:150], label = "total combined spectrum")
+    plt.errorbar(e[0:150], ConvSpec[0:150], yerr = ConvUnc[0:150], label = "Conversion Spectrum")
+    plt.errorbar(e[0:150], SummationEngine.spectrum[0:150],yerr = SummationEngine.uncertainty[0:150], label = "U238 Sum Spectrum")
     plt.ylabel(r"${\nu}_e/MeV/Fission$")
     plt.xlabel("E (in MeV)")
     plt.legend()
-    fig.savefig("Hybrid_reactor.png")
+    fig.savefig("Hybrid_reactor.pdf")
     plt.yscale('log')
-    fig.savefig("Hybrid_reactor_log.png")
+    fig.savefig("Hybrid_reactor_log.pdf")

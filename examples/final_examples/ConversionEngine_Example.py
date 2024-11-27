@@ -86,7 +86,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.xlabel("E (MeV)")
     plt.ylabel("(beta\neutrino)/fission/MeV")
-    fig.savefig("U235_conversion.png")
+    fig.savefig("U235_conversion.pdf")
 
     #Note, I am going to plot out the converted spectrum that we got from SummedSpectra, and will show that it's the
     #Exact same as if I called SumBranches from the last plt.errorbar call above.
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     plt.errorbar(e, conSpec, yerr = conUnc, label = "SummedSpec", fmt = "--")
     plt.errorbar(e, convertmodel.vblist["U235"].SumBranches(e, nu_spectrum = True), label='SumBranches')
     plt.legend()
-    fig.savefig("comparison.png")
+    fig.savefig("comparison.pdf")
 
 
     #This calculates the errors of our conversion calcualtion, with 50 samples.
@@ -110,6 +110,8 @@ if __name__ == "__main__":
     relativeErr = np.zeros(len(e))
     for i in range(len(spectrumBeta)):
         if spectrumBeta[i] > 0:
+            print(np.sqrt(covmat[i][i]))
+            print(spectrumBeta[i])
             relativeErr[i] = np.sqrt(covmat[i][i]) / spectrumBeta[i]
 
 
@@ -127,12 +129,12 @@ if __name__ == "__main__":
     fig = plt.figure()
     plt.ylim([-20, 20])
     plt.xlabel("E (MeV)")
-    plt.ylabel("Relative uncertainty (\%)")
+    plt.ylabel("Relative uncertainty (%)")
 
     plt.fill_between(e, relativeErr*100, -relativeErr*100, label='beta', alpha=0.4)
     plt.fill_between(e, relativeErrNu*100, -relativeErrNu*100, label='neutrino', alpha=0.4)
     plt.legend()
-    name = "U235_errors.png"
+    name = "U235_errors.pdf"
     fig.savefig(name)
 
     plt.close()

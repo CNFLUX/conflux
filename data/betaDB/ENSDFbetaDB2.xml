@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <betaDB>
-	<!-- <isotope name="Nn1" isotope="10" Q="0.782347" HL="613.9" Ex="0.0">
+	<isotope name="Nn1" isotope="10" Q="0.782347" HL="613.9" Ex="0.0">
 		<branch fraction="1.000" sigma_frac="0.000" end_point_E="0.782" sigma_E0="0.000" dJpi="0"/>
-	</isotope> -->
+	</isotope>
 	<isotope name="H3" isotope="10030" Q="0.0185906" HL="388523520.0" Ex="0.0">
 		<branch fraction="1.000" sigma_frac="0.000" end_point_E="0.019" sigma_E0="0.000" dJpi="0"/>
 	</isotope>

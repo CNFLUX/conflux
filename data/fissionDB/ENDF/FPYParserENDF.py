@@ -3,7 +3,7 @@
 """
 Created on Sat Apr 17 10:51:51 2021
 
-@author: zhang39
+@author: Xianyi Zhang, LLNL
 """
 
 # universal modules

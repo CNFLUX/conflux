@@ -35,14 +35,16 @@ if __name__ == "__main__":
     # That I want to plot, or look at more spectral information of. Again, each isotope
     # has a unique FPZAI number. See FissionIstp_Example.py for more information.
     for FPZAI in BetaEngineDB.istplist:
-        print(BetaEngineDB.istplist[FPZAI].ID, BetaEngineDB.istplist[FPZAI].name)
+        print(BetaEngineDB.istplist[FPZAI].id, BetaEngineDB.istplist[FPZAI].name)
 
 
-    # I will also go ahead and plot the spectra and uncertainties of Boron 13 using its'
+    # I will also go ahead and plot the spectra and uncertainties of Cs-141 using its'
     # Unique FPZAI number.
-    BoronSpectra = BetaEngineDB.istplist[551410].spectrum
-    BoronUnc = BetaEngineDB.istplist[551410].uncertainty
-    fig = plt.plot()
-    plt.errorbar(BetaEngineDB.xbins, BoronSpectra, BoronUnc, label="Cesium Spectra")
+    cs141spectrum = BetaEngineDB.istplist[551410].spectrum
+    cs141uncertainty = BetaEngineDB.istplist[551410].uncertainty
+    plt.figure()
+    plt.errorbar(BetaEngineDB.xbins, cs141spectrum, cs141uncertainty, label="Cs-141 Spectrum")
     plt.legend()
-    plt.savefig("CesiumSpec.png")
+    plt.xlabel("E (MeV)")
+    plt.ylabel("neutrino/MeV")
+    plt.savefig("beta_spectrum.pdf")

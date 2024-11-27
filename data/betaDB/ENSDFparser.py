@@ -275,12 +275,14 @@ def ENSDFbeta(fileList):
 
             # find parent isotope of beta decay (ignore other types of decay)
             MT = line[5:8]      # Check datatype
-            betatag = ["B- DECAY", 
-                       "B-N DECAY", 
-                       "B-2N DECAY", 
-                       "B-P DECAY",
-                       "B-_ DECAY"]
-            if MT == "   " and contains_any(line, betatag) and "2B- DECAY" not in line:
+            # betatag = ["B- DECAY", 
+            #            "B-N DECAY", 
+            #            "B-2N DECAY", 
+            #            "B-P DECAY",
+            #            "B-_ DECAY"]
+            betatag = ["B- DECAY"]
+            excludetag = ["B- DECAY:NEUTRON", "2B- DECAY"] # providing a list of exceptions
+            if MT == "   " and contains_any(line, betatag) and not contains_any(line, excludetag):
                 lastline = line
                 betabool = True
 
@@ -301,6 +303,8 @@ def ENSDFbeta(fileList):
                         isomer = 0
                     ZAI = int(decayparent.Z*1e4 + decayparent.A*10 + isomer)
                     # save the parent isotope information
+                    istpname = decayparent.name
+                    if isomer>0: istpname = decayparent.name+f"m{isomer}"
                     xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL, decayparent.level)
                     lastline = line
                 elif MT == "  L":
@@ -326,9 +330,12 @@ def ENSDFbeta(fileList):
                             forbid_str = forbid_str+dspin_str
                         else:
                             forbid_str = forbid_str+","+dspin_str
-                    # print(forbid_str)
                     # save the decay branch information
-                    xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), str("{:.3f}".format(decaybranch.E0)), forbid_str, str("{:.3f}".format(decaybranch.sigma_frac)), str("{:.3f}".format(decaybranch.sigma_E0)))
+                    xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), 
+                                         str("{:.3f}".format(decaybranch.E0)), 
+                                         forbid_str, 
+                                         str("{:.3f}".format(decaybranch.sigma_frac)), 
+                                         str("{:.3f}".format(decaybranch.sigma_E0)))
                     lastline = line
                     #print(lastline)
 

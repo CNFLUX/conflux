@@ -33,8 +33,9 @@ if __name__ == "__main__":
     fig = plt.plot()
     for i in BetaSpectraDB.istplist:
         betaIstp = BetaSpectraDB.istplist[i]
-        plt.errorbar(e, betaIstp.spectrum, betaIstp.uncertainty, label = i)
+        plt.errorbar(e, betaIstp.spectrum, betaIstp.uncertainty, label = betaIstp.name)
 
-    plt.xlabel("Energy (in MeV)")
+    plt.xlabel("E (MeV)")
+    plt.ylabel("beta/MeV")
     plt.legend()
-    plt.savefig("CustomBetaSpectrum.png")
+    plt.savefig("Individual_beta_spectrum.pdf")

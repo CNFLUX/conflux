@@ -319,7 +319,7 @@ class FissionIstp(Spectrum, Summed):
                 self.FPYlist[i].cov[j]=yerri*corr[j]*yerrj #carry out the covariance calculation
                 #(error of i) * (correlation of j) * (error of j)
 
-    def CalcBetaSpectra(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = 0, modelunc = True, silent = False):
+    def CalcBetaSpectra(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = np.inf, modelunc = True, silent = False):
         """
         Calculate the summed beta/neutrino spectrum of this fission isotope.
         
@@ -329,7 +329,7 @@ class FissionIstp(Spectrum, Summed):
         :type processMissing: bool, optional
         :param ifp_begin: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to 0
         :type ifp_begin: float, optional
-        :param ifp_end: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to 0
+        :param ifp_end: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to inf
         :type ifp_end: float, optional
         :param modelunc: Determine whether to include beta modeling uncertainty, defaults to True
         :type modelunc: bool, optional
@@ -348,53 +348,48 @@ class FissionIstp(Spectrum, Summed):
 
         # Find common isotopes among beta decaying isotopes and fission products
         self.betaFPYlist = set(self.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys())
-        self.missing_list = set(self.FPYlist.keys()) - set(betaSpectraDB.istplist.keys())
-
+        
         #Iterate through every fission product in the Reactor Model.
         for FPZAI in tqdm(self.betaFPYlist, desc="Summing beta/neutrino spectra for "+str(len(self.betaFPYlist))+ " fission products", disable=silent):
             # get the yield of the fission products
-            thisyield = self.FPYlist[FPZAI].y
-            yielderr = self.FPYlist[FPZAI].yerr
+            thisyield = self.FPYlist[FPZAI].y                        
+            thisistp = betaSpectraDB.istplist[FPZAI]
+            
+            if processMissing==False and thisistp.missing:
+                continue
+                        
+            #Pull the beta spectrum and the beta uncertainties, add the product of the Beta Spectra and yield
+            #To the total spectrum
+            betaSpectraList[FPZAI] = thisistp.spectrum
+            betaUncertainty[FPZAI] = thisistp.uncertainty
 
             # for IFP calculation, adjust the decay rate of the target isotope
             # by the rate of isotope that are decayed in the time window
             if (self.IFPY and ifp_begin < ifp_end):
-                adjustment = betaSpectraDB.istplist[FPZAI].decay_time_adjust(ifp_begin, ifp_end)
-                thisyield *= adjustment
-                yielderr *= adjustment
+                thisistp.CalcDecayChain(betaSpectraDB, ifp_begin, ifp_end)
+                betaSpectraList[FPZAI] = thisistp.decay_chain_spectrum
+                betaUncertainty[FPZAI] = thisistp.decay_chain_uncertainty
 
-            #Pull the beta spectrum and the beta uncertainties, add the product of the Beta Spectra and yield
-            #To the total spectrum
-            betaSpectraList[FPZAI] = betaSpectraDB.istplist[FPZAI].spectrum
-            betaUncertainty[FPZAI] = betaSpectraDB.istplist[FPZAI].uncertainty
             self.spectrum += betaSpectraList[FPZAI]*thisyield
-
-            '''
-            obsolete code
-            '''
-            # self.yieldUnc += betaSpectraList[FPZAI]*yielderr
-            # self.modelUnc += betaUncertainty[FPZAI]*thisyield
 
         # Uncertainty calculation
         #Have to make a 2D Lattice of every single combination of fission products i_j
         for i in tqdm(self.betaFPYlist, desc="Calculating uncertainties of "+str(len(self.betaFPYlist))+ " fission products"):
             for j in self.betaFPYlist:
-                adjustmenti = 1
-                adjustmentj = 1
-                #If we're doing an IFP calculation, calculate the adjustments need to be made to
-                #Both fission products.
-                if (ifp_begin < ifp_end):
-                    adjustmenti = betaSpectraDB.istplist[i].decay_time_adjust(ifp_begin, ifp_end)
-                    adjustmentj = betaSpectraDB.istplist[j].decay_time_adjust(ifp_begin, ifp_end)
-
+                
+                if (processMissing==False and 
+                    (betaSpectraDB.istplist[i].missing 
+                     or betaSpectraDB.istplist[j].missing)):
+                    continue
+                
                 #Pull the yields, yeild errors, the beta Spectra, and beta Spectral uncertainty
                 #For both fission products (i and j)
-                yi = self.FPYlist[i].y*adjustmenti
-                yerri = self.FPYlist[i].yerr*adjustmenti
+                yi = self.FPYlist[i].y #*adjustmenti
+                yerri = self.FPYlist[i].yerr #*adjustmenti
                 fi = betaSpectraList[i]
                 ferri = betaUncertainty[i]
 
-                yj = self.FPYlist[j].y*adjustmentj
+                yj = self.FPYlist[j].y #*adjustmentj
                 # yerrj = self.FPYlist[j].yerr*adjustmentj
                 fj = betaSpectraList[j]
                 # ferrj = betaUncertainty[j]
@@ -416,6 +411,7 @@ class FissionIstp(Spectrum, Summed):
 
                 self.uncertainty += variance_ij
                 
+        print(f'length {len(betaSpectraList)}')
         self.yieldUnc = np.sqrt(self.yieldUnc)
         self.modelUnc = np.sqrt(self.modelUnc)
         self.uncertainty = np.sqrt(self.uncertainty)
@@ -694,27 +690,3 @@ class FissionModel:
         ax.set(xlabel='A', ylabel='fraction', title='Branch fractions')
         fig.savefig(figname)
 
-# if __name__ == "__main__":
-#     from conflux.BetaEngine import BetaEngine
-#     from conflux.SumEngine import SumEngine
-#     xbins = np.arange(0, 20, 0.1)
-
-#     U235 = FissionIstp(92, 235, Ei = 0.5, DB='ENDF', IFPY=True)
-#     U235.LoadFissionDB(Ei = 0.5)
-#     U235.LoadCorrelation(DB='ENDF')
-
-#     betaSpectraDB = BetaEngine(xbins=xbins)
-#     #betaSpectraDB = BetaEngine(newlist)
-#     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
-
-#     U235.CalcBetaSpectra(betaSpectraDB)
-#     # Pu239.CalcBetaSpectra(betaSpectraDB)
-
-#     newsum = SumEngine(xbins = xbins)
-#     newsum.AddFissionIstp(U235, "U235", 1, 0)
-#     fig, ax = plt.subplots()
-#     ax.set_xlim([0, 10])
-#     ax.set(xlabel='E (MeV)', ylabel='neutrino count')
-#     ax.errorbar(newsum.xbins, newsum.spectrum, yerr=newsum.uncertainty, label="test spectrum")
-#     ax.legend()
-#     plt.show()

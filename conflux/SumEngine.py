@@ -27,20 +27,16 @@ class SumEngine(Spectrum, Summed):
     """Dictionary of contribution (decay accoungting or fractional) of all fissile and non-fissile isotope that directly contribute in the summation model"""
     d_countlist: dict
     """Dictionary of contribution incertainty of all fissile and non-fissile isotope that directly contribute in the summation model"""
-    nu_spectrum: bool
-    """Whether to calculate neutrino (True) or beta (False) spectrum. default to True"""
 
     betaDB: BetaEngine
     """Calculated database of beta/neutrino spectra to sum from. The object should only be called after running the :meth:`conflux.BetaEngine.BetaEngine.CalcBetaSpectra` function"""
     
-    def __init__(self, betaSpectraDB, nu_spectrum=True):
+    def __init__(self, betaSpectraDB):
         """
         Construct the SummationEngine class. The function read an input BetaEngine object that already calculated the beta spectra.
         
         :param betaSpectraDB: A calculated database of beta/neutrino spectra to sum from. The object should only be called after running the :meth:`conflux.BetaEngine.BetaEngine.CalcBetaSpectra` function
         :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
-        :param nu_spectrum: Determine whether to calculate neutrino spectrum, defaults to True
-        :type nu_spectrum: bool, optional
 
         """
         self.FPYlist = {}
@@ -51,8 +47,6 @@ class SumEngine(Spectrum, Summed):
         self.betaUncertainty = {}
         self.countlist = {}
         self.d_countlist = {}
-
-        self.nu_spectrum = nu_spectrum
 
         self.betaDB = betaSpectraDB
         self.covariance = {}
