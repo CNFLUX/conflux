@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionIstp
 
-# A simple explosion model for fissions 100 ton TNT equivalent energy
+# A simple burst fission model for fissions 100 ton TNT equivalent energy
 e_fission = 3.2e-11 #joules
 e_TNT = 4.184e9
 r2 = 10000**2
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # generate neutrino spectra in different time window after ignition
     for i in range(len(windows_log)-1):
         
-        # calculate the beta spectra within different windows after the explosion
+        # calculate the beta spectra within different windows after the fission 
         begin = windows_log[i]
         end = windows_log[i+1]
         U235.CalcBetaSpectra(betaSpectraDB, processMissing=False,  ifp_begin = begin,  ifp_end = end)
