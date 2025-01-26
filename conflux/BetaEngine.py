@@ -173,31 +173,6 @@ class BetaBranch(Spectrum):
         """
         A class to save isotopic branch information.
         
-        :param Z: The Atomic number of the isotope whose Beta branch information you want to record
-        :type Z: int
-        :param A: The Atomic mass number of the isotope whose branch information you want to record
-        :type A: int
-        :param I: The isomeric number of the Beta Branch whose information you want to record
-        :type I: int
-        :param Q: The Q-value of the Beta Branch whose information you want to record. Unit: MeV
-        :type Q: float
-        :param E0: The End-point energy of the isotope whose branch information we want to record
-        :type E0: float
-        :param sigma_E0: The uncertainty of the end-point energy
-        :type sigma_E0: float
-        :param frac: The fraction that this branch contributes to the total isotopic spectrum
-        :type frac: float
-        :param sigma_frac: The uncertainty of the fraction
-        :type sigma_frac: float
-        :param forbiddenness: The forbidden transition type, defaults to 0 (allowed transition)
-        :type forbiddenness: int, optional
-        :param bAc: The weak magnetic correction parameter, defaults to 4.7
-        :type bAc: float, optional
-        :param xbins: the spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)
-        :type xbins: :class:`numpy.array`, optional
-        :param custom_func: customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None
-        :type custom_func: `method`, optional
-        
         """
         
         Spectrum.__init__(self, xbins)
@@ -415,24 +390,35 @@ class BetaBranch(Spectrum):
 
 # class to save isotope information, including Z A I Q and beta brances
 class BetaIstp(Spectrum, Summed):
-    """
-    Class to save isotope information, including Z A I Q and beta decay brances.
+    "Class to save isotope information, including Z A I Q and beta decay brances."
     
-    :param Z: The Atomic number of the isotope 
-    :type Z: int
-    :param A: The Atomic mass number of the isotope 
-    :type A: int
-    :param I: The isomeric number of the beta isotope 
-    :type I: int
-    :param Q: The Q-value of the beta isotope (MeV)
-    :type Q: float
-    :param HL: half-life of the isotope (s)
-    :type HL: float 
-    :param name: an isotope name in the art of ``
-    :type name: TYPE
-    :param xbins: the spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)
-    :type xbins: numpy.array, optional
-    """
+    id: int
+    """ The identity of each beta-unstable isotope (ZAI = Z*1e4+A*10+I)"""
+    ZAI : int
+    """ The identity of each beta-unstable isotope (ZAI = Z*1e4+A*10+I)"""
+    Z: int
+    """The Atomic number of the mother isotope"""
+    A: int
+    """The Atomic mass of the mother isotope"""
+    I: int
+    """The isomeric state this decay mode"""
+    HL: float
+    """Half life of this isotope (s)"""
+    Q: float
+    """Q value of the decay (MeV)"""
+    name: str
+    """Name of the isotope"""
+    missing: bool = False
+    """Uncertainty of the end-point energy"""
+    branches: dict
+    """Dictionary of decay brances, keys (float) are endpoint energies, values are :class:`conflux.BetaEngine.BetaBranch` """
+    numass: float
+    """neutrno mass (MeV), by default 0"""
+    mixing: float
+    """mixing of nonzero neutrino mass, by default 0"""
+    MaxBranch: "BetaEngine.BetaBranch"
+    """The beta decay branch with the largest fraction"""
+    
     
     def __init__(self, Z, A, I, Q, HL, name, xbins=np.arange(0, 20, 0.1), numass=0, mixing=0):
         """Constructor method."""
@@ -722,17 +708,22 @@ class BetaIstp(Spectrum, Summed):
 class BetaEngine:
     """
     BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra of all tallied branches.
-    
-    :param inputlist: a list of isotopes, defaults to None. If inputlist is not given, load the entire betaDB from the default betaDB.
-    :type inputlist: list, optional
-    :param targetDB: The file name of beta decay data base, defaults to CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
-    :type targetDB: str, optional
-    :param xbins: the spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)
-    :type xbins: :class:`numpy.array`, optional
-    :param custom_func: customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None
-    :type custom_func: `method`, optional
-
     """
+    inputlist: list(int) = None
+    """A list of isotopes. If the inputlist is not given, load the entire betaDB from the default betaDB."""
+    istplist: dict
+    """A dictionary of isotopes. istplist contain keys as the ZAI number of the isotope and values being :class:`conflux.BetaEngine.BetaIstp`"""
+    targetDB: str = CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
+    """The file name of beta decay data base, defaults to CONFLUX_DB+`/betaDB/ENSDFbetaDB2.xml'"""
+    xbins: np.ndarray
+    """The spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)"""
+    custom_func: callable = None
+    """Customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None"""
+    numass: float = 0
+    """To calculate the spectrum with non-zero neutrino mass, give the neutrino mass in the MeV unit."""
+    mixing: float = 0
+    """To calcualte spectrum with non-zero neutrino mass, provide the mixing (0-1) of the neutrino mass state."""
+    
     
     def __init__(self, 
                  inputlist=None, 

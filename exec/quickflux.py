@@ -38,7 +38,7 @@ def read_json_file(json_file_path):
         print(f"Error: Invalid JSON format in file '{json_file_path}'.")
         return None
     
-def summation(json_file, xbins, nu_spec):
+def summation(json_file, xbins, nu_spec, rxpower=1):
     summation = json_file['summation']
     qlow = summation['qlow']          # select the lower limit of the beta q values
     qhigh = summation['qhigh']        # select the upper limit of the beta q values
@@ -62,35 +62,39 @@ def summation(json_file, xbins, nu_spec):
     #if 'fission_db' in json_file:
     
     # loading fission istps in the model
-    fissionistps = summation['fissionistps']
-    for fissile_istp in fissionistps:
-        name = fissile_istp['name']
-        Z = fissile_istp['Z']
-        A = fissile_istp['A']
-        Ei = fissile_istp['ei']
-        istp = FissionIstp(Z, A, Ei, DB=fissile_istp['fissiondb'])
-        if 'fissiondb' in fissile_istp:
-            istp.LoadFissionDB(DB=fissile_istp['fissiondb'])
-        if 'covariancedb' in fissile_istp:
-            istp.LoadCovariance(DB=fissile_istp['covariancedb'])
-        else:
-            istp.LoadCovariance(DB=fissile_istp['fissiondb'])
-        istp.CalcBetaSpectra(betaSpectraDB, 
-                             processMissing=missing, 
-                             ifp_begin = ifp_begin, 
-                             ifp_end = ifp_end)
+    if 'fissionistps' in summation:
+        fissionistps = summation['fissionistps']
+        for fissile_istp in fissionistps:
+            name = fissile_istp['name']
+            Z = fissile_istp['Z']
+            A = fissile_istp['A']
+            Ei = fissile_istp['ei']
+            istp = FissionIstp(Z, A, Ei, DB=fissile_istp['fissiondb'])
+            if 'fissiondb' in fissile_istp:
+                istp.LoadFissionDB(DB=fissile_istp['fissiondb'])
+            if 'covariancedb' in fissile_istp:
+                istp.LoadCovariance(DB=fissile_istp['covariancedb'])
+            else:
+                istp.LoadCovariance(DB=fissile_istp['fissiondb'])
+            istp.CalcBetaSpectra(betaSpectraDB, 
+                                 processMissing=missing, 
+                                 ifp_begin = ifp_begin, 
+                                 ifp_end = ifp_end)
 
-        count = fissile_istp['count']
-        d_count = 0 if 'd_count' not in fissile_istp else fissile_istp["d_count"]
-        sum_model.AddFissionIstp(istp, name, count, d_count)
+            calccount = rxpower
+            count = rxpower if 'd_count' not in fissile_istp else fissile_istp['count']
+            d_count = 0 if 'd_count' not in fissile_istp else fissile_istp["d_count"]
+            print(count)
+            sum_model.AddFissionIstp(istp, name, count, d_count)
     
-    betaistps = summation['betaistps']
-    for betaistps in fissionistps:
-        name = betaistps['name']
-        Z = betaistps['Z']
-        A = betaistps['A']
-    for istp in betaSpectraDB.istplist:
-        betaIstp = betaSpectraDB.istplist[istp]
+    if 'betaistps' in summation:
+        betaistps = summation['betaistps']
+        for betaistps in fissionistps:
+            name = betaistps['name']
+            Z = betaistps['Z']
+            A = betaistps['A']
+        for istp in betaSpectraDB.istplist:
+            betaIstp = betaSpectraDB.istplist[istp]
             
     sum_model.CalcReactorSpectrum()
         
@@ -159,17 +163,18 @@ def buildmodel(json_file):
     # Reactor power setup for absolute neutrino flux calcualtion
     rxpower = 1
     if 'rxpower' in json_file:
-        rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['unit']]
+        rxpower = json_file['rxpower']['value']*rxunits[json_file['rxpower']['unit']]/200 #MeV
+        print(f"{rxpower}")
 
     # Calculate fissile isotopes with summation mode
     if 'summation' in json_file:
-        sumspect, sumunc = summation(json_file, xbins, nu_spec)
+        sumspect, sumunc = summation(json_file, xbins, nu_spec, rxpower)
         spectrum += sumspect
         uncertainty += sumunc
 
     # calculate the neutrino spectra with 
     if 'conversion' in json_file:
-        convert_spect, unc = conversion(json_file, xbins, nu_spec)
+        convert_spect, unc = conversion(json_file, xbins, nu_spec, rxpower)
         spectrum += convert_spect
         uncertainty += unc**2
 
