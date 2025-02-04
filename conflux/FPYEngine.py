@@ -20,6 +20,18 @@ from conflux.Basic import Spectrum, Summed
 # Class that counts fission products of a specified fission isotope
 class FissionIstp(Spectrum, Summed):
     """Class to handle all the Fission Nuclide Information."""
+    id: int
+    """Unique ID of this object. Z*1e4+A*10"""
+    Z: int
+    """The atomic number of isotope """
+    A: int
+    """The atomic mass of isotope"""
+    Ei: float
+    """Incident neutron energy"""
+    IFPY: float=False
+    """Whether to calculate independent fission product yields"""
+    FPYlist: dict
+    """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
 
     def __init__(self, Z, A, Ei, DB='ENDF', IFPY=False):
         """
@@ -49,7 +61,7 @@ class FissionIstp(Spectrum, Summed):
         """Whether to calculate independent fission product yields"""
         self.FPYlist = {}
         """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
-        self.DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
+        self._DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
         """Dictionary of the two fission databases included in CONFLUX (can be downloaded using the file in the aux folder)"""
 
         self.LoadFissionDB(Ei=self.Ei, DB=DB)
@@ -73,7 +85,7 @@ class FissionIstp(Spectrum, Summed):
         # if there is no specified fissionDB, look for the default one
         if DBname == None or not os.path.exists(DBname):
             DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
-            if DBname != None and DBname not in list(self.DBtitle.keys()):
+            if DBname != None and DBname not in list(self._DBtitle.keys()):
                 print('Custom DB: '+ DBname + ' NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')
             fileList = listdir(DBpath) #Get the list of files in the Database directory
