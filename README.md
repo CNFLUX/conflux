@@ -32,8 +32,10 @@ Follow these steps to set up the project locally:
 this will setup the nuclear databases necessary for the reactor neutrino calculation.
 
 ## Databases:
-CONFLUX provides python executables to download and parse nucleaer databases including
-[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1), [JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html), [JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),\
+CONFLUX provides python executables to download and parse nucleaer databases including 
+[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1), 
+[JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html), 
+[JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),
 for fission for fission product yield calculation, and
 [ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),
 for beta decay and neutrino spectrum measurement.
@@ -51,7 +53,7 @@ CONFLUX also uses correlation and covariance matrix from [FYCOM](https://nuclear
 CONFLUX contains a python executable at `<conflux>/exec/quickflux.py`, which takes `json` file as macros to calculate reactor or beta decay neutrino productions with simple source term configurations. An example `<conflux>/exec/example.json` contains all basic json entries and sequences needed to execute the calculation by running:
 `python3 <conflux>/exec/quickflux.py <conflux>/exec/example.json`
 
-### Library
+### Libraries
 Users can import CONFLUX libraries in their own python scripts for neutrino flux calculations. The major libraries include:
 - `conflux.bsg`: the beta spectrum generation functions through beta decay calculation with theoretical corrections \
 - `conflux.BetaEngine` tallies beta decay branches of beta-unstable isotopes to calculate each individual beta/neutrino spectrum\
