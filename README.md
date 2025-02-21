@@ -24,9 +24,10 @@ Follow these steps to set up the project locally:
 1. Clone the repository
 2. Execute: 
 `pip3 install ./conflux`
-3. In the system environment setup, add:
-`export CONFLUX_DB=</path/to/conflux>/data` on Linux or MacOS
+3. In the system environment setup, such as `$HOME/.bashrc`, add:\
+`export CONFLUX_DB=</path/to/conflux>/data` on Linux or MacOS\
 `set CONFLUX_DB=</path/to/conflux>/data` on Windows 
+
 this will setup the nuclear databases necessary for the reactor neutrino calculation.
 
 Program structure:
