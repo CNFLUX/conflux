@@ -33,11 +33,9 @@ this will setup the nuclear databases necessary for the reactor neutrino calcula
 
 ## Databases:
 CONFLUX provides python executables to download and parse nucleaer databases including
-[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1),\
-[JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html),\
-[JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),\
+[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1), [JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html), [JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),\
 for fission for fission product yield calculation, and
-[ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),\
+[ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),
 for beta decay and neutrino spectrum measurement.
 All databases are saved in the `$CONFLUX_DB` folder, in `xml` format. For databases different from the CONFLUX prepackaged version, download the database and run:\
 `python3 $CONFLUX_DB/fissionDB/ENDF/FPYParserENDF.py <ENDF-6 format database folder>` to parse fission product yield data into the CONFLUX xml format, and\
