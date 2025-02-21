@@ -48,10 +48,19 @@ CONFLUX also uses correlation and covariance matrix from [FYCOM](https://nuclear
 
 ##  Usage:
 ### Executable
+CONFLUX contains a python executable at `<conflux>/exec/quickflux.py`, which takes `json` file as macros to calculate reactor or beta decay neutrino productions with simple source term configurations. An example `<conflux>/exec/example.json` contains all basic json entries and sequences needed to execute the calculation by running:
+`python3 <conflux>/exec/quickflux.py <conflux>/exec/example.json`
 
 ### Library
-
-### Example
+Users can import CONFLUX libraries in their own python scripts for neutrino flux calculations. The major libraries include:
+- `conflux.bsg`: the beta spectrum generation functions through beta decay calculation with theoretical corrections \
+- `conflux.BetaEngine` tallies beta decay branches of beta-unstable isotopes to calculate each individual beta/neutrino spectrum\
+- `conflux.FPYEngine` tallies fission products to calculate the spectrum and uncertainty of each individual fissile isotopes\
+- `conflux.SumEngine` sums neutrino/beta spectra with respect to fission fraction and non-fissile contributions in a reactor model\
+- `conflux.Conversion` converts beta spectra of fissile isotopes to the corresponding neutrino spectra using best fit virtual beta branches
+ 
+### Examples
+A large list of example python scripts are saved in `<conflux>/examples/`. Users can run the examples or write calculation programs based off the examples for most common reactor neutrino production modeling. 
 
 ## Contributing:
 
