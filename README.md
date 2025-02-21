@@ -59,7 +59,7 @@ Users can import CONFLUX libraries in their own python scripts for neutrino flux
 - `conflux.BetaEngine` tallies beta decay branches of beta-unstable isotopes to calculate each individual beta/neutrino spectrum\
 - `conflux.FPYEngine` tallies fission products to calculate the spectrum and uncertainty of each individual fissile isotopes\
 - `conflux.SumEngine` sums neutrino/beta spectra with respect to fission fraction and non-fissile contributions in a reactor model\
-- `conflux.Conversion` converts beta spectra of fissile isotopes to the corresponding neutrino spectra using best fit virtual beta branches
+- `conflux.ConversionEngine` converts beta spectra of fissile isotopes to the corresponding neutrino spectra using best fit virtual beta branches
  
 ### Examples
 A large list of example python scripts are saved in `<conflux>/examples/`. Users can run the examples or write calculation programs based off the examples for most common reactor neutrino production modeling. 
