@@ -1,21 +1,32 @@
 CONFLUX: A reactor neutrino flux calculation framework
 ======================================================
-
 CONFLUX, Calculation Of Neutrino FLUX, is a framework that allow users to
 calculate reactor neutrino flux with flexible and time dependent inputs of
-reactor models. The framework provides three different modes of neutrino flux
+reactor models. 
+
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+## Features
+The framework provides three different modes of neutrino flux
 calculation:
 - Summation mode,
 - Beta-conversion mode,
 - Experiment mode.
-
-Installation:
-=============
-Execute: 
+  
+## Installation:
+Follow these steps to set up the project locally:
+1. Clone the repository
+2. Execute: 
 `pip3 install ./conflux`
-In the system environment setup, add:
-`export CONFLUX_DB=</path/to/conflux>/data`, OR<br>
-`set CONFLUX_DB=</path/to/conflux>/data`
+3. In the system environment setup, add:
+`export CONFLUX_DB=</path/to/conflux>/data` on Linux or MacOS
+`set CONFLUX_DB=</path/to/conflux>/data` on Windows 
 this will setup the nuclear databases necessary for the reactor neutrino calculation.
 
 Program structure:
