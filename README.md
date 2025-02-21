@@ -7,6 +7,7 @@ reactor models.
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
+- [Databases](#database)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
@@ -17,41 +18,44 @@ The framework provides three different modes of neutrino flux
 calculation:
 - Summation mode,
 - Beta-conversion mode,
-- Experiment mode.
+- Neutrino data mode.
   
 ## Installation:
 Follow these steps to set up the project locally:
 1. Clone the repository
-2. Execute: 
+2. Execute:
+`cd <cloned_repository>`\
 `pip3 install ./conflux`
-3. In the system environment setup, such as `$HOME/.bashrc`, add:\
+4. In the system environment setup, such as `$HOME/.bashrc`, add:\
 `export CONFLUX_DB=</path/to/conflux>/data` on Linux or MacOS\
-`set CONFLUX_DB=</path/to/conflux>/data` on Windows 
-
+`set CONFLUX_DB=</path/to/conflux>/data` on Windows\
 this will setup the nuclear databases necessary for the reactor neutrino calculation.
 
-Program structure:
-==================
+## Databases:
+CONFLUX provides python executables to download and parse nucleaer databases including
+[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1),\
+[JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html),\
+[JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),\
+for fission for fission product yield calculation, and
+[ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),\
+for beta decay and neutrino spectrum measurement.
+All databases are saved in the `$CONFLUX_DB` folder, in `xml` format. For databases different from the CONFLUX prepackaged version, download the database and run:\
+`python3 $CONFLUX_DB/fissionDB/ENDF/FPYParserENDF.py <ENDF-6 format database folder>` to parse fission product yield data into the CONFLUX xml format, and\
+`python3 $CONFLUX_DB/betaDB/ENSDFparser.py <ENSDF database folder>` to parse beta decay data into the CONFLUX xml format.
 
-Databases:
------------
-cumulative fission yield, beta decay branch
+CONFLUX also uses correlation and covariance matrix from [FYCOM](https://nucleardata.berkeley.edu/FYCoM/). Run\
+`python3 CovMatDownloader.py` to download the database. This data is in csv file due to its size.
 
-Summation calculation modules:
-------------------------------
-fission yield tally, beta/neutrino spectral shape
-calculation, spectrum summation
+##  Usage:
+### Executable
 
-Usage:
-======
+### Library
 
-Summation calculation:
-----------------------
-Define fission isotope and beta decaying isotope
+### Example
 
-Define reactor model with reactor power, isotope fractions and uncertainties of
-fractions
+## Contributing:
 
-Load beta decay database and calculate beta spectra.
+## License:
 
-Sum beta spectra with respect to total isotope fractions.
+## Acknowledgement:
+This work was supported by the Lawrence Livermore National Laboratory LDRD Program under Project No. 20-SI-005, the U.S. Department of Energy Office of Science, Office of High Energy Physics under Award No. DE-SC0020262 to Virginia Polytechnic Institute and State University and under Work Proposal Number SCW1504 to Lawrence Livermore National Laboratory, and by the U.S. Department of Energy Office of Defense Nuclear Nonproliferation Research and Development.  This work was supported by the Consortium for Monitoring, Technology, and Verification under DOE-NNSA award number DE-NA0003920. The authors thank Daniel Nestares from the University of California, Merced, for his work to test the software. The authors thank Mitchel Crockett from the University of Tennessee, Knoxville, for his reactor simulation output to aid CONFLUX on understanding the reactor simulation input. At last, The authors thank Eric F. Matthew from University of California, Berkeley for providing a reference fission product covariance dataset. This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344. LLNL-SW-872132
