@@ -38,8 +38,10 @@ for fission for fission product yield calculation, and
 [ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),
 for beta decay and neutrino spectrum measurement.
 All databases are saved in the `$CONFLUX_DB` folder, in `xml` format. For databases different from the CONFLUX prepackaged version, download the database and run:\
-`python3 $CONFLUX_DB/fissionDB/ENDF/FPYParserENDF.py <ENDF-6 format database folder>` to parse fission product yield data into the CONFLUX xml format, and\
-`python3 $CONFLUX_DB/betaDB/ENSDFparser.py <ENSDF database folder>` to parse beta decay data into the CONFLUX xml format.
+`python3 $CONFLUX_DB/fissionDB/ENDF/FPYParserENDF.py <ENDF-6 format database folder>`\
+to parse fission product yield data into the CONFLUX xml format, and\
+`python3 $CONFLUX_DB/betaDB/ENSDFparser.py <ENSDF database folder>`\
+to parse beta decay data into the CONFLUX xml format.
 
 CONFLUX also uses correlation and covariance matrix from [FYCOM](https://nucleardata.berkeley.edu/FYCoM/). Run\
 `python3 CovMatDownloader.py` to download the database. This data is in csv file due to its size.
