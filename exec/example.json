@@ -68,7 +68,7 @@
         "Z": 94,
         "A": 239,
         "fissiondb": "JEFF",
-        "conversiondb": "/Users/zhang39/conflux/conflux/data/conversionDB/Pu_239_e_2014.csv",
+        "conversiondb": "$CONFLUX_DB/conversionDB/Pu_239_e_2014.csv",
         "slice": 0.5,
         "count": 20,
         "dcount": 0.2
@@ -78,7 +78,7 @@
         "Z": 94,
         "A": 241,
         "fissiondb": "JEFF",
-        "conversiondb": "/Users/zhang39/conflux/conflux/data/conversionDB/Pu_241_e_2014.csv",
+        "conversiondb": "$CONFLUX_DB/conversionDB/Pu_241_e_2014.csv",
         "slice": 0.5,
         "count": 10,
         "dcount": 0.1

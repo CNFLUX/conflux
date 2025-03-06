@@ -31,12 +31,12 @@ import matplotlib.pyplot as plt
 def electron(ebeta, p, numass=0):
     """
     Calculate the beta spectrum from theory as a function of energy.
-    
+
     :param ebeta: The energy of the beta. Unit: MeV
-    :type ebeta: float 
-    :param p: A dictionary containing parameters to be used in the 
-        calculation of the beta spectrum from theory. 
-        Parameters: { 
+    :type ebeta: float
+    :param p: A dictionary containing parameters to be used in the
+        calculation of the beta spectrum from theory.
+        Parameters: {
                     'Z': Z,
                     'A': A,
                     'W0': kinetic energy,
@@ -51,7 +51,7 @@ def electron(ebeta, p, numass=0):
     :type p: dictionary
     :param numass: Neutrino mass parameter, defaults to 0
     :type numass: float, optional
-    :return: beta spectrum amplitude at given beta energy 
+    :return: beta spectrum amplitude at given beta energy
     :rtype: float
 
     """

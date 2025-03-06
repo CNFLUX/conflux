@@ -12,6 +12,7 @@ from iminuit import Minuit
 from scipy.optimize import nnls
 import math
 from tqdm import tqdm
+import os
 
 # local modules
 from conflux.Basic import Spectrum
@@ -79,7 +80,7 @@ class BetaData(Spectrum):
         self.x = []
         self.y = []
         self.yerr = []
-        with open(inputDB, newline='') as inputCSV:
+        with open(os.path.expandvars(inputDB), newline='') as inputCSV:
             inputreader = csv.DictReader(inputCSV, delimiter=',', quotechar='|')
             for row in inputreader:
                 E = float(row["E"])

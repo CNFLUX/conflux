@@ -103,7 +103,7 @@ def summation(json_file, xbins, nu_spec, rxpower=1):
     
     return spectrum, uncertainty
 
-def conversion(json_file, xbins, nu_spec):
+def conversion(json_file, xbins, nu_spec, rxpower = 1):
     conversion = json_file['conversion']
     if conversion:
         # Declare the conversion engine by adding beta data with corresponding 
@@ -120,7 +120,7 @@ def conversion(json_file, xbins, nu_spec):
 
             beta_istp = BetaData(fissile_istp['conversiondb'])
             branch_slice = fissile_istp['slice']
-            count = fissile_istp['count']
+            count = rxpower if 'd_count' not in fissile_istp else fissile_istp['count']
             d_count = fissile_istp['dcount']
             convertmodel.AddBetaData(beta_istp, istp, name, count, d_count=d_count)
             convertmodel.VBfitbeta(name, branch_slice)

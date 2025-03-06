@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 # conflux modules
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionIstp
+from conflux.IBDXSection import ibd_xsection
 
 # A simple burst fission model for fissions 100 ton TNT equivalent energy
 e_fission = 3.2e-11 #joules
@@ -13,20 +14,6 @@ fission_per_t = e_TNT/e_fission
 test_flux = 1000*fission_per_t/r2 # cm^-2
 
 det_eff = 0.5
-
-# An IBD cross section empirical IBD cross section function  
-# Phys. Rev. D 60 053003 (Vogel model) (m2)
-def ibd_xsection(enu):
-    epos = enu - 1.29
-    epos[epos<0] = 0
-    ppos = np.sqrt(epos**2-0.511**2)
-    # tau_n = 877.75
-    # fr = 1.7152
-    xsection = 0.0952*epos*ppos*1e-42 
-    # xsection = 2*np.pi/0.511**5/(fr*tau_n)*epos*ppos #Phys. Rev. D 60 053003 (Vogel model) (m2)
-    xsection[np.isnan(xsection)] = 0
-    return xsection
-
 
 if __name__ == "__main__":
 
