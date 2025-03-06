@@ -709,7 +709,7 @@ class BetaEngine:
     """
     BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra of all tallied branches.
     """
-    inputlist: list(int) = None
+    inputlist: list[int] = None
     """A list of isotopes. If the inputlist is not given, load the entire betaDB from the default betaDB."""
     istplist: dict
     """A dictionary of isotopes. istplist contain keys as the ZAI number of the isotope and values being :class:`conflux.BetaEngine.BetaIstp`"""
