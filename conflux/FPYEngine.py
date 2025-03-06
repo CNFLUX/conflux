@@ -77,14 +77,17 @@ class FissionIstp(Spectrum, Summed):
         :type DB: string, optional
         
         """
+
         if Ei != None: 
             self.Ei = Ei
             self.FPYlist = {}
+
         DBname = DB
+
         # Check if the user gave a valid Database path
         # if there is no specified fissionDB, look for the default one
         if DBname == None or not os.path.exists(DBname):
-            DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
+            DBpath = CONFLUX_DB + "/fissionDB/" + DB + "/"
             if DBname != None and DBname not in list(self._DBtitle.keys()):
                 print('Custom DB: '+ DBname + ' NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')
@@ -94,7 +97,7 @@ class FissionIstp(Spectrum, Summed):
                 namecache = filename.split('.')
                 if namecache[-1] != 'xml': #if the file is not an xml file, continue
                     continue
-                if (self.DBtitle[DB] not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
+                if (self._DBtitle[DB] not in namecache[0] or str(self.Z) not in namecache[0] or str(self.A) not in namecache[0]):
                     continue # Alternatively, if the isotope is not in the list, continue
                 istpfound = True # Else, assert that the isotope is in the DB
                 break
@@ -245,11 +248,10 @@ class FissionIstp(Spectrum, Summed):
         
         :param DB: filename or names of default correlation of fission product, defaults to 'ENDF', alternative default DB is 'JEFF'
         :type DB: string, optional
-
         """
 
-        DBpath = DB  #Figure out where the DB and files are in a similar method we loaded the
-        #Fission Database.
+        # Figure out where the DB and files are in a similar method we loaded the Fission Database.
+        DBpath = DB
         if DBpath in ['JEFF', 'ENDF'] or not os.path.exists(DBpath):
             DBpath = CONFLUX_DB+"/fissionDB/"+DB+"/"
             print("Reading correlation matrices in: "+DBpath+"...")

@@ -27,7 +27,56 @@ import matplotlib.pyplot as plt
 #########################################
 # Final neutrino and antineutrino spectra
 
-#Function to calculate the electron spectrum from theory as a function of energy
+# Electron or neutrino spectrum
+def _e_nu_spectrum(W, p, isNu, numass = 0):
+    """
+    Calculate the electron or beta spectrum from theory as a function of energy.
+
+    :param W: electron total energy in electron mass units, (m_e + KE)/m_e
+    :type W: float
+    :param p: A dictionary containing parameters to be used in the
+        calculation of the beta spectrum from theory.
+        Parameters: {
+                    'Z': Z,
+                    'A': A,
+                    'W0': Spectrum endpoint W
+                    'R': nuclear radius,
+                    'L': forbiddenness transition,
+                    'c': 1.0,
+                    'b': bAc*A,
+                    'd': 0.0,
+                    'Lambda': 0.0,
+                    'l': screening_potential(Z)
+                }
+    :type p: dictionary
+    :param isNu: spectrum corrections for neutrino or electron?
+    :type isNu: bool
+    :param numass: Neutrino mass parameter, defaults to 0
+    :type numass: float, optional
+    :return: beta spectrum amplitude at given beta energy
+    :rtype: float
+    """
+
+    result = (
+        phase_space(W, numass=numass, **p)
+        * fermi_function(W, **p)
+        * finite_size_L0(W, **p)
+        * recoil_gamow_teller(W, **p)
+        * recoil_Coulomb_gamow_teller(W, **p)
+        * atomic_screening(W, **p)
+    )
+
+    if isNu: result *= radiative_correction_neutrino(W, **p)
+    else:    result *= radiative_correction(W, **p)
+
+    if p['L'] == 0:
+        result *= shape_factor_gamow_teller(W, **p)
+    else:
+        result *= shape_factor_unique_forbidden(W, **p)
+
+    return np.nan_to_num(result, nan=0.0)
+
+
 def electron(ebeta, p, numass=0):
     """
     Calculate the beta spectrum from theory as a function of energy.
@@ -39,7 +88,7 @@ def electron(ebeta, p, numass=0):
         Parameters: {
                     'Z': Z,
                     'A': A,
-                    'W0': kinetic energy,
+                    'W0': Spectrum endpoint electron total energy (m_e + KE)/m_e
                     'R': nuclear radius,
                     'L': forbiddenness transition,
                     'c': 1.0,
@@ -53,36 +102,11 @@ def electron(ebeta, p, numass=0):
     :type numass: float, optional
     :return: beta spectrum amplitude at given beta energy
     :rtype: float
-
     """
-    result = 0.
-    W = ebeta/ELECTRON_MASS_MEV + 1
-    result = (phase_space(W, numass=numass, **p, )
-            *fermi_function(W, **p)
-            *finite_size_L0(W, **p)
-            *recoil_gamow_teller(W, **p)
-            *radiative_correction(W, **p)
-            *recoil_Coulomb_gamow_teller(W, **p)
-            *atomic_screening(W, **p)
-            )
-    
-    # plt.figure()
-    # print("allowed", shape_factor_gamow_teller(W, **p)/shape_factor_unique_forbidden(W, **p))
-    # plt.plot(result*shape_factor_gamow_teller(W, **p), label = "allowed")
-    # plt.plot(result*shape_factor_unique_forbidden(W, **p), label = "forbid")
-    # plt.legend()
-    # plt.show()
-    
-    if p['L'] == 0:
-        result *= shape_factor_gamow_teller(W, **p)
-    else:
-        result *= shape_factor_unique_forbidden(W, **p)
 
-    result = np.nan_to_num(result, nan=0.0)
-    
-    return result
+    return _e_nu_spectrum(ebeta/ELECTRON_MASS_MEV + 1, p, False, numass)
 
-#Function to calculate the neutrino spectrum from theory as a function of energy
+
 def neutrino(enu, p, numass=0):
     """
     Calculate the neutrino spectrum from theory as a function of energy.
@@ -94,7 +118,7 @@ def neutrino(enu, p, numass=0):
         Parameters: { 
                     'Z': Z,
                     'A': A,
-                    'W0': kinetic energy,
+                    'W0': Spectrum endpoint electron total energy (m_e + KE)/m_e
                     'R': nuclear radius,
                     'L': forbiddenness transition,
                     'c': 1.0,
@@ -110,25 +134,9 @@ def neutrino(enu, p, numass=0):
     :rtype: float
     
     """
-    result = 0.
-    W0 = p['W0']
-    Wv = W0-enu/(ELECTRON_MASS_MEV*1.0) #enu/ELECTRON_MASS_MEV + 1
-    result = (phase_space(Wv, numass=numass, **p)
-            *fermi_function(Wv, **p)
-            *finite_size_L0(Wv, **p)
-            *recoil_gamow_teller(Wv, **p)
-            *radiative_correction_neutrino(Wv, **p)
-            *recoil_Coulomb_gamow_teller(Wv, **p)
-            *atomic_screening(Wv, **p)
-            )
 
-    if p['L'] == 0:
-        result *= shape_factor_gamow_teller(Wv, **p)
-    else:
-        result *= shape_factor_unique_forbidden(Wv, **p)
-        
-    result = np.nan_to_num(result, nan=0.0)
-    return result
+    return _e_nu_spectrum(p['W0'] - enu/ELECTRON_MASS_MEV, p, True, numass)
+
 
 # BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
@@ -308,7 +316,8 @@ class BetaBranch(Spectrum):
     # calculate the spectrum uncertainty with MC sampling
     def SpectUncertMC(self, e, nu_spectrum=False, samples = 30):
         """
-        Calculate the beta/neutrino spectral shape uncertainty as a function of energy using Monte Carlo sampling.
+        Calculate the beta/neutrino spectral shape uncertainty due to enpoint energy uncertainty sigma_E0
+        as a function of energy using Monte Carlo sampling.
         
         :param e: The energy of beta/neutrino (MeV).
         :type e: float
@@ -318,13 +327,13 @@ class BetaBranch(Spectrum):
         :type samples: int, optional
         :return: The uncertainty of spectrum amplitude at the input energy
         :rtype: float
-
         """
-        if self.sigma_E0 == 0:
-            return 0
+
+        if self.sigma_E0 == 0: return 0
+
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
-        newParameters['W0'] = E0range/ELECTRON_MASS_MEV+1
+        newParameters['W0'] = E0range/ELECTRON_MASS_MEV + 1
 
         if (nu_spectrum == True):
             function = lambda e: ((1-self.mixing)*neutrino(e, newParameters)
@@ -365,10 +374,10 @@ class BetaBranch(Spectrum):
                 x_high = self.E0
             thisbinwidth = abs(x_high-x_low)
             relativewidth = abs(x_high-x_low)/binwidths
-            self.spectrum[k] = (thisbinwidth*relativewidth
+            self.spectrum[k] = (thisbinwidth * relativewidth
                                 *self.BetaSpectrum(x_low, nu_spectrum))
-            self.uncertainty[k] = (thisbinwidth*relativewidth
-                                *self.SpectUncertMC(x_low, nu_spectrum))
+            self.uncertainty[k] = (thisbinwidth * relativewidth
+                                * self.SpectUncertMC(x_low, nu_spectrum))
             if x_high == self.E0:
                 break
             lower += binwidths
@@ -569,13 +578,13 @@ class BetaIstp(Spectrum, Summed):
         :type nu_spectrum: bool, optional
         :param branchErange: set the lower and upper limit of the endpoint energy of branches to be summed, defaults to [0, 20.]
         :type branchErange: two-element list, optional
-
         """
-        self.spectrum=np.zeros(self.nbin)
-        self.uncertainty=np.zeros(self.nbin)
-        self.spectUnc=np.zeros(self.nbin) # theoretical uncertainty
-        self.branchUnc=np.zeros(self.nbin)
-        totalUnc=np.zeros(self.nbin)
+
+        self.spectrum = np.zeros(self.nbin)
+        self.uncertainty = np.zeros(self.nbin)
+        self.spectUnc = np.zeros(self.nbin) # theoretical uncertainty
+        self.branchUnc = np.zeros(self.nbin)
+        totalUnc = np.zeros(self.nbin)
 
         # calculate the total uncertaintty and append spectra
         for E0i, branchi in self.branches.items():
@@ -586,7 +595,7 @@ class BetaIstp(Spectrum, Summed):
             # di = branchi.sigma_frac
 
             branchi.BinnedSpectrum(nu_spectrum)
-            self.spectrum += si*fi
+            self.spectrum += si * fi
             self.spectUnc += branchi.uncertainty*fi
 
             for E0j, branchj in self.branches.items():
@@ -594,10 +603,10 @@ class BetaIstp(Spectrum, Summed):
                 # fj = branchi.frac
                 # dj = branchj.sigma_frac
                 cov_bij = branchi.cov[E0j]
-                sigma_bij = si*cov_bij*sj
+                sigma_bij = si * cov_bij * sj
                 self.branchUnc += sigma_bij
-                if (E0i==E0j):
-                    totalUnc += (branchi.uncertainty*fi)**2 + sigma_bij
+                if E0i == E0j:
+                    totalUnc += (branchi.uncertainty * fi)**2 + sigma_bij
                 else:
                     totalUnc += sigma_bij
 
@@ -892,5 +901,4 @@ class BetaEngine:
                 continue
 
             betaIstp.CalcCovariance(GSF=GSF)
-
             betaIstp.SumSpectra(nu_spectrum, branchErange)

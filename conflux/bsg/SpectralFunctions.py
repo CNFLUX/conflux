@@ -13,8 +13,8 @@ def phase_space(W, W0, numass = 0, **kwargs):
     :param W0: Electron endpoint energy in units of me c^2
 
     """
-    nue = W0-W-numass
-    return np.sqrt(W**2-1)*W*nue*np.sqrt(nue**2-numass**2)
+    nue = W0 - W - numass
+    return np.sqrt(W**2-1) * W * nue * np.sqrt(nue**2-numass**2)
 
 def fermi_function(W, Z, R, **kwargs):
     """Traditional Fermi Function
@@ -35,8 +35,8 @@ def fermi_function(W, Z, R, **kwargs):
     p = np.sqrt(W**2-1)
     y = ALPHA*Z*W/p
 
-    #We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1+gamma)
-    #This is consistent with the L0 description below
+    # We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1 + gamma)
+    # This is consistent with the L0 description below
 
     f = (4
             *np.power(2*p*R, 2*(g-1))
@@ -373,7 +373,7 @@ def atomic_screening(W, Z, R, l, **kwargs):
     """Screening correction due to atomic electrons in the final state
 
     :param Z: Proton number of the final nuclear state
-    :param W: Elecron energy in units of me c^2
+    :param W: Electron total energy in units of me c^2
     :param R: Nuclear charge radius in units of the electron Compton wavelength
     :param l: Shift in electric potential at the origin due to atomic electrons
 
