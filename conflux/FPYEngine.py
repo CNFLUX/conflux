@@ -14,14 +14,12 @@ from tqdm import tqdm
 
 """Conflux modules."""
 from conflux.config import CONFLUX_DB
-from conflux.Basic import Spectrum, Summed
+from conflux.Basic import Spectrum
 
 
 # Class that counts fission products of a specified fission isotope
-class FissionIstp(Spectrum, Summed):
+class FissionIstp(Spectrum):
     """Class to handle all the Fission Nuclide Information."""
-    id: int
-    """Unique ID of this object. Z*1e4+A*10"""
     Z: int
     """The atomic number of isotope """
     A: int
@@ -53,8 +51,6 @@ class FissionIstp(Spectrum, Summed):
         """Atomic number of your nuclide"""
         self.A = A
         """Atomic mass of your nuclide"""
-        self.id = Z*1e4+A*10
-        """Unique ID of the fissile isotope"""
         self.Ei = Ei
         """The incident neutron energy to ignite fission"""
         self.IFPY=IFPY

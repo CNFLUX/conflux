@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # That I want to plot, or look at more spectral information of. Again, each isotope
     # has a unique FPZAI number. See FissionIstp_Example.py for more information.
     for FPZAI in BetaEngineDB.istplist:
-        print(BetaEngineDB.istplist[FPZAI].id, BetaEngineDB.istplist[FPZAI].name)
+        print(BetaEngineDB.istplist[FPZAI].ZAI, BetaEngineDB.istplist[FPZAI].name)
 
 
     # I will also go ahead and plot the spectra and uncertainties of Cs-141 using its'

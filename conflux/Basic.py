@@ -16,7 +16,7 @@ class Spectrum:
         self.integral = 0
         """Integral of spectrum"""
         
-    def Add(self, targetSpec, W=1, sigma_W = 0):
+    def Add(self, targetSpec, W = 1, sigma_W = 0):
         '''
         An operator to add (or subtract) a spectrum
         
@@ -41,13 +41,12 @@ class Spectrum:
         Returns:
             None
         '''
-        uncertainty = self.uncertainty
-        #Calculate the relative uncertainty of the spectrum
-        relativeUnc = np.sqrt((sigma_W/W)**2+(uncertainty*self.spectrum)**2)
-        #calculate the normed uncertainty        
-        self.uncertainty = W*self.spectrum*relativeUnc
-        #Scale the spectrum by our Normalization weight
+        # Calculate the relative uncertainty of the spectrum
+        relativeUnc = np.sqrt((sigma_W / W)**2 + (self.uncertainty / self.spectrum)**2)
+        # Scale the spectrum by our Normalization weight
         self.spectrum *= W
+        # calculate the normed uncertainty
+        self.uncertainty = self.spectrum * relativeUnc
     
     def Integral(self):
         '''
@@ -58,7 +57,6 @@ class Spectrum:
         Returns:
             integral (float): The integral of the spectrum
         '''
-        #Calculate the integral of the spectrum
         self.integral = np.dot(self.spectrum.sum(), self.xbins)
         return self.integral
         

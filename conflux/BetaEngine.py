@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
-from conflux.Basic import Spectrum, Summed
+from conflux.Basic import Spectrum
 from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
                                            fermi_function, 
@@ -137,13 +137,9 @@ def neutrino(enu, p, numass=0):
 
     return _e_nu_spectrum(p['W0'] - enu/ELECTRON_MASS_MEV, p, True, numass)
 
-
-# BetaBranch class to save the isotopic information
 class BetaBranch(Spectrum):
-    """A class to save isotopic branch information."""
+    """Beta decay branch with spectrum"""
     
-    id : float
-    """ The identity of each beta branch, each branch of an isotope has unique end-point energy"""
     Z: int
     """The Atomic number of the mother isotope"""
     A: int
@@ -178,19 +174,14 @@ class BetaBranch(Spectrum):
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
                 forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
                 numass = 0, mixing = 0, custom_func=None):
-        """
-        A class to save isotopic branch information.
-        
-        """
         
         Spectrum.__init__(self, xbins)
         
-        self.id = E0
         self.Z = Z
         self.A = A
         self.I = I
         self.Q = Q
-        self.ZAI=Z*1e4+A*10+I
+        self.ZAI = Z*1e4 + A*10 + I
 
         self.E0 = E0
         self.sigma_E0 = sigma_E0
@@ -215,13 +206,13 @@ class BetaBranch(Spectrum):
             'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
             'L': self.forbiddenness,
             'c': 1.0,
-            'b': self.bAc*self.A,
+            'b': self.bAc * self.A,
             'd': 0.0,
             'Lambda': 0.0,
             'l': screening_potential(self.Z)
         }
         
-        self.corr = {E0:1}  # correlation with other branches of the same isotope
+        self.corr = {E0: 1}  # correlation with other branches of the same isotope
         self.cov = {E0:self.sigma_frac**2} # Set the covariance diagonal element to the square of the branch fraction uncertainty
 
     # display the vital info of branch
@@ -397,14 +388,12 @@ class BetaBranch(Spectrum):
             self.spectrum /= norm*binwidths
             self.uncertainty /= norm*binwidths
 
-# class to save isotope information, including Z A I Q and beta brances
-class BetaIstp(Spectrum, Summed):
-    "Class to save isotope information, including Z A I Q and beta decay brances."
+
+class BetaIstp(Spectrum):
+    """Collection of all beta decay branches from one isotope"""
     
-    id: int
-    """ The identity of each beta-unstable isotope (ZAI = Z*1e4+A*10+I)"""
     ZAI : int
-    """ The identity of each beta-unstable isotope (ZAI = Z*1e4+A*10+I)"""
+    """Top-of-chain isotope (ZAI = Z*1e4+A*10+I)"""
     Z: int
     """The Atomic number of the mother isotope"""
     A: int
@@ -433,13 +422,12 @@ class BetaIstp(Spectrum, Summed):
         """Constructor method."""
         Spectrum.__init__(self, xbins)
         
-        self.ZAI=int(Z*1e4+A*10+I) # unique ID of a isotope
-        self.id = self.ZAI
-        self.HL = HL
+        self.HL = HL # top-of-chain isotope half-life (seconds)
 
         self.Z = Z
         self.A = A
         self.I = I
+        self.ZAI = self.daughterZAI(0)
         self.Q = Q
         self.name = name
         self.missing=False
@@ -454,10 +442,8 @@ class BetaIstp(Spectrum, Summed):
         
         :param branch: the branch to be added
         :type branch: :class: `conflux.BetaEngine.BetaBranch`
-
-
         """
-        self.branches[branch.id] = branch #branch.id is the endpoint energy
+        self.branches[branch.E0] = branch
 
 
     def EditBranch(self, defaultE0, **kwargs):
@@ -621,88 +607,75 @@ class BetaIstp(Spectrum, Summed):
         for E0, branch in self.branches.items():
             branch.Display()
 
-    def decay_time_adjust(self, begin=0, end=0):
+    def decay_time_adjust(self, begin, end):
         """
         Calculate the percentage of isotope decayed in the given time window.
         
-        :param begin: the begining of the window (s), defaults to 0
-        :type begin: float, optional
-        :param end: the end of the window (s), defaults to 0
-        :type end: float, optional
-        :return: The percentage of isotope decayed (from 0 to 1)
+        :param begin: the begining of the window (s)
+        :type begin: float
+        :param end: the end of the window (s)
+        :type end: float
+        :return: The fraction of isotope decayed (from 0 to 1)
         :rtype: float
-
         """
-        '''
-        Calculate percentage of decayed isotope given
-        counting to the end of the counting.
-        if no argument is given, return 1
-        '''
-        if begin < end:
-            return 2**(-begin/self.HL)-2**(-end/self.HL)
-        else:
-            return 1
-    
+        return 2**(-begin/self.HL) - 2**(-end/self.HL)
+
     def daughterZAI(self, gen):
         """
-        Indicate the decay daughter.
+        ZAI identifier for decay daughter at generation `gen`.
         
+        :param gen: daughter generation
+        :type gen: int
         :return: The ZAI of the decay daughter
         :rtype: int
-
         """
-        Z = self.Z+gen
-        A = self.A
-        I = 0
-        ZAI = Z*1e4+A*10+I
-        return ZAI
+        return (self.Z+gen)*1e4 + self.A*10 + (0 if not gen else self.I)
     
-    def decay_rate(self, t, HLs):
+    def decay_fraction(self, t, HLs):
         """
-        Calculate the decay rate of different generations in a decay chain. 
-        The list HLs contains all half lives of the this isotope and parents and grand parents. 
-        Only calculate the decay rate of calculate this generation. 
+        Calculate the fraction of decays completed at a generation in a decay chain.
+        The list HLs contains all half lives of the this isotope and all its antecedents.
         
-        :param t: time as the variable of the rate calculation
+        :param t: time for which to calculate decay fraction (in same units as HLs)
         :type t: float
-        :param HLs: a list of half lives of the decays, in the order from parents to daughters
+        :param HLs: half-lives of all decays in chain (in same units as t)
         :type HLs: list(int)
-        :return: decay rate at the time t
+        :return: fraction of decays completed at time t (0 for t=0; 1 as t -> infinity)
         :rtype: float
-
         """
+
         rate = 1
-        for HL in HLs:
-            rate *= 1-2**(-t/HL)
+        for HL in HLs: rate *= 1 - 2**(-t/HL)
         return rate
     
-    def CalcDecayChain(self, betaSpectraDB, begin=0, end=0):
+    def CalcDecayChain(self, betaSpectraDB, begin, end):
         """
-        Calculate the total spectrum of a beta-decay chain in a selected window
+        Calculate the total spectrum of a beta-decay chain in a selected window.
+        Assumes beta decays are 100% of allowed decays in chain.
         
         :param betaSpectraDB: the spectrum database that saves all relavant spectra
         :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
-        :param begin: begining of the window, unit is second, defaults to 0
+        :param begin: begining of the window (in seconds)
         :type begin: float, optional
-        :param end: end of the window, unit is second, defaults to 0
+        :param end: end of the window (in seconds)
         :type end: float, optional
         :return: summed, decay rate adjusted spectrum and uncertainty in the calculated window
         :rtype: :class:`numpy.array`
-
         """
+
         generation = 0
         HLs = []
         self.decay_chain_spectrum = np.zeros(len(betaSpectraDB.xbins))
         self.decay_chain_uncertainty = np.zeros(len(betaSpectraDB.xbins))
         
-        # Look for the decay daughters, if they are also beta-unstable, continue to the next generation
+        # Look for the decay daughters; if they are also beta-unstable, continue to the next generation
         while self.daughterZAI(generation) in betaSpectraDB.istplist.keys():
             currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
             HLs.append(currentistp.HL)
             
-            delta_rate = self.decay_rate(end, HLs)-self.decay_rate(begin, HLs) # decay rate in current window
-            self.decay_chain_spectrum += delta_rate*currentistp.spectrum
-            self.decay_chain_uncertainty += (delta_rate*currentistp.uncertainty)**2
+            delta_rate = self.decay_fraction(end, HLs) - self.decay_fraction(begin, HLs) # decay fraction in current window
+            self.decay_chain_spectrum += delta_rate * currentistp.spectrum
+            self.decay_chain_uncertainty += (delta_rate * currentistp.uncertainty)**2
             
             generation += 1
             
@@ -710,6 +683,7 @@ class BetaIstp(Spectrum, Summed):
         
         return self.decay_chain_spectrum, self.decay_chain_uncertainty
         
+
 
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
 # spectra of all tallied branches
@@ -876,7 +850,7 @@ class BetaEngine:
         :rtype: :class:`conflux.BetaEngine.BetaIstp`
 
         """
-        ZAI = Z*1e4+A*10+I
+        ZAI = Z*1e4 + A*10 + I
         return self.istplist[ZAI]
         
     def CalcBetaSpectra(self, nu_spectrum=True,
@@ -895,10 +869,10 @@ class BetaEngine:
 
         """
     
-        for ZAI in tqdm(self.istplist, desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes", disable=silent):
-            betaIstp = self.istplist[ZAI]
+        for ZAI,betaIstp in tqdm(self.istplist.items(),
+                                 desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes",
+                                 disable=silent):
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
-
             betaIstp.CalcCovariance(GSF=GSF)
             betaIstp.SumSpectra(nu_spectrum, branchErange)
