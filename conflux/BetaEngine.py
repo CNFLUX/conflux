@@ -11,6 +11,7 @@ from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
                                            fermi_function, 
                                            finite_size_L0, 
+                                           finite_size_L0_simple,
                                            recoil_gamow_teller, 
                                            radiative_correction, 
                                            radiative_correction_neutrino,
@@ -18,6 +19,7 @@ from conflux.bsg.SpectralFunctions import (phase_space,
                                            atomic_screening,
                                            shape_factor_gamow_teller,
                                            shape_factor_unique_forbidden)
+from conflux.bsg.FiniteSize import getL0Constants
 from conflux.bsg.Functions import getEltonNuclearRadius
 from conflux.bsg.Screening import screening_potential
 
@@ -57,10 +59,13 @@ def _e_nu_spectrum(W, p, isNu, numass = 0):
     :rtype: float
     """
 
+    np.seterr(divide='ignore', invalid='ignore', over='ignore')
+
     result = (
         phase_space(W, numass=numass, **p)
         * fermi_function(W, **p)
-        * finite_size_L0(W, **p)
+        * finite_size_L0(W, L0Const = getL0Constants(p['Z']), **p)
+        #* finite_size_L0_simple(W, **p)
         * recoil_gamow_teller(W, **p)
         * recoil_Coulomb_gamow_teller(W, **p)
         * atomic_screening(W, **p)

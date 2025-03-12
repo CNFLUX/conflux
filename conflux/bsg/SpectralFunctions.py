@@ -5,6 +5,7 @@ from scipy.special import factorial, factorial2
 from conflux.bsg.CoulombFunctions import lambda_k
 
 from conflux.bsg.Constants import *
+from conflux.bsg.FiniteSize import getL0Constants
 
 def phase_space(W, W0, numass = 0, **kwargs):
     """Phase space
@@ -24,19 +25,13 @@ def fermi_function(W, Z, R, **kwargs):
     :param R: Nuclear radius in units of the electron Compton wavelength
 
     """
-    f = 1
-
-    if Z == 0:
-        return f
-
-    np.seterr(divide='ignore', invalid='ignore', over='ignore')
 
     g = np.sqrt(1-(ALPHA*Z)**2)
     p = np.sqrt(W**2-1)
     y = ALPHA*Z*W/p
 
-    # We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1 + gamma)
-    # This is consistent with the L0 description below
+    #We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1+gamma)
+    #This is consistent with the L0 description below
 
     f = (4
             *np.power(2*p*R, 2*(g-1))
@@ -45,7 +40,7 @@ def fermi_function(W, Z, R, **kwargs):
 
     return f
 
-def finite_size_L0(W, Z, R, **kwargs):
+def finite_size_L0_simple(W, Z, R, **kwargs):
     """ Dominant electrostatic finite size correction
     Correction to the traditional Fermi function to use a uniformly charged sphere rather than point charge
 
@@ -58,6 +53,39 @@ def finite_size_L0(W, Z, R, **kwargs):
             -ALPHA*Z*W*R
             +13/60*(ALPHA*Z)**2
             -ALPHA*Z*R/W)
+
+def finite_size_L0(W, Z, R, L0Const = None, **kwargs):
+    """ Dominant electrostatic finite size correction
+    Correction to the traditional Fermi function to use a uniformly charged sphere rather than point charge
+
+    :param Z: Proton number of the final nuclear state
+    :param W: Electron energy in units of me c^2
+    :param R: Nuclear radius in units of the electron Compton wavelength
+
+    """
+    g = (1-(ALPHA*Z)**2)**0.5
+
+    if L0Const is None: aNeg, aPos = getL0Constants(Z)
+    else: aNeg, aPos = L0Const
+
+    s = 0
+    common = 0
+    specific = 0
+    for i in range(1, 7):
+        if Z < 0:
+            s += aPos[i] * (W*R)**(i-1)
+        else:
+            s += aNeg[i] * (W*R)**(i-1)
+    common= (1
+            -ALPHA*Z*W*R*(41-26*g)/15./(2*g-1)
+            +13/60*(ALPHA*Z)**2
+            -ALPHA*Z*R/W*g*(17-2*g)/30/(2*g-1)
+            +s)
+    if Z < 0:
+        specific = aPos[0] * R / W + 0.22 * (R - 0.0164) * (ALPHA * abs(Z))** 4.5
+    else:
+        specific = aNeg[0] * R / W + 0.41 * (R - 0.0164) * (ALPHA * Z)** 4.5
+    return (common + specific) * 2. / (1. + g)
 
 def finite_size_U_fermi(W, Z, **kwargs):
     """Higher-order electrostatic finite size correction
@@ -92,13 +120,11 @@ def sirlin_g(W, W0, **kwargs):
 
     beta = np.sqrt(W**2-1)/W
 
-    np.seterr(divide='ignore', invalid='ignore')
     g = (3*np.log(PROTON_MASS_W)
         -3./4.
         +4./beta*(-1*spence(1-(2*beta/(1+beta))))
         +4*(np.arctanh(beta)/beta-1)*((W0-W)/(3*W)-3/2+np.log(2*(W0-W)))
         +np.arctanh(beta)/beta*(2*(1+beta**2)+(W0-W)**2/(6*W**2)-4*np.arctanh(beta)))
-
 
     return g
 
@@ -147,7 +173,7 @@ def radiative_correction_o2(W, Z, R, **kwargs):
             +np.pi**2/6
             -6*np.log(2))
 
-    return abs(Z)*ALPHA**2*(d1f+d2+d3+d01d4)
+    return -Z*ALPHA**2*(d1f+d2+d3+d01d4)
 
 def radiative_correction_o3(W, Z, W0, R, **kwargs):
     """Radiative correction of order alpha^3 Z^2 to the beta spectrum shape
@@ -367,13 +393,13 @@ def shape_factor_unique_forbidden(W, L, W0, Z, R, **kwargs):
     L = abs(L)
     for k in range(1, L+1, 1):
         C += lambda_k(W, Z, R, k) * pe**(2*(k-1))*pnu**(2*(L-k))/factorial(2*k-1)/factorial(2*(L-k)+1)
-    return C
+    return factorial(2*L-1)*C
 
 def atomic_screening(W, Z, R, l, **kwargs):
     """Screening correction due to atomic electrons in the final state
 
     :param Z: Proton number of the final nuclear state
-    :param W: Electron total energy in units of me c^2
+    :param W: Elecron energy in units of me c^2
     :param R: Nuclear charge radius in units of the electron Compton wavelength
     :param l: Shift in electric potential at the origin due to atomic electrons
 
@@ -393,7 +419,7 @@ def atomic_screening(W, Z, R, l, **kwargs):
     yt = ALPHA*Z*Wt/pt
     g = np.sqrt(1-(ALPHA*Z)**2)
 
-    S = (np.abs(gamma(g+1.j*yt)/gamma(g+1.j*y))**2
+    S = (Wt/W*np.abs(gamma(g+1.j*yt)/gamma(g+1.j*y))**2
             *np.abs(np.exp(loggamma(g+2.j*pt/l)-loggamma(1+2.j*p/l)))**2
             #*np.abs(gamma(g+1.j*2*pt/l))**2/np.abs(gamma(1+1.j*2*p/l))**2
             *np.exp(-np.pi*y)
@@ -431,3 +457,20 @@ def atomic_mismatch(W, Z, W0, A, **kwargs):
             *((0.5 + l * l) / (1 + l * l) - l * np.arctan(1 / l)) / psi2)
 
     return 1 - 2 / (W0 - W) * (0.5 * dBdZ2 + 2 * (C0 + C1))
+
+def atomic_exchange(W, exPars):
+    E = W - 1
+
+    return (1 + exPars[0] / E + exPars[1] / E / E +
+           exPars[2] * np.exp(-exPars[3] * E) +
+           exPars[4] * np.sin((W - exPars[6])**exPars[5] + exPars[7]) /
+           W**exPars[8])
+
+def atomic_exchange_simkovic(W, exPars):
+    '''Exchange correction due to Simkovic et al., https://journals.aps.org/prc/pdf/10.1103/PhysRevC.107.025501
+    Equation (34)
+    '''
+    x = (W-1)*ELECTRON_MASS_KEV
+    a, b, c, d, e = exPars
+
+    return 1. + (a+b*x**c)*np.exp(-d*x**e)
