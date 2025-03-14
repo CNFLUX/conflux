@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
-from conflux.Basic import Spectrum
+from conflux.Basic import Spectrum, integrate_trapezoid
 from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
                                            fermi_function, 
@@ -23,14 +23,23 @@ from conflux.bsg.FiniteSize import getL0Constants
 from conflux.bsg.Functions import getEltonNuclearRadius
 from conflux.bsg.Screening import screening_potential
 
-
 import matplotlib.pyplot as plt
+from ctypes import *
+
+libBSG = None
+
+def init_libBSG(libname = "libBSG.so"):
+    global libBSG
+    libBSG = cdll.LoadLibrary(libname)
+    libBSG.BSG_beta_spectrum.argtypes = [c_double, c_double, c_int, c_int, c_double, c_int, c_bool]
+    libBSG.BSG_beta_spectrum.restype = c_double
+    print("Calculations using BSG library", libname)
 
 #########################################
 # Final neutrino and antineutrino spectra
 
 # Electron or neutrino spectrum
-def _e_nu_spectrum(W, p, isNu, numass = 0):
+def _e_nu_spectrum(p, isNu, numass = 0):
     """
     Calculate the electron or beta spectrum from theory as a function of energy.
 
@@ -39,6 +48,7 @@ def _e_nu_spectrum(W, p, isNu, numass = 0):
     :param p: A dictionary containing parameters to be used in the
         calculation of the beta spectrum from theory.
         Parameters: {
+                    'We': electron total energy in electron mass units, (m_e + KE)/m_e
                     'Z': Z,
                     'A': A,
                     'W0': Spectrum endpoint W
@@ -61,23 +71,45 @@ def _e_nu_spectrum(W, p, isNu, numass = 0):
 
     np.seterr(divide='ignore', invalid='ignore', over='ignore')
 
+    if libBSG is not None:
+        # determine which inputs are arrays
+        array_n = 0
+        isarray = {k: hasattr(p[k], '__iter__') for k in {'We', 'W0'}}
+        for k,b in isarray.items():
+            if b:
+                n = len(p[k])
+                assert array_n == 0 or n == array_n
+                array_n = n
+
+        if not array_n:
+            res = libBSG.BSG_beta_spectrum(p["We"], p["W0"], p["A"], p["Z"], p["R"], p['L'], isNu)
+        else:
+            res = np.zeros(array_n)
+            for i in range(array_n):
+                res[i] = libBSG.BSG_beta_spectrum(
+                    p['We'][i] if isarray['We'] else p['We'],
+                    p['W0'][i] if isarray['W0'] else p['W0'],
+                    p['A'], p['Z'], p['R'], p['L'], isNu)
+
+        return res
+
     result = (
-        phase_space(W, numass=numass, **p)
-        * fermi_function(W, **p)
-        * finite_size_L0(W, L0Const = getL0Constants(p['Z']), **p)
+        phase_space(p["We"], numass=numass, **p)
+        * fermi_function(p["We"], **p)
+        * finite_size_L0(p["We"], L0Const = getL0Constants(p['Z']), **p)
         #* finite_size_L0_simple(W, **p)
-        * recoil_gamow_teller(W, **p)
-        * recoil_Coulomb_gamow_teller(W, **p)
-        * atomic_screening(W, **p)
+        * recoil_gamow_teller(p["We"], **p)
+        * recoil_Coulomb_gamow_teller(p["We"], **p)
+        * atomic_screening(p["We"], **p)
     )
 
-    if isNu: result *= radiative_correction_neutrino(W, **p)
-    else:    result *= radiative_correction(W, **p)
+    if isNu: result *= radiative_correction_neutrino(p["We"], **p)
+    else:    result *= radiative_correction(p["We"], **p)
 
     if p['L'] == 0:
-        result *= shape_factor_gamow_teller(W, **p)
+        result *= shape_factor_gamow_teller(p["We"], **p)
     else:
-        result *= shape_factor_unique_forbidden(W, **p)
+        result *= shape_factor_unique_forbidden(p["We"], **p)
 
     return np.nan_to_num(result, nan=0.0)
 
@@ -109,7 +141,8 @@ def electron(ebeta, p, numass=0):
     :rtype: float
     """
 
-    return _e_nu_spectrum(ebeta/ELECTRON_MASS_MEV + 1, p, False, numass)
+    p['We'] = ebeta/ELECTRON_MASS_MEV + 1
+    return _e_nu_spectrum(p, False, numass)
 
 
 def neutrino(enu, p, numass=0):
@@ -140,7 +173,8 @@ def neutrino(enu, p, numass=0):
     
     """
 
-    return _e_nu_spectrum(p['W0'] - enu/ELECTRON_MASS_MEV, p, True, numass)
+    p['We'] = np.clip(p['W0'] - enu/ELECTRON_MASS_MEV, 1., None)
+    return _e_nu_spectrum(p, True, numass)
 
 class BetaBranch(Spectrum):
     """Beta decay branch with spectrum"""
@@ -177,7 +211,7 @@ class BetaBranch(Spectrum):
     """Covariance vector of this beta decay branch with other branches of the same isotope"""
     
     def __init__(self, Z, A, I, Q, E0, sigma_E0, frac, sigma_frac,
-                forbiddenness=0, bAc=4.7, xbins=np.arange(0, 20, 0.1),
+                forbiddenness=0, bAc=4.7, xbins = np.arange(0, 20, 0.1),
                 numass = 0, mixing = 0, custom_func=None):
         
         Spectrum.__init__(self, xbins)
@@ -262,12 +296,11 @@ class BetaBranch(Spectrum):
         self.cov[otherBranch.E0] = (self.sigma_frac * correlation
                                     * otherBranch.sigma_frac)
 
-    # beta spectrum shape as function of energy
     def BetaSpectrum(self, e, nu_spectrum=False):
         """
-        Calculate the beta/neutrino spectral shape as a function of energy.
+        Calculate the unnormalized beta/neutrino spectral shape as a function of energy.
         
-        :param e: the energy of beta/neutrino (MeV)
+        :param e: the kinetic energy of beta/neutrino (MeV)
         :type e: float
         :param nu_spectrum: Determine whether to calculate neutrino spectrum, defaults to False
         :type nu_spectrum: bool, optional
@@ -290,9 +323,6 @@ class BetaBranch(Spectrum):
             'l': screening_potential(self.Z)
         }
  
-        # prevent out-of-range (> Q value)variable to create insane results
-        rangeCorrect = e <= self.E0
-
         if (nu_spectrum == True):
             function = lambda e: ((1-self.mixing)*neutrino(e, self.Parameters)
                                   +self.mixing*neutrino(e, self.Parameters, numass=self.numass))
@@ -304,13 +334,9 @@ class BetaBranch(Spectrum):
             function = lambda e: ((1-self.mixing)*self.custom_func(e, self.Parameters)
                                   +self.mixing*self.custom_func(e, self.Parameters, numass=self.numass))
 
-        result = function(e)
-        result = np.nan_to_num(result, nan=0.0)
-        
-        return result*rangeCorrect
+        return function(e)
 
-    # calculate the spectrum uncertainty with MC sampling
-    def SpectUncertMC(self, e, nu_spectrum=False, samples = 30):
+    def SpectEndpointUncertMC(self, e, nu_spectrum=False, samples = 30):
         """
         Calculate the beta/neutrino spectral shape uncertainty due to enpoint energy uncertainty sigma_E0
         as a function of energy using Monte Carlo sampling.
@@ -325,7 +351,7 @@ class BetaBranch(Spectrum):
         :rtype: float
         """
 
-        if self.sigma_E0 == 0: return 0
+        if self.sigma_E0 == 0: return 0.
 
         E0range = np.random.normal(self.E0, self.sigma_E0, samples)
         newParameters = deepcopy(self.Parameters)
@@ -342,57 +368,32 @@ class BetaBranch(Spectrum):
             function = lambda e: ((1-self.mixing)*self.custom_func(e, newParameters)
                                   +self.mixing*self.custom_func(e, newParameters, numass=self.numass))
 
-        fE0 = function(e)
-        fE0 = np.nan_to_num(fE0, nan=0.0)
+        return np.std(function(e))
 
-        return np.std(fE0)
-
-    # bined beta spectrum
-    def BinnedSpectrum(self, nu_spectrum=False):
+    def CalcNormalizedSpectrum(self, nu_spectrum=False):
         """
-        Calculated a binned beta/neutrino spectrum.
+        Calculated unit-normalized beta/neutrino spectrum shape (at `xbins` coordinates)
         
         :param nu_spectrum: Determine whether to calculate neutrino spectrum, defaults to False
         :type nu_spectrum: bool, optional
-
         """
-        # to prevent lower limit of the energy range < 0
-        lower = self.xbins[0]
-        if (lower > self.E0):
-            return 1
-        # TODO make the code compatible to uneven binning
-        binwidths = self.xbins[1]-self.xbins[0]
-        # integrating each bin
-        for k in range(0, self.nbin):
-            x_low = lower
-            x_high = lower+binwidths
-            if x_high > self.E0:
-                x_high = self.E0
-            thisbinwidth = abs(x_high-x_low)
-            relativewidth = abs(x_high-x_low)/binwidths
-            self.spectrum[k] = (thisbinwidth * relativewidth
-                                *self.BetaSpectrum(x_low, nu_spectrum))
-            self.uncertainty[k] = (thisbinwidth * relativewidth
-                                * self.SpectUncertMC(x_low, nu_spectrum))
-            if x_high == self.E0:
-                break
-            lower += binwidths
 
-        full_range = np.arange(0, 20, 0.01)
-        this_range = np.arange(self.xbins[0], self.xbins[-1], 0.01)
-        full_spect = self.BetaSpectrum(full_range, nu_spectrum)
-        this_spect = self.BetaSpectrum(this_range, nu_spectrum)
+        self.spectrum = self.BetaSpectrum(self.xbins, nu_spectrum)
+        self.uncertainty = np.array([self.SpectEndpointUncertMC(x, nu_spectrum) for x in self.xbins])
 
-        # normalizing the spectrum
-        norm = (self.spectrum.sum()*full_spect.sum()/this_spect.sum() 
-                if self.E0 > binwidths else self.spectrum.sum())
+        # Normalization spectrum (calculate full range if not already covered)
+        if self.xbins[0] <= 0 and self.xbins[-1] >= self.E0:
+            norm = integrate_trapezoid(self.xbins, self.spectrum)
+        else:
+            nrmx = np.arange(0., self.E0, self.E0/50.)
+            nrmspec = self.BetaSpectrum(nrmx, nu_spectrum)
+            norm = integrate_trapezoid(nrmx, nrmspec)
 
-        if self.spectrum.sum() <=0:
+        if not norm > 0:
             self.spectrum = np.zeros(self.nbin)
         else:
-            self.spectrum /= norm*binwidths
-            self.uncertainty /= norm*binwidths
-
+            self.spectrum /= norm
+            self.uncertainty /= norm
 
 class BetaIstp(Spectrum):
     """Collection of all beta decay branches from one isotope"""
@@ -581,11 +582,11 @@ class BetaIstp(Spectrum):
         for E0i, branchi in self.branches.items():
             if(E0i < branchErange[0] or E0i > branchErange[1]):
                 continue
+
+            branchi.CalcNormalizedSpectrum(nu_spectrum)
             si = branchi.spectrum
             fi = branchi.frac
-            # di = branchi.sigma_frac
 
-            branchi.BinnedSpectrum(nu_spectrum)
             self.spectrum += si * fi
             self.spectUnc += branchi.uncertainty*fi
 
@@ -600,7 +601,6 @@ class BetaIstp(Spectrum):
                     totalUnc += (branchi.uncertainty * fi)**2 + sigma_bij
                 else:
                     totalUnc += sigma_bij
-
 
         self.branchUnc = np.sqrt(self.branchUnc)
         self.uncertainty = np.sqrt(totalUnc)

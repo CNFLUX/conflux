@@ -365,8 +365,7 @@ class FissionIstp(Spectrum):
             thisyield = self.FPYlist[FPZAI].y                        
             thisistp = betaSpectraDB.istplist[FPZAI]
             
-            if processMissing==False and thisistp.missing:
-                continue
+            if thisistp.missing and not processMissing: continue
                         
             #Pull the beta spectrum and the beta uncertainties, add the product of the Beta Spectra and yield
             #To the total spectrum

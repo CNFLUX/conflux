@@ -15,7 +15,7 @@ def phase_space(W, W0, numass = 0, **kwargs):
 
     """
     nue = W0 - W - numass
-    return np.sqrt(W**2-1) * W * nue * np.sqrt(nue**2-numass**2)
+    return np.sqrt(np.clip(W**2-1, 0., None) * np.clip(nue**2-numass**2, 0., None)) * W * nue
 
 def fermi_function(W, Z, R, **kwargs):
     """Traditional Fermi Function

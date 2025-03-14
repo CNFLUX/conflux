@@ -81,6 +81,17 @@ class Spectrum:
                 error = self.uncertainty[i]
                 writer.writerow({'E':E, 'count':count, 'error':error})
 
+def integrate_trapezoid(xs, ys):
+    """integrate \int y dx points (sorted ascending x) by trapezoidal rule"""
+    assert len(xs) == len(ys)
+    if len(xs) < 2: return 0.
+
+    S = ys[0] * (xs[1] - xs[0])
+    for k in range(len(xs))[1:-1]:
+       S += ys[k]*(xs[k+1] - xs[k-1])
+    S += ys[-1] * (xs[-1] - xs[-2])
+
+    return 0.5*S
 
 class Summed:
     '''
