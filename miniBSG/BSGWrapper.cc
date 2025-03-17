@@ -9,6 +9,8 @@
 using std::vector;
 #include <map>
 using std::map;
+#include <array>
+using std::array;
 
 using namespace bsg;
 using namespace bsg::SpectralFunctions;
@@ -20,40 +22,6 @@ double py_phase_space(double W, double W0, double numass = 0) {
     double nue = W0 - W - numass;
     if(nue <= numass) return 0;
     return W * nue * sqrt((W*W - 1) * (nue*nue - numass*numass));
-}
-
-double py_finite_size_L0(double W, double Z, double R) {
-    return (
-            1
-            - ALPHA * Z * W * R
-            + 13./60 * ALPHA*ALPHA*Z*Z
-            - ALPHA*Z*R/W
-            );
-}
-
-double py_recoil_gamow_teller(double W, double W0, double A) {
-    double M = A * NUCLEON_MASS_KEV / ELECTRON_MASS_KEV;
-    double M2 = M*M;
-
-    double Ar0 = -2. * W0 / 3. / M - W0 * W0 / 6. / M2 - 77. / 18. / M2;
-    double Ar1 = -2. / 3. / M + 7. * W0 / 9. / M2;
-    double Ar2 = 10. / 3. / M - 28. * W0 / 9. / M2;
-    double Ar3 = 88. / 9. / M2;
-
-    return (1
-            +Ar0
-            +Ar1/W
-            +Ar2*W
-            +Ar3*W*W);
-}
-
-double py_recoil_Coulomb_gamow_teller(double W, double W0, double Z, double A) {
-    double M = A * NUCLEON_MASS_KEV / ELECTRON_MASS_KEV;
-    double p = sqrt(W*W - 1);
-
-    return (1
-            -ALPHA*Z*M_PI/M/p
-            *(1-1/3*(W0-W)/(3*W)));
 }
 
 double py_shape_factor_gamow_teller(double W, double Z, double W0, double R, double A, double b, double c, double d, double Lambda) {
@@ -82,73 +50,64 @@ double py_shape_factor_gamow_teller(double W, double Z, double W0, double R, dou
     return 1 + C0 + C1*W + Cm1/W + C2*W*W;
 }
 
-vector<double>& get_aNeg(int Z) {
+array<double,7>& get_aNeg(int Z) {
 
-    static map<int, vector<double>> m_aNeg;
+    static map<int, array<double,7>> m_aNeg;
     auto it = m_aNeg.find(Z);
     if(it != m_aNeg.end()) return it->second;
 
-    double bNeg[7][6];
-    bNeg[0][0] = 0.115;
-    bNeg[0][1] = -1.8123;
-    bNeg[0][2] = 8.2498;
-    bNeg[0][3] = -11.223;
-    bNeg[0][4] = -14.854;
-    bNeg[0][5] = 32.086;
-    bNeg[1][0] = -0.00062;
-    bNeg[1][1] = 0.007165;
-    bNeg[1][2] = 0.01841;
-    bNeg[1][3] = -0.53736;
-    bNeg[1][4] = 1.2691;
-    bNeg[1][5] = -1.5467;
-    bNeg[2][0] = 0.02482;
-    bNeg[2][1] = -0.5975;
-    bNeg[2][2] = 4.84199;
-    bNeg[2][3] = -15.3374;
-    bNeg[2][4] = 23.9774;
-    bNeg[2][5] = -12.6534;
-    bNeg[3][0] = -0.14038;
-    bNeg[3][1] = 3.64953;
-    bNeg[3][2] = -38.8143;
-    bNeg[3][3] = 172.1368;
-    bNeg[3][4] = -346.708;
-    bNeg[3][5] = 288.7873;
-    bNeg[4][0] = 0.008152;
-    bNeg[4][1] = -1.15664;
-    bNeg[4][2] = 49.9663;
-    bNeg[4][3] = -273.711;
-    bNeg[4][4] = 657.6292;
-    bNeg[4][5] = -603.7033;
-    bNeg[5][0] = 1.2145;
-    bNeg[5][1] = -23.9931;
-    bNeg[5][2] = 149.9718;
-    bNeg[5][3] = -471.2985;
-    bNeg[5][4] = 662.1909;
-    bNeg[5][5] = -305.6804;
-    bNeg[6][0] = -1.5632;
-    bNeg[6][1] = 33.4192;
-    bNeg[6][2] = -255.1333;
-    bNeg[6][3] = 938.5297;
-    bNeg[6][4] = -1641.2845;
-    bNeg[6][5] = 1095.358;
+    constexpr double bNeg[7][6] = {
+        {0.115, -1.8123, 8.2498, -11.223, -14.854, 32.086},
+        {-0.00062, 0.007165, 0.01841, -0.53736, 1.2691, -1.5467},
+        {0.02482, -0.5975, 4.84199, -15.3374, 23.9774, -12.6534},
+        {-0.14038, 3.64953, -38.8143, 172.137, -346.708, 288.787},
+        {0.008152, -1.15664, 49.9663, -273.711, 657.629, -603.703},
+        {1.2145, -23.9931, 149.972, -471.298, 662.191, -305.68},
+        {-1.5632, 33.4192, -255.133, 938.53, -1641.28, 1095.36}
+    };
 
-    vector<double> aNeg(7);
-    for (int i = 0; i < 7; i++) {
-        aNeg[i] = 0;
-        for (int j = 0; j < 6; j++) {
-            aNeg[i] += bNeg[i][j] * std::pow(ALPHA * Z, j + 1);
-        }
+    array<double,7> aNeg = {};
+    double c = 1;
+    for(int j = 0; j < 6; j++) {
+        c *= ALPHA*Z;
+        for(int i = 0; i < 7; i++) aNeg[i] += bNeg[i][j] * c;
     }
 
     return (m_aNeg[Z] = aNeg);
 }
 
+
+array<double,7>& get_aPos(int Z) {
+
+    static map<int, array<double,7>> m_aPos;
+    auto it = m_aPos.find(Z);
+    if(it != m_aPos.end()) return it->second;
+
+    constexpr double bPos[7][6] = {
+        {0.0701, -2.572, 27.5971, -128.658, 272.264, -214.925},
+        {-0.002308, 0.066463, -0.6407, 2.63606, -5.6317, 4.0011},
+        {0.07936, -2.09284, 18.4546, -80.9375, 160.838, -124.893},
+        {-0.93832, 22.0251, -197.002, 807.188, -1566.61, 1156.33},
+        {4.27618, -96.8241, 835.265, -3355.84, 6411.33, -4681.57},
+        {-8.2135, 179.086, -1492.13, 5872.54, -11038.7, 7963.47},
+        {5.4583, -115.892, 940.831, -3633.92, 6727.63, -4795.05}
+    };
+
+    array<double,7> aPos = {};
+    double c = 1;
+    for(int j = 0; j < 6; j++) {
+        c *= ALPHA * Z;
+        for(int i = 0; i < 7; i++) aPos[i] += bPos[i][j] * c;
+    };
+
+    return (m_aPos[Z] = aPos);
+}
+
+
 double BSG_FermiFunction(double W, double Z, double R) {
-    // normalization matching python
+    // normalization changed to match python version
     double g = sqrt(1 - ALPHA*ALPHA*Z*Z);
     return FermiFunction(W, Z, R, BETA_MINUS) * 2/(g+1);
-
-    //return FermiFunction(W, Z, R, BETA_MINUS);
 }
 
 double BSG_L0Correction(double W, int Z, double R) {
@@ -219,6 +178,8 @@ double lambda_k(double W, int Z, double R, int k) {
     :param Z: Proton number of the final nuclear state
 */
 double shape_factor_unique_forbidden(double W, int L, double W0, int Z, double R) {
+    if(!(W>1)) return 1;
+
     double pe = sqrt(W*W - 1.);
     double pnu = W0 - W;
     L = abs(L);
