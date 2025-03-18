@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # conflux modules
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionIstp
-from conflux.IBDXSection import ibd_xsection
+from conflux.IBDXSection import ibd_xsection_cm2
 
 E_fission = 3.2e-11                 # energy per fission, joules
 E_TNT = 4.184e9                     # energy per ton TNT, joules
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     U235.CalcBetaSpectra(betaSpectraDB)
     totalspect = U235.spectrum * test_flux # the full spectrum summed with all fission products
 
-    totalspect_ibd = totalspect*ibd_xsection(xbins) # the IBD detector spectrum
+    totalspect_ibd = totalspect*ibd_xsection_cm2(xbins) # the IBD detector spectrum
 
     # define the time windows of the calculation
     windows = np.linspace(0, 100, 101)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         spect_time.append(spect)
         spect_sum_t.append(100 * sum(cumuspect) / sum(totalspect))
         spect_sum_t_thresh.append(100 * sum(cumuspect[xbins > 1.8]) / sum(totalspect[xbins > 1.8]))
-        spect_sum_t_ibd.append(100 * sum(cumuspect*ibd_xsection(xbins)) / sum(totalspect_ibd))
+        spect_sum_t_ibd.append(100 * sum(cumuspect*ibd_xsection_cm2(xbins)) / sum(totalspect_ibd))
     
         ax.plot(xbins, cumuspect, label="%g s - %g s"%(begin, end))
         
