@@ -1,3 +1,8 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC. See the top-level NOTICE file for details.
+# Author: Xianyi Zhang
+
+# SPDX-License-Identifier: MIT
+
 # fission product and spectra summation engine
 
 # universal modules
