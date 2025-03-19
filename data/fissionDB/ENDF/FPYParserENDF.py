@@ -221,7 +221,6 @@ def ENDF6FPYreader(filename):
 if __name__ == "__main__":
     dirName = sys.argv[1]
     fileList = listdir(dirName)
-    #print(fileList)
     for filename in fileList:
         if filename.split('.')[-1] == 'endf':
             ENDF6FPYreader(dirName+filename)

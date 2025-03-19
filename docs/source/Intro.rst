@@ -1,19 +1,27 @@
-intro
+Introduction
 *****
 
 
 How Does CONFLUX Work?
 ======================
 
-The CONFLUX (Calculation Of Neutrino FLUX) software framework is built with the goal of simplifying and standardizing neutrino flux calculations. CONFLUX is packaged with three prediction modes:
+The CONFLUX (Calculation Of Neutrino FLUX) software framework is built with the goal to simplify and standardize neutrino flux calculations. CONFLUX is packaged with three prediction modes:
 
 - Summation mode
 - :math:`\beta` Conversion mode
-- Direct Experimental Measurement mode
+- Direct neutrino data mode
 
-All of which calculate the Neutrino spectrum in different ways. A block diagram of how the calculation is run is provided below.
+CONFLUX uses parsered nuclear data, theoretical beta/neutrino spectrum calclation, and existing beta/neutrino measurement from fissile isotopes to calculate reactor or beta decay neutrino productions. The full documentation has been published in BLAH. 
 
 .. image:: block_diagram.jpg
+
+CONFLUX was built aiming to help researchers with limited programming and nuclear data knowledge to calculate neutrino flux with ease. Features include:
+
+- Calculating neutrino spectrum and flux from customized model of nuclear reactor
+- Beta and neutrino spectrum with non-zero neutrino mass
+- Allow user input of covariance matrix among fission product yields
+- Neutrino flux evolution over time from independent fission yields
+- Calculating neutrino flux with customized beta decay function, updated nuclear data, or individually modified isotopic data
 
 Modes
 =====

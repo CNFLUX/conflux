@@ -34,14 +34,6 @@ Overview
 
 API Reference
 -------------
-.. toctree::
-   :maxdepth: 2
-
-   Basic
-   BetaEngine
-   FPYEngine
-   SumEngine
-   ConversionEngine
 
 
 Status

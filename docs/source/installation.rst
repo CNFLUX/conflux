@@ -57,8 +57,7 @@ CONFLUX comes with up to date Nuclear data databases for Fission Yields (ENDF/JE
 .. _FYCOM: https://nucleardata.berkeley.edu/FYCoM/index.html
 
 More on what each database does in the context of CONFLUX can be found in the introduction_ of this manual.
-Additionally, ``ENSDFparser.py`` , ``betdaDBxmlGen.py`` , and ``CovMatDownloader.py`` are all files that either download these databases to CONFLUX, or 
-help to make the databases more readable. 
+Additionally, ``ENSDFparser.py`` , ``betaDBxmlGen.py`` are prewritten programs that help the user to generate readable nuclear databases for the user, , and ``CovMatDownloader.py`` downloads the covdatabases to CONFLUX. 
 
 .. _introduction: 
 
@@ -69,7 +68,8 @@ Installation
 CONFLUX can be installed using pip
 
 .. code-block:: bash
-    pip install /path/to/conflux
+
+    pip3 install /path/to/conflux
 
 Make sure that after installation, the ``CONFLUX_DB`` environmental variable points to the ``data`` directory in the CONFLUX installation.
 Alternatively, you can define it in your ``.bashrc`` file
@@ -80,6 +80,7 @@ Execution
 Execution of CONFLUX is performed as with any other python file. an example running a Summation Engine is given below.
 
 .. code-block:: bash
-    python3 SumEngineExample.py
 
-Running this specific example will output a ``.png`` file with a U235 neutrino spectrum. How to extract other spectral information can be found within the various examples provided with CONFLUX.
+    python3 examples/SumEngineExample.py
+    
+Running this specific example will output a ``.pdf`` file with a U235 neutrino spectrum. How to extract other spectral information can be found within the various examples provided with CONFLUX.

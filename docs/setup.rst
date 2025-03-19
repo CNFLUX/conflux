@@ -1,4 +1,4 @@
-setup module
+`qqsetup module
 ============
 
 .. automodule:: setup
