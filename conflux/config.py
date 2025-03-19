@@ -1,3 +1,8 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC. See the top-level COPYRIGHT file for details.
+# Author: Xianyi Zhang
+
+# SPDX-License-Identifier: MIT
+
 import os
 
 # Load environment variables and provide default values if needed

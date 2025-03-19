@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 # fission product yield engine:
 # input: dictionary of fission fractions, with {'ZA', fission_fraction}
 # output: dictionary of fission yield isotopes, with {'ZA', isotope_fraction}

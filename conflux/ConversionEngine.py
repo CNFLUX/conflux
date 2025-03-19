@@ -1,3 +1,8 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC. See the top-level COPYRIGHT file for details.
+# Author: Xianyi Zhang
+
+# SPDX-License-Identifier: MIT
+
 # beta spectra conversion engine:
 # input: beta spectra measured on nuclear reactors
 # output: neutrino spectra of nuclear reactors
