@@ -5,3 +5,4 @@ iminuit
 tqdm
 fortranformat
 sphinx-autoapi
+sphinx_rtd_theme
