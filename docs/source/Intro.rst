@@ -79,8 +79,14 @@ ENSDF
 .. literalinclude:: ENSDF_example.txt
 
 
-FYCOM
+FyCOM
 -----
+Prepackaged example covariance and correlation matrices are included for the fission products from  U-235, U-238, Pu-239, and Pu-241, calculated by the work referred in https://nucleardata.berkeley.edu/FYCoM/, a MC calculation based on ENDF.B/VIII and JEFF-3.3.
+The user can download the referred covariance matrices by running
+
+.. code-block:: bash
+
+    python3 $CONFLUX_DB/CovMatDownloader.py
 
 Conversion Libraries
 --------------------
