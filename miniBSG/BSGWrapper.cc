@@ -209,18 +209,18 @@ double  BSG_beta_spectrum(
     c *= BSG_RecoilCorrection(W, W0, A);
     c *= BSG_QCorrection(W, W0, Z, A);
 
-
     // don't have this in BSG... porting from thecobs .py function
-    if(!L) c *= py_shape_factor_gamow_teller(W, Z, W0, R, A, A*4.7, 1.0, 0.0, 0.0);
-    else c *= shape_factor_unique_forbidden(W, L, W0, Z, R);
+    if(Z) {
+        if(!L) c *= py_shape_factor_gamow_teller(W, Z, W0, R, A, A*4.7, 1.0, 0.0, 0.0);
+        else c *= shape_factor_unique_forbidden(W, L, W0, Z, R);
+    }
 
     if(isNu) c *= BSG_NeutrinoRadiativeCorrection(W);
     else c *= BSG_RadiativeCorrection(W, W0, Z, R); // 7% effect, 1% +- 0.5% difference from thecobs
 
     c *= BSG_L0Correction(W, Z, R);
 
-    c *= BSG_AtomicScreeningCorrection(W, Z);
-
+    if(Z) c *= BSG_AtomicScreeningCorrection(W, Z);
 
     if(!(std::isfinite(c)) || c < 0) {
         printf("c = %g, W-1 = %g, W0 = %g, pf = %g, Z = %i R = %g, L = %i\n", c, W-1, W0, py_phase_space(W, W0), Z, R, L);

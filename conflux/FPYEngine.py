@@ -52,22 +52,27 @@ class FissionIstp(Spectrum):
         :type IFPY: bool, optional
 
         """
+
         self.Z = Z 
-        """Atomic number of your nuclide"""
+        """Atomic number of fissioning nuclide"""
+
         self.A = A
-        """Atomic mass of your nuclide"""
+        """Atomic mass of fissioning nuclide"""
+
         self.Ei = Ei
-        """The incident neutron energy to ignite fission"""
-        self.IFPY=IFPY
+        """The incident neutron energy (MeV) to ignite fission"""
+
+        self.IFPY = IFPY
         """Whether to calculate independent fission product yields"""
+
         self.FPYlist = {}
         """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
+
         self._DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
         """Dictionary of the two fission databases included in CONFLUX (can be downloaded using the file in the aux folder)"""
 
         self.LoadFissionDB(Ei=self.Ei, DB=DB)
 
-    # method that load xml database of FPY and save nuclide info in dictionaries.
     def LoadFissionDB(self, Ei=None, DB='ENDF'):
         """
         Load fission product yeilds with given incident neutron energy.
@@ -138,10 +143,11 @@ class FissionIstp(Spectrum):
                 for CONT in LIST:
                     FPZA = int(CONT.attrib['ZA'])
                     isomeric = float(CONT.attrib['FPS'])
+                    assert isomeric == int(isomeric)
                     Y = float(CONT.attrib['Y'])
                     DY = float(CONT.attrib['DY'])
                     #print(MT, Ei, FPZA, Y)
-                    FPZAI = FPZA*10+isomeric
+                    FPZAI = FPZA*10 + int(isomeric)
                     nuclide = FPNuclide(FPZAI, y=Y, yerr=DY)
                     nuclidelist[FPZAI] = nuclide
                     self.FPYlist = nuclidelist
@@ -334,7 +340,11 @@ class FissionIstp(Spectrum):
                 self.FPYlist[i].cov[j]=yerri*corr[j]*yerrj #carry out the covariance calculation
                 #(error of i) * (correlation of j) * (error of j)
 
-    def CalcBetaSpectra(self, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = np.inf, modelunc = True, silent = False):
+    def GetYields(self):
+        """Get [(ZAI, y), ...] summary of yields"""
+        return [(ZAI, I.y) for ZAI,I in self.FPYlist.items() if I.y > 0]
+
+    def CalcBetaSpectra(self, Es, betaSpectraDB, processMissing=False, ifp_begin = 0, ifp_end = np.inf, modelunc = True, silent = False):
         """
         Calculate the summed beta/neutrino spectrum of this fission isotope.
         
@@ -352,7 +362,7 @@ class FissionIstp(Spectrum):
         :type silent: bool, optional
 
         """
-        Spectrum.__init__(self, xbins=betaSpectraDB.xbins)
+        Spectrum.__init__(self, xbins = Es)
         betaSpectraList = {}
         betaUncertainty = {}
 
@@ -366,6 +376,7 @@ class FissionIstp(Spectrum):
         
         #Iterate through every fission product in the Reactor Model.
         for FPZAI in tqdm(self.betaFPYlist, desc="Summing beta/neutrino spectra for "+str(len(self.betaFPYlist))+ " fission products", disable=silent):
+
             # get the yield of the fission products
             thisyield = self.FPYlist[FPZAI].y                        
             thisistp = betaSpectraDB.istplist[FPZAI]
@@ -387,7 +398,7 @@ class FissionIstp(Spectrum):
             self.spectrum += betaSpectraList[FPZAI]*thisyield
 
         # Uncertainty calculation
-        #Have to make a 2D Lattice of every single combination of fission products i_j
+        # Have to make a 2D Lattice of every single combination of fission products i_j
         for i in tqdm(self.betaFPYlist, desc="Calculating uncertainties of "+str(len(self.betaFPYlist))+ " fission products"):
             for j in self.betaFPYlist:
                 
@@ -433,21 +444,23 @@ class FissionIstp(Spectrum):
 # this class saves nuclide info of fission products
 class FPNuclide:
     """
-    Class to save all fission product nuclides and their information.
-    
-    :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
-    :type FPZAI: int
-    :param y: The yeild of the fission product
-    :type y: float
-    :param yerr: The uncertainty of yield
-    :type yerr: float
-
+    Information on one fission product nuclide.
     """
     
-    def __init__(self, FPZAI, y, yerr):
+    def __init__(self, FPZAI: int, y: float, yerr: float):
+        """
+        Constructor for fission product info
 
-        self.Z = int(FPZAI/10000)
-        self.A = int((FPZAI-self.Z*10000)/10)
+        :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
+        :type FPZAI: int
+        :param y: The yeild of the fission product
+        :type y: float
+        :param yerr: The uncertainty of yield
+        :type yerr: float
+        """
+
+        self.Z = FPZAI//10000
+        self.A = (FPZAI-self.Z*10000)//10
         self.N = self.A-self.Z
         self.isomer = int(FPZAI-self.Z*10000-self.A*10)
         self.FPZAI = FPZAI

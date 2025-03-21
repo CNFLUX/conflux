@@ -368,7 +368,7 @@ class SumEngine(Spectrum, Summed):
             # for IFP calculation, adjust the decay rate of the target isotope
             # by the rate of isotope that are decayed in the time window
             if (ifp_begin < ifp_end):
-                adjustment = betaSpectraDB.istplist[FPZAI].decay_time_adjust(ifp_begin, ifp_end)
+                adjustment = betaSpectraDB.istplist[FPZAI].decay_fraction(ifp_begin, ifp_end)
                 thisyield *= adjustment
                 yielderr *= adjustment
 
@@ -399,8 +399,8 @@ class SumEngine(Spectrum, Summed):
                 #If we're doing an IFP calculation, calculate the adjustments need to be made to
                 #Both fission products.
                 if (ifp_begin < ifp_end):
-                    adjustmenti = betaSpectraDB.istplist[i].decay_time_adjust(ifp_begin, ifp_end)
-                    adjustmentj = betaSpectraDB.istplist[j].decay_time_adjust(ifp_begin, ifp_end)
+                    adjustmenti = betaSpectraDB.istplist[i].decay_fraction(ifp_begin, ifp_end)
+                    adjustmentj = betaSpectraDB.istplist[j].decay_fraction(ifp_begin, ifp_end)
 
                 #Pull the yields, yeild errors, the beta Spectra, and beta Spectral uncertainty
                 #For both fission products (i and j)
