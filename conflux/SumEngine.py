@@ -98,7 +98,7 @@ class SumEngine(Spectrum, Summed):
         assert len(isotope.xbins) == self.nbin, "binning of two spectra are different"
         assert istpname not in self.betaSpectraList.keys(), f"{istpname} already exists in the model, please set a different name"
 
-        self.istplist[istpname]=(isotope.id)
+        self.istplist[istpname]=(isotope.Z*1e4+isotope.A*10)
         self.betaSpectraList[istpname] = isotope.spectrum
         self.betaUncertainty[istpname] = isotope.uncertainty
         self.yieldUncList[istpname] = isotope.yieldUnc

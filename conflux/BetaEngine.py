@@ -8,6 +8,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from tqdm import tqdm
+import pandas as pd
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
@@ -880,9 +881,40 @@ class BetaEngine:
         """
     
         for ZAI,betaIstp in tqdm(self.istplist.items(),
-                                 desc="Calculating beta/neutrino spectra of "+str(len(self.istplist))+ " isotopes",
+                                 desc=f"Calculating beta/neutrino spectra of {len(self.istplist)} isotopes",
                                  disable=silent):
             if betaIstp.Q < branchErange[0] or betaIstp.Q > branchErange[1]:
                 continue
             betaIstp.CalcCovariance(GSF=GSF)
             betaIstp.SumSpectra(nu_spectrum, branchErange)
+            
+    def SaveToFile(self, filename):
+        spect_data = {}
+        spect_data["xbins"] = self.xbins
+        for ZAI,betaIstp in self.istplist.items():
+            spect_data[f"{ZAI}"] = betaIstp.spectrum
+            spect_data[f"{ZAI}_unc"] = betaIstp.uncertainty
+            
+        df = pd.DataFrame(spect_data)
+        df.to_csv(filename, index=False)
+            
+    def LoadFile(self, filename):
+        df = pd.read_csv(filename)
+        self.xbins = df["xbins"].values
+        
+        for col in df.columns:
+            if col == "xbins":
+                continue
+            elif not col.endswith("_unc"):
+                key = int(col)  # remove "_unc"
+                Z = key/1e4
+                A = (key-Z*1e4)/10
+                I = key-Z*1e4-A*10
+                newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
+                newistp.spectrum=df[col].values
+            if col.endswith("_unc"):
+                key = int(col[:-4])
+                newistp.unsertinaty=df[col].values        
+                self.istplist[key]=newistp
+                
+        print(f"Loaded spectra and uncertainties from {filename}")

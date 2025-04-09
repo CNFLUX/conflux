@@ -24,9 +24,11 @@ if __name__  == "__main__":
     #Ei, or the incident energy of the neutron that causes fission (0 - Thermal, .5 - Fast, 14 - relativistic)
     U235 = FissionIstp(92,235, Ei= 0)
     U235.LoadFissionDB()
+    
     #Load up the Correlation data, and calculate the Covariance matrix (both are done by calling LoadCorrelation).
     #Must be done after loading up the Fission Data
     U235.LoadCorrelation()
+    
     #I will quickly calculate the beta spectrum of U235. I have to calculate the U235 spectrum before calculating the
     #Total spectrum. If I add multiple isotopes to the Summation Engine, I will need each isotopes individual
     #Spectrum to be able to calcualte the total spectrum. I will get an error if I do not do this step before
