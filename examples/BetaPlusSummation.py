@@ -57,7 +57,7 @@ if __name__ == "__main__":
     for i in range(19, 76):
         TotalY.append(convertSpec[i])
         TotalUnc.append(convertUnc[i])
-    for i in range(75, len(e)):
+    for i in range(76, len(e)):
         TotalY.append(SumSpec[i])
         TotalUnc.append(SumUnc[i])
 
