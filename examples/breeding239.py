@@ -84,8 +84,10 @@ if __name__ == "__main__":
         SummationEngine.EditContribution(istpname="Pu239", count = row["Pu239"], d_count = 0)
         SummationEngine.EditContribution(istpname="Pu241", count = row["Pu241"], d_count = 0)
         
-        SummationEngine.EditContribution(istpname="U239", count = row["Pu239"]/0.64, d_count = 0)
-        SummationEngine.EditContribution(istpname="Np239", count = row["Pu239"]/0.64, d_count = 0)
+        # SummationEngine.EditContribution(istpname="U239", count = row["Pu239"]/0.64, d_count = 0)
+        # SummationEngine.EditContribution(istpname="Np239", count = row["Pu239"]/0.64, d_count = 0)
+        SummationEngine.EditContribution(istpname="U239", count = row["U238"]*5, d_count = 0)
+        SummationEngine.EditContribution(istpname="Np239", count = row["U238"]*5, d_count = 0)
         SummationEngine.CalcReactorSpectrum()
 
         #Plot the spectrum at the current timestep
@@ -104,4 +106,4 @@ if __name__ == "__main__":
     ax2.set_xscale('log')
     ax2.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$ (%)" )
 
-    plt.savefig("time_dependent_neutrino_flux.pdf")
+    plt.savefig("time_dependent_neutrino_flux_6.pdf")

@@ -19,10 +19,19 @@ test_flux = m_TNT * fissions_per_ton
 if __name__ == "__main__":
 
     xbins = np.arange(0, 13, 0.1)
-    
+
     # Calculate beta spectra of all beta unstable isotopes
     betaSpectraDB = BetaEngine(xbins=xbins)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+    filename = "fission_burst.csv"
+    try:
+        with open(filename, "r") as file:
+            betaSpectraDB.LoadFile(filename)
+    except FileNotFoundError:
+        print("File not found. Creating the file.")
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+        betaSpectraDB.SaveToFile(filename)
+    print("File created.")
+
 
     # Load the independent fission product yields from the JEFF database
     # Ei is set to be 0.4 MeV
@@ -52,7 +61,7 @@ if __name__ == "__main__":
         # calculate the beta spectra within different windows after the fission 
         begin = windows_log[i]
         end = windows_log[i+1]
-        U235.CalcBetaSpectra(betaSpectraDB, processMissing=False,  ifp_begin = begin,  ifp_end = end)
+        U235.CalcBetaSpectraOld(betaSpectraDB, processMissing=False,  ifp_begin=begin, ifp_end=end)
         spect = U235.spectrum * test_flux
         
         # add spectrum of each window to a cumulative spectrum
@@ -62,12 +71,13 @@ if __name__ == "__main__":
         spect_sum_t_thresh.append(100 * sum(cumuspect[xbins > 1.8]) / sum(totalspect[xbins > 1.8]))
         spect_sum_t_ibd.append(100 * sum(cumuspect*ibd_xsection_cm2(xbins)) / sum(totalspect_ibd))
     
-        ax.plot(xbins, cumuspect, label="%g s - %g s"%(begin, end))
+        ax.plot(xbins, spect, label="%g s - %g s"%(begin, end))
         
     ax.set(xlabel='E (MeV)', ylabel='neutrinos/MeV from %g ton yield'%m_TNT)
-    ax.plot(xbins, totalspect, label="total")
+    # ax.plot(xbins, totalspect, label="total")
+    ax.set_yscale("log")
     ax.legend()
-    fig.savefig("235U_ENDF_jeff_0.4_MeV_time.pdf")
+    fig.savefig("235U_ENDF_jeff_0.4_MeV_time_Old.pdf")
     
     # Drawing the total neutrino flux with respect to time 
     fig, ax = plt.subplots()
@@ -86,5 +96,5 @@ if __name__ == "__main__":
     
     plt.legend()
     plt.xscale('log')
-    fig.savefig("235U_ENDF_jeff_0.4_MeV_ratevstime_log.pdf")
+    fig.savefig("235U_ENDF_jeff_0.4_MeV_ratevstime_log_Old.pdf")
 

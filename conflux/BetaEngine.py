@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from copy import deepcopy
 from tqdm import tqdm
 import pandas as pd
+from scipy.integrate import solve_ivp
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
@@ -17,7 +18,6 @@ from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
                                            fermi_function, 
                                            finite_size_L0, 
-                                           finite_size_L0_simple,
                                            recoil_gamow_teller, 
                                            radiative_correction, 
                                            radiative_correction_neutrino,
@@ -40,6 +40,14 @@ def init_libBSG(libname = "libBSG.so"):
     libBSG.BSG_beta_spectrum.argtypes = [c_double, c_double, c_int, c_int, c_double, c_int, c_bool]
     libBSG.BSG_beta_spectrum.restype = c_double
     print("Calculations using BSG library", libname)
+
+def decay_rhs(t, N, lambdas):
+    """Bateman ODEs for a linear chain."""
+    dN = np.empty_like(N)
+    dN[0] = -lambdas[0] * N[0]
+    for i in range(1, N.size):
+        dN[i] =  lambdas[i-1] * N[i-1] - lambdas[i] * N[i]
+    return dN
 
 #########################################
 # Final neutrino and antineutrino spectra
@@ -659,7 +667,7 @@ class BetaIstp(Spectrum):
         for HL in HLs: rate *= 1 - 2**(-t/HL)
         return rate
     
-    def CalcDecayChain(self, betaSpectraDB, begin, end):
+    def CalcDecayChainOld(self, betaSpectraDB, begin, end):
         """
         Calculate the total spectrum of a beta-decay chain in a selected window.
         Assumes beta decays are 100% of allowed decays in chain.
@@ -667,9 +675,9 @@ class BetaIstp(Spectrum):
         :param betaSpectraDB: the spectrum database that saves all relavant spectra
         :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
         :param begin: begining of the window (in seconds)
-        :type begin: float, optional
+        :type begin: float
         :param end: end of the window (in seconds)
-        :type end: float, optional
+        :type end: float
         :return: summed, decay rate adjusted spectrum and uncertainty in the calculated window
         :rtype: :class:`numpy.array`
         """
@@ -693,7 +701,58 @@ class BetaIstp(Spectrum):
         self.decay_chain_uncertainty = np.sqrt(self.decay_chain_uncertainty)
         
         return self.decay_chain_spectrum, self.decay_chain_uncertainty
+    
+    def CalcDecayChain(self, betaSpectraDB, time):
+        """
+        Calculate the total spectrum of a beta-decay chain in a selected window.
+        Assumes beta decays are 100% of allowed decays in chain.
         
+        :param betaSpectraDB: the spectrum database that saves all relavant spectra
+        :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
+        :param time: the time stamp 
+        :type time: float
+        :return: summed, decay rate adjusted spectrum and uncertainty in the calculated window
+        :rtype: :class:`numpy.array`
+        """
+        generation = 0
+        isotopes = []
+        HLs = []
+
+        self.decay_chain_spectrum = np.zeros(len(betaSpectraDB.xbins))
+        self.decay_chain_uncertainty = np.zeros(len(betaSpectraDB.xbins))
+        
+        # Look for the decay daughters; if they are also beta-unstable, continue to the next generation
+        while self.daughterZAI(generation) in betaSpectraDB.istplist.keys():
+            currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
+            isotopes.append(self.daughterZAI(generation))
+            HLs.append(currentistp.HL)
+            
+            generation += 1
+        
+
+        lambdas = np.log(2)/np.array(HLs)
+        N0 = np.zeros(len(lambdas))
+        N0[0] = 1
+        # Calculating the decay rate
+        sol = solve_ivp(decay_rhs,
+                t_span=(0, time),
+                y0=N0,
+                args=(lambdas,),
+                t_eval=[time],
+                atol=1e-12, rtol=1e-10)
+        N_t = sol.y[:, 0] 
+        # print(f"decay constants: {lambdas}")
+        decayrates = lambdas*N_t
+        # print(f"decay rates at time: {decayrates}")
+        for i in range(len(isotopes)):
+            ZAI = isotopes[i]
+            decayrate = decayrates[i]
+            self.decay_chain_spectrum += decayrate * betaSpectraDB.istplist[ZAI].spectrum
+            self.decay_chain_uncertainty += (decayrate * betaSpectraDB.istplist[ZAI].uncertainty)**2
+
+        self.decay_chain_uncertainty = np.sqrt(self.decay_chain_uncertainty)
+
+        return self.decay_chain_spectrum, self.decay_chain_uncertainty
 
 
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
@@ -910,11 +969,11 @@ class BetaEngine:
                 Z = key/1e4
                 A = (key-Z*1e4)/10
                 I = key-Z*1e4-A*10
-                newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
-                newistp.spectrum=df[col].values
+                # newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
+                self.istplist[key].spectrum=df[col].values
             if col.endswith("_unc"):
                 key = int(col[:-4])
-                newistp.unsertinaty=df[col].values        
-                self.istplist[key]=newistp
+                self.istplist[key].unsertinaty=df[col].values        
+                # self.istplist[key]=newistp
                 
         print(f"Loaded spectra and uncertainties from {filename}")

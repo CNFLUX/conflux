@@ -1,4 +1,16 @@
-# universal modules
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Author: Xianyi Zhang, LLNL <zhang39@llnl.gov>
+# License: MIT License
+#
+# Description:
+#   Generate CONFLUX xml format nuclear structure dataset for B- DECAY ONLY
+#
+# Usage:
+#   python ENSDFparser.py <ENSDF folder path>
+
+# # universal modules
 import sys
 from xml.dom import minidom
 from os import listdir, environ
