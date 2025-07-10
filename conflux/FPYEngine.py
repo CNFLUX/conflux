@@ -31,7 +31,7 @@ class FissionIstp(Spectrum):
     """The atomic mass of isotope"""
     Ei: float
     """Incident neutron energy"""
-    IFPY: float=False
+    IFPY: bool=False
     """Whether to calculate independent fission product yields"""
     FPYlist: dict
     """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
@@ -388,7 +388,7 @@ class FissionIstp(Spectrum):
 
         # Uncertainty calculation
         #Have to make a 2D Lattice of every single combination of fission products i_j
-        for i in tqdm(self.betaFPYlist, desc="Calculating uncertainties of "+str(len(self.betaFPYlist))+ " fission products"):
+        for i in tqdm(self.betaFPYlist, desc="Calculating uncertainties of "+str(len(self.betaFPYlist))+ " fission products", disable=silent):
             for j in self.betaFPYlist:
                 
                 if (processMissing==False and 
@@ -425,7 +425,7 @@ class FissionIstp(Spectrum):
 
                 self.uncertainty += variance_ij
                 
-        print(f'length {len(betaSpectraList)}')
+        # print(f'length {len(betaSpectraList)}')
         self.yieldUnc = np.sqrt(self.yieldUnc)
         self.modelUnc = np.sqrt(self.modelUnc)
         self.uncertainty = np.sqrt(self.uncertainty)

@@ -10,6 +10,7 @@ from copy import deepcopy
 from tqdm import tqdm
 import pandas as pd
 from scipy.integrate import solve_ivp
+from scipy.linalg import expm
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
@@ -729,21 +730,20 @@ class BetaIstp(Spectrum):
             
             generation += 1
         
-
         lambdas = np.log(2)/np.array(HLs)
-        N0 = np.zeros(len(lambdas))
+        k = len(lambdas)
+        A = np.zeros((k, k))
+        for i, lam in enumerate(lambdas):
+            A[i, i] = -lam
+            if i > 0:
+                A[i, i-1] = lambdas[i-1]
+
+        N0 = np.zeros(k)
         N0[0] = 1
-        # Calculating the decay rate
-        sol = solve_ivp(decay_rhs,
-                t_span=(0, time),
-                y0=N0,
-                args=(lambdas,),
-                t_eval=[time],
-                atol=1e-12, rtol=1e-10)
-        N_t = sol.y[:, 0] 
-        # print(f"decay constants: {lambdas}")
+        N_t = expm(A * time).dot(N0)
+
         decayrates = lambdas*N_t
-        # print(f"decay rates at time: {decayrates}")
+
         for i in range(len(isotopes)):
             ZAI = isotopes[i]
             decayrate = decayrates[i]
