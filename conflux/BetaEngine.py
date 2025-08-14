@@ -973,7 +973,7 @@ class BetaEngine:
                 self.istplist[key].spectrum=df[col].values
             if col.endswith("_unc"):
                 key = int(col[:-4])
-                self.istplist[key].unsertinaty=df[col].values        
+                self.istplist[key].uncertainty=df[col].values        
                 # self.istplist[key]=newistp
                 
         print(f"Loaded spectra and uncertainties from {filename}")
