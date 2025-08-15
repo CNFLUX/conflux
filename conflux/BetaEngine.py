@@ -622,8 +622,7 @@ class BetaIstp(Spectrum):
 
     def Display(self):
         """Display vital isotope property and branch information."""
-        print('Beta isotope: '+self.name+', ZAI = '+str(self.ZAI)+', Q = '
-            +str(self.Q)+" MeV, " +str(len(self.branches))+" branches")
+        print(f"Beta isotope: {self.name}, ZAI = {self.ZAI}, Q = {self.Q} MeV, HL = {self.HL}, {len(self.branches)} branches")
         for E0, branch in self.branches.items():
             branch.Display()
 
@@ -649,7 +648,7 @@ class BetaIstp(Spectrum):
         :return: The ZAI of the decay daughter
         :rtype: int
         """
-        return (self.Z+gen)*1e4 + self.A*10 + (0 if not gen else self.I)
+        return (self.Z+gen)*1e4 + self.A*10 + (0 if gen else self.I)
     
     def decay_fraction(self, t, HLs):
         """
@@ -727,7 +726,7 @@ class BetaIstp(Spectrum):
             currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
             isotopes.append(self.daughterZAI(generation))
             HLs.append(currentistp.HL)
-            
+
             generation += 1
         
         lambdas = np.log(2)/np.array(HLs)
@@ -974,6 +973,5 @@ class BetaEngine:
             elif col.endswith("_unc"):
                 key = int(col[:-4])
                 self.istplist[key].uncertainty=df[col].values 
-                print(f"test: {sum(self.istplist[key].uncertainty)}")      
                 
         print(f"Loaded spectra and uncertainties from {filename}")
