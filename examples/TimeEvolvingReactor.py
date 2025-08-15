@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from copy import deepcopy
+
 if __name__ == "__main__":
     # Load in the Fission Data for our fissile isotopes.
     # Also load up the energy range array
@@ -24,8 +26,17 @@ if __name__ == "__main__":
     binwidth = e[1]-e[0]
 
     #Load up the BetaSpectrum, and Calculate the beta spectrum for our fission products.
-    betaSpectraDB = BetaEngine(xbins=e)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0,15])
+    # # Calculate beta spectra of all beta unstable isotopes
+    xbins = e
+    betaSpectraDB = BetaEngine(xbins=xbins)
+    filename = "beta_spectra.csv"
+    try:
+        with open(filename, "r") as file:
+            betaSpectraDB.LoadFile(filename)
+    except FileNotFoundError:
+        print("File not found. Creating the file.")
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+        betaSpectraDB.SaveToFile(filename)
     U235.CalcBetaSpectra(betaSpectraDB)
     U238.CalcBetaSpectra(betaSpectraDB)
     Pu239.CalcBetaSpectra(betaSpectraDB)
@@ -44,11 +55,14 @@ if __name__ == "__main__":
     #read out the first line which should be the isotope names that are being fed into our simulation
     #As well as the # of Days (This is the Header)
 
-    fig, (ax1, ax2) = plt.subplots(2)
+    fig, (ax1, ax2, ax3) = plt.subplots(3)
+    fig.set_figheight(10)
+    fig.set_figwidth(8)
 
     days = []
     ratio_to_day_0 = []
 
+    count = 0
     #Next, I iterate through the lines in the csv file
     for index, row in df.iterrows():
         #Figure out what day we are doing the calculation for
@@ -68,16 +82,23 @@ if __name__ == "__main__":
         #Plot the spectrum at the current timestep
         sumX = SummationEngine.xbins
         sumY = SummationEngine.spectrum
+        if count == 0:
+            first_spec = deepcopy(sumY)
         days.append(name)
         ratio_to_day_0.append(sum(sumY)*binwidth)
         Labelmaker = "Reactor on for " + str(name) + " days"
         ax1.plot(sumX, sumY, label = Labelmaker)
+        ax2.plot(sumX, sumY/first_spec, label=Labelmaker)
+        count+=1
 
     #Plotting
     ax1.legend()
     ax1.set(xlabel="E (MeV)", ylabel="neurtino/MeV")
-    ax2.plot(days, np.array(ratio_to_day_0)/ratio_to_day_0[0]*100, 'bo')
-    ax2.set_xscale('log')
-    ax2.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$ (%)" )
+
+    ax2.set(xlabel="E (MeV)", ylabel="relative to first period")
+
+    ax3.plot(days, np.array(ratio_to_day_0)/ratio_to_day_0[0]*100, 'bo')
+    ax3.set_xscale('log')
+    ax3.set(xlabel = "Days since reactor on", ylabel=r"${\phi}_x / {\phi}_0$ (%)" )
 
     plt.savefig("time_dependent_neutrino_flux.pdf")

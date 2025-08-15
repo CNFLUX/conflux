@@ -12,11 +12,25 @@ if __name__  == "__main__":
     #the calculation is being set from 0 MeV-15 MeV with 100keV bins
 
     e = np.arange(0, 15., 0.1)
-    
+
+    xbins = e
+
+    # # Calculate beta spectra of all beta unstable isotopes
+    betaSpectraDB = BetaEngine(xbins=xbins)
+    filename = "beta_spectra.csv"
+    try:
+        with open(filename, "r") as file:
+            betaSpectraDB.LoadFile(filename)
+    except FileNotFoundError:
+        print("File not found. Creating the file.")
+        betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+        betaSpectraDB.SaveToFile(filename)
+    print("File created.")
+        
     #First, load the BetaEngine and calculate the spectral shapes of all fission branches. This is
     #now our Beta Spectra Database, that we will input into our fission model. 
-    betaSpectraDB = BetaEngine(xbins = e)
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+    # betaSpectraDB = BetaEngine(xbins = e)
+    # betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
     
     #initialize the Isotopes that you would like to use in your
     #Reaction and load them into the Database. Here, remember that the
@@ -52,6 +66,8 @@ if __name__  == "__main__":
     #And here I will pull out the uncertainties and spectrum from my reactor engine, to plot the spectrum and uncertainties.
     spectrum = SummationEngine.spectrum
     uncertainty = SummationEngine.uncertainty
+    FPY_uncertainty = SummationEngine.yieldUnc
+    model_uncertainty = SummationEngine.modelUnc
 
     #Draw the SummationEngineing spectra
     fig = plt.figure()
@@ -59,9 +75,12 @@ if __name__  == "__main__":
     #Here, I am plotting all the individual beta branches that make up the totality of the
     #Reactor spectrum. It is a good visualization of what the "ab-initio" method does when
     #Making it's neutrino prediction
+    loopcount = 0
     for FPZAI in set(SummationEngine.FPYlist.keys()).intersection(betaSpectraDB.istplist.keys()):
         individualBranch = SummationEngine.FPYlist[FPZAI].y * betaSpectraDB.istplist[FPZAI].spectrum
-        plt.plot(e, individualBranch)
+        label = "Individual FP spectra" if loopcount == 0 else "_nolegend_"
+        plt.plot(e, individualBranch, linestyle="--", color="grey", label=label)
+        loopcount += 1
 
 
     #This is the plotting of the total spectrum
@@ -73,3 +92,19 @@ if __name__  == "__main__":
     plt.ylabel("neutrinos/MeV/Fission")
     fig.savefig("summation_neutrino_spectrum.pdf")
 
+    #Draw the relative uncertainty 
+    rel_err_tot = uncertainty/spectrum*100
+    rel_err_mod = model_uncertainty/spectrum*100
+    rel_err_fpy = FPY_uncertainty/spectrum*100
+    fig = plt.figure()
+    # plt.plot(e, rel_err_tot, label='total uncertainty')
+    # plt.plot(e, rel_err_mod, label='beta uncertainty')
+    # plt.plot(e, rel_err_fpy, label='FPY uncertainty')
+    plt.fill_between(e, rel_err_tot, -rel_err_tot, label='total uncertainty', alpha=0.4)
+    plt.fill_between(e, rel_err_mod, -rel_err_mod, label='beta model uncertainty', alpha=0.4)
+    plt.fill_between(e, rel_err_fpy, -rel_err_fpy, label='FPY uncertainty', alpha=0.4)
+    plt.ylim([-100, 100])
+    plt.legend()
+    plt.xlabel("E (MeV)")
+    plt.ylabel("Relative error (%)")
+    fig.savefig("relative_summation_uncertainty.pdf")

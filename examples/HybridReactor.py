@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     #While I'm at it, I will initailize an energy range, and calculate the neutrino spectrum of my Fission Products
     #With the BetaEngine
-    e = np.arange(0., 20., 0.1)
+    e = np.arange(0., 14., 0.1)
     betaSpectraDB = BetaEngine(xbins = e)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True, branchErange=[0.0, 20.0])
 

@@ -7,7 +7,7 @@ import numpy as np
 
 if __name__ == "__main__":
 
-    e = np.arange(0., 20., 0.1)
+    e = np.arange(0., 14., 0.1)
 
 
     beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     plt.errorbar(e, totalSpec, totalUnc, fmt="-r",label="Combined")
     plt.yscale("log")
     plt.xlabel("Energy (MeV)")
-    plt.ylabel("neutrino/MeV/Fission)$")
+    plt.ylabel("neutrino/MeV/Fission")
     plt.ylim([1e-6, 10])
     plt.legend()
 

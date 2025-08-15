@@ -369,6 +369,8 @@ class FissionIstp(Spectrum):
             # get the yield of the fission products
             thisyield = self.FPYlist[FPZAI].y                        
             thisistp = betaSpectraDB.istplist[FPZAI]
+            # print("spectrum test", sum(betaSpectraDB.istplist[FPZAI].spectrum))
+            # print("uncertainty test", sum(betaSpectraDB.istplist[FPZAI].uncertainty))
             
             if thisistp.missing and not processMissing: continue
                         

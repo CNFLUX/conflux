@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     U235E = FissionIstp(92, 235, Ei=0, DB='ENDF')
     U235J = FissionIstp(92, 235, Ei=0, DB='JEFF')
-    e = np.arange(0,20,0.1)
+    e = np.arange(0,14,0.1)
     BetaSpectraDB = BetaEngine(xbins = e)
     BetaSpectraDB.CalcBetaSpectra(nu_spectrum=False)
     U235E.CalcBetaSpectra(BetaSpectraDB)

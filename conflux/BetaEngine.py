@@ -971,9 +971,9 @@ class BetaEngine:
                 I = key-Z*1e4-A*10
                 # newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
                 self.istplist[key].spectrum=df[col].values
-            if col.endswith("_unc"):
+            elif col.endswith("_unc"):
                 key = int(col[:-4])
-                self.istplist[key].unsertinaty=df[col].values        
-                # self.istplist[key]=newistp
+                self.istplist[key].uncertainty=df[col].values 
+                print(f"test: {sum(self.istplist[key].uncertainty)}")      
                 
         print(f"Loaded spectra and uncertainties from {filename}")
