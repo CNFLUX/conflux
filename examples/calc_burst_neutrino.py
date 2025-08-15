@@ -32,7 +32,9 @@ except FileNotFoundError:
     betaSpectraDB.SaveToFile(filename)
 print("File created.")
 
-# Declare all fissile isotopes
+# Declare all fissile isotopes, using the JEFF database
+# NOTICE: if using the ENDF, the fast neutron energy should 
+# be set to 0.5 MeV
 FPY_DB_name = "JEFF"
 fissile_istps = {}
 
@@ -44,13 +46,13 @@ fissile_istps["U238_fast"] = FissionIstp(92, 238, 0.4, DB=FPY_DB_name, IFPY=True
 fissile_istps["U238_fast"].LoadFissionDB(DB = FPY_DB_name)
 fissile_istps["U238_fast"].LoadCorrelation(DB = FPY_DB_name)
 
-fissile_istps["Pu239"] = FissionIstp(94, 239, 0., DB=FPY_DB_name, IFPY=True)
-fissile_istps["Pu239"].LoadFissionDB(DB = FPY_DB_name)
-fissile_istps["Pu239"].LoadCorrelation(DB = FPY_DB_name)
+fissile_istps["Pu239_thermal"] = FissionIstp(94, 239, 0., DB=FPY_DB_name, IFPY=True)
+fissile_istps["Pu239_thermal"].LoadFissionDB(DB = FPY_DB_name)
+fissile_istps["Pu239_thermal"].LoadCorrelation(DB = FPY_DB_name)
 
-fissile_istps["Pu241"] = FissionIstp(94, 241, 0., DB=FPY_DB_name, IFPY=True)
-fissile_istps["Pu241"].LoadFissionDB(DB = FPY_DB_name)
-fissile_istps["Pu241"].LoadCorrelation(DB = FPY_DB_name)
+fissile_istps["Pu241_thermal"] = FissionIstp(94, 241, 0., DB=FPY_DB_name, IFPY=True)
+fissile_istps["Pu241_thermal"].LoadFissionDB(DB = FPY_DB_name)
+fissile_istps["Pu241_thermal"].LoadCorrelation(DB = FPY_DB_name)
 
 logedges = np.logspace(-10, 9, num=100)
 # logedges = np.insert(logedges, 0, 0.0)
