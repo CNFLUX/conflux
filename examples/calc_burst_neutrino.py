@@ -54,17 +54,20 @@ fissile_istps["Pu241_thermal"] = FissionIstp(94, 241, 0., DB=FPY_DB_name, IFPY=T
 fissile_istps["Pu241_thermal"].LoadFissionDB(DB = FPY_DB_name)
 fissile_istps["Pu241_thermal"].LoadCorrelation(DB = FPY_DB_name)
 
-logedges = np.logspace(-10, 9, num=100)
+logedges = np.logspace(-9, 9, num=100)
 # logedges = np.insert(logedges, 0, 0.0)
 
 # calculate the burst fission of every fissile isotopes
 for key in fissile_istps.keys():
     time_labels = [f"{t}" for t in logedges]    
     col_labels  = [f"{j}" for j in (xbins)] 
-    data = np.empty((len(logedges), len(xbins)))
-    outname = f'{CONFLUX_DB}/example_models/{key}_burst_fission_neutrino.csv'
+    spectrum = np.empty((len(logedges), len(xbins)))
+    uncertainty = np.empty((len(logedges), len(xbins)))
+    outname = f'{key}_burst_fission_neutrino'
+    spectfile = f'{CONFLUX_DB}/example_models/{outname}.csv'
+    uncfile = f'{CONFLUX_DB}/example_models/{outname}_unc.csv'
     try:
-        with open(outname, "r") as file:
+        with open(spectfile, "r") as file:
             continue
     except FileNotFoundError:
         print(f"Calculting burst fission spectrum of {key}")
@@ -74,11 +77,19 @@ for key in fissile_istps.keys():
             fissile_istps[key].CalcBetaSpectra(betaSpectraDB, 
                                                processMissing=False,  
                                                time=tau, silent=False)
-            data[i] = (fissile_istps[key].spectrum)
+            spectrum[i] = (fissile_istps[key].spectrum)
+            uncertainty[i] = (fissile_istps[key].uncertainty)
 
-        df = pd.DataFrame(data,
+        df_spect = pd.DataFrame(spectrum,
                         index=time_labels,
                         columns=col_labels)
-        df.index.name = 'time_s'   
+        df_spect.index.name = 'time_s'   
 
-        df.to_csv(outname)
+        df_spect.to_csv(spectfile)
+
+        df_unc = pd.DataFrame(uncertainty,
+                        index=time_labels,
+                        columns=col_labels)
+        df_unc.index.name = 'time_s'   
+
+        df_unc.to_csv(uncfile)

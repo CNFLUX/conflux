@@ -741,6 +741,8 @@ class BetaIstp(Spectrum):
         N0[0] = 1
         N_t = expm(A * time).dot(N0)
 
+        print("N_t", N_t)
+
         decayrates = lambdas*N_t
 
         for i in range(len(isotopes)):
