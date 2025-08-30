@@ -353,7 +353,6 @@ class BetaBranch(Spectrum):
             'Lambda': 0.0,
             'l': screening_potential(self.Z)
         }
-        print(self.Z, self.Parameters['W0'], self.E0)
  
         if (nu_spectrum == True):
             function = lambda e: ((1-self.mixing)*neutrino(e, self.Parameters)
@@ -447,7 +446,6 @@ class BetaBranch(Spectrum):
 
         ecfrac = self.ecfrac
         sigma_ecfrac = self.sigma_ecfrac
-        print(ecfrac, sigma_ecfrac)
         shellfrac = []
         for shell, xray_edge in xray_edges.items():
             omega = 0
@@ -839,9 +837,9 @@ class BetaIstp(Spectrum):
 # BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
 # spectra of all tallied branches
 # if inputlist is not given, load the entire betaDB from the default betaDB
-class BetaEngine:
+class BetaPlusEngine:
     """
-    BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra of all tallied branches.
+    BetaPlusEngine tallys beta branches in the betaDB and calculate theoretical beta spectra of all tallied branches.
     """
     inputlist: list[int] = None
     """A list of isotopes. If the inputlist is not given, load the entire betaDB from the default betaDB."""
