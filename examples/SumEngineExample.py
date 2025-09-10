@@ -1,5 +1,5 @@
-from conflux.BetaEngine import BetaEngine
-from conflux.FPYEngine import FissionModel, FissionIstp
+from conflux.BetaEngine import BetaEngine, CONFLUX_DB
+from conflux.FPYEngine import FissionIstp
 from conflux.SumEngine import SumEngine
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,9 +15,10 @@ if __name__  == "__main__":
 
     xbins = e
 
-    # # Calculate beta spectra of all beta unstable isotopes
+    # Calculate beta spectra of all beta unstable isotopes
     betaSpectraDB = BetaEngine(xbins=xbins)
-    filename = "beta_spectra.csv"
+    # trying to load the default neutrino spectra. If not found, calculate the data
+    filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
     try:
         with open(filename, "r") as file:
             betaSpectraDB.LoadFile(filename)

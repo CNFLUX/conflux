@@ -20,12 +20,13 @@ if __name__ == "__main__":
 
     #Load up a list of isotopes I want to calculate
     istplist = [
-        40070, 
-        60100,
+        # 40070, 
+        # 60100,
         90180, 
         220450,
-        521180, 
-        822000
+        # 521180, 
+        # 822000,
+        # 471030
         ]
 
     #Load up the BetaEngine, and pass the isotope list above into the BetaEngine

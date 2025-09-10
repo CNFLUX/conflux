@@ -90,7 +90,9 @@ def _p_nu_spectrum(p, isNu, numass = 0):
     """
 
     np.seterr(divide='ignore', invalid='ignore', over='ignore')
-
+    
+    # flipping the sign of Z to calculate beta+ fermi function.
+    p["Z"] *= -1
     if libBSG is not None:
         # determine which inputs are arrays
         array_n = 0
@@ -100,16 +102,15 @@ def _p_nu_spectrum(p, isNu, numass = 0):
                 n = len(p[k])
                 assert array_n == 0 or n == array_n
                 array_n = n
-
         if not array_n:
-            res = libBSG.BSG_beta_spectrum(p["We"], p["W0"], p["A"], -p["Z"], p["R"], p['L'], isNu)
+            res = libBSG.BSG_beta_spectrum(p["We"], p["W0"], p["A"], p["Z"], p["R"], p['L'], isNu)
         else:
             res = np.zeros(array_n)
             for i in range(array_n):
                 res[i] = libBSG.BSG_beta_spectrum(
                     p['We'][i] if isarray['We'] else p['We'],
                     p['W0'][i] if isarray['W0'] else p['W0'],
-                    p['A'], -p['Z'], p['R'], p['L'], isNu)
+                    p['A'], p['Z'], p['R'], p['L'], isNu)
 
         return res
 
