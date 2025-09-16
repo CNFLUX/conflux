@@ -272,7 +272,7 @@ class DecayBranch:
 def ENSDFbeta(fileList):
     xmloutput = XMLedit()
     for filename in tqdm(fileList):
-        inputfile = open(dirName+filename, "r", errors='replace')
+        inputfile = open(f"{dirName}/{filename}", "r", errors='replace')
 
         lastline = ""
         betabool = False
@@ -343,15 +343,14 @@ def ENSDFbeta(fileList):
                         else:
                             forbid_str = forbid_str+","+dspin_str
                     # save the decay branch information
-                    xmloutput.editBranch(str("{:.3f}".format(decaybranch.fraction)), 
-                                         str("{:.3f}".format(decaybranch.E0)), 
+                    xmloutput.editBranch(str("{:.4f}".format(decaybranch.fraction)), 
+                                         str("{:.4f}".format(decaybranch.E0)), 
                                          forbid_str, 
-                                         str("{:.3f}".format(decaybranch.sigma_frac)), 
-                                         str("{:.3f}".format(decaybranch.sigma_E0)))
+                                         str("{:.4f}".format(decaybranch.sigma_frac)), 
+                                         str("{:.4f}".format(decaybranch.sigma_E0)))
                     lastline = line
-                    #print(lastline)
 
-    xmloutput.saveXML("ENSDFbetaDB3.xml")
+    xmloutput.saveXML("ENSDFbetaDB_250804.xml")
 
     return 0
 

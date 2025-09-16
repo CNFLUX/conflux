@@ -1,2 +1,3 @@
 build/
 conflux.egg-info/
+conflux/__pycache__/

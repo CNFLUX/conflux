@@ -54,7 +54,7 @@ def betaDBReader(filename):
             else:
                 xmloutput.editBranch(fraction, end_point_E, forbideness)
 
-	xmloutput.saveXML("betaDB.xml")
+        xmloutput.saveXML("betaDB.xml")
 
     return 0
 
