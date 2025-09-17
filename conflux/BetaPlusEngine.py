@@ -846,8 +846,8 @@ class BetaPlusEngine:
     """A list of isotopes. If the inputlist is not given, load the entire betaDB from the default betaDB."""
     istplist: dict
     """A dictionary of isotopes. istplist contain keys as the ZAI number of the isotope and values being :class:`conflux.BetaEngine.BetaIstp`"""
-    targetDB: str = CONFLUX_DB+"/betaDB/ENSDFbetaDB2.xml"
-    """The file name of beta decay data base, defaults to CONFLUX_DB+`/betaDB/ENSDFbetaDB2.xml'"""
+    targetDB: str = CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml"
+    """The file name of beta decay data base, defaults to CONFLUX_DB+`/betaDB/ENSDFbetaDB_EC_250804.xml'"""
     xbins: np.ndarray
     """The spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)"""
     custom_func: callable = None
@@ -859,7 +859,7 @@ class BetaPlusEngine:
     
     def __init__(self, 
                  inputlist=None, 
-                 targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC.xml",
+                 targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None,
                  numass=0,
@@ -875,7 +875,7 @@ class BetaPlusEngine:
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC.xml", missingBranch = 3):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml", missingBranch = 3):
         """
         Load default or input betaDB to obtain beta decay informtion. A customed DB must follow the same format as the default DB.
         
@@ -1051,9 +1051,9 @@ class BetaPlusEngine:
                 continue
             elif not col.endswith("_unc"):
                 key = int(col)  # remove "_unc"
-                Z = key/1e4
-                A = (key-Z*1e4)/10
-                I = key-Z*1e4-A*10
+                Z = int(key/1e4)
+                A = int((key-Z*1e4)/10)
+                I = int(key-Z*1e4-A*10)
                 # newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
                 self.istplist[key].spectrum=df[col].values
             elif col.endswith("_unc"):
