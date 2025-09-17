@@ -12,24 +12,14 @@ xbins = np.arange(0, 15, 0.01)
 
 # Calculate beta spectra of all beta unstable isotopes
 betaSpectraDB = BetaEngine(xbins=xbins)
-filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
-try:
-    with open(filename, "r") as file:
-        betaSpectraDB.LoadFile(filename)
-except FileNotFoundError:
-    print("File not found. Creating the file.")
-    betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
-    betaSpectraDB.SaveToFile(filename)
-print("File created.")
+filename = f"{CONFLUX_DB}/default_neutrino_spectra_V2.csv"
+betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+betaSpectraDB.SaveToFile(filename)
+print(f"File {filename} created.")
 
 # Calculate beta spectra of all beta unstable isotopes
 betaplusSpectraDB = BetaPlusEngine(xbins=xbins)
-filename2 = f"{CONFLUX_DB}/default_ec_neutrino_spectra.csv"
-try:
-    with open(filename, "r") as file:
-        betaSpectraDB.LoadFile(filename2)
-except FileNotFoundError:
-    print("File not found. Creating the file.")
-    betaplusSpectraDB.CalcBetaSpectra(nu_spectrum=True)
-    betaplusSpectraDB.SaveToFile(filename2)
-print("File created.")
+filename2 = f"{CONFLUX_DB}/default_ec_neutrino_spectra_V2.csv"
+betaplusSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+betaplusSpectraDB.SaveToFile(filename2)
+print(f"File {filename2} created.")

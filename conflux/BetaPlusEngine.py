@@ -1051,9 +1051,9 @@ class BetaPlusEngine:
                 continue
             elif not col.endswith("_unc"):
                 key = int(col)  # remove "_unc"
-                Z = key/1e4
-                A = (key-Z*1e4)/10
-                I = key-Z*1e4-A*10
+                Z = int(key/1e4)
+                A = int((key-Z*1e4)/10)
+                I = int(key-Z*1e4-A*10)
                 # newistp = BetaIstp(Z, A, I, Q=0, HL=0, name="", xbins=self.xbins)
                 self.istplist[key].spectrum=df[col].values
             elif col.endswith("_unc"):
