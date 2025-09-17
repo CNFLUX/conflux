@@ -11,6 +11,7 @@ from tqdm import tqdm
 import pandas as pd
 from scipy.integrate import solve_ivp
 from scipy.linalg import expm
+import mpmath as mp
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
@@ -741,6 +742,25 @@ class BetaIstp(Spectrum):
         N0 = np.zeros(k)
         N0[0] = 1
         N_t = expm(A * time).dot(N0)
+        # Fix to the NaN value problem when running the CalcDecayChain function
+        if(np.isnan(N_t[0])):
+            mp.mp.dps = 30
+            
+            #Convert our matrices to lists to be converted to mpmath lists
+            A_list_of_lists = A.tolist()
+            N0_list_of_lists = N0.tolist()
+            
+            A_mp = mp.matrix(A_list_of_lists)
+            N0_mp = mp.matrix(N0_list_of_lists)            
+            N_t_mp = mp.expm(A_mp * time) * N0_mp
+            
+            # print(N_t_mp * lambdas_mp, "Decay Rates")
+            for i in range(len(lambdas)):
+              # If the value is too small, simply set it to 0, otherwise set it to the mpmath value
+                if(N_t_mp[i] < 1e-100):
+                    N_t[i] = 0
+                else:
+                    N_t[i] = N_t_mp[i]         
 
         decayrates = lambdas*N_t
 
