@@ -667,41 +667,6 @@ class BetaIstp(Spectrum):
         for HL in HLs: rate *= 1 - 2**(-t/HL)
         return rate
     
-    def CalcDecayChainOld(self, betaSpectraDB, begin, end):
-        """
-        Calculate the total spectrum of a beta-decay chain in a selected window.
-        Assumes beta decays are 100% of allowed decays in chain.
-        
-        :param betaSpectraDB: the spectrum database that saves all relavant spectra
-        :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
-        :param begin: begining of the window (in seconds)
-        :type begin: float
-        :param end: end of the window (in seconds)
-        :type end: float
-        :return: summed, decay rate adjusted spectrum and uncertainty in the calculated window
-        :rtype: :class:`numpy.array`
-        """
-
-        generation = 0
-        HLs = []
-        self.decay_chain_spectrum = np.zeros(len(betaSpectraDB.xbins))
-        self.decay_chain_uncertainty = np.zeros(len(betaSpectraDB.xbins))
-        
-        # Look for the decay daughters; if they are also beta-unstable, continue to the next generation
-        while self.daughterZAI(generation) in betaSpectraDB.istplist.keys():
-            currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
-            HLs.append(currentistp.HL)
-            
-            delta_rate = self.decay_fraction(end, HLs) - self.decay_fraction(begin, HLs) # decay fraction in current window
-            self.decay_chain_spectrum += delta_rate * currentistp.spectrum
-            self.decay_chain_uncertainty += (delta_rate * currentistp.uncertainty)**2
-            
-            generation += 1
-            
-        self.decay_chain_uncertainty = np.sqrt(self.decay_chain_uncertainty)
-        
-        return self.decay_chain_spectrum, self.decay_chain_uncertainty
-    
     def CalcDecayChain(self, betaSpectraDB, time):
         """
         Calculate the total spectrum of a beta-decay chain in a selected window.
@@ -737,9 +702,14 @@ class BetaIstp(Spectrum):
             if i > 0:
                 A[i, i-1] = lambdas[i-1]
 
-        N0 = np.zeros(k)
-        N0[0] = 1
+        N0 = np.zeros(k); N0[0] = 1
         N_t = expm(A * time).dot(N0)
+
+        # indicate large value exceptions in the calculation
+        if (np.inf in N_t) or (np.nan in N_t):
+            print("WARNING: Overflowing found for very large exponential values")
+            print(f"N_t: {N_t}")
+            self.Display()
 
         decayrates = lambdas*N_t
 

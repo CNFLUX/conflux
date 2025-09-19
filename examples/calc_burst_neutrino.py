@@ -71,7 +71,6 @@ for key in fissile_istps.keys():
             continue
     except FileNotFoundError:
         print(f"Calculting burst fission spectrum of {key}")
-
         for i in range(len(logedges)):
             tau = logedges[i]
             fissile_istps[key].CalcBetaSpectra(betaSpectraDB, 
