@@ -88,9 +88,9 @@ class FissionIstp(Spectrum):
         # Check if the user gave a valid Database path
         # if there is no specified fissionDB, look for the default one
         if DBname == None or not os.path.exists(DBname):
-            DBpath = CONFLUX_DB + "/fissionDB/" + DB + "/"
+            DBpath = f"{CONFLUX_DB}/fissionDB/{DB}/"
             if DBname != None and DBname not in list(self._DBtitle.keys()):
-                print('Custom DB: '+ DBname + ' NOT found!')
+                print(f'Custom DB: {DBname} NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')
             fileList = listdir(DBpath) #Get the list of files in the Database directory
             istpfound = False
@@ -103,14 +103,14 @@ class FissionIstp(Spectrum):
                 istpfound = True # Else, assert that the isotope is in the DB
                 break
             if (not istpfound):
-                print(f"WARNING!!! Fisson DB {DBpath} {filename} not found")# assert error if isotope not found in DB
+                print(f"WARNING!!! Fisson DB {DBpath}/{filename} not found")# assert error if isotope not found in DB
 
                 return
 
             DBname = DBpath+filename # this is the isotope that we found in the list.
             assert(DBname)
 
-        print('Reading FPY DB: '+DBname+'...')
+        print(f'Reading FPY DB: {DBname}...')
         tree = ET.parse(DBname)
         root = tree.getroot()
 
