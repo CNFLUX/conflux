@@ -18,7 +18,7 @@ class Spectrum:
         """Contents of the spectrum"""
         self.uncertainty = np.zeros(self.nbin)
         """Spectrum content uncertainties"""
-        self.covariance = np.zeros(self.nbin)
+        self.cov_matrix = np.zeros(self.nbin, self.nbin)
         """Spectrum content covariance"""
         self.integral = 0
         """Integral of spectrum"""
