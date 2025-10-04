@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.132368.v2/t6
+#: name: Spectrum analysis: IBD spectrum in antineutrino energy
+#: description: STEREO unfolded U-235 spectrum, given with 20 antineutrino energy bins (bins 1-19 are 250 keV wide, with centers ranging from 2.5 MeV to 7 MeV and bin 20 is 750 keV wide with center at 7.5 MeV). The prediction from Huber multiplied by the IBD cross section is also given.
+#: data_file: Spec_UnfoldedSpectrum.yaml
+#: keyword phrases: Unfolded spectrum
+$E_ u$ [MeV],IBD spectrum [cm2/fission/MeV]
+2.5,1.0353e-43
+2.75,1.29032e-43
+3,1.66621e-43
+3.25,1.88044e-43
+3.5,1.84598e-43
+3.75,1.77932e-43
+4,1.86876e-43
+4.25,1.78232e-43
+4.5,1.63698e-43
+4.75,1.45015e-43
+5,1.35658e-43
+5.25,1.2536e-43
+5.5,1.12811e-43
+5.75,9.39326e-44
+6,7.52123e-44
+6.25,6.02967e-44
+6.5,4.78434e-44
+6.75,3.75831e-44
+7,2.83865e-44
+7.5,1.45755e-44

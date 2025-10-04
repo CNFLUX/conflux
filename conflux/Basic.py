@@ -9,7 +9,7 @@ import csv
 class Spectrum:
     """A general class of a spectrum to initialize, add, and modify the object."""
     
-    def __init__(self, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, xbins=np.arange(0, 15, 0.1)):
         self.xbins = xbins
         """The particle energy (MeV), or x values of the spectrum"""
         self.nbin = len(xbins)
@@ -18,6 +18,8 @@ class Spectrum:
         """Contents of the spectrum"""
         self.uncertainty = np.zeros(self.nbin)
         """Spectrum content uncertainties"""
+        self.covariance = np.zeros(self.nbin)
+        """Spectrum content covariance"""
         self.integral = 0
         """Integral of spectrum"""
         
