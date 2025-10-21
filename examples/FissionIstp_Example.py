@@ -36,8 +36,8 @@ if __name__ == "__main__":
 
     #Next, I use this BetaEngine to calculate the Spectra for U235. By default, the calculation will
     #Only look at Cumulative fission products. However, one can also calculate the independant fission
-    #products in a given time range by passing integer values to the "ifp_begin" and "ifp_end" variables.
-    U235.CalcBetaSpectra(BetaEngineDB, processMissing=True)
+    #products at a given time stamp (default unit: second) by passing positive values to the "time" variables.
+    U235.CalcBetaSpectra(BetaEngineDB, processMissing=True, time=0)
 
     #Lastly, I will go ahead and plot each individual beta branch in this fission isotope
     fig = plt.plot()

@@ -342,10 +342,8 @@ class FissionIstp(Spectrum):
         :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
         :param processMissing: Determine whether to include assummed spectrum calculated for missing branches in the beta database, defaults to False
         :type processMissing: bool, optional
-        :param ifp_begin: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to 0
-        :type ifp_begin: float, optional
-        :param ifp_end: The beginning of the time window after the fission to calculate beta/neutrino spectra, will only be effective if IFPY=True when this FissionIstp is constructed. defaults to inf
-        :type ifp_end: float, optional
+        :param time: The time stamp (unit: second) of the IFP calculation. If time < 0, or the optional input is ignored, the engine will calculate neutrino spectra with CFP
+        :type time: float, optional
         :param modelunc: Determine whether to include beta modeling uncertainty, defaults to True
         :type modelunc: bool, optional
         :param silent: whether to disable the tqdm output, defaults to False
