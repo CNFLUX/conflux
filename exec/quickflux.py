@@ -44,8 +44,7 @@ def summation(json_file, xbins, nu_spec, rxpower=1):
     qhigh = summation['qhigh']        # select the upper limit of the beta q values
     missing = summation['missing']    # whether to process the missing beta isotopes
     IFP = ('time' in summation)
-    ifp_begin = 0
-    ifp_end = 0
+    time = 0
 
     # Loading the beta spectrum data base and calculate beta spectra
     betaSpectraDB = BetaEngine(xbins=xbins)
@@ -57,7 +56,7 @@ def summation(json_file, xbins, nu_spec, rxpower=1):
     # Determine whether to calculate independent fission yield
     if IFP:
         "setting up reactor model dependent on time"
-        ifptime = summation['time']
+        time = summation['time']
 
     #if 'fission_db' in json_file:
     
@@ -78,8 +77,8 @@ def summation(json_file, xbins, nu_spec, rxpower=1):
                 istp.LoadCovariance(DB=fissile_istp['fissiondb'])
             istp.CalcBetaSpectra(betaSpectraDB, 
                                  processMissing=missing, 
-                                 ifp_begin = ifp_begin, 
-                                 ifp_end = ifp_end)
+                                 time = time, 
+                                 )
 
             calccount = rxpower
             count = rxpower if 'd_count' not in fissile_istp else fissile_istp['count']
