@@ -250,8 +250,8 @@ class BetaBranch(Spectrum):
         self.mixing = mixing
         
         self.custom_func = custom_func
-        #Add the parameters of this branch to a dictionary to be passed onto one of the
-        #functions that generates spectra from theory (See neutrino/electron above)
+        # Add the parameters of this branch to a dictionary to be passed to one of the
+        # functions that generates spectra from theory (see neutrino/electron above).
         
         self.Parameters = {
             'Z': self.Z,
@@ -269,10 +269,9 @@ class BetaBranch(Spectrum):
         self.corr = {E0: 1}  # correlation with other branches of the same isotope
         self.cov = {E0:self.sigma_frac**2} # Set the covariance diagonal element to the square of the branch fraction uncertainty
 
-    # display the vital info of branch
+    # Display the vital info of branch.
     def Display(self):
         """Display vital branch info."""
-        #A little self explanatory as to what's happening
         print("Branch E0 = " + str(self.E0)+ "+\-" + str(self.sigma_E0)
             + ", frac = " + str(self.frac) + "+\-"+str(self.sigma_frac)
             + f", forbiddenness = {self.forbiddenness}")
@@ -291,7 +290,7 @@ class BetaBranch(Spectrum):
             'l': screening_potential(self.Z)
         }
 
-    # set correlation between this branch and the other branch
+    # Set correlation between this branch and the other branch.
     def SetCovariance(self, otherBranch, correlation):
         """
         Calculate the correlation and covariances between this branch and the other branch.
@@ -302,12 +301,12 @@ class BetaBranch(Spectrum):
         :type correlation: float
         
         """
-        #If the endpoint energy between the two branches is the same, do nothing
+        # If the endpoint energy between the two branches is the same, do nothing.
         if self.E0 == otherBranch.E0:
             return
-        #Otherwise, set the correlation of the other branch at that endpoint energy to the correlation of this branch
+        # Otherwise, set the correlation of the other branch at that endpoint energy.
         self.corr[otherBranch.E0] = correlation
-        #Also, calculate the covariance of the other branch from the fractoinal uncertainties of the two branches and their correlation
+        # Also, calculate the covariance from the fractional uncertainties of the two branches and their correlation.
         self.cov[otherBranch.E0] = (self.sigma_frac * correlation
                                     * otherBranch.sigma_frac)
 
@@ -593,7 +592,7 @@ class BetaIstp(Spectrum):
         self.branchUnc = np.zeros(self.nbin)
         totalUnc = np.zeros(self.nbin)
 
-        # calculate the total uncertaintty and append spectra
+        # Calculate the total uncertainty and append spectra.
         for E0i, branchi in self.branches.items():
             if(E0i < branchErange[0] or E0i > branchErange[1]):
                 continue
@@ -724,9 +723,9 @@ class BetaIstp(Spectrum):
         return self.decay_chain_spectrum, self.decay_chain_uncertainty
 
 
-# BetaEngine tallys beta branches in the betaDB and calculate theoretical beta 
-# spectra of all tallied branches
-# if inputlist is not given, load the entire betaDB from the default betaDB
+# BetaEngine tallies beta branches in the betaDB and calculates theoretical beta
+# spectra of all tallied branches.
+# If inputlist is not given, load the entire betaDB from the default betaDB.
 class BetaEngine:
     """
     BetaEngine tallys beta branches in the betaDB and calculate theoretical beta spectra of all tallied branches.

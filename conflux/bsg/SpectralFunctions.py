@@ -30,8 +30,8 @@ def fermi_function(W, Z, R, **kwargs):
     p = np.sqrt(W**2-1)
     y = ALPHA*Z*W/p
 
-    #We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1+gamma)
-    #This is consistent with the L0 description below
+    # We use the traditional Fermi function, i.e. a prefactor 4 instead of 2(1+gamma).
+    # This is consistent with the L0 description below.
 
     f = (4
             *np.power(2*p*R, 2*(g-1))
@@ -452,7 +452,7 @@ def atomic_mismatch(W, Z, W0, A, **kwargs):
     M = A * NUCLEON_MASS_W
     vR = np.sqrt(1 - M * M / (M * M + (W0 * W0 - 1) / 4.))
     psi2 = 1 + 2 * ALPHA / beta * (np.arctan(1 / l) - l / 2 / (1 + l * l))
-    C0 = -ALPHA**3*Z / beta * l / (1 + l * l) / psi2 #CHECK ALPHA power
+    C0 = -ALPHA**3*Z / beta * l / (1 + l * l) / psi2 # CHECK: ALPHA power
     C1 = (2*ALPHA**2*Z * vR / beta
             *((0.5 + l * l) / (1 + l * l) - l * np.arctan(1 / l)) / psi2)
 
@@ -467,9 +467,9 @@ def atomic_exchange(W, exPars):
            W**exPars[8])
 
 def atomic_exchange_simkovic(W, exPars):
-    '''Exchange correction due to Simkovic et al., https://journals.aps.org/prc/pdf/10.1103/PhysRevC.107.025501
+    """Exchange correction due to Simkovic et al., https://journals.aps.org/prc/pdf/10.1103/PhysRevC.107.025501
     Equation (34)
-    '''
+    """
     x = (W-1)*ELECTRON_MASS_KEV
     a, b, c, d, e = exPars
 
