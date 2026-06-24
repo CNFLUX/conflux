@@ -660,10 +660,6 @@ class VirtualBranch(Spectrum):
         print(f'Calculating covariance matrix with {samples} MC samples...')
         startTiming = timeit.default_timer()
 
-        # plt.figure()   # TODO comment me
-        # vbbuffer = deepcopy(self)
-        # vbbuffer.FitData(betadata, vbbuffer.slicesize) # TODO comment me
-        # y0 = vbbuffer.SumBranches(x, thresh, nu_spectrum)
         for i in (range(0, samples)):
             toy = deepcopy(betadata)
             for it in range(len(betadata.x)-1, -1, -1):
@@ -673,21 +669,34 @@ class VirtualBranch(Spectrum):
             vbnew = deepcopy(self)
             vbnew.FitData(toy, vbnew.slicesize)
             y = vbnew.SumBranches(x, thresh, nu_spectrum)
-            # plt.plot(x, (y-y0)/y0*100, color='red') # TODO comment me
-            # plt.ylim((-20, 20))
-            # plt.ylabel("Relative difference to mean")
-            # plt.xlabel("E (MeV)")
-            # for s in y:
-            #     if np.isnan(s):
-            #         print(y)
+
             result.append(y)
-        # plt.savefig("conversion_MC.png") # TODO comment me     
+
         endTiming = timeit.default_timer()
         runTime = endTiming-startTiming
         print(f"Finished calculating covairance matrix of {samples} samples.")
         print(f"Processing time: {runTime} seconds")
-        
-        covariance = np.cov(np.transpose(result))
+
+        # Convert result to array and check for issues
+        result_array = np.array(result)
+
+        # Check if result contains NaN or Inf
+        if np.any(np.isnan(result_array)):
+            print("Warning: NaN detected in MC samples, replacing with zeros")
+            result_array = np.nan_to_num(result_array, nan=0.0)
+
+        if np.any(np.isinf(result_array)):
+            print("Warning: Inf detected in MC samples, replacing with finite values")
+            result_array = np.nan_to_num(result_array, posinf=0.0, neginf=0.0)
+
+        # Calculate covariance
+        covariance = np.cov(np.transpose(result_array))
+
+        # Handle case where covariance is NaN (e.g., zero variance)
+        if np.any(np.isnan(covariance)):
+            print("Warning: NaN detected in covariance matrix, setting to zeros")
+            covariance = np.nan_to_num(covariance, nan=0.0)
+
         self.uncertainty = np.sqrt(covariance.diagonal())
         return covariance
 
@@ -822,10 +831,15 @@ class ConversionEngine(Spectrum):
                                                 samples=cov_samp,
                                                 nu_spectrum=nu_spectrum))
             # Propagating the uncertainty of fraction and spectra
-            sqratio1 = new_cov/this_count**2 if this_count!=0 else 0
-            sqratio2 = np.where(new_spect>0, this_dcount**2/new_spect**2, 0)
-            new_cov = sqratio1 + np.identity(nbins_x) * sqratio2
-            self.covariance += new_cov
+            # Covariance contribution from spectrum uncertainty: count² * Cov(spect)
+            cov_from_spect = new_cov * this_count**2 if this_count!=0 else new_cov
+
+            # Covariance contribution from count uncertainty: (dcount * spect)²
+            # Only add diagonal terms for count uncertainty
+            diag_from_count = (this_dcount * new_spect)**2
+            cov_from_count = np.diag(diag_from_count)
+
+            self.covariance += cov_from_spect + cov_from_count
 
         # Get the sqrt diagonal of summed covariance matrix as the uncertainty
         # at each energy bin.

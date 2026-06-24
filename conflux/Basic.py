@@ -9,7 +9,7 @@ import csv
 class Spectrum:
     """A general class of a spectrum to initialize, add, and modify the object."""
     
-    def __init__(self, xbins=np.arange(0, 20, 0.1)):
+    def __init__(self, xbins=np.arange(0, 15, 0.1)):
         self.xbins = xbins
         """The particle energy (MeV), or x values of the spectrum"""
         self.nbin = len(xbins)
