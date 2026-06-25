@@ -24,7 +24,7 @@ class Spectrum:
         """Integral of spectrum"""
         
     def Add(self, targetSpec, W = 1, sigma_W = 0):
-        '''
+        """
         An operator to add (or subtract) a spectrum
         
         Parameters:
@@ -33,13 +33,13 @@ class Spectrum:
             sigma_W (float): The uncertainty in the weight of the added spectrum
         Returns:
             None        
-        '''
-        assert(targetSpec.xbins == self.xbins) # ensure the identical binning
-        targetSpec.Norm(W, sigma_W) #Rescale the added spectrum to the current spectrum
-        self.spectrum += targetSpec.spectrum #Add the target spectrum to the current spectrum
+        """
+        assert(targetSpec.xbins == self.xbins) # Ensure identical binning
+        targetSpec.Norm(W, sigma_W) # Rescale the added spectrum to the current spectrum
+        self.spectrum += targetSpec.spectrum # Add the target spectrum to the current spectrum
         
     def Norm(self, W, sigma_W = 0):
-        '''
+        """
         An operator to scale the spectrum by a weighting factor
 
         Parameters:
@@ -47,37 +47,37 @@ class Spectrum:
             sigma_W (float): The uncertainty in the weight
         Returns:
             None
-        '''
+        """
         # Calculate the relative uncertainty of the spectrum
         relativeUnc = np.sqrt((sigma_W / W)**2 + (self.uncertainty / self.spectrum)**2)
         # Scale the spectrum by our Normalization weight
         self.spectrum *= W
-        # calculate the normed uncertainty
+        # Calculate the normed uncertainty
         self.uncertainty = self.spectrum * relativeUnc
     
     def Integral(self):
-        '''
+        """
         The absolute integral of the spectrum
         
         Parameters:
             None
         Returns:
             integral (float): The integral of the spectrum
-        '''
+        """
         self.integral = np.dot(self.spectrum.sum(), self.xbins)
         return self.integral
         
     def SaveToFile(self, filename):
-        '''
+        """
         To save the spectrum to a csv file
 
         Parameters:
             filename (String): The name of the file you want to save the spectrum to.
         Returns:
             None
-        '''
+        """
 
-        #Save the spectrum information in the file in the format [Energy, spectrum, error]
+        # Save spectrum information in the format [Energy, spectrum, error]
         with open(filename, 'w', newline='') as outputfile:
             colNames = ['E', 'count', 'error']
             writer = csv.DictWriter(outputfile, fieldnames=colNames)
@@ -101,7 +101,7 @@ def integrate_trapezoid(xs, ys):
     return 0.5*S
 
 class Summed:
-    '''
+    """
     A general class for summed objects, such as summed spectra
 
     ...
@@ -123,10 +123,10 @@ class Summed:
     Clear():
         Clears out all associated dictionaries inside the summed spectra
     AddBranch(branch):
-        Adds a branch object to the summed specctra
+        Adds a branch object to the summed spectra
     SumSpectra():
         Sums the spectra of all branches
-    '''
+    """
     def __init__(self, ID):
         self.ID = ID
         self.branches = {}
@@ -143,34 +143,33 @@ class Summed:
                 None
         """
 
-        #Pretty self explanatory what these do
         self.branches = {}
         self.spectra = {}
         self.uncertainty = {}
     
     def AddBranch(self, branch):
-        '''
+        """
             Adding a branch element to the summing object
 
             Parameters:
                 branch (int): The ID of the branch you want to add to the summed spectrum
             Returns:
                 None
-        '''
+        """
         self.branches[branch.ID] = branch
     
     def SumSpectra(self):
-        '''
+        """
             Summing units together
 
-            Paremeters:
+            Parameters:
                 None
             Returns:
                 None
-        '''
+        """
         
         spectrum = Spectrum()
-        #walk through all branch IDs in the branch dictionary
+        # Walk through all branch IDs in the branch dictionary
         for ZAI in self.branches:
-            #Add all the individual branch spectra to the total spectra
+            # Add all individual branch spectra to the total spectra
             spectrum.Add(self.spectra[ZAI], self.branches[ZAI])

@@ -3,9 +3,9 @@
 
 # SPDX-License-Identifier: MIT
 
-# beta spectra conversion engine:
-# input: beta spectra measured on nuclear reactors
-# output: neutrino spectra of nuclear reactors
+# Beta spectra conversion engine.
+# Input: beta spectra measured on nuclear reactors.
+# Output: neutrino spectra of nuclear reactors.
 
 # universal modules
 import csv
@@ -394,13 +394,13 @@ class VirtualBranch(Spectrum):
                                                              Aavg=Aavg,
                                                              forbiddenness=1,
                                                              bAc=wm))))
-                    #Scale the binwidths of our energy scale from keV to Mev
+                    # Scale the bin widths of the energy scale from keV to MeV.
                     if(1000 > betadata.x[1]-betadata.x[0] > 1):
                         binwidths = (betadata.x[1]-betadata.x[0])/1e3
-                    #Scale the binwidths of our energy scale from eV to MeV
+                    # Scale the bin widths of the energy scale from eV to MeV.
                     elif(100000 > betadata.x[1]-betadata.x[0] > 1000):
                         binwidths = (betadata.x[1]-betadata.x[0]) / 1e6
-                    #Get the binwidths in MeV
+                    # Bin widths are already in MeV.
                     else:
                         binwidths = betadata.x[1]-betadata.x[0]
                     full_range = np.arange(0, 20, binwidths)

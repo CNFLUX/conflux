@@ -4,9 +4,9 @@ from scipy.interpolate import interp1d
 from conflux.bsg.Constants import *
 
 def stableA(Z):
-    '''Get estimate for stable mass number as a function of Z'''
+    """Get estimate for stable mass number as a function of Z"""
 
-    '''Parameters from Bethe-Weiszacker formula'''
+    # Parameters from Bethe-Weiszacker formula
     aC = 0.71 # MeV
     aA = 23.7 # MeV
     alpha = aC/4/aA
