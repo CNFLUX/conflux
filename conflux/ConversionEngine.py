@@ -293,10 +293,10 @@ class VirtualBranch(Spectrum):
         new_spect /= normalize*binwidths
         return new_spect
 
-    # function that fit the reference beta spectrum with virtual brances
+    # function that fit the reference beta spectrum with virtual branches
     def FitData(self, betadata, slicesize=0.5):
         """
-        Fits the reference beta spectrum with virtual brances data.
+        Fits the reference beta spectrum with virtual branches data.
 
         The virtual branches are defined as single beta decay spectra.
         The virtual branches are fitted to slices of the reference data spectra

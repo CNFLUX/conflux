@@ -213,9 +213,9 @@ class BetaBranch(Spectrum):
     sigma_frac: float
     """The uncertainty of the branching fraction."""
     forbiddenness: int
-    """Type of forbiddeness """
+    """Type of forbiddenness """
     numass: float
-    """neutrno mass (MeV), by default 0"""
+    """neutrino mass (MeV), by default 0"""
     mixing: float
     """mixing of nonzero neutrino mass, by default 0"""
     Parameters: dict
@@ -429,9 +429,9 @@ class BetaIstp(Spectrum):
     missing: bool = False
     """Uncertainty of the end-point energy"""
     branches: dict
-    """Dictionary of decay brances, keys (float) are endpoint energies, values are :class:`conflux.BetaEngine.BetaBranch` """
+    """Dictionary of decay branches, keys (float) are endpoint energies, values are :class:`conflux.BetaEngine.BetaBranch` """
     numass: float
-    """neutrno mass (MeV), by default 0"""
+    """neutrino mass (MeV), by default 0"""
     mixing: float
     """mixing of nonzero neutrino mass, by default 0"""
     MaxBranch: "BetaEngine.BetaBranch"
@@ -479,8 +479,8 @@ class BetaIstp(Spectrum):
             fraction (float): The fraction that this branch contributes to the total isotopic spectrum.
             sigma_frac (float): The uncertainty of fraction.
             forbiddenness (int): The type of forbidden/allowed transition.
-            bAc (float): weak magnetism correcion.
-            custom_func (method): customized beta function, needs to be structued similarly as :meth:`neutrino` or :meth:`electron`, defaults to None.
+            bAc (float): weak magnetism correction.
+            custom_func (method): customized beta function, needs to be structured similarly as :meth:`neutrino` or :meth:`electron`, defaults to None.
         """
         # if sigma_E0 > E0:
         #     sigma_E0 = E0
@@ -629,7 +629,7 @@ class BetaIstp(Spectrum):
         """
         Calculate the percentage of isotope decayed in the given time window.
         
-        :param begin: the begining of the window (s)
+        :param begin: the beginning of the window (s)
         :type begin: float
         :param end: the end of the window (s)
         :type end: float
@@ -739,11 +739,11 @@ class BetaEngine:
     xbins: np.ndarray
     """The spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)"""
     custom_func: callable = None
-    """Customized beta function, needs to be structued similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None"""
+    """Customized beta function, needs to be structured similarly as :meth:`conflux.BetaEngine.neutrino` or :meth:`conflux.BetaEngine.electron`, defaults to None"""
     numass: float = 0
     """To calculate the spectrum with non-zero neutrino mass, give the neutrino mass in the MeV unit."""
     mixing: float = 0
-    """To calcualte spectrum with non-zero neutrino mass, provide the mixing (0-1) of the neutrino mass state."""
+    """To calculate spectrum with non-zero neutrino mass, provide the mixing (0-1) of the neutrino mass state."""
     
     
     def __init__(self, 

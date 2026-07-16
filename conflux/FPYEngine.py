@@ -70,7 +70,7 @@ class FissionIstp(Spectrum):
     # method that load xml database of FPY and save nuclide info in dictionaries.
     def LoadFissionDB(self, Ei=None, DB='ENDF'):
         """
-        Load fission product yeilds with given incident neutron energy.
+        Load fission product yields with given incident neutron energy.
         
         :param Ei: The incident neutron energy to ignite fission
         :type Ei: float
@@ -429,7 +429,7 @@ class FPNuclide:
     
     :param FPZAI: The identity of the fission products, contain Z, A, and isomeric state combined as Z*10000+A*10+I
     :type FPZAI: int
-    :param y: The yeild of the fission product
+    :param y: The yield of the fission product
     :type y: float
     :param yerr: The uncertainty of yield
     :type yerr: float
@@ -470,7 +470,7 @@ class FPNuclide:
 
         # Adding the fission fraction uncertainty and fission yield uncertainty together
         self.yerr = self.y*fraction*np.sqrt((self.yerr/self.y)**2 + (d_fraction/fraction**2))
-        # force yeild uncertainty to equal 0, when yeild is zero
+        # force yield uncertainty to equal 0, when yield is zero
         self.yerr = np.nan_to_num(self.yerr, nan=0.0)
 
         # Also scale the covariance matrix.
@@ -543,7 +543,7 @@ class FissionModel:
                 Ei (float) : The neutron energy that is causing the fissions to occur (0.0, 0.4/0.5, 14)
                 fraction (float) : The fractional contribution that this isotope has on the overall model
                 d_frac (float) : The uncertainty in the contribution
-                IFP (boolean) : determines whether to include the independant fission products in the model
+                IFP (boolean) : determines whether to include the independent fission products in the model
 
             Returns:
                 None
