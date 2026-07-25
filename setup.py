@@ -9,7 +9,7 @@ setup(
     author="Xianyi Zhang",
     author_email="zhang39@llnl.gov",
     description="A package to calculate neutrino flux from beta decaying sources",
-    long_description="README.md",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/CNFLUX/conflux",
     project_urls={
@@ -18,11 +18,28 @@ setup(
 
     packages=find_packages(),
     package_data={
+        'conflux': [
+            'data/fissionDB/ENDF/*.xml',
+            'data/fissionDB/JEFF/*.xml',
+            'data/betaDB/*.xml',
+            'data/betaDB/*.csv',
+            'data/example_models/*.json',
+        ],
+    },
+    include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'conflux-setup=conflux.cli_setup:main',
+            'conflux-update-endf=update_endf_database:main',
+        ],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Physics",
+        "License :: OSI Approved :: MIT License",
     ],
-	install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib', 'iminuit', 'fortranformat', 'pandas', 'xraydb'],
+    install_requires=['numpy', 'scipy>=1.8.1', 'tqdm', 'matplotlib', 'iminuit', 'fortranformat', 'pandas', 'xraydb'],
     python_requires=">=3.6",
 )

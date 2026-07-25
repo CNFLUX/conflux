@@ -13,15 +13,15 @@
 # # universal modules
 import sys
 from xml.dom import minidom
-from os import listdir, environ
+from os import listdir
 import csv
 import numpy as np
 import re
-import pkg_resources
 from tqdm import tqdm
+from conflux import get_package_data
 
 # define time units to convert all half-lives in seconds
-tu = {'NS':1e-9, 'MS':1e-3, 'S':1}
+tu = {'NS':1e-9, 'US':1e-6, 'MS':1e-3, 'S':1}
 tu['M'] = tu['S']*60
 tu['H'] = tu['M']*60
 tu['D'] = tu['H']*24
@@ -39,8 +39,9 @@ def is_number(s):
 # global method to generate a dictionary of element and Z
 def element_to_Z():
     zdict = {}
-    # listname = pkg_resources.resource_filename('conflux', 'betaDB/Z_to_element.csv')
-    with open(environ["CONFLUX_DB"]+"/betaDB/Z_to_element.csv") as csvinput:
+    # Use package helper to access data files (works with both editable and regular installs)
+    csv_path = get_package_data('data/betaDB/Z_to_element.csv')
+    with open(csv_path, 'r') as csvinput:
         csvreader = csv.reader(csvinput, delimiter=',')
         for row in csvreader:
             if row[0].isdigit:
@@ -185,7 +186,8 @@ class XMLedit:
 
     # beta-decay isotopes
     def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = 0.0, Ex = '0.0'):
-        if HL == 0: return
+        # Keep isotopes with HL=0 (unknown half-life) in database
+        # Calculation engines should check HL before computing decay
         self.isotope = self.root.createElement('isotope')
         self.isotope.setAttribute('name', str(istpName))
         self.isotope.setAttribute('isotope', str(isotopeID))
@@ -233,12 +235,14 @@ class ParentIstp:
             leveltxt = '0'
         self.level = float(leveltxt)/1e3#convert to MeV
         self.HL = 0.
-        hl_str = line[39:49]
-        hl_array = hl_str.split()
-        if hl_array:
-            life = float(hl_array[0])
-            unit = tu[hl_array[1]]
-            self.HL = life*unit
+        hl_str = line[39:49].strip()
+        # Handle UNKNOWN or invalid half-life values - keep HL=0 for database
+        if hl_str and hl_str != 'UNKNOWN':
+            hl_array = hl_str.split()
+            if len(hl_array) >= 2 and is_number(hl_array[0]) and hl_array[1] in tu:
+                life = float(hl_array[0])
+                unit = tu[hl_array[1]]
+                self.HL = life*unit
         self.Emax = float(line[64:74].strip())/1e3+float(leveltxt)/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
         self.pi, self.J = convert_J(line[21:39])
@@ -269,7 +273,7 @@ class DecayBranch:
         self.sigma_frac = transUncert(line[21:29].strip(), line[29:31].strip())/100 if is_number(line[29:31]) else 0
         self.forbidden = line[77:79].strip() if not line[77:79].isspace() else "0"
 
-def ENSDFbeta(fileList):
+def ENSDFbeta(fileList, output_name):
     xmloutput = XMLedit()
     for filename in tqdm(fileList):
         inputfile = open(f"{dirName}/{filename}", "r", errors='replace')
@@ -350,13 +354,14 @@ def ENSDFbeta(fileList):
                                          str("{:.4f}".format(decaybranch.sigma_E0)))
                     lastline = line
 
-    xmloutput.saveXML("ENSDFbetaDB_250804.xml")
+    xmloutput.saveXML(output_name)
 
     return 0
 
 
 if __name__ == "__main__":
     dirName = sys.argv[1]
+    output_name = sys.argv[2]
     fileList = listdir(dirName)
     fileList.sort()
-    ENSDFbeta(fileList)
+    ENSDFbeta(fileList, output_name)

@@ -10,15 +10,16 @@ Created on Sat Apr 17 10:51:51 2021
 import sys
 from xml.dom import minidom
 import fortranformat as ff
-from os import listdir, environ
+from os import listdir
 import csv
-import pkg_resources
+from conflux import get_package_data
 
 # global method to generate a dictionary of element and Z
 def Z_to_element():
     zdict = {}
-    listname = environ['CONFLUX_DB']+'/betaDB/Z_to_element.csv'
-    with open(listname) as csvinput:
+    # Use package helper to access data files (works with both editable and regular installs)
+    csv_path = get_package_data('data/betaDB/Z_to_element.csv')
+    with open(csv_path, 'r') as csvinput:
         csvreader = csv.DictReader(csvinput, dialect='excel', delimiter=',')
         for row in csvreader:
             Z = int(row['Z'])

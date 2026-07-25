@@ -333,26 +333,39 @@
 	<isotope name="Na24" isotope="110241" Q="5.9878841" HL="0.02018" Ex="0.47220710000000005">
 		<branch fraction="0.0005" sigma_frac="0.0000" end_point_E="5.9879" sigma_E0="0.0000" dJpi="1"/>
 	</isotope>
-	<isotope name="F25" isotope="90250" Q="13.38" HL="0.08" Ex="0.0">
-		<branch fraction="0.1800" sigma_frac="0.0400" end_point_E="11.6772" sigma_E0="0.1007" dJpi="0,1"/>
-		<branch fraction="0.1000" sigma_frac="0.0200" end_point_E="11.2900" sigma_E0="0.1050" dJpi="1,0"/>
-		<branch fraction="0.0700" sigma_frac="0.0000" end_point_E="10.0636" sigma_E0="0.1011" dJpi="0"/>
-		<branch fraction="0.1900" sigma_frac="0.0200" end_point_E="10.0560" sigma_E0="0.1050" dJpi="1,0,1"/>
-		<branch fraction="0.2400" sigma_frac="0.0400" end_point_E="9.4888" sigma_E0="0.1012" dJpi="1,0,1"/>
+	<isotope name="F25" isotope="90250" Q="13.37" HL="0.1426" Ex="0.0">
+		<branch fraction="0.1200" sigma_frac="0.0600" end_point_E="11.6673" sigma_E0="0.1007" dJpi="0,1"/>
+		<branch fraction="0.0800" sigma_frac="0.0300" end_point_E="11.2800" sigma_E0="0.1000" dJpi="1,0"/>
+		<branch fraction="0.2100" sigma_frac="0.0400" end_point_E="10.0460" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.2100" sigma_frac="0.0500" end_point_E="9.4789" sigma_E0="0.1012" dJpi="1,0,1"/>
+		<branch fraction="0.0210" sigma_frac="0.0040" end_point_E="8.8770" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0460" sigma_frac="0.0050" end_point_E="8.8310" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0240" sigma_frac="0.0040" end_point_E="8.7300" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0140" sigma_frac="0.0050" end_point_E="8.0960" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0750" sigma_frac="0.0060" end_point_E="7.8000" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0440" sigma_frac="0.0050" end_point_E="7.3760" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0140" sigma_frac="0.0050" end_point_E="7.2190" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0350" sigma_frac="0.0080" end_point_E="7.0100" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0250" sigma_frac="0.0050" end_point_E="6.5970" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0360" sigma_frac="0.0130" end_point_E="6.2880" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0190" sigma_frac="0.0120" end_point_E="6.2090" sigma_E0="0.1000" dJpi="0"/>
+		<branch fraction="0.0090" sigma_frac="0.0070" end_point_E="5.9550" sigma_E0="0.1000" dJpi="0"/>
 	</isotope>
-	<isotope name="Ne25" isotope="100250" Q="7.25" HL="0.602" Ex="0.0">
-		<branch fraction="0.7660" sigma_frac="0.0200" end_point_E="7.1605" sigma_E0="0.0301" dJpi="1"/>
-		<branch fraction="0.1950" sigma_frac="0.0200" end_point_E="6.1807" sigma_E0="0.0302" dJpi="0"/>
-		<branch fraction="0.0210" sigma_frac="0.0050" end_point_E="5.0480" sigma_E0="0.0310" dJpi="1"/>
-		<branch fraction="0.0120" sigma_frac="0.0030" end_point_E="3.5630" sigma_E0="0.0320" dJpi="0,1,2"/>
-		<branch fraction="0.0053" sigma_frac="0.0015" end_point_E="2.9610" sigma_E0="0.0330" dJpi="0"/>
+	<isotope name="Ne25" isotope="100250" Q="7.334" HL="0.603" Ex="0.0">
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="7.3340" sigma_E0="0.0080" dJpi="2"/>
+		<branch fraction="0.7680" sigma_frac="0.0210" end_point_E="7.2445" sigma_E0="0.0081" dJpi="1"/>
+		<branch fraction="0.2000" sigma_frac="0.0200" end_point_E="6.2647" sigma_E0="0.0082" dJpi="0"/>
+		<branch fraction="0.0210" sigma_frac="0.0050" end_point_E="5.1319" sigma_E0="0.0090" dJpi="1"/>
+		<branch fraction="0.0120" sigma_frac="0.0030" end_point_E="3.6460" sigma_E0="0.0110" dJpi="1"/>
+		<branch fraction="0.0052" sigma_frac="0.0000" end_point_E="3.0440" sigma_E0="0.0110" dJpi="0"/>
 	</isotope>
-	<isotope name="Na25" isotope="110250" Q="3.835" HL="59.1" Ex="0.0">
+	<isotope name="Na25" isotope="110250" Q="3.835" HL="59.3" Ex="0.0">
 		<branch fraction="0.6250" sigma_frac="0.0200" end_point_E="3.8350" sigma_E0="0.0012" dJpi="0"/>
-		<branch fraction="0.2746" sigma_frac="0.0022" end_point_E="2.8603" sigma_E0="0.0012" dJpi="1"/>
-		<branch fraction="0.0948" sigma_frac="0.0014" end_point_E="2.2232" sigma_E0="0.0012" dJpi="1"/>
-		<branch fraction="0.0044" sigma_frac="0.0001" end_point_E="1.8704" sigma_E0="0.0012" dJpi="0"/>
-		<branch fraction="0.0025" sigma_frac="0.0000" end_point_E="1.0335" sigma_E0="0.0012" dJpi="1"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="3.2500" sigma_E0="0.0012" dJpi="2"/>
+		<branch fraction="0.2750" sigma_frac="0.0160" end_point_E="2.8603" sigma_E0="0.0012" dJpi="1"/>
+		<branch fraction="0.0950" sigma_frac="0.0060" end_point_E="2.2232" sigma_E0="0.0012" dJpi="1"/>
+		<branch fraction="0.0044" sigma_frac="0.0003" end_point_E="1.8704" sigma_E0="0.0012" dJpi="0"/>
+		<branch fraction="0.0025" sigma_frac="0.0001" end_point_E="1.0335" sigma_E0="0.0012" dJpi="1"/>
 	</isotope>
 	<isotope name="F26" isotope="90260" Q="18.19" HL="0.0097" Ex="0.0">
 		<branch fraction="0.3650" sigma_frac="0.0600" end_point_E="18.1900" sigma_E0="0.0800" dJpi="1"/>
@@ -679,42 +692,35 @@
 		<branch fraction="0.0011" sigma_frac="0.0002" end_point_E="1.3083" sigma_E0="0.0008" dJpi="0"/>
 		<branch fraction="0.0031" sigma_frac="0.0006" end_point_E="1.2681" sigma_E0="0.0008" dJpi="1"/>
 	</isotope>
-	<isotope name="Na35" isotope="110350" Q="22.59" HL="0.0018000000000000002" Ex="0.0"/>
-	<isotope name="Al35" isotope="130350" Q="14.141" HL="0.037200000000000004" Ex="0.0">
-		<branch fraction="0.0300" sigma_frac="0.0010" end_point_E="14.1410" sigma_E0="0.0800" dJpi="1-"/>
-		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="13.2310" sigma_E0="0.0802" dJpi="1-"/>
-		<branch fraction="0.5000" sigma_frac="0.0300" end_point_E="13.1671" sigma_E0="0.0802" dJpi="1"/>
-		<branch fraction="0.0920" sigma_frac="0.0190" end_point_E="11.9728" sigma_E0="0.0804" dJpi="0"/>
-		<branch fraction="0.0330" sigma_frac="0.0020" end_point_E="11.0010" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0600" sigma_frac="0.0030" end_point_E="10.6910" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0320" sigma_frac="0.0020" end_point_E="10.3710" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0890" sigma_frac="0.0030" end_point_E="8.9510" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0450" sigma_frac="0.0020" end_point_E="8.3810" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0680" sigma_frac="0.0030" end_point_E="7.8110" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0260" sigma_frac="0.0020" end_point_E="6.7810" sigma_E0="0.0800" dJpi="0"/>
-		<branch fraction="0.0270" sigma_frac="0.0020" end_point_E="6.4510" sigma_E0="0.0800" dJpi="0"/>
+	<isotope name="Na35" isotope="110350" Q="22.19" HL="0.0021000000000000003" Ex="0.0"/>
+	<isotope name="Al35" isotope="130350" Q="14.17" HL="0.0381" Ex="0.0">
+		<branch fraction="0.0300" sigma_frac="0.0100" end_point_E="14.1700" sigma_E0="0.0400" dJpi="1-"/>
+		<branch fraction="0.5200" sigma_frac="0.0000" end_point_E="13.1961" sigma_E0="0.0402" dJpi="1"/>
+		<branch fraction="0.0950" sigma_frac="0.0000" end_point_E="12.0018" sigma_E0="0.0404" dJpi="0"/>
+		<branch fraction="0.0330" sigma_frac="0.0020" end_point_E="11.0300" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0600" sigma_frac="0.0030" end_point_E="10.7200" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0320" sigma_frac="0.0020" end_point_E="10.4000" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0890" sigma_frac="0.0030" end_point_E="8.9800" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0450" sigma_frac="0.0020" end_point_E="8.4100" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0680" sigma_frac="0.0030" end_point_E="7.8400" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0260" sigma_frac="0.0020" end_point_E="6.8100" sigma_E0="0.0400" dJpi="1,0,1"/>
+		<branch fraction="0.0270" sigma_frac="0.0020" end_point_E="6.4800" sigma_E0="0.0400" dJpi="1,0,1"/>
 	</isotope>
-	<isotope name="Si35" isotope="140350" Q="10.5" HL="0.78" Ex="0.0">
-		<branch fraction="0.0200" sigma_frac="0.0000" end_point_E="6.6402" sigma_E0="0.0406" dJpi="1-"/>
-		<branch fraction="0.4600" sigma_frac="0.0000" end_point_E="6.3989" sigma_E0="0.0406" dJpi="0"/>
-		<branch fraction="0.0940" sigma_frac="0.0000" end_point_E="6.1187" sigma_E0="0.0408" dJpi="0"/>
-		<branch fraction="0.2140" sigma_frac="0.0000" end_point_E="6.0066" sigma_E0="0.0406" dJpi="0"/>
-		<branch fraction="0.1080" sigma_frac="0.0000" end_point_E="5.6306" sigma_E0="0.0409" dJpi="0"/>
-		<branch fraction="0.1240" sigma_frac="0.0000" end_point_E="4.9393" sigma_E0="0.0407" dJpi="0"/>
+	<isotope name="Si35" isotope="140350" Q="10.47" HL="0.78" Ex="0.0">
+		<branch fraction="0.0190" sigma_frac="0.0000" end_point_E="8.0835" sigma_E0="0.0405" dJpi="2-"/>
+		<branch fraction="0.4610" sigma_frac="0.0000" end_point_E="6.3688" sigma_E0="0.0405" dJpi="0"/>
+		<branch fraction="0.0970" sigma_frac="0.0000" end_point_E="6.0887" sigma_E0="0.0408" dJpi="1"/>
+		<branch fraction="0.1660" sigma_frac="0.0000" end_point_E="5.9765" sigma_E0="0.0406" dJpi="0"/>
+		<branch fraction="0.1080" sigma_frac="0.0000" end_point_E="5.6006" sigma_E0="0.0406" dJpi="1,0"/>
+		<branch fraction="0.0510" sigma_frac="0.0000" end_point_E="5.5076" sigma_E0="0.0407" dJpi="1"/>
+		<branch fraction="0.1270" sigma_frac="0.0000" end_point_E="4.9093" sigma_E0="0.0407" dJpi="1"/>
 	</isotope>
 	<isotope name="P35" isotope="150350" Q="3.9884" HL="47.3" Ex="0.0">
-		<branch fraction="0.0070" sigma_frac="0.0000" end_point_E="3.9884" sigma_E0="0.0019" dJpi="1"/>
-		<branch fraction="0.9880" sigma_frac="0.0003" end_point_E="2.4161" sigma_E0="0.0019" dJpi="0"/>
-		<branch fraction="0.0008" sigma_frac="0.0000" end_point_E="1.9944" sigma_E0="0.0019" dJpi="3-"/>
-		<branch fraction="0.0008" sigma_frac="0.0000" end_point_E="1.6384" sigma_E0="0.0019" dJpi="1-"/>
-		<branch fraction="0.0047" sigma_frac="0.0003" end_point_E="1.0500" sigma_E0="0.0023" dJpi="1"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.5674" sigma_E0="0.0019" dJpi="2"/>
-		<branch fraction="0.0011" sigma_frac="0.0000" end_point_E="0.4304" sigma_E0="0.0019" dJpi="1-,2"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.3914" sigma_E0="0.0019" dJpi="0,1,2"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.3134" sigma_E0="0.0019" dJpi="0-,1-"/>
-		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.1864" sigma_E0="0.0019" dJpi="1-"/>
+		<branch fraction="0.0073" sigma_frac="0.0000" end_point_E="3.9884" sigma_E0="0.0019" dJpi="1"/>
+		<branch fraction="0.9920" sigma_frac="0.0000" end_point_E="2.4161" sigma_E0="0.0019" dJpi="0"/>
+		<branch fraction="0.0047" sigma_frac="0.0000" end_point_E="1.0500" sigma_E0="0.0023" dJpi="1"/>
 	</isotope>
-	<isotope name="S35" isotope="160350" Q="0.16733" HL="7548768.0" Ex="0.0">
+	<isotope name="S35" isotope="160350" Q="0.167322" HL="7569504.0" Ex="0.0">
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.1673" sigma_E0="0.0000" dJpi="0"/>
 	</isotope>
 	<isotope name="Mg36" isotope="120360" Q="14.43" HL="0.0039" Ex="0.0"/>
@@ -2025,50 +2031,93 @@
 		<branch fraction="0.0240" sigma_frac="0.0050" end_point_E="1.2531" sigma_E0="0.0030" dJpi="0,1"/>
 		<branch fraction="0.0100" sigma_frac="0.0030" end_point_E="0.9495" sigma_E0="0.0040" dJpi="0"/>
 	</isotope>
-	<isotope name="Co69" isotope="270690" Q="9.81" HL="0.227" Ex="0.0">
-		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="9.8100" sigma_E0="0.1900" dJpi="1-"/>
-		<branch fraction="0.4790" sigma_frac="0.0200" end_point_E="8.8947" sigma_E0="0.1900" dJpi="1"/>
-		<branch fraction="0.1710" sigma_frac="0.0180" end_point_E="8.2924" sigma_E0="0.1900" dJpi="1"/>
-		<branch fraction="0.0290" sigma_frac="0.0040" end_point_E="7.9888" sigma_E0="0.1900" dJpi="0"/>
+	<isotope name="Mn69" isotope="250690" Q="11.19" HL="0.0258" Ex="0.0"/>
+	<isotope name="Fe69" isotope="260690" Q="10.88" HL="0.162" Ex="0.0"/>
+	<isotope name="Co69" isotope="270690" Q="9.59" HL="0.18" Ex="0.0">
+		<branch fraction="0.4320" sigma_frac="0.0120" end_point_E="8.6747" sigma_E0="0.0913" dJpi="1"/>
+		<branch fraction="0.2250" sigma_frac="0.0190" end_point_E="8.0726" sigma_E0="0.0921" dJpi="1"/>
+		<branch fraction="0.0260" sigma_frac="0.0240" end_point_E="7.7688" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="7.7600" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="7.6800" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="7.6000" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0280" sigma_frac="0.0000" end_point_E="7.4900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0260" sigma_frac="0.0000" end_point_E="7.3900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0120" sigma_frac="0.0000" end_point_E="7.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0060" sigma_frac="0.0000" end_point_E="7.1900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0260" sigma_frac="0.0000" end_point_E="7.0900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="6.9900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0130" sigma_frac="0.0000" end_point_E="6.8900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0170" sigma_frac="0.0000" end_point_E="6.7900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0020" sigma_frac="0.0000" end_point_E="6.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0150" sigma_frac="0.0000" end_point_E="6.5900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="6.4400" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="6.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0300" sigma_frac="0.0000" end_point_E="6.1400" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0240" sigma_frac="0.0000" end_point_E="5.9900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0060" sigma_frac="0.0000" end_point_E="5.8400" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0070" sigma_frac="0.0000" end_point_E="5.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0280" sigma_frac="0.0000" end_point_E="5.5400" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0330" sigma_frac="0.0000" end_point_E="5.3900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0050" sigma_frac="0.0000" end_point_E="5.2400" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="5.0900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0150" sigma_frac="0.0000" end_point_E="4.8900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="4.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0020" sigma_frac="0.0000" end_point_E="4.4900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="4.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0060" sigma_frac="0.0000" end_point_E="4.0900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="3.8900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="3.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="3.4900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="3.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="3.0900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="2.8900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="2.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="2.4900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="2.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="2.0900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.8900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.6900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0020" sigma_frac="0.0000" end_point_E="1.4900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.2900" sigma_E0="0.0900" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.0900" sigma_E0="0.0900" dJpi="0"/>
 	</isotope>
 	<isotope name="Ni69" isotope="280690" Q="5.758" HL="11.4" Ex="0.0">
-		<branch fraction="0.0790" sigma_frac="0.0000" end_point_E="4.5445" sigma_E0="0.0041" dJpi="2,1-"/>
-		<branch fraction="0.0170" sigma_frac="0.0000" end_point_E="4.0466" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="3.8867" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="3.5759" sigma_E0="0.0043" dJpi="0-"/>
-		<branch fraction="0.1030" sigma_frac="0.0000" end_point_E="3.2062" sigma_E0="0.0043" dJpi="0"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="3.1551" sigma_E0="0.0043" dJpi="0-"/>
-		<branch fraction="0.3320" sigma_frac="0.0000" end_point_E="3.0611" sigma_E0="0.0043" dJpi="1,0,1"/>
-		<branch fraction="0.4060" sigma_frac="0.0000" end_point_E="3.0010" sigma_E0="0.0043" dJpi="1,0,1"/>
-		<branch fraction="0.0600" sigma_frac="0.0000" end_point_E="2.9571" sigma_E0="0.0043" dJpi="1,0,1"/>
-		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="2.6943" sigma_E0="0.0044" dJpi="0"/>
+		<branch fraction="0.0790" sigma_frac="0.0130" end_point_E="4.5445" sigma_E0="0.0041" dJpi="2-"/>
+		<branch fraction="0.0170" sigma_frac="0.0120" end_point_E="4.0462" sigma_E0="0.0043" dJpi="1-"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="3.8862" sigma_E0="0.0043" dJpi="1-"/>
+		<branch fraction="0.0100" sigma_frac="0.0000" end_point_E="3.5755" sigma_E0="0.0043" dJpi="0-"/>
+		<branch fraction="0.1030" sigma_frac="0.0160" end_point_E="3.2058" sigma_E0="0.0043" dJpi="0"/>
+		<branch fraction="0.3330" sigma_frac="0.0140" end_point_E="3.0608" sigma_E0="0.0043" dJpi="1"/>
+		<branch fraction="0.4080" sigma_frac="0.0140" end_point_E="3.0006" sigma_E0="0.0043" dJpi="1"/>
+		<branch fraction="0.0600" sigma_frac="0.0090" end_point_E="2.9567" sigma_E0="0.0043" dJpi="0"/>
+		<branch fraction="0.0011" sigma_frac="0.0000" end_point_E="2.6939" sigma_E0="0.0044" dJpi="0"/>
 	</isotope>
 	<isotope name="Ni69" isotope="280691" Q="6.079" HL="3.5" Ex="0.321">
 		<branch fraction="0.2600" sigma_frac="0.0900" end_point_E="6.0790" sigma_E0="0.0040" dJpi="1"/>
 		<branch fraction="0.0300" sigma_frac="0.0000" end_point_E="4.9690" sigma_E0="0.0040" dJpi="0"/>
 		<branch fraction="0.7400" sigma_frac="0.0900" end_point_E="4.7811" sigma_E0="0.0041" dJpi="0,1"/>
 	</isotope>
-	<isotope name="Cu69" isotope="290690" Q="2.6814" HL="171.0" Ex="0.0">
-		<branch fraction="0.5100" sigma_frac="0.0800" end_point_E="2.6814" sigma_E0="0.0017" dJpi="1"/>
-		<branch fraction="0.0250" sigma_frac="0.0060" end_point_E="2.1501" sigma_E0="0.0018" dJpi="1"/>
-		<branch fraction="0.0880" sigma_frac="0.0150" end_point_E="1.8469" sigma_E0="0.0018" dJpi="0"/>
-		<branch fraction="0.2400" sigma_frac="0.0400" end_point_E="1.6737" sigma_E0="0.0018" dJpi="1,0"/>
-		<branch fraction="0.0420" sigma_frac="0.0070" end_point_E="1.5007" sigma_E0="0.0018" dJpi="1"/>
-		<branch fraction="0.0055" sigma_frac="0.0010" end_point_E="1.4297" sigma_E0="0.0019" dJpi="1-,0-"/>
-		<branch fraction="0.0690" sigma_frac="0.0110" end_point_E="1.2519" sigma_E0="0.0019" dJpi="1,0,1"/>
-		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="1.2231" sigma_E0="0.0022" dJpi="1"/>
-		<branch fraction="0.0004" sigma_frac="0.0001" end_point_E="1.0482" sigma_E0="0.0023" dJpi="1-"/>
-		<branch fraction="0.0180" sigma_frac="0.0030" end_point_E="0.8534" sigma_E0="0.0019" dJpi="0"/>
-		<branch fraction="0.0007" sigma_frac="0.0001" end_point_E="0.7880" sigma_E0="0.0022" dJpi="0"/>
-		<branch fraction="0.0046" sigma_frac="0.0008" end_point_E="0.6486" sigma_E0="0.0020" dJpi="1"/>
+	<isotope name="Cu69" isotope="290690" Q="2.6816999999999998" HL="171.0" Ex="0.0">
+		<branch fraction="0.7900" sigma_frac="0.0300" end_point_E="2.6817" sigma_E0="0.0016" dJpi="1"/>
+		<branch fraction="0.0110" sigma_frac="0.0040" end_point_E="2.1504" sigma_E0="0.0017" dJpi="1"/>
+		<branch fraction="0.0380" sigma_frac="0.0100" end_point_E="1.8472" sigma_E0="0.0017" dJpi="0"/>
+		<branch fraction="0.1010" sigma_frac="0.0230" end_point_E="1.6741" sigma_E0="0.0017" dJpi="0"/>
+		<branch fraction="0.0180" sigma_frac="0.0040" end_point_E="1.5009" sigma_E0="0.0017" dJpi="1"/>
+		<branch fraction="0.0024" sigma_frac="0.0006" end_point_E="1.4300" sigma_E0="0.0018" dJpi="1-,0-"/>
+		<branch fraction="0.0290" sigma_frac="0.0070" end_point_E="1.2522" sigma_E0="0.0018" dJpi="1,0,1"/>
+		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="1.2234" sigma_E0="0.0021" dJpi="1"/>
+		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="1.0485" sigma_E0="0.0022" dJpi="1-"/>
+		<branch fraction="0.0079" sigma_frac="0.0020" end_point_E="0.8537" sigma_E0="0.0018" dJpi="0"/>
+		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.7883" sigma_E0="0.0021" dJpi="0"/>
+		<branch fraction="0.0020" sigma_frac="0.0006" end_point_E="0.6489" sigma_E0="0.0019" dJpi="1"/>
 	</isotope>
-	<isotope name="Zn69" isotope="300690" Q="0.9102" HL="3384.0" Ex="0.0">
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.9102" sigma_E0="0.0015" dJpi="1"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.5918" sigma_E0="0.0017" dJpi="0"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0385" sigma_E0="0.0017" dJpi="1"/>
+	<isotope name="Zn69" isotope="300690" Q="0.9098999999999999" HL="3384.0" Ex="0.0">
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.9099" sigma_E0="0.0014" dJpi="1"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.5915" sigma_E0="0.0016" dJpi="0"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0382" sigma_E0="0.0016" dJpi="1"/>
 	</isotope>
-	<isotope name="Zn69" isotope="300691" Q="1.348836" HL="49521.6" Ex="0.438636">
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.7749" sigma_E0="0.0017" dJpi="2-"/>
+	<isotope name="Zn69" isotope="300691" Q="1.348536" HL="49496.4" Ex="0.438636">
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.7742" sigma_E0="0.0016" dJpi="2-"/>
 	</isotope>
 	<isotope name="Mn70" isotope="250700" Q="17.1" HL="0.019899999999999998" Ex="0.0">
 		<branch fraction="0.3900" sigma_frac="0.0000" end_point_E="17.1000" sigma_E0="0.0000" dJpi="0"/>
@@ -7907,6 +7956,7 @@
 		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="8.1322" sigma_E0="0.0003" dJpi="1"/>
 		<branch fraction="0.2000" sigma_frac="0.0000" end_point_E="7.5206" sigma_E0="0.0002" dJpi="0,1"/>
 	</isotope>
+	<isotope name="Ag122" isotope="471220" Q="9.5" HL="0.0" Ex="0.0"/>
 	<isotope name="Cd122" isotope="481220" Q="2.85" HL="5.24" Ex="0.0">
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.8500" sigma_E0="0.0700" dJpi="1"/>
 	</isotope>
@@ -7969,6 +8019,7 @@
 		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="0.2316" sigma_E0="0.0028" dJpi="0-"/>
 	</isotope>
 	<isotope name="Pd123" isotope="461230" Q="9.14" HL="0.109" Ex="0.0"/>
+	<isotope name="Pd123" isotope="461230" Q="9.14" HL="0.0" Ex="0.0"/>
 	<isotope name="Ag123" isotope="471230" Q="7.85" HL="0.299" Ex="0.0">
 		<branch fraction="0.0400" sigma_frac="0.0220" end_point_E="7.7336" sigma_E0="0.0300" dJpi="3"/>
 		<branch fraction="0.3080" sigma_frac="0.0190" end_point_E="7.5861" sigma_E0="0.0300" dJpi="0"/>
@@ -8046,6 +8097,7 @@
 		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.7202" sigma_E0="0.0026" dJpi="1"/>
 	</isotope>
 	<isotope name="Ag124" isotope="471240" Q="10.24" HL="0.172" Ex="0.0"/>
+	<isotope name="Ag124" isotope="471240" Q="10.24" HL="0.0" Ex="0.0"/>
 	<isotope name="Cd124" isotope="481240" Q="4.17" HL="1.25" Ex="0.0"/>
 	<isotope name="In124" isotope="491240" Q="7.36" HL="3.12" Ex="0.0">
 		<branch fraction="0.2000" sigma_frac="0.0700" end_point_E="6.2284" sigma_E0="0.0501" dJpi="1"/>
@@ -11145,110 +11197,151 @@
 		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1028" sigma_E0="0.0003" dJpi="1-"/>
 		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0268" sigma_E0="0.0003" dJpi="2-"/>
 	</isotope>
-	<isotope name="Cs148" isotope="551480" Q="10.3" HL="0.146" Ex="0.0"/>
-	<isotope name="Ba148" isotope="561480" Q="5.11" HL="0.612" Ex="0.0">
-		<branch fraction="0.2300" sigma_frac="0.0000" end_point_E="5.0540" sigma_E0="0.0600" dJpi="1"/>
-		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="5.0001" sigma_E0="0.0600" dJpi="1"/>
-		<branch fraction="0.0900" sigma_frac="0.0000" end_point_E="4.9763" sigma_E0="0.0600" dJpi="0-"/>
-		<branch fraction="0.0700" sigma_frac="0.0000" end_point_E="4.8921" sigma_E0="0.0600" dJpi="0"/>
-		<branch fraction="0.0600" sigma_frac="0.0000" end_point_E="4.7408" sigma_E0="0.0600" dJpi="0"/>
-		<branch fraction="0.0700" sigma_frac="0.0000" end_point_E="4.6381" sigma_E0="0.0600" dJpi="0"/>
+	<isotope name="Cs148" isotope="551480" Q="10.634" HL="0.15109999999999998" Ex="0.0">
+		<branch fraction="0.0900" sigma_frac="0.0400" end_point_E="10.6340" sigma_E0="0.0130" dJpi="0"/>
+		<branch fraction="0.0570" sigma_frac="0.0100" end_point_E="10.4924" sigma_E0="0.0131" dJpi="2"/>
+		<branch fraction="0.0260" sigma_frac="0.0040" end_point_E="10.2110" sigma_E0="0.0131" dJpi="4"/>
+		<branch fraction="0.0910" sigma_frac="0.0130" end_point_E="9.9470" sigma_E0="0.0131" dJpi="1"/>
+		<branch fraction="0.0720" sigma_frac="0.0100" end_point_E="9.8593" sigma_E0="0.0131" dJpi="3"/>
+		<branch fraction="0.0210" sigma_frac="0.0030" end_point_E="9.7731" sigma_E0="0.0131" dJpi="0"/>
+		<branch fraction="0.0040" sigma_frac="0.0010" end_point_E="9.6717" sigma_E0="0.0131" dJpi="5"/>
+		<branch fraction="0.0320" sigma_frac="0.0050" end_point_E="9.6538" sigma_E0="0.0131" dJpi="2,3"/>
+		<branch fraction="0.0440" sigma_frac="0.0060" end_point_E="9.5851" sigma_E0="0.0131" dJpi="2"/>
+		<branch fraction="0.0130" sigma_frac="0.0020" end_point_E="9.4321" sigma_E0="0.0131" dJpi="2,3,4"/>
+		<branch fraction="0.0100" sigma_frac="0.0020" end_point_E="9.3793" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0160" sigma_frac="0.0020" end_point_E="9.2046" sigma_E0="0.0132" dJpi="1,2,3"/>
+		<branch fraction="0.0080" sigma_frac="0.0010" end_point_E="9.1397" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0220" sigma_frac="0.0030" end_point_E="9.1119" sigma_E0="0.0131" dJpi="0"/>
+		<branch fraction="0.0210" sigma_frac="0.0030" end_point_E="9.1019" sigma_E0="0.0131" dJpi="0,1,2"/>
+		<branch fraction="0.0070" sigma_frac="0.0010" end_point_E="9.0756" sigma_E0="0.0132" dJpi="2,3,4"/>
+		<branch fraction="0.0170" sigma_frac="0.0020" end_point_E="9.0552" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0070" sigma_frac="0.0010" end_point_E="9.0311" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0130" sigma_frac="0.0020" end_point_E="9.0067" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0040" sigma_frac="0.0010" end_point_E="8.9502" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0050" sigma_frac="0.0010" end_point_E="8.9370" sigma_E0="0.0132" dJpi="1,2,3"/>
+		<branch fraction="0.0260" sigma_frac="0.0040" end_point_E="8.9070" sigma_E0="0.0131" dJpi="0,1,2"/>
+		<branch fraction="0.0030" sigma_frac="0.0010" end_point_E="8.9020" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0040" sigma_frac="0.0010" end_point_E="8.8847" sigma_E0="0.0133" dJpi="1,2,3"/>
+		<branch fraction="0.0070" sigma_frac="0.0010" end_point_E="8.8646" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0080" sigma_frac="0.0010" end_point_E="8.8507" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0050" sigma_frac="0.0010" end_point_E="8.7941" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0080" sigma_frac="0.0010" end_point_E="8.7615" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0170" sigma_frac="0.0030" end_point_E="8.7501" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0170" sigma_frac="0.0020" end_point_E="8.7305" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.7226" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.7008" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0020" sigma_frac="0.0010" end_point_E="8.6469" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.6233" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0110" sigma_frac="0.0020" end_point_E="8.6126" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.5604" sigma_E0="0.0134" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.4068" sigma_E0="0.0135" dJpi="0"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="8.2104" sigma_E0="0.0133" dJpi="0"/>
+		<branch fraction="0.0110" sigma_frac="0.0020" end_point_E="8.0764" sigma_E0="0.0132" dJpi="0,1,2"/>
+		<branch fraction="0.2900" sigma_frac="0.0450" end_point_E="5.2820" sigma_E0="0.0130" dJpi="0"/>
 	</isotope>
-	<isotope name="La148" isotope="571480" Q="7.69" HL="1.26" Ex="0.0">
+	<isotope name="Ba148" isotope="561480" Q="5.164" HL="0.619" Ex="0.0">
+		<branch fraction="0.2300" sigma_frac="0.0000" end_point_E="5.1080" sigma_E0="0.0200" dJpi="1"/>
+		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="5.0541" sigma_E0="0.0200" dJpi="1"/>
+		<branch fraction="0.0900" sigma_frac="0.0000" end_point_E="5.0303" sigma_E0="0.0200" dJpi="0-"/>
+		<branch fraction="0.0700" sigma_frac="0.0000" end_point_E="4.9461" sigma_E0="0.0200" dJpi="0"/>
+		<branch fraction="0.0600" sigma_frac="0.0000" end_point_E="4.7948" sigma_E0="0.0200" dJpi="0"/>
+		<branch fraction="0.0700" sigma_frac="0.0000" end_point_E="4.6921" sigma_E0="0.0201" dJpi="0"/>
+	</isotope>
+	<isotope name="La148" isotope="571480" Q="7.69" HL="1.34" Ex="0.0">
 		<branch fraction="0.1240" sigma_frac="0.0000" end_point_E="7.5315" sigma_E0="0.0220" dJpi="0-"/>
-		<branch fraction="0.0184" sigma_frac="0.0000" end_point_E="7.2366" sigma_E0="0.0221" dJpi="2-"/>
+		<branch fraction="0.0180" sigma_frac="0.0000" end_point_E="7.2366" sigma_E0="0.0221" dJpi="2-"/>
 		<branch fraction="0.1400" sigma_frac="0.0000" end_point_E="6.9297" sigma_E0="0.0220" dJpi="1"/>
 		<branch fraction="0.0160" sigma_frac="0.0000" end_point_E="6.9196" sigma_E0="0.0221" dJpi="2-"/>
 		<branch fraction="0.0680" sigma_frac="0.0000" end_point_E="6.8486" sigma_E0="0.0221" dJpi="1"/>
 		<branch fraction="0.0530" sigma_frac="0.0000" end_point_E="6.7544" sigma_E0="0.0221" dJpi="0-"/>
 		<branch fraction="0.1060" sigma_frac="0.0000" end_point_E="6.7001" sigma_E0="0.0220" dJpi="0-"/>
-		<branch fraction="0.0239" sigma_frac="0.0000" end_point_E="6.5734" sigma_E0="0.0221" dJpi="1-"/>
+		<branch fraction="0.0240" sigma_frac="0.0000" end_point_E="6.5734" sigma_E0="0.0221" dJpi="1-"/>
 		<branch fraction="0.0050" sigma_frac="0.0000" end_point_E="6.4660" sigma_E0="0.0221" dJpi="2-"/>
-		<branch fraction="0.0640" sigma_frac="0.0000" end_point_E="6.3211" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0234" sigma_frac="0.0000" end_point_E="6.2744" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0083" sigma_frac="0.0000" end_point_E="6.2331" sigma_E0="0.0222" dJpi="0"/>
-		<branch fraction="0.0067" sigma_frac="0.0000" end_point_E="6.2039" sigma_E0="0.0221" dJpi="2"/>
-		<branch fraction="0.0239" sigma_frac="0.0000" end_point_E="6.1929" sigma_E0="0.0221" dJpi="0-,1-"/>
-		<branch fraction="0.0122" sigma_frac="0.0000" end_point_E="6.1352" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0033" sigma_frac="0.0000" end_point_E="6.1315" sigma_E0="0.0222" dJpi="0"/>
-		<branch fraction="0.0089" sigma_frac="0.0000" end_point_E="6.1060" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0640" sigma_frac="0.0000" end_point_E="6.3211" sigma_E0="0.0221" dJpi="2-"/>
+		<branch fraction="0.0230" sigma_frac="0.0000" end_point_E="6.2744" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0080" sigma_frac="0.0000" end_point_E="6.2331" sigma_E0="0.0222" dJpi="0"/>
+		<branch fraction="0.0070" sigma_frac="0.0000" end_point_E="6.2039" sigma_E0="0.0221" dJpi="2"/>
+		<branch fraction="0.0240" sigma_frac="0.0000" end_point_E="6.1929" sigma_E0="0.0221" dJpi="0-,1-"/>
+		<branch fraction="0.0120" sigma_frac="0.0000" end_point_E="6.1352" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="6.1315" sigma_E0="0.0222" dJpi="0"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="6.1060" sigma_E0="0.0221" dJpi="0"/>
 		<branch fraction="0.0430" sigma_frac="0.0000" end_point_E="6.1001" sigma_E0="0.0221" dJpi="0-,1-"/>
-		<branch fraction="0.0089" sigma_frac="0.0000" end_point_E="6.0672" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0033" sigma_frac="0.0000" end_point_E="6.0640" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0122" sigma_frac="0.0000" end_point_E="5.9616" sigma_E0="0.0221" dJpi="0"/>
-		<branch fraction="0.0295" sigma_frac="0.0000" end_point_E="5.7988" sigma_E0="0.0221" dJpi="0-,1-"/>
-		<branch fraction="0.0089" sigma_frac="0.0000" end_point_E="5.7623" sigma_E0="0.0222" dJpi="0"/>
-		<branch fraction="0.0256" sigma_frac="0.0000" end_point_E="5.5455" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="6.0672" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="6.0640" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0120" sigma_frac="0.0000" end_point_E="5.9616" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0300" sigma_frac="0.0000" end_point_E="5.7988" sigma_E0="0.0221" dJpi="0-,1-"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="5.7623" sigma_E0="0.0222" dJpi="0"/>
+		<branch fraction="0.0260" sigma_frac="0.0000" end_point_E="5.5455" sigma_E0="0.0221" dJpi="0"/>
 		<branch fraction="0.0400" sigma_frac="0.0000" end_point_E="5.5363" sigma_E0="0.0221" dJpi="0-,1-"/>
-		<branch fraction="0.0067" sigma_frac="0.0000" end_point_E="5.4976" sigma_E0="0.0222" dJpi="0"/>
-		<branch fraction="0.0745" sigma_frac="0.0000" end_point_E="5.4378" sigma_E0="0.0221" dJpi="0"/>
+		<branch fraction="0.0070" sigma_frac="0.0000" end_point_E="5.4976" sigma_E0="0.0222" dJpi="0"/>
+		<branch fraction="0.0750" sigma_frac="0.0000" end_point_E="5.4378" sigma_E0="0.0221" dJpi="0"/>
 		<branch fraction="0.0420" sigma_frac="0.0000" end_point_E="5.1396" sigma_E0="0.0222" dJpi="0-,1-"/>
 	</isotope>
 	<isotope name="Ce148" isotope="581480" Q="2.137" HL="56.8" Ex="0.0">
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.1370" sigma_E0="0.0130" dJpi="1-"/>
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0388" sigma_E0="0.0130" dJpi="1-,2-,3-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0380" sigma_E0="0.0130" dJpi="0-,1-,2-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0318" sigma_E0="0.0130" dJpi="0,1,2-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0158" sigma_E0="0.0130" dJpi="0-,1-,2-"/>
-		<branch fraction="0.0580" sigma_frac="0.0170" end_point_E="1.9410" sigma_E0="0.0130" dJpi="1"/>
+		<branch fraction="0.0600" sigma_frac="0.0000" end_point_E="2.0380" sigma_E0="0.0130" dJpi="0-,1-,2-"/>
+		<branch fraction="0.0300" sigma_frac="0.0000" end_point_E="2.0318" sigma_E0="0.0130" dJpi="0,1,2-"/>
+		<branch fraction="0.0600" sigma_frac="0.0000" end_point_E="2.0158" sigma_E0="0.0130" dJpi="0-,1-,2-"/>
+		<branch fraction="0.0460" sigma_frac="0.0000" end_point_E="1.9410" sigma_E0="0.0130" dJpi="1-"/>
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8633" sigma_E0="0.0130" dJpi="0,1,2"/>
-		<branch fraction="0.0010" sigma_frac="0.0070" end_point_E="1.8498" sigma_E0="0.0130" dJpi="0"/>
-		<branch fraction="0.0010" sigma_frac="0.0160" end_point_E="1.8473" sigma_E0="0.0130" dJpi="0"/>
+		<branch fraction="0.0040" sigma_frac="0.0000" end_point_E="1.8498" sigma_E0="0.0130" dJpi="0"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8473" sigma_E0="0.0130" dJpi="0,1,2"/>
 		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8043" sigma_E0="0.0131" dJpi="0"/>
-		<branch fraction="0.0210" sigma_frac="0.0030" end_point_E="1.7843" sigma_E0="0.0131" dJpi="0-"/>
-		<branch fraction="0.5900" sigma_frac="0.0400" end_point_E="1.7463" sigma_E0="0.0130" dJpi="1"/>
-		<branch fraction="0.0330" sigma_frac="0.0030" end_point_E="1.6692" sigma_E0="0.0131" dJpi="0"/>
-		<branch fraction="0.1630" sigma_frac="0.0090" end_point_E="1.6162" sigma_E0="0.0130" dJpi="1"/>
-		<branch fraction="0.0070" sigma_frac="0.0016" end_point_E="1.5106" sigma_E0="0.0132" dJpi="0"/>
-		<branch fraction="0.0210" sigma_frac="0.0030" end_point_E="1.3716" sigma_E0="0.0131" dJpi="1"/>
+		<branch fraction="0.0210" sigma_frac="0.0000" end_point_E="1.7843" sigma_E0="0.0131" dJpi="0-"/>
+		<branch fraction="0.5900" sigma_frac="0.0000" end_point_E="1.7463" sigma_E0="0.0130" dJpi="1"/>
+		<branch fraction="0.0330" sigma_frac="0.0000" end_point_E="1.6692" sigma_E0="0.0131" dJpi="0"/>
+		<branch fraction="0.1600" sigma_frac="0.0000" end_point_E="1.6162" sigma_E0="0.0130" dJpi="1"/>
+		<branch fraction="0.0070" sigma_frac="0.0000" end_point_E="1.5106" sigma_E0="0.0132" dJpi="0"/>
+		<branch fraction="0.0210" sigma_frac="0.0000" end_point_E="1.3715" sigma_E0="0.0131" dJpi="1"/>
 	</isotope>
-	<isotope name="Pr148" isotope="591480" Q="4.872" HL="137.4" Ex="0.0">
-		<branch fraction="0.2190" sigma_frac="0.0150" end_point_E="4.8000" sigma_E0="0.2000" dJpi="1-"/>
-		<branch fraction="0.2760" sigma_frac="0.0230" end_point_E="4.5000" sigma_E0="0.2000" dJpi="1-"/>
-		<branch fraction="0.0130" sigma_frac="0.0060" end_point_E="4.1198" sigma_E0="0.0151" dJpi="3-"/>
-		<branch fraction="0.0190" sigma_frac="0.0040" end_point_E="3.9551" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0420" sigma_frac="0.0090" end_point_E="3.8727" sigma_E0="0.0151" dJpi="2"/>
-		<branch fraction="0.0430" sigma_frac="0.0110" end_point_E="3.8488" sigma_E0="0.0151" dJpi="0"/>
-		<branch fraction="0.0250" sigma_frac="0.0090" end_point_E="3.7011" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0420" sigma_frac="0.0160" end_point_E="3.6234" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0040" sigma_frac="0.0100" end_point_E="3.3605" sigma_E0="0.0151" dJpi="2-"/>
-		<branch fraction="0.0100" sigma_frac="0.0019" end_point_E="3.3564" sigma_E0="0.0154" dJpi="0"/>
-		<branch fraction="0.0093" sigma_frac="0.0015" end_point_E="3.2264" sigma_E0="0.0152" dJpi="0"/>
-		<branch fraction="0.0880" sigma_frac="0.0120" end_point_E="3.2121" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0260" sigma_frac="0.0060" end_point_E="3.1887" sigma_E0="0.0154" dJpi="3-"/>
-		<branch fraction="0.0570" sigma_frac="0.0040" end_point_E="2.7983" sigma_E0="0.0152" dJpi="1-"/>
-		<branch fraction="0.0050" sigma_frac="0.0030" end_point_E="2.6898" sigma_E0="0.0154" dJpi="0"/>
-		<branch fraction="0.0010" sigma_frac="0.0040" end_point_E="2.6352" sigma_E0="0.0159" dJpi="0"/>
-		<branch fraction="0.0180" sigma_frac="0.0040" end_point_E="2.4660" sigma_E0="0.0152" dJpi="1-"/>
-		<branch fraction="0.0370" sigma_frac="0.0060" end_point_E="2.4407" sigma_E0="0.0152" dJpi="1-"/>
-		<branch fraction="0.0090" sigma_frac="0.0030" end_point_E="2.3270" sigma_E0="0.0157" dJpi="0"/>
-		<branch fraction="0.0410" sigma_frac="0.0060" end_point_E="1.9414" sigma_E0="0.0152" dJpi="1"/>
-		<branch fraction="0.0110" sigma_frac="0.0050" end_point_E="1.8352" sigma_E0="0.0159" dJpi="0"/>
-		<branch fraction="0.0008" sigma_frac="0.0002" end_point_E="1.7421" sigma_E0="0.0159" dJpi="0"/>
+	<isotope name="Pr148" isotope="591480" Q="4.873" HL="137.4" Ex="0.0">
+		<branch fraction="0.2190" sigma_frac="0.0000" end_point_E="4.8730" sigma_E0="0.0150" dJpi="1-"/>
+		<branch fraction="0.2770" sigma_frac="0.0000" end_point_E="4.5713" sigma_E0="0.0150" dJpi="1-"/>
+		<branch fraction="0.0130" sigma_frac="0.0000" end_point_E="4.1208" sigma_E0="0.0151" dJpi="3-"/>
+		<branch fraction="0.0200" sigma_frac="0.0000" end_point_E="3.9561" sigma_E0="0.0151" dJpi="1-"/>
+		<branch fraction="0.0430" sigma_frac="0.0000" end_point_E="3.8737" sigma_E0="0.0151" dJpi="2"/>
+		<branch fraction="0.0440" sigma_frac="0.0000" end_point_E="3.8498" sigma_E0="0.0151" dJpi="0"/>
+		<branch fraction="0.0250" sigma_frac="0.0000" end_point_E="3.7021" sigma_E0="0.0151" dJpi="1-"/>
+		<branch fraction="0.0420" sigma_frac="0.0000" end_point_E="3.6244" sigma_E0="0.0151" dJpi="1-"/>
+		<branch fraction="0.0040" sigma_frac="0.0000" end_point_E="3.3615" sigma_E0="0.0151" dJpi="2-"/>
+		<branch fraction="0.0100" sigma_frac="0.0000" end_point_E="3.3574" sigma_E0="0.0153" dJpi="0"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="3.2274" sigma_E0="0.0152" dJpi="0"/>
+		<branch fraction="0.0880" sigma_frac="0.0000" end_point_E="3.2131" sigma_E0="0.0150" dJpi="1-"/>
+		<branch fraction="0.0260" sigma_frac="0.0000" end_point_E="3.1897" sigma_E0="0.0154" dJpi="3-"/>
+		<branch fraction="0.0570" sigma_frac="0.0000" end_point_E="2.7993" sigma_E0="0.0152" dJpi="1-"/>
+		<branch fraction="0.0050" sigma_frac="0.0000" end_point_E="2.6908" sigma_E0="0.0153" dJpi="0"/>
+		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="2.6362" sigma_E0="0.0159" dJpi="0"/>
+		<branch fraction="0.0180" sigma_frac="0.0000" end_point_E="2.4670" sigma_E0="0.0152" dJpi="1-"/>
+		<branch fraction="0.0380" sigma_frac="0.0000" end_point_E="2.4417" sigma_E0="0.0152" dJpi="1-"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="2.3280" sigma_E0="0.0156" dJpi="0"/>
+		<branch fraction="0.0410" sigma_frac="0.0000" end_point_E="1.9424" sigma_E0="0.0152" dJpi="1"/>
+		<branch fraction="0.0110" sigma_frac="0.0000" end_point_E="1.8362" sigma_E0="0.0159" dJpi="0"/>
+		<branch fraction="0.0008" sigma_frac="0.0000" end_point_E="1.7431" sigma_E0="0.0158" dJpi="0"/>
 	</isotope>
-	<isotope name="Pr148" isotope="591481" Q="4.9488" HL="120.6" Ex="0.0768">
-		<branch fraction="0.4300" sigma_frac="0.0500" end_point_E="4.1964" sigma_E0="0.0153" dJpi="0-"/>
-		<branch fraction="0.4200" sigma_frac="0.0500" end_point_E="3.9496" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0160" sigma_frac="0.0020" end_point_E="3.2614" sigma_E0="0.0157" dJpi="1-,0-,1-"/>
-		<branch fraction="0.0900" sigma_frac="0.0090" end_point_E="3.0903" sigma_E0="0.0154" dJpi="2-,1-"/>
+	<isotope name="Pr148" isotope="591481" Q="4.949800000000001" HL="120.6" Ex="0.0768">
+		<branch fraction="0.4300" sigma_frac="0.0000" end_point_E="4.1974" sigma_E0="0.0153" dJpi="0-"/>
+		<branch fraction="0.4200" sigma_frac="0.0000" end_point_E="3.9506" sigma_E0="0.0151" dJpi="1"/>
+		<branch fraction="0.0160" sigma_frac="0.0000" end_point_E="3.2624" sigma_E0="0.0157" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0900" sigma_frac="0.0000" end_point_E="3.0913" sigma_E0="0.0153" dJpi="2-,1-"/>
 	</isotope>
-	<isotope name="Pm148" isotope="611480" Q="2.471" HL="463795.2" Ex="0.0">
+	<isotope name="Pm148" isotope="611480" Q="2.47" HL="463795.2" Ex="0.0">
 		<branch fraction="0.5550" sigma_frac="0.0110" end_point_E="2.4800" sigma_E0="0.0300" dJpi="1-"/>
 		<branch fraction="0.0940" sigma_frac="0.0030" end_point_E="1.9300" sigma_E0="0.0300" dJpi="1-"/>
-		<branch fraction="0.0024" sigma_frac="0.0001" end_point_E="1.0465" sigma_E0="0.0060" dJpi="1-"/>
-		<branch fraction="0.0009" sigma_frac="0.0000" end_point_E="1.0168" sigma_E0="0.0060" dJpi="1-"/>
+		<branch fraction="0.0024" sigma_frac="0.0001" end_point_E="1.0455" sigma_E0="0.0060" dJpi="1-"/>
+		<branch fraction="0.0009" sigma_frac="0.0000" end_point_E="1.0158" sigma_E0="0.0060" dJpi="1-"/>
 		<branch fraction="0.3340" sigma_frac="0.0080" end_point_E="1.0200" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.8068" sigma_E0="0.0060" dJpi="1-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.5494" sigma_E0="0.0062" dJpi="1-"/>
-		<branch fraction="0.0136" sigma_frac="0.0004" end_point_E="0.4130" sigma_E0="0.0060" dJpi="1"/>
-		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="0.1866" sigma_E0="0.0060" dJpi="0-,1-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1570" sigma_E0="0.0062" dJpi="1-"/>
+		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.8058" sigma_E0="0.0060" dJpi="1-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.5484" sigma_E0="0.0062" dJpi="1-"/>
+		<branch fraction="0.0136" sigma_frac="0.0004" end_point_E="0.4120" sigma_E0="0.0060" dJpi="1"/>
+		<branch fraction="0.0010" sigma_frac="0.0001" end_point_E="0.1856" sigma_E0="0.0060" dJpi="0-,1-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1560" sigma_E0="0.0062" dJpi="1-"/>
 	</isotope>
-	<isotope name="Pm148" isotope="611481" Q="2.6089" HL="3567456.0" Ex="0.1379">
-		<branch fraction="0.0096" sigma_frac="0.0023" end_point_E="1.0146" sigma_E0="0.0060" dJpi="0"/>
-		<branch fraction="0.2290" sigma_frac="0.0040" end_point_E="0.7030" sigma_E0="0.0060" dJpi="1-"/>
-		<branch fraction="0.1950" sigma_frac="0.0030" end_point_E="0.5133" sigma_E0="0.0060" dJpi="1-"/>
-		<branch fraction="0.5640" sigma_frac="0.0050" end_point_E="0.4148" sigma_E0="0.0060" dJpi="1-"/>
+	<isotope name="Pm148" isotope="611481" Q="2.6079000000000003" HL="3567456.0" Ex="0.1379">
+		<branch fraction="0.0096" sigma_frac="0.0023" end_point_E="1.0136" sigma_E0="0.0060" dJpi="0"/>
+		<branch fraction="0.2290" sigma_frac="0.0040" end_point_E="0.7020" sigma_E0="0.0060" dJpi="1-"/>
+		<branch fraction="0.1950" sigma_frac="0.0030" end_point_E="0.5123" sigma_E0="0.0060" dJpi="1-"/>
+		<branch fraction="0.5640" sigma_frac="0.0050" end_point_E="0.4139" sigma_E0="0.0060" dJpi="1-"/>
 	</isotope>
 	<isotope name="Cs149" isotope="551490" Q="9.53" HL="0.107" Ex="0.0">
 		<branch fraction="0.4500" sigma_frac="0.0600" end_point_E="9.5300" sigma_E0="0.0000" dJpi="2,1"/>
@@ -12355,6 +12448,7 @@
 	</isotope>
 	<isotope name="Sm162" isotope="621620" Q="4.344" HL="3.15" Ex="0.0"/>
 	<isotope name="Eu162" isotope="631620" Q="5.558" HL="11.4" Ex="0.0"/>
+	<isotope name="Eu162" isotope="631621" Q="5.7164" HL="0.0" Ex="0.1584"/>
 	<isotope name="Gd162" isotope="641620" Q="1.599" HL="504.0" Ex="0.0">
 		<branch fraction="0.0430" sigma_frac="0.0070" end_point_E="1.2576" sigma_E0="0.0041" dJpi="0-,1"/>
 		<branch fraction="0.9500" sigma_frac="0.1400" end_point_E="1.1569" sigma_E0="0.0041" dJpi="1"/>
@@ -12562,19 +12656,19 @@
 		<branch fraction="0.8000" sigma_frac="0.0000" end_point_E="3.2000" sigma_E0="0.3000" dJpi="1"/>
 		<branch fraction="0.2000" sigma_frac="0.0000" end_point_E="1.6218" sigma_E0="0.3004" dJpi="1-,0-,1"/>
 	</isotope>
-	<isotope name="Ho169" isotope="671690" Q="2.126" HL="283.2" Ex="0.0">
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0341" sigma_E0="0.0202" dJpi="1"/>
-		<branch fraction="0.0190" sigma_frac="0.0000" end_point_E="1.9493" sigma_E0="0.0202" dJpi="0"/>
-		<branch fraction="0.0720" sigma_frac="0.0000" end_point_E="1.8824" sigma_E0="0.0202" dJpi="0-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8087" sigma_E0="0.0205" dJpi="1-"/>
-		<branch fraction="0.0270" sigma_frac="0.0000" end_point_E="1.3564" sigma_E0="0.0201" dJpi="1"/>
-		<branch fraction="0.6000" sigma_frac="0.0000" end_point_E="1.2730" sigma_E0="0.0201" dJpi="1"/>
-		<branch fraction="0.1220" sigma_frac="0.0000" end_point_E="1.1850" sigma_E0="0.0202" dJpi="0"/>
+	<isotope name="Ho169" isotope="671690" Q="2.125" HL="282.0" Ex="0.0">
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.0331" sigma_E0="0.0201" dJpi="1"/>
+		<branch fraction="0.0180" sigma_frac="0.0000" end_point_E="1.9483" sigma_E0="0.0201" dJpi="0"/>
+		<branch fraction="0.0720" sigma_frac="0.0000" end_point_E="1.8813" sigma_E0="0.0202" dJpi="0-"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8077" sigma_E0="0.0205" dJpi="1-"/>
+		<branch fraction="0.0270" sigma_frac="0.0000" end_point_E="1.3554" sigma_E0="0.0201" dJpi="1"/>
+		<branch fraction="0.6000" sigma_frac="0.0000" end_point_E="1.2720" sigma_E0="0.0201" dJpi="1"/>
+		<branch fraction="0.1220" sigma_frac="0.0000" end_point_E="1.1840" sigma_E0="0.0201" dJpi="0"/>
 	</isotope>
-	<isotope name="Er169" isotope="681690" Q="0.3513" HL="811468.7999999999" Ex="0.0">
-		<branch fraction="0.5500" sigma_frac="0.0500" end_point_E="0.3513" sigma_E0="0.0011" dJpi="0-"/>
-		<branch fraction="0.4500" sigma_frac="0.0500" end_point_E="0.3429" sigma_E0="0.0011" dJpi="1-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.2331" sigma_E0="0.0011" dJpi="2-"/>
+	<isotope name="Er169" isotope="681690" Q="0.3535" HL="811296.0" Ex="0.0">
+		<branch fraction="0.5500" sigma_frac="0.0500" end_point_E="0.3535" sigma_E0="0.0008" dJpi="0-"/>
+		<branch fraction="0.4500" sigma_frac="0.0500" end_point_E="0.3451" sigma_E0="0.0008" dJpi="1-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.2353" sigma_E0="0.0008" dJpi="2-"/>
 	</isotope>
 	<isotope name="Tb170" isotope="651700" Q="6.94" HL="0.96" Ex="0.0"/>
 	<isotope name="Ho170" isotope="671700" Q="3.87" HL="165.6" Ex="0.0">
@@ -12689,36 +12783,31 @@
 		<branch fraction="0.0040" sigma_frac="0.0010" end_point_E="0.7433" sigma_E0="0.0503" dJpi="0,1-"/>
 		<branch fraction="0.1430" sigma_frac="0.0080" end_point_E="0.7000" sigma_E0="0.0500" dJpi="1"/>
 	</isotope>
-	<isotope name="Er175" isotope="681750" Q="3.7" HL="72.0" Ex="0.0">
-		<branch fraction="0.3500" sigma_frac="0.0000" end_point_E="3.3421" sigma_E0="0.0008" dJpi="0"/>
-		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="3.0607" sigma_E0="0.0010" dJpi="1-"/>
-		<branch fraction="0.4800" sigma_frac="0.0000" end_point_E="2.4088" sigma_E0="0.0009" dJpi="0"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="2.3323" sigma_E0="0.0011" dJpi="1"/>
-	</isotope>
+	<isotope name="Er175" isotope="681750" Q="3.66" HL="72.0" Ex="0.0"/>
 	<isotope name="Tm175" isotope="691750" Q="2.39" HL="912.0" Ex="0.0">
 		<branch fraction="0.1900" sigma_frac="0.0800" end_point_E="1.8753" sigma_E0="0.0502" dJpi="0-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.8342" sigma_E0="0.0502" dJpi="1-"/>
-		<branch fraction="0.0310" sigma_frac="0.0040" end_point_E="1.5789" sigma_E0="0.0502" dJpi="1-"/>
-		<branch fraction="0.1240" sigma_frac="0.0090" end_point_E="1.4701" sigma_E0="0.0503" dJpi="0-"/>
-		<branch fraction="0.0550" sigma_frac="0.0040" end_point_E="1.3980" sigma_E0="0.0503" dJpi="1-"/>
-		<branch fraction="0.0026" sigma_frac="0.0004" end_point_E="1.3219" sigma_E0="0.0508" dJpi="1"/>
-		<branch fraction="0.0180" sigma_frac="0.0030" end_point_E="0.9216" sigma_E0="0.0503" dJpi="1"/>
-		<branch fraction="0.3710" sigma_frac="0.0140" end_point_E="0.8932" sigma_E0="0.0502" dJpi="1"/>
-		<branch fraction="0.0020" sigma_frac="0.0004" end_point_E="0.7700" sigma_E0="0.0530" dJpi="0"/>
-		<branch fraction="0.0048" sigma_frac="0.0010" end_point_E="0.7077" sigma_E0="0.0506" dJpi="0,1,2"/>
-		<branch fraction="0.0061" sigma_frac="0.0006" end_point_E="0.6993" sigma_E0="0.0504" dJpi="0"/>
+		<branch fraction="0.0320" sigma_frac="0.0050" end_point_E="1.5789" sigma_E0="0.0502" dJpi="1-"/>
+		<branch fraction="0.1250" sigma_frac="0.0120" end_point_E="1.4701" sigma_E0="0.0503" dJpi="0-"/>
+		<branch fraction="0.0550" sigma_frac="0.0060" end_point_E="1.3980" sigma_E0="0.0503" dJpi="1-"/>
+		<branch fraction="0.0019" sigma_frac="0.0010" end_point_E="1.3219" sigma_E0="0.0508" dJpi="1"/>
+		<branch fraction="0.0178" sigma_frac="0.0028" end_point_E="0.9216" sigma_E0="0.0503" dJpi="0-,1"/>
+		<branch fraction="0.3770" sigma_frac="0.0290" end_point_E="0.8932" sigma_E0="0.0502" dJpi="1"/>
+		<branch fraction="0.0010" sigma_frac="0.0005" end_point_E="0.7700" sigma_E0="0.0530" dJpi="0-,1-"/>
+		<branch fraction="0.0049" sigma_frac="0.0011" end_point_E="0.7077" sigma_E0="0.0506" dJpi="0,1,2"/>
+		<branch fraction="0.0062" sigma_frac="0.0008" end_point_E="0.6993" sigma_E0="0.0504" dJpi="0-,1,2-"/>
 		<branch fraction="0.0320" sigma_frac="0.0040" end_point_E="0.5969" sigma_E0="0.0503" dJpi="0"/>
-		<branch fraction="0.0170" sigma_frac="0.0030" end_point_E="0.5256" sigma_E0="0.0503" dJpi="0"/>
-		<branch fraction="0.0770" sigma_frac="0.0110" end_point_E="0.4984" sigma_E0="0.0503" dJpi="0"/>
-		<branch fraction="0.0139" sigma_frac="0.0014" end_point_E="0.3080" sigma_E0="0.0510" dJpi="0"/>
-		<branch fraction="0.0028" sigma_frac="0.0005" end_point_E="0.2970" sigma_E0="0.0510" dJpi="0"/>
-		<branch fraction="0.0047" sigma_frac="0.0006" end_point_E="0.2760" sigma_E0="0.0510" dJpi="0"/>
-		<branch fraction="0.0023" sigma_frac="0.0005" end_point_E="0.2500" sigma_E0="0.0520" dJpi="0"/>
+		<branch fraction="0.0150" sigma_frac="0.0040" end_point_E="0.5256" sigma_E0="0.0503" dJpi="0"/>
+		<branch fraction="0.0760" sigma_frac="0.0120" end_point_E="0.4984" sigma_E0="0.0503" dJpi="1"/>
+		<branch fraction="0.0141" sigma_frac="0.0018" end_point_E="0.3080" sigma_E0="0.0510" dJpi="1"/>
+		<branch fraction="0.0024" sigma_frac="0.0008" end_point_E="0.2970" sigma_E0="0.0510" dJpi="0"/>
+		<branch fraction="0.0047" sigma_frac="0.0007" end_point_E="0.2760" sigma_E0="0.0510" dJpi="1"/>
+		<branch fraction="0.0020" sigma_frac="0.0008" end_point_E="0.2500" sigma_E0="0.0520" dJpi="0"/>
 	</isotope>
-	<isotope name="Yb175" isotope="701750" Q="0.4701" HL="361583.99999999994" Ex="0.0">
-		<branch fraction="0.7290" sigma_frac="0.0050" end_point_E="0.4701" sigma_E0="0.0013" dJpi="0-"/>
-		<branch fraction="0.0670" sigma_frac="0.0040" end_point_E="0.3563" sigma_E0="0.0013" dJpi="1-"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.2186" sigma_E0="0.0013" dJpi="2-"/>
+	<isotope name="Yb175" isotope="701750" Q="0.4701" HL="359553.60000000003" Ex="0.0">
+		<branch fraction="0.7250" sigma_frac="0.0040" end_point_E="0.4701" sigma_E0="0.0012" dJpi="0-"/>
+		<branch fraction="0.0671" sigma_frac="0.0018" end_point_E="0.3563" sigma_E0="0.0012" dJpi="1-"/>
+		<branch fraction="0.0005" sigma_frac="0.0000" end_point_E="0.2186" sigma_E0="0.0012" dJpi="2-"/>
+		<branch fraction="0.2082" sigma_frac="0.0027" end_point_E="0.0738" sigma_E0="0.0012" dJpi="1"/>
 	</isotope>
 	<isotope name="Tm176" isotope="691760" Q="4.12" HL="114.0" Ex="0.0">
 		<branch fraction="0.1600" sigma_frac="0.0000" end_point_E="3.8480" sigma_E0="0.1001" dJpi="0"/>
@@ -13631,9 +13720,72 @@
 		<branch fraction="0.0680" sigma_frac="0.0090" end_point_E="1.3771" sigma_E0="0.0156" dJpi="0"/>
 	</isotope>
 	<isotope name="Po215" isotope="842150" Q="0.715" HL="0.001781" Ex="0.0"/>
-	<isotope name="Bi216" isotope="832160" Q="4.09" HL="135.0" Ex="0.0"/>
-	<isotope name="Bi216" isotope="832160" Q="4.09" HL="135.0" Ex="0.0"/>
-	<isotope name="Bi216" isotope="832160" Q="4.09" HL="396.0" Ex="0.0"/>
+	<isotope name="Bi216" isotope="832160" Q="4.092" HL="128.0" Ex="0.0">
+		<branch fraction="0.0270" sigma_frac="0.0000" end_point_E="2.7638" sigma_E0="0.0114" dJpi="2-"/>
+		<branch fraction="0.4420" sigma_frac="0.0110" end_point_E="2.5405" sigma_E0="0.0114" dJpi="0-"/>
+		<branch fraction="0.0120" sigma_frac="0.0040" end_point_E="2.4805" sigma_E0="0.0113" dJpi="2-"/>
+		<branch fraction="0.0373" sigma_frac="0.0006" end_point_E="2.3927" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0080" sigma_frac="0.0004" end_point_E="2.3063" sigma_E0="0.0114" dJpi="2-,1-,0-"/>
+		<branch fraction="0.1708" sigma_frac="0.0018" end_point_E="2.2893" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0330" sigma_frac="0.0160" end_point_E="2.2777" sigma_E0="0.0115" dJpi="2-"/>
+		<branch fraction="0.0444" sigma_frac="0.0006" end_point_E="2.2181" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0140" sigma_frac="0.0030" end_point_E="2.2017" sigma_E0="0.0114" dJpi="2-,1-,0-"/>
+		<branch fraction="0.0195" sigma_frac="0.0012" end_point_E="2.1121" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0420" sigma_frac="0.0070" end_point_E="2.0532" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0230" sigma_frac="0.0040" end_point_E="1.9099" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.1071" sigma_frac="0.0011" end_point_E="1.8577" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0095" sigma_frac="0.0015" end_point_E="1.8209" sigma_E0="0.0114" dJpi="1-,0-"/>
+		<branch fraction="0.0095" sigma_frac="0.0015" end_point_E="1.7538" sigma_E0="0.0115" dJpi="1-,0-"/>
+		<branch fraction="0.0055" sigma_frac="0.0003" end_point_E="1.5830" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0033" sigma_frac="0.0011" end_point_E="1.4784" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0043" sigma_frac="0.0011" end_point_E="1.3645" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0032" sigma_frac="0.0011" end_point_E="1.3307" sigma_E0="0.0116" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0027" sigma_frac="0.0004" end_point_E="1.2416" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+	</isotope>
+	<isotope name="Bi216" isotope="832161" Q="4.116" HL="204.60000000000002" Ex="0.024">
+		<branch fraction="0.0690" sigma_frac="0.0210" end_point_E="3.5662" sigma_E0="0.0112" dJpi="1-"/>
+		<branch fraction="0.0950" sigma_frac="0.0110" end_point_E="3.1473" sigma_E0="0.0112" dJpi="1-"/>
+		<branch fraction="0.0540" sigma_frac="0.0190" end_point_E="2.9854" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0304" sigma_frac="0.0015" end_point_E="2.7521" sigma_E0="0.0112" dJpi="2-,1-"/>
+		<branch fraction="0.0330" sigma_frac="0.0010" end_point_E="2.7115" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0790" sigma_frac="0.0040" end_point_E="2.6127" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0136" sigma_frac="0.0024" end_point_E="2.5906" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0220" sigma_frac="0.0040" end_point_E="2.4889" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0210" sigma_frac="0.0030" end_point_E="2.4400" sigma_E0="0.0113" dJpi="2-,1-,0-,1-"/>
+		<branch fraction="0.1340" sigma_frac="0.0040" end_point_E="2.4063" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.1390" sigma_frac="0.0030" end_point_E="2.3888" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0530" sigma_frac="0.0030" end_point_E="2.3237" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0068" sigma_frac="0.0014" end_point_E="2.3185" sigma_E0="0.0114" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0110" sigma_frac="0.0024" end_point_E="2.2979" sigma_E0="0.0112" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0246" sigma_frac="0.0024" end_point_E="2.2403" sigma_E0="0.0112" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0340" sigma_frac="0.0040" end_point_E="2.2077" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0094" sigma_frac="0.0008" end_point_E="2.2042" sigma_E0="0.0113" dJpi="1-,0-,1-,2-"/>
+		<branch fraction="0.0116" sigma_frac="0.0020" end_point_E="2.1992" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0133" sigma_frac="0.0006" end_point_E="2.1517" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0097" sigma_frac="0.0018" end_point_E="2.1454" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0040" sigma_frac="0.0013" end_point_E="2.1060" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0290" sigma_frac="0.0060" end_point_E="2.0850" sigma_E0="0.0113" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0074" sigma_frac="0.0004" end_point_E="2.0408" sigma_E0="0.0113" dJpi="1-,0-,1-,2-"/>
+		<branch fraction="0.0026" sigma_frac="0.0009" end_point_E="2.0325" sigma_E0="0.0116" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0083" sigma_frac="0.0016" end_point_E="2.0015" sigma_E0="0.0114" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0162" sigma_frac="0.0022" end_point_E="1.9363" sigma_E0="0.0113" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0053" sigma_frac="0.0011" end_point_E="1.8334" sigma_E0="0.0114" dJpi="1-,0-,1-,2-"/>
+		<branch fraction="0.0049" sigma_frac="0.0012" end_point_E="1.7094" sigma_E0="0.0113" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0061" sigma_frac="0.0009" end_point_E="1.6698" sigma_E0="0.0112" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0049" sigma_frac="0.0010" end_point_E="1.6397" sigma_E0="0.0115" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0050" sigma_frac="0.0011" end_point_E="1.6368" sigma_E0="0.0114" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0111" sigma_frac="0.0016" end_point_E="1.5453" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0031" sigma_frac="0.0008" end_point_E="1.5063" sigma_E0="0.0114" dJpi="2-,1-,0-,1-"/>
+		<branch fraction="0.0065" sigma_frac="0.0004" end_point_E="1.4321" sigma_E0="0.0112" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0105" sigma_frac="0.0015" end_point_E="1.2954" sigma_E0="0.0113" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0043" sigma_frac="0.0005" end_point_E="1.2516" sigma_E0="0.0113" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0011" sigma_frac="0.0005" end_point_E="1.0197" sigma_E0="0.0119" dJpi="2-,1-,0-,1-,2-"/>
+		<branch fraction="0.0012" sigma_frac="0.0001" end_point_E="0.9799" sigma_E0="0.0113" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0026" sigma_frac="0.0013" end_point_E="0.9495" sigma_E0="0.0118" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0016" sigma_frac="0.0005" end_point_E="0.8257" sigma_E0="0.0116" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0028" sigma_frac="0.0005" end_point_E="0.7821" sigma_E0="0.0114" dJpi="1-,0-,1-"/>
+		<branch fraction="0.0009" sigma_frac="0.0004" end_point_E="0.7201" sigma_E0="0.0115" dJpi="1-,0-,1-"/>
+	</isotope>
 	<isotope name="Bi217" isotope="832170" Q="2.846" HL="98.5" Ex="0.0"/>
 	<isotope name="Bi218" isotope="832180" Q="4.859" HL="33.0" Ex="0.0">
 		<branch fraction="0.1900" sigma_frac="0.0000" end_point_E="3.9238" sigma_E0="0.0272" dJpi="2-"/>
@@ -14061,64 +14213,71 @@
 		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.0970" sigma_E0="0.0032" dJpi="1,0,1"/>
 		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0109" sigma_E0="0.0033" dJpi="1"/>
 	</isotope>
-	<isotope name="Fr229" isotope="872290" Q="3.25" HL="50.2" Ex="0.0">
-		<branch fraction="0.5700" sigma_frac="0.0200" end_point_E="2.7711" sigma_E0="0.0401" dJpi="0-"/>
-		<branch fraction="0.0040" sigma_frac="0.0000" end_point_E="2.7486" sigma_E0="0.0401" dJpi="2"/>
-		<branch fraction="0.0930" sigma_frac="0.0040" end_point_E="2.7318" sigma_E0="0.0401" dJpi="1-"/>
-		<branch fraction="0.0051" sigma_frac="0.0010" end_point_E="2.7085" sigma_E0="0.0401" dJpi="2-"/>
-		<branch fraction="0.0051" sigma_frac="0.0006" end_point_E="2.6991" sigma_E0="0.0401" dJpi="1-,2-,3-"/>
-		<branch fraction="0.0090" sigma_frac="0.0012" end_point_E="2.6869" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0035" sigma_frac="0.0011" end_point_E="2.6844" sigma_E0="0.0401" dJpi="1-"/>
-		<branch fraction="0.0083" sigma_frac="0.0006" end_point_E="2.6517" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0090" sigma_frac="0.0008" end_point_E="2.5849" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0052" sigma_frac="0.0009" end_point_E="2.4971" sigma_E0="0.0401" dJpi="0,1-"/>
-		<branch fraction="0.0021" sigma_frac="0.0005" end_point_E="2.4768" sigma_E0="0.0403" dJpi="0"/>
-		<branch fraction="0.0028" sigma_frac="0.0013" end_point_E="2.4361" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0078" sigma_frac="0.0016" end_point_E="2.4141" sigma_E0="0.0402" dJpi="0"/>
-		<branch fraction="0.0036" sigma_frac="0.0010" end_point_E="2.3791" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0073" sigma_frac="0.0015" end_point_E="2.3154" sigma_E0="0.0402" dJpi="0"/>
-		<branch fraction="0.0084" sigma_frac="0.0011" end_point_E="2.2080" sigma_E0="0.0403" dJpi="0"/>
-		<branch fraction="0.0042" sigma_frac="0.0005" end_point_E="1.9274" sigma_E0="0.0402" dJpi="0"/>
-		<branch fraction="0.0049" sigma_frac="0.0006" end_point_E="1.9100" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0033" sigma_frac="0.0004" end_point_E="1.8739" sigma_E0="0.0402" dJpi="0"/>
-		<branch fraction="0.0120" sigma_frac="0.0000" end_point_E="1.8399" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0720" sigma_frac="0.0050" end_point_E="1.8251" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0180" sigma_frac="0.0030" end_point_E="1.8130" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0362" sigma_frac="0.0024" end_point_E="1.7887" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0108" sigma_frac="0.0009" end_point_E="1.6412" sigma_E0="0.0401" dJpi="0"/>
-		<branch fraction="0.0062" sigma_frac="0.0006" end_point_E="1.5532" sigma_E0="0.0402" dJpi="0"/>
-		<branch fraction="0.0200" sigma_frac="0.0070" end_point_E="1.5295" sigma_E0="0.0402" dJpi="0"/>
+	<isotope name="Fr229" isotope="872290" Q="3.106" HL="50.2" Ex="0.0">
+		<branch fraction="0.0078" sigma_frac="0.0023" end_point_E="2.9686" sigma_E0="0.0161" dJpi="2-"/>
+		<branch fraction="0.5280" sigma_frac="0.0180" end_point_E="2.6271" sigma_E0="0.0161" dJpi="0-"/>
+		<branch fraction="0.0045" sigma_frac="0.0000" end_point_E="2.6046" sigma_E0="0.0161" dJpi="2"/>
+		<branch fraction="0.0880" sigma_frac="0.0040" end_point_E="2.5878" sigma_E0="0.0161" dJpi="1-"/>
+		<branch fraction="0.0034" sigma_frac="0.0014" end_point_E="2.5645" sigma_E0="0.0161" dJpi="1-"/>
+		<branch fraction="0.0047" sigma_frac="0.0005" end_point_E="2.5551" sigma_E0="0.0161" dJpi="1-"/>
+		<branch fraction="0.0083" sigma_frac="0.0012" end_point_E="2.5429" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0033" sigma_frac="0.0010" end_point_E="2.5404" sigma_E0="0.0161" dJpi="1-"/>
+		<branch fraction="0.0076" sigma_frac="0.0005" end_point_E="2.5077" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0065" sigma_frac="0.0008" end_point_E="2.4409" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0109" sigma_frac="0.0016" end_point_E="2.3531" sigma_E0="0.0161" dJpi="1-"/>
+		<branch fraction="0.0020" sigma_frac="0.0005" end_point_E="2.3328" sigma_E0="0.0163" dJpi="0,1"/>
+		<branch fraction="0.0044" sigma_frac="0.0013" end_point_E="2.2921" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0072" sigma_frac="0.0017" end_point_E="2.2701" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0033" sigma_frac="0.0009" end_point_E="2.2351" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="2.1714" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0077" sigma_frac="0.0012" end_point_E="2.0640" sigma_E0="0.0163" dJpi="0,1"/>
+		<branch fraction="0.0039" sigma_frac="0.0005" end_point_E="1.7834" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0045" sigma_frac="0.0006" end_point_E="1.7660" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0030" sigma_frac="0.0003" end_point_E="1.7299" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="1.6959" sigma_E0="0.0161" dJpi="0,1"/>
+		<branch fraction="0.0660" sigma_frac="0.0040" end_point_E="1.6811" sigma_E0="0.0161" dJpi="1"/>
+		<branch fraction="0.0168" sigma_frac="0.0029" end_point_E="1.6690" sigma_E0="0.0161" dJpi="1"/>
+		<branch fraction="0.0385" sigma_frac="0.0022" end_point_E="1.6447" sigma_E0="0.0161" dJpi="0-,1"/>
+		<branch fraction="0.0100" sigma_frac="0.0008" end_point_E="1.4972" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0057" sigma_frac="0.0005" end_point_E="1.4092" sigma_E0="0.0162" dJpi="0,1"/>
+		<branch fraction="0.0180" sigma_frac="0.0060" end_point_E="1.3855" sigma_E0="0.0162" dJpi="0,1"/>
 	</isotope>
-	<isotope name="Ra229" isotope="882290" Q="1.81" HL="240.0" Ex="0.0">
-		<branch fraction="0.9500" sigma_frac="0.0000" end_point_E="1.7600" sigma_E0="0.0400" dJpi="1"/>
-		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="1.0900" sigma_E0="0.0500" dJpi="0"/>
-	</isotope>
-	<isotope name="Ac229" isotope="892290" Q="1.17" HL="3762.0" Ex="0.0">
-		<branch fraction="0.7900" sigma_frac="0.0100" end_point_E="1.1700" sigma_E0="0.0300" dJpi="1"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.1700" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0330" sigma_frac="0.0050" end_point_E="1.1408" sigma_E0="0.0300" dJpi="1"/>
-		<branch fraction="0.0380" sigma_frac="0.0030" end_point_E="1.0055" sigma_E0="0.0300" dJpi="0-"/>
-		<branch fraction="0.0017" sigma_frac="0.0002" end_point_E="0.9528" sigma_E0="0.0300" dJpi="1-"/>
-		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="0.9336" sigma_E0="0.0302" dJpi="0"/>
-		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="0.9326" sigma_E0="0.0300" dJpi="2-"/>
-		<branch fraction="0.0160" sigma_frac="0.0010" end_point_E="0.9080" sigma_E0="0.0300" dJpi="1"/>
-		<branch fraction="0.0050" sigma_frac="0.0020" end_point_E="0.8814" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0016" sigma_frac="0.0009" end_point_E="0.8528" sigma_E0="0.0300" dJpi="1"/>
-		<branch fraction="0.0036" sigma_frac="0.0009" end_point_E="0.8495" sigma_E0="0.0300" dJpi="1,2"/>
-		<branch fraction="0.0010" sigma_frac="0.0001" end_point_E="0.7460" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0009" sigma_frac="0.0002" end_point_E="0.7447" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0052" sigma_frac="0.0004" end_point_E="0.7206" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0097" sigma_frac="0.0007" end_point_E="0.6914" sigma_E0="0.0300" dJpi="1,2-"/>
-		<branch fraction="0.0022" sigma_frac="0.0002" end_point_E="0.6432" sigma_E0="0.0300" dJpi="0-"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.6350" sigma_E0="0.0301" dJpi="1-"/>
-		<branch fraction="0.0420" sigma_frac="0.0070" end_point_E="0.6007" sigma_E0="0.0300" dJpi="0,1,2"/>
-		<branch fraction="0.0011" sigma_frac="0.0001" end_point_E="0.5936" sigma_E0="0.0301" dJpi="0"/>
-		<branch fraction="0.0220" sigma_frac="0.0020" end_point_E="0.5648" sigma_E0="0.0300" dJpi="0,1,2"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.5315" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.5162" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0009" sigma_frac="0.0001" end_point_E="0.5082" sigma_E0="0.0300" dJpi="0"/>
-		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.4810" sigma_E0="0.0301" dJpi="0"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.3907" sigma_E0="0.0301" dJpi="0"/>
+	<isotope name="Ra229" isotope="882290" Q="1.872" HL="240.0" Ex="0.0"/>
+	<isotope name="Ac229" isotope="892290" Q="1.104" HL="3762.0" Ex="0.0">
+		<branch fraction="0.7620" sigma_frac="0.0340" end_point_E="1.1040" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.1040" sigma_E0="0.0120" dJpi="0"/>
+		<branch fraction="0.0320" sigma_frac="0.0080" end_point_E="1.0748" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.0616" sigma_E0="0.0120" dJpi="2"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.0322" sigma_E0="0.0120" dJpi="2"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.0069" sigma_E0="0.0120" dJpi="3"/>
+		<branch fraction="0.0377" sigma_frac="0.0024" end_point_E="0.9395" sigma_E0="0.0120" dJpi="0-"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.8917" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0022" sigma_frac="0.0002" end_point_E="0.8868" sigma_E0="0.0120" dJpi="1-"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.8689" sigma_E0="0.0120" dJpi="1-,2-"/>
+		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="0.8666" sigma_E0="0.0120" dJpi="2-"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.8481" sigma_E0="0.0120" dJpi="0,1,2"/>
+		<branch fraction="0.0150" sigma_frac="0.0014" end_point_E="0.8420" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.8161" sigma_E0="0.0120" dJpi="2-"/>
+		<branch fraction="0.0370" sigma_frac="0.0120" end_point_E="0.8155" sigma_E0="0.0120" dJpi="0"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.8010" sigma_E0="0.0120" dJpi="2"/>
+		<branch fraction="0.0015" sigma_frac="0.0000" end_point_E="0.7868" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0037" sigma_frac="0.0009" end_point_E="0.7835" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.7443" sigma_E0="0.0120" dJpi="2"/>
+		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="0.7382" sigma_E0="0.0120" dJpi="2"/>
+		<branch fraction="0.0014" sigma_frac="0.0003" end_point_E="0.6800" sigma_E0="0.0120" dJpi="1-"/>
+		<branch fraction="0.0005" sigma_frac="0.0000" end_point_E="0.6787" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0033" sigma_frac="0.0018" end_point_E="0.6542" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0127" sigma_frac="0.0010" end_point_E="0.6254" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0039" sigma_frac="0.0010" end_point_E="0.5775" sigma_E0="0.0120" dJpi="1-"/>
+		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.5677" sigma_E0="0.0121" dJpi="1-"/>
+		<branch fraction="0.0500" sigma_frac="0.0033" end_point_E="0.5347" sigma_E0="0.0120" dJpi="0"/>
+		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="0.5272" sigma_E0="0.0121" dJpi="0"/>
+		<branch fraction="0.0221" sigma_frac="0.0017" end_point_E="0.4988" sigma_E0="0.0120" dJpi="1"/>
+		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.4654" sigma_E0="0.0120" dJpi="1-,0-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.4502" sigma_E0="0.0120" dJpi="0-"/>
+		<branch fraction="0.0008" sigma_frac="0.0001" end_point_E="0.4424" sigma_E0="0.0120" dJpi="0,1"/>
+		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.4150" sigma_E0="0.0120" dJpi="1-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.3247" sigma_E0="0.0121" dJpi="1-"/>
 	</isotope>
 	<isotope name="Fr230" isotope="872300" Q="4.97" HL="19.1" Ex="0.0"/>
 	<isotope name="Ra230" isotope="882300" Q="0.678" HL="5580.0" Ex="0.0">
@@ -14349,94 +14508,95 @@
 		<branch fraction="0.2800" sigma_frac="0.0300" end_point_E="0.1545" sigma_E0="0.0020" dJpi="0-"/>
 		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.1143" sigma_E0="0.0021" dJpi="1-"/>
 	</isotope>
-	<isotope name="Ac234" isotope="892340" Q="4.7" HL="44.0" Ex="0.0"/>
-	<isotope name="Th234" isotope="902340" Q="0.273" HL="2082240.0000000002" Ex="0.0">
-		<branch fraction="0.7800" sigma_frac="0.0200" end_point_E="0.1985" sigma_E0="0.0015" dJpi="0-"/>
-		<branch fraction="0.1400" sigma_frac="0.0200" end_point_E="0.1067" sigma_E0="0.0030" dJpi="1-"/>
-		<branch fraction="0.0640" sigma_frac="0.0090" end_point_E="0.1063" sigma_E0="0.0030" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="0.0957" sigma_E0="0.0030" dJpi="1-"/>
-		<branch fraction="0.0150" sigma_frac="0.0070" end_point_E="0.0863" sigma_E0="0.0030" dJpi="1"/>
+	<isotope name="Ac234" isotope="892340" Q="4.228" HL="44.0" Ex="0.0"/>
+	<isotope name="Th234" isotope="902340" Q="0.274" HL="2082240.0000000002" Ex="0.0">
+		<branch fraction="0.0015" sigma_frac="0.0002" end_point_E="0.2001" sigma_E0="0.0030" dJpi="3"/>
+		<branch fraction="0.7800" sigma_frac="0.0200" end_point_E="0.1975" sigma_E0="0.0034" dJpi="0-"/>
+		<branch fraction="0.1380" sigma_frac="0.0130" end_point_E="0.1051" sigma_E0="0.0034" dJpi="1-"/>
+		<branch fraction="0.0640" sigma_frac="0.0150" end_point_E="0.1047" sigma_E0="0.0034" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="0.0941" sigma_E0="0.0034" dJpi="1-"/>
+		<branch fraction="0.0150" sigma_frac="0.0070" end_point_E="0.0847" sigma_E0="0.0034" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="0.0127" sigma_E0="0.0034" dJpi="1"/>
 	</isotope>
-	<isotope name="Pa234" isotope="912340" Q="2.195" HL="24120.0" Ex="0.0">
-		<branch fraction="0.0080" sigma_frac="0.0000" end_point_E="1.2474" sigma_E0="0.0045" dJpi="0"/>
-		<branch fraction="0.0210" sigma_frac="0.0000" end_point_E="1.2266" sigma_E0="0.0043" dJpi="1"/>
-		<branch fraction="0.0200" sigma_frac="0.0190" end_point_E="1.2056" sigma_E0="0.0061" dJpi="2-"/>
-		<branch fraction="0.0540" sigma_frac="0.0000" end_point_E="1.1712" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.0480" sigma_frac="0.0080" end_point_E="1.1711" sigma_E0="0.0044" dJpi="0"/>
-		<branch fraction="0.0790" sigma_frac="0.0000" end_point_E="1.1257" sigma_E0="0.0064" dJpi="0-"/>
-		<branch fraction="1.0000" sigma_frac="0.0000" end_point_E="1.1100" sigma_E0="0.0050" dJpi="2"/>
-		<branch fraction="0.0118" sigma_frac="0.0022" end_point_E="1.1041" sigma_E0="0.0044" dJpi="1"/>
-		<branch fraction="0.0300" sigma_frac="0.0120" end_point_E="1.0675" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.0340" sigma_frac="0.0000" end_point_E="1.0002" sigma_E0="0.0064" dJpi="2-"/>
-		<branch fraction="0.0018" sigma_frac="0.0013" end_point_E="0.9803" sigma_E0="0.0045" dJpi="0"/>
-		<branch fraction="0.0012" sigma_frac="0.0002" end_point_E="0.8828" sigma_E0="0.0049" dJpi="1-"/>
-		<branch fraction="0.0011" sigma_frac="0.0003" end_point_E="0.7475" sigma_E0="0.0048" dJpi="1-"/>
-		<branch fraction="0.0012" sigma_frac="0.0003" end_point_E="0.7088" sigma_E0="0.0052" dJpi="1-"/>
-		<branch fraction="0.0280" sigma_frac="0.0000" end_point_E="0.6989" sigma_E0="0.0043" dJpi="1"/>
-		<branch fraction="0.0026" sigma_frac="0.0004" end_point_E="0.6926" sigma_E0="0.0048" dJpi="1,0"/>
-		<branch fraction="0.0026" sigma_frac="0.0004" end_point_E="0.6617" sigma_E0="0.0047" dJpi="0-"/>
-		<branch fraction="0.0100" sigma_frac="0.0000" end_point_E="0.6577" sigma_E0="0.0043" dJpi="0"/>
-		<branch fraction="0.0010" sigma_frac="0.0010" end_point_E="0.6513" sigma_E0="0.0046" dJpi="0"/>
-		<branch fraction="0.2040" sigma_frac="0.0180" end_point_E="0.6424" sigma_E0="0.0043" dJpi="1"/>
-		<branch fraction="0.0005" sigma_frac="0.0003" end_point_E="0.6133" sigma_E0="0.0050" dJpi="1-"/>
-		<branch fraction="0.0080" sigma_frac="0.0000" end_point_E="0.6062" sigma_E0="0.0043" dJpi="1"/>
-		<branch fraction="0.0004" sigma_frac="0.0002" end_point_E="0.5755" sigma_E0="0.0049" dJpi="2"/>
-		<branch fraction="0.0019" sigma_frac="0.0004" end_point_E="0.5450" sigma_E0="0.0052" dJpi="2-"/>
-		<branch fraction="0.0099" sigma_frac="0.0013" end_point_E="0.5413" sigma_E0="0.0047" dJpi="1"/>
-		<branch fraction="0.0730" sigma_frac="0.0080" end_point_E="0.5016" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.1290" sigma_frac="0.0120" end_point_E="0.4721" sigma_E0="0.0044" dJpi="1-"/>
-		<branch fraction="0.3400" sigma_frac="0.0400" end_point_E="0.4716" sigma_E0="0.0065" dJpi="0"/>
-		<branch fraction="0.0120" sigma_frac="0.0014" end_point_E="0.4576" sigma_E0="0.0047" dJpi="1"/>
-		<branch fraction="0.0081" sigma_frac="0.0011" end_point_E="0.4568" sigma_E0="0.0046" dJpi="1"/>
-		<branch fraction="0.0300" sigma_frac="0.0030" end_point_E="0.4331" sigma_E0="0.0046" dJpi="0-"/>
-		<branch fraction="0.0013" sigma_frac="0.0002" end_point_E="0.4242" sigma_E0="0.0049" dJpi="1"/>
-		<branch fraction="0.0800" sigma_frac="0.0300" end_point_E="0.4124" sigma_E0="0.0043" dJpi="1"/>
-		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.4108" sigma_E0="0.0053" dJpi="0"/>
-		<branch fraction="0.0042" sigma_frac="0.0008" end_point_E="0.4019" sigma_E0="0.0046" dJpi="0"/>
-		<branch fraction="0.0164" sigma_frac="0.0016" end_point_E="0.3834" sigma_E0="0.0046" dJpi="0"/>
-		<branch fraction="0.0017" sigma_frac="0.0003" end_point_E="0.3511" sigma_E0="0.0057" dJpi="1,0,1-"/>
-		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.3319" sigma_E0="0.0055" dJpi="1"/>
-		<branch fraction="0.0026" sigma_frac="0.0003" end_point_E="0.3133" sigma_E0="0.0047" dJpi="0"/>
-		<branch fraction="0.0021" sigma_frac="0.0003" end_point_E="0.2787" sigma_E0="0.0049" dJpi="1,0"/>
-		<branch fraction="0.0023" sigma_frac="0.0004" end_point_E="0.2675" sigma_E0="0.0047" dJpi="0"/>
-		<branch fraction="0.0037" sigma_frac="0.0005" end_point_E="0.2545" sigma_E0="0.0049" dJpi="0"/>
-		<branch fraction="0.0046" sigma_frac="0.0006" end_point_E="0.2362" sigma_E0="0.0044" dJpi="1-"/>
-		<branch fraction="0.0004" sigma_frac="0.0001" end_point_E="0.2262" sigma_E0="0.0050" dJpi="0,1"/>
-		<branch fraction="0.0061" sigma_frac="0.0008" end_point_E="0.2138" sigma_E0="0.0047" dJpi="0"/>
-		<branch fraction="0.0013" sigma_frac="0.0002" end_point_E="0.1946" sigma_E0="0.0053" dJpi="0"/>
-		<branch fraction="0.0012" sigma_frac="0.0002" end_point_E="0.1752" sigma_E0="0.0053" dJpi="0"/>
-		<branch fraction="0.0094" sigma_frac="0.0010" end_point_E="0.1615" sigma_E0="0.0045" dJpi="1,0"/>
-		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.1579" sigma_E0="0.0057" dJpi="0,1"/>
-		<branch fraction="0.0015" sigma_frac="0.0003" end_point_E="0.1288" sigma_E0="0.0050" dJpi="0"/>
-		<branch fraction="0.0042" sigma_frac="0.0007" end_point_E="0.1262" sigma_E0="0.0051" dJpi="1,0,1"/>
-		<branch fraction="0.0007" sigma_frac="0.0001" end_point_E="0.0936" sigma_E0="0.0049" dJpi="1"/>
-		<branch fraction="0.0022" sigma_frac="0.0003" end_point_E="0.0793" sigma_E0="0.0051" dJpi="0"/>
-		<branch fraction="0.0043" sigma_frac="0.0005" end_point_E="0.0510" sigma_E0="0.0049" dJpi="1,0"/>
+	<isotope name="Pa234" isotope="912340" Q="2.194" HL="24120.0" Ex="0.0">
+		<branch fraction="0.0080" sigma_frac="0.0000" end_point_E="1.2464" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.0210" sigma_frac="0.0000" end_point_E="1.2255" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0200" sigma_frac="0.0190" end_point_E="1.2046" sigma_E0="0.0040" dJpi="2-"/>
+		<branch fraction="0.0540" sigma_frac="0.0000" end_point_E="1.1702" sigma_E0="0.0040" dJpi="1-"/>
+		<branch fraction="0.0480" sigma_frac="0.0080" end_point_E="1.1701" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.0790" sigma_frac="0.0000" end_point_E="1.1247" sigma_E0="0.0040" dJpi="0-"/>
+		<branch fraction="0.0118" sigma_frac="0.0022" end_point_E="1.1031" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0300" sigma_frac="0.0120" end_point_E="1.0664" sigma_E0="0.0040" dJpi="1-"/>
+		<branch fraction="0.0340" sigma_frac="0.0000" end_point_E="0.9992" sigma_E0="0.0040" dJpi="2-"/>
+		<branch fraction="0.0018" sigma_frac="0.0013" end_point_E="0.9793" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.0012" sigma_frac="0.0002" end_point_E="0.8818" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0011" sigma_frac="0.0003" end_point_E="0.7465" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0012" sigma_frac="0.0003" end_point_E="0.7078" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0280" sigma_frac="0.0000" end_point_E="0.6979" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0026" sigma_frac="0.0004" end_point_E="0.6916" sigma_E0="0.0041" dJpi="1,0"/>
+		<branch fraction="0.0026" sigma_frac="0.0004" end_point_E="0.6607" sigma_E0="0.0041" dJpi="0-"/>
+		<branch fraction="0.0100" sigma_frac="0.0000" end_point_E="0.6567" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.0010" sigma_frac="0.0010" end_point_E="0.6503" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.2040" sigma_frac="0.0180" end_point_E="0.6414" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0005" sigma_frac="0.0003" end_point_E="0.6123" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0080" sigma_frac="0.0000" end_point_E="0.6052" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0004" sigma_frac="0.0002" end_point_E="0.5745" sigma_E0="0.0041" dJpi="2"/>
+		<branch fraction="0.0019" sigma_frac="0.0004" end_point_E="0.5439" sigma_E0="0.0041" dJpi="2-"/>
+		<branch fraction="0.0099" sigma_frac="0.0013" end_point_E="0.5407" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0730" sigma_frac="0.0080" end_point_E="0.5006" sigma_E0="0.0040" dJpi="1-"/>
+		<branch fraction="0.1290" sigma_frac="0.0120" end_point_E="0.4711" sigma_E0="0.0040" dJpi="1-"/>
+		<branch fraction="0.3400" sigma_frac="0.0400" end_point_E="0.4706" sigma_E0="0.0040" dJpi="0"/>
+		<branch fraction="0.0120" sigma_frac="0.0014" end_point_E="0.4566" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0081" sigma_frac="0.0011" end_point_E="0.4558" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0300" sigma_frac="0.0030" end_point_E="0.4321" sigma_E0="0.0041" dJpi="0-"/>
+		<branch fraction="0.0013" sigma_frac="0.0002" end_point_E="0.4232" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0800" sigma_frac="0.0300" end_point_E="0.4114" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.4098" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0042" sigma_frac="0.0008" end_point_E="0.4009" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0164" sigma_frac="0.0016" end_point_E="0.3824" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0017" sigma_frac="0.0003" end_point_E="0.3501" sigma_E0="0.0042" dJpi="1,0,1-"/>
+		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.3309" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0026" sigma_frac="0.0003" end_point_E="0.3122" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0021" sigma_frac="0.0003" end_point_E="0.2777" sigma_E0="0.0041" dJpi="1,0"/>
+		<branch fraction="0.0023" sigma_frac="0.0004" end_point_E="0.2665" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0037" sigma_frac="0.0005" end_point_E="0.2535" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0046" sigma_frac="0.0006" end_point_E="0.2352" sigma_E0="0.0040" dJpi="1-"/>
+		<branch fraction="0.0005" sigma_frac="0.0001" end_point_E="0.2251" sigma_E0="0.0041" dJpi="0,1"/>
+		<branch fraction="0.0061" sigma_frac="0.0008" end_point_E="0.2128" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0013" sigma_frac="0.0002" end_point_E="0.1936" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0012" sigma_frac="0.0002" end_point_E="0.1742" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0094" sigma_frac="0.0010" end_point_E="0.1605" sigma_E0="0.0040" dJpi="1,0"/>
+		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.1569" sigma_E0="0.0042" dJpi="0,1"/>
+		<branch fraction="0.0015" sigma_frac="0.0003" end_point_E="0.1278" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0042" sigma_frac="0.0007" end_point_E="0.1252" sigma_E0="0.0041" dJpi="1,0,1"/>
+		<branch fraction="0.0007" sigma_frac="0.0001" end_point_E="0.0926" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0022" sigma_frac="0.0003" end_point_E="0.0783" sigma_E0="0.0041" dJpi="0"/>
+		<branch fraction="0.0044" sigma_frac="0.0005" end_point_E="0.0500" sigma_E0="0.0041" dJpi="1,0"/>
 	</isotope>
-	<isotope name="Pa234" isotope="912341" Q="2.26892" HL="69.54" Ex="0.07392">
-		<branch fraction="0.9757" sigma_frac="0.0004" end_point_E="2.2900" sigma_E0="0.0200" dJpi="0-"/>
-		<branch fraction="0.0095" sigma_frac="0.0001" end_point_E="1.4590" sigma_E0="0.0040" dJpi="0-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="1.2795" sigma_E0="0.0040" dJpi="2"/>
-		<branch fraction="0.0100" sigma_frac="0.0001" end_point_E="1.2244" sigma_E0="0.0040" dJpi="0-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.1426" sigma_E0="0.0040" dJpi="2-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.0948" sigma_E0="0.0044" dJpi="1-,2-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="1.0316" sigma_E0="0.0040" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.8338" sigma_E0="0.0040" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.7679" sigma_E0="0.0043" dJpi="1-"/>
-		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.7152" sigma_E0="0.0041" dJpi="1-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.6983" sigma_E0="0.0040" dJpi="1-"/>
-		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.6765" sigma_E0="0.0041" dJpi="1-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.6671" sigma_E0="0.0040" dJpi="1-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.6015" sigma_E0="0.0044" dJpi="1"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.5751" sigma_E0="0.0046" dJpi="1"/>
-		<branch fraction="0.0004" sigma_frac="0.0000" end_point_E="0.4877" sigma_E0="0.0041" dJpi="0-,1-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.4725" sigma_E0="0.0046" dJpi="1-"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.4599" sigma_E0="0.0041" dJpi="1"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.4058" sigma_E0="0.0041" dJpi="1-"/>
-		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.3940" sigma_E0="0.0041" dJpi="1-"/>
-		<branch fraction="0.0005" sigma_frac="0.0000" end_point_E="0.3578" sigma_E0="0.0040" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.3322" sigma_E0="0.0041" dJpi="1-"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.2990" sigma_E0="0.0045" dJpi="1"/>
+	<isotope name="Pa234" isotope="912341" Q="2.2704999999999997" HL="69.54" Ex="0.0765">
+		<branch fraction="0.9757" sigma_frac="0.0004" end_point_E="2.2705" sigma_E0="0.0040" dJpi="0-"/>
+		<branch fraction="0.0095" sigma_frac="0.0001" end_point_E="1.4601" sigma_E0="0.0041" dJpi="0-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="1.2811" sigma_E0="0.0040" dJpi="2"/>
+		<branch fraction="0.0100" sigma_frac="0.0001" end_point_E="1.2260" sigma_E0="0.0040" dJpi="0-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.1455" sigma_E0="0.0041" dJpi="2-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="1.0964" sigma_E0="0.0044" dJpi="1-,2-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="1.0331" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.8358" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.7692" sigma_E0="0.0043" dJpi="1-"/>
+		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.7168" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.6998" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0002" sigma_frac="0.0000" end_point_E="0.6779" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.6686" sigma_E0="0.0048" dJpi="1-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.6032" sigma_E0="0.0044" dJpi="1"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.5768" sigma_E0="0.0045" dJpi="1"/>
+		<branch fraction="0.0004" sigma_frac="0.0000" end_point_E="0.4892" sigma_E0="0.0041" dJpi="0-,1-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.4742" sigma_E0="0.0045" dJpi="1-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.4615" sigma_E0="0.0041" dJpi="1"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.4073" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.3956" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0005" sigma_frac="0.0000" end_point_E="0.3595" sigma_E0="0.0040" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.3337" sigma_E0="0.0041" dJpi="1-"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.3006" sigma_E0="0.0045" dJpi="1"/>
 	</isotope>
 	<isotope name="Th235" isotope="902350" Q="1.729" HL="426.0" Ex="0.0">
 		<branch fraction="0.9300" sigma_frac="0.0000" end_point_E="1.7290" sigma_E0="0.0190" dJpi="1-"/>
@@ -14553,61 +14713,49 @@
 		<branch fraction="0.0170" sigma_frac="0.0006" end_point_E="0.2107" sigma_E0="0.0011" dJpi="1"/>
 		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.1663" sigma_E0="0.0010" dJpi="1-"/>
 	</isotope>
-	<isotope name="U240" isotope="922400" Q="0.4" HL="50760.0" Ex="0.0">
-		<branch fraction="0.7500" sigma_frac="0.0000" end_point_E="0.4000" sigma_E0="0.0160" dJpi="1"/>
-		<branch fraction="0.2500" sigma_frac="0.0000" end_point_E="0.3558" sigma_E0="0.0160" dJpi="1"/>
-		<branch fraction="0.0014" sigma_frac="0.0000" end_point_E="0.3174" sigma_E0="0.0160" dJpi="0"/>
-		<branch fraction="0.0250" sigma_frac="0.0000" end_point_E="0.2893" sigma_E0="0.0160" dJpi="0"/>
-		<branch fraction="0.0017" sigma_frac="0.0000" end_point_E="0.2884" sigma_E0="0.0160" dJpi="0"/>
-		<branch fraction="0.0350" sigma_frac="0.0000" end_point_E="0.2103" sigma_E0="0.0160" dJpi="0-,1"/>
-		<branch fraction="0.0090" sigma_frac="0.0000" end_point_E="0.1200" sigma_E0="0.0160" dJpi="0-,1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1052" sigma_E0="0.0160" dJpi="0-,1"/>
-		<branch fraction="0.0003" sigma_frac="0.0000" end_point_E="0.1002" sigma_E0="0.0160" dJpi="0-,1"/>
+	<isotope name="U240" isotope="922400" Q="0.399" HL="50760.0" Ex="0.0"/>
+	<isotope name="Np240" isotope="932400" Q="2.191" HL="3714.0" Ex="0.0">
+		<branch fraction="0.0140" sigma_frac="0.0170" end_point_E="1.8966" sigma_E0="0.0180" dJpi="1"/>
+		<branch fraction="0.0134" sigma_frac="0.0011" end_point_E="1.2322" sigma_E0="0.0180" dJpi="3-"/>
+		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="1.1605" sigma_E0="0.0180" dJpi="2"/>
+		<branch fraction="0.0500" sigma_frac="0.0400" end_point_E="1.1534" sigma_E0="0.0180" dJpi="1-"/>
+		<branch fraction="0.0052" sigma_frac="0.0006" end_point_E="1.1147" sigma_E0="0.0180" dJpi="1"/>
+		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="1.0754" sigma_E0="0.0180" dJpi="0-"/>
+		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="1.0294" sigma_E0="0.0180" dJpi="1-"/>
+		<branch fraction="0.0900" sigma_frac="0.0400" end_point_E="1.0134" sigma_E0="0.0180" dJpi="2"/>
+		<branch fraction="0.0026" sigma_frac="0.0005" end_point_E="0.9585" sigma_E0="0.0180" dJpi="1"/>
+		<branch fraction="0.7900" sigma_frac="0.1200" end_point_E="0.8822" sigma_E0="0.0180" dJpi="0-"/>
 	</isotope>
-	<isotope name="Np240" isotope="932400" Q="2.188" HL="3714.0" Ex="0.0">
-		<branch fraction="0.0300" sigma_frac="0.0000" end_point_E="1.8937" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0130" sigma_frac="0.0000" end_point_E="1.2292" sigma_E0="0.0152" dJpi="3-"/>
-		<branch fraction="0.0130" sigma_frac="0.0000" end_point_E="1.1861" sigma_E0="0.0151" dJpi="2-"/>
-		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="1.1575" sigma_E0="0.0151" dJpi="2"/>
-		<branch fraction="0.1000" sigma_frac="0.0000" end_point_E="1.1505" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0050" sigma_frac="0.0000" end_point_E="1.1118" sigma_E0="0.0152" dJpi="1"/>
-		<branch fraction="0.1700" sigma_frac="0.0000" end_point_E="1.0725" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0500" sigma_frac="0.0000" end_point_E="1.0265" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0900" sigma_frac="0.0400" end_point_E="1.0106" sigma_E0="0.0151" dJpi="2"/>
-		<branch fraction="0.0030" sigma_frac="0.0000" end_point_E="0.9555" sigma_E0="0.0152" dJpi="1"/>
-		<branch fraction="0.7900" sigma_frac="0.1200" end_point_E="0.8793" sigma_E0="0.0151" dJpi="0-"/>
-	</isotope>
-	<isotope name="Np240" isotope="932400" Q="2.188" HL="433.2" Ex="0.0">
-		<branch fraction="0.1000" sigma_frac="0.0000" end_point_E="2.1800" sigma_E0="0.0200" dJpi="1"/>
-		<branch fraction="0.4200" sigma_frac="0.0000" end_point_E="2.1452" sigma_E0="0.0150" dJpi="1"/>
-		<branch fraction="0.0150" sigma_frac="0.0000" end_point_E="2.0463" sigma_E0="0.0150" dJpi="3"/>
-		<branch fraction="0.3100" sigma_frac="0.0200" end_point_E="1.5907" sigma_E0="0.0150" dJpi="0-"/>
-		<branch fraction="0.0010" sigma_frac="0.0000" end_point_E="1.5391" sigma_E0="0.0150" dJpi="2-"/>
-		<branch fraction="0.0250" sigma_frac="0.0020" end_point_E="1.3273" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0380" sigma_frac="0.0020" end_point_E="1.2877" sigma_E0="0.0150" dJpi="1"/>
-		<branch fraction="0.0140" sigma_frac="0.0010" end_point_E="1.2500" sigma_E0="0.0150" dJpi="0-"/>
-		<branch fraction="0.0126" sigma_frac="0.0005" end_point_E="1.2292" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0010" sigma_frac="0.0002" end_point_E="1.0986" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0018" sigma_frac="0.0001" end_point_E="1.0571" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0001" end_point_E="1.0510" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.9651" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.9472" sigma_E0="0.0153" dJpi="1-"/>
-		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.8669" sigma_E0="0.0151" dJpi="0,1"/>
-		<branch fraction="0.0020" sigma_frac="0.0003" end_point_E="0.7772" sigma_E0="0.0151" dJpi="1-"/>
-		<branch fraction="0.0058" sigma_frac="0.0002" end_point_E="0.6998" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0016" sigma_frac="0.0002" end_point_E="0.6621" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0230" sigma_frac="0.0010" end_point_E="0.6483" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0031" sigma_frac="0.0003" end_point_E="0.6291" sigma_E0="0.0150" dJpi="1"/>
-		<branch fraction="0.0007" sigma_frac="0.0001" end_point_E="0.5803" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0026" sigma_frac="0.0001" end_point_E="0.5546" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0008" sigma_frac="0.0001" end_point_E="0.4776" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.4127" sigma_E0="0.0152" dJpi="0-"/>
-		<branch fraction="0.0004" sigma_frac="0.0001" end_point_E="0.3918" sigma_E0="0.0151" dJpi="0-"/>
-		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.3800" sigma_E0="0.0151" dJpi="0-,1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.2702" sigma_E0="0.0153" dJpi="0-"/>
-		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.2335" sigma_E0="0.0151" dJpi="1"/>
-		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1916" sigma_E0="0.0152" dJpi="0-,1"/>
-		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0704" sigma_E0="0.0152" dJpi="0,1"/>
+	<isotope name="Np240" isotope="932400" Q="2.191" HL="433.2" Ex="0.0">
+		<branch fraction="0.1800" sigma_frac="0.1500" end_point_E="2.1800" sigma_E0="0.0200" dJpi="1"/>
+		<branch fraction="0.3700" sigma_frac="0.1500" end_point_E="2.1482" sigma_E0="0.0170" dJpi="1"/>
+		<branch fraction="0.0090" sigma_frac="0.0060" end_point_E="2.0493" sigma_E0="0.0170" dJpi="3"/>
+		<branch fraction="0.2980" sigma_frac="0.0060" end_point_E="1.5936" sigma_E0="0.0170" dJpi="0-"/>
+		<branch fraction="0.0264" sigma_frac="0.0004" end_point_E="1.3303" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0380" sigma_frac="0.0007" end_point_E="1.2907" sigma_E0="0.0170" dJpi="1"/>
+		<branch fraction="0.0140" sigma_frac="0.0006" end_point_E="1.2529" sigma_E0="0.0170" dJpi="0-"/>
+		<branch fraction="0.0121" sigma_frac="0.0005" end_point_E="1.2322" sigma_E0="0.0171" dJpi="1-"/>
+		<branch fraction="0.0009" sigma_frac="0.0002" end_point_E="1.1015" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0017" sigma_frac="0.0001" end_point_E="1.0600" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="1.0540" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.9681" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.9502" sigma_E0="0.0173" dJpi="1-"/>
+		<branch fraction="0.0002" sigma_frac="0.0001" end_point_E="0.8699" sigma_E0="0.0171" dJpi="0,1"/>
+		<branch fraction="0.0018" sigma_frac="0.0003" end_point_E="0.7802" sigma_E0="0.0171" dJpi="1-"/>
+		<branch fraction="0.0058" sigma_frac="0.0001" end_point_E="0.7028" sigma_E0="0.0171" dJpi="0,1"/>
+		<branch fraction="0.0018" sigma_frac="0.0002" end_point_E="0.6651" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0229" sigma_frac="0.0004" end_point_E="0.6513" sigma_E0="0.0171" dJpi="0-"/>
+		<branch fraction="0.0031" sigma_frac="0.0002" end_point_E="0.6321" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0007" sigma_frac="0.0001" end_point_E="0.5833" sigma_E0="0.0171" dJpi="0-"/>
+		<branch fraction="0.0026" sigma_frac="0.0001" end_point_E="0.5576" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0008" sigma_frac="0.0001" end_point_E="0.4806" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.4157" sigma_E0="0.0172" dJpi="0-"/>
+		<branch fraction="0.0004" sigma_frac="0.0001" end_point_E="0.3948" sigma_E0="0.0171" dJpi="0,1"/>
+		<branch fraction="0.0003" sigma_frac="0.0001" end_point_E="0.3830" sigma_E0="0.0171" dJpi="0-"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.2732" sigma_E0="0.0173" dJpi="0-,2-"/>
+		<branch fraction="0.0006" sigma_frac="0.0001" end_point_E="0.2365" sigma_E0="0.0171" dJpi="1"/>
+		<branch fraction="0.0001" sigma_frac="0.0000" end_point_E="0.1946" sigma_E0="0.0172" dJpi="0,1"/>
+		<branch fraction="0.0000" sigma_frac="0.0000" end_point_E="0.0734" sigma_E0="0.0172" dJpi="0,1"/>
 	</isotope>
 	<isotope name="Np241" isotope="932410" Q="1.3" HL="834.0" Ex="0.0">
 		<branch fraction="0.7000" sigma_frac="0.0400" end_point_E="1.3000" sigma_E0="0.0700" dJpi="0"/>

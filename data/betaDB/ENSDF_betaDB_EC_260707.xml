@@ -281,31 +281,34 @@
 		<branch IB="0.0026" sigma_IB="0.0004" IE="0.0000" sigma_IE="0.0000" end_point_E="4.3070" sigma_E0="0.0310" dJpi="1"/>
 		<branch IB="0.0007" sigma_IB="0.0002" IE="0.0000" sigma_IE="0.0000" end_point_E="4.0590" sigma_E0="0.0310" dJpi="1"/>
 	</isotope>
-	<isotope name="Al25" isotope="130250" Q="4.2767" HL="7.183" Ex="0.0">
-		<branch IB="0.9903" sigma_IB="0.0008" IE="0.0008" sigma_IE="0.0000" end_point_E="4.2767" sigma_E0="0.0005" dJpi="0"/>
-		<branch IB="0.0005" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="3.3020" sigma_E0="0.0005" dJpi="1"/>
-		<branch IB="0.0078" sigma_IB="0.0002" IE="0.0000" sigma_IE="0.0000" end_point_E="2.6649" sigma_E0="0.0005" dJpi="1"/>
+	<isotope name="Al25" isotope="130250" Q="4.27681" HL="7.168" Ex="0.0">
+		<branch IB="0.9907" sigma_IB="0.0004" IE="0.0009" sigma_IE="0.0000" end_point_E="4.2768" sigma_E0="0.0000" dJpi="0"/>
+		<branch IB="0.0005" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="3.3021" sigma_E0="0.0001" dJpi="1"/>
+		<branch IB="0.0078" sigma_IB="0.0003" IE="0.0000" sigma_IE="0.0000" end_point_E="2.6650" sigma_E0="0.0001" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="2.3122" sigma_E0="0.0001" dJpi="0"/>
 	</isotope>
-	<isotope name="Si25" isotope="140250" Q="12.74" HL="0.22" Ex="0.0">
-		<branch IB="0.2500" sigma_IB="0.0700" IE="0.0000" sigma_IE="0.0000" end_point_E="12.7400" sigma_E0="0.0100" dJpi="0"/>
-		<branch IB="0.2600" sigma_IB="0.0400" IE="0.0000" sigma_IE="0.0000" end_point_E="11.7950" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.1500" sigma_IB="0.0300" IE="0.0000" sigma_IE="0.0000" end_point_E="11.1270" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.0480" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="10.0680" sigma_E0="0.0110" dJpi="1"/>
-		<branch IB="0.0040" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="8.8960" sigma_E0="0.0170" dJpi="0"/>
-		<branch IB="0.0299" sigma_IB="0.0003" IE="0.0000" sigma_IE="0.0000" end_point_E="8.5510" sigma_E0="0.0120" dJpi="1"/>
-		<branch IB="0.0320" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="8.1580" sigma_E0="0.0120" dJpi="0"/>
-		<branch IB="0.0060" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="7.8320" sigma_E0="0.0160" dJpi="0,1"/>
-		<branch IB="0.0056" sigma_IB="0.0011" IE="0.0000" sigma_IE="0.0000" end_point_E="7.1430" sigma_E0="0.0160" dJpi="0"/>
-		<branch IB="0.0170" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="6.9380" sigma_E0="0.0140" dJpi="0"/>
-		<branch IB="0.0032" sigma_IB="0.0006" IE="0.0000" sigma_IE="0.0000" end_point_E="6.5700" sigma_E0="0.0120" dJpi="1"/>
-		<branch IB="0.0016" sigma_IB="0.0007" IE="0.0000" sigma_IE="0.0000" end_point_E="6.1200" sigma_E0="0.0190" dJpi="0"/>
-		<branch IB="0.0050" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="5.8690" sigma_E0="0.0180" dJpi="0"/>
-		<branch IB="0.0370" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="5.6330" sigma_E0="0.0130" dJpi="1"/>
-		<branch IB="0.0100" sigma_IB="0.0060" IE="0.0000" sigma_IE="0.0000" end_point_E="5.4850" sigma_E0="0.0170" dJpi="0"/>
-		<branch IB="0.0034" sigma_IB="0.0006" IE="0.0000" sigma_IE="0.0000" end_point_E="5.0620" sigma_E0="0.0170" dJpi="1,0,1"/>
-		<branch IB="0.1280" sigma_IB="0.0080" IE="0.0001" sigma_IE="0.0000" end_point_E="4.8480" sigma_E0="0.0120" dJpi="1,0,1"/>
-		<branch IB="0.0120" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="4.5470" sigma_E0="0.0160" dJpi="1,0,1"/>
-		<branch IB="0.0021" sigma_IB="0.0004" IE="0.0000" sigma_IE="0.0000" end_point_E="3.6670" sigma_E0="0.0170" dJpi="1,0,1"/>
+	<isotope name="Si25" isotope="140250" Q="12.743" HL="0.2187" Ex="0.0">
+		<branch IB="0.2150" sigma_IB="0.0120" IE="0.0000" sigma_IE="0.0000" end_point_E="12.7430" sigma_E0="0.0100" dJpi="0"/>
+		<branch IB="0.2260" sigma_IB="0.0070" IE="0.0000" sigma_IE="0.0000" end_point_E="11.7979" sigma_E0="0.0106" dJpi="1"/>
+		<branch IB="0.1520" sigma_IB="0.0090" IE="0.0000" sigma_IE="0.0000" end_point_E="11.1309" sigma_E0="0.0110" dJpi="1"/>
+		<branch IB="0.0146" sigma_IB="0.0007" IE="0.0000" sigma_IE="0.0000" end_point_E="10.9533" sigma_E0="0.0106" dJpi="0"/>
+		<branch IB="0.0490" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="10.0694" sigma_E0="0.0105" dJpi="1"/>
+		<branch IB="0.0040" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="8.8840" sigma_E0="0.0120" dJpi="0"/>
+		<branch IB="0.0290" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="8.5520" sigma_E0="0.0130" dJpi="1"/>
+		<branch IB="0.0320" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="8.1610" sigma_E0="0.0120" dJpi="0"/>
+		<branch IB="0.0060" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="7.8370" sigma_E0="0.0140" dJpi="0"/>
+		<branch IB="0.0060" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="7.1460" sigma_E0="0.0150" dJpi="1,0,1"/>
+		<branch IB="0.0170" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="6.9390" sigma_E0="0.0140" dJpi="1,0,1"/>
+		<branch IB="0.0032" sigma_IB="0.0006" IE="0.0000" sigma_IE="0.0000" end_point_E="6.5730" sigma_E0="0.0120" dJpi="1,0,1"/>
+		<branch IB="0.0016" sigma_IB="0.0007" IE="0.0000" sigma_IE="0.0000" end_point_E="6.1230" sigma_E0="0.0190" dJpi="1,0,1"/>
+		<branch IB="0.0050" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="5.8660" sigma_E0="0.0180" dJpi="1,0,1"/>
+		<branch IB="0.0370" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="5.6350" sigma_E0="0.0130" dJpi="1"/>
+		<branch IB="0.0120" sigma_IB="0.0050" IE="0.0000" sigma_IE="0.0000" end_point_E="5.4940" sigma_E0="0.0150" dJpi="0"/>
+		<branch IB="0.0034" sigma_IB="0.0006" IE="0.0000" sigma_IE="0.0000" end_point_E="5.0650" sigma_E0="0.0170" dJpi="1-"/>
+		<branch IB="0.1290" sigma_IB="0.0080" IE="0.0001" sigma_IE="0.0000" end_point_E="4.8403" sigma_E0="0.0122" dJpi="0"/>
+		<branch IB="0.0120" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="4.5550" sigma_E0="0.0130" dJpi="1,0,1"/>
+		<branch IB="0.0021" sigma_IB="0.0004" IE="0.0000" sigma_IE="0.0000" end_point_E="3.6750" sigma_E0="0.0170" dJpi="1,0,1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="3.4680" sigma_E0="0.0350" dJpi="0"/>
 	</isotope>
 	<isotope name="Al26" isotope="130260" Q="4.00414" HL="22611312000000.0" Ex="0.0">
 		<branch IB="0.8173" sigma_IB="0.0021" IE="0.1551" sigma_IE="0.0013" end_point_E="2.1954" sigma_E0="0.0001" dJpi="3"/>
@@ -651,32 +654,52 @@
 		<branch IB="0.0086" sigma_IB="0.0005" IE="0.0000" sigma_IE="0.0000" end_point_E="3.4823" sigma_E0="0.0015" dJpi="1"/>
 		<branch IB="0.0128" sigma_IB="0.0007" IE="0.0002" sigma_IE="0.0000" end_point_E="2.9326" sigma_E0="0.0011" dJpi="1"/>
 	</isotope>
-	<isotope name="Ar35" isotope="180350" Q="5.9661" HL="1.7756" Ex="0.0">
-		<branch IB="0.9816" sigma_IB="0.0005" IE="0.0007" sigma_IE="0.0000" end_point_E="5.9661" sigma_E0="0.0007" dJpi="0"/>
-		<branch IB="0.0123" sigma_IB="0.0003" IE="0.0000" sigma_IE="0.0000" end_point_E="4.7469" sigma_E0="0.0009" dJpi="1"/>
-		<branch IB="0.0025" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="4.2030" sigma_E0="0.0009" dJpi="1"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="3.3209" sigma_E0="0.0015" dJpi="0"/>
+	<isotope name="Ar35" isotope="180350" Q="5.9662" HL="1.7755" Ex="0.0">
+		<branch IB="0.9817" sigma_IB="0.0010" IE="0.0007" sigma_IE="0.0000" end_point_E="5.9662" sigma_E0="0.0007" dJpi="0"/>
+		<branch IB="0.0122" sigma_IB="0.0004" IE="0.0000" sigma_IE="0.0000" end_point_E="4.7470" sigma_E0="0.0009" dJpi="1"/>
+		<branch IB="0.0026" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="4.2031" sigma_E0="0.0009" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="3.3211" sigma_E0="0.0017" dJpi="2"/>
 		<branch IB="0.0016" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="3.2723" sigma_E0="0.0009" dJpi="0"/>
-		<branch IB="0.0009" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="2.9638" sigma_E0="0.0011" dJpi="1"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="2.0478" sigma_E0="0.0014" dJpi="0"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.9984" sigma_E0="0.0011" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3416" sigma_E0="0.0013" dJpi="0,1"/>
+		<branch IB="0.0009" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="2.9640" sigma_E0="0.0011" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="2.0479" sigma_E0="0.0022" dJpi="0"/>
+		<branch IB="0.0001" sigma_IB="0.0001" IE="0.0000" sigma_IE="0.0000" end_point_E="1.9983" sigma_E0="0.0013" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3417" sigma_E0="0.0012" dJpi="0,1"/>
 	</isotope>
-	<isotope name="K35" isotope="190350" Q="11.8745" HL="0.178" Ex="0.0">
-		<branch IB="0.1900" sigma_IB="0.0400" IE="0.0000" sigma_IE="0.0000" end_point_E="11.8745" sigma_E0="0.0009" dJpi="0"/>
-		<branch IB="0.0220" sigma_IB="0.0070" IE="0.0000" sigma_IE="0.0000" end_point_E="10.6905" sigma_E0="0.0011" dJpi="1"/>
-		<branch IB="0.1190" sigma_IB="0.0090" IE="0.0000" sigma_IE="0.0000" end_point_E="10.1238" sigma_E0="0.0012" dJpi="1"/>
-		<branch IB="0.0040" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="9.2365" sigma_E0="0.0012" dJpi="0,1"/>
-		<branch IB="0.2600" sigma_IB="0.0300" IE="0.0001" sigma_IE="0.0000" end_point_E="8.8917" sigma_E0="0.0010" dJpi="0,1"/>
-		<branch IB="0.0055" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="7.8095" sigma_E0="0.0013" dJpi="1,0,1"/>
-		<branch IB="0.0070" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.3463" sigma_E0="0.0013" dJpi="1,0,1"/>
-		<branch IB="0.0210" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.1486" sigma_E0="0.0015" dJpi="1"/>
-		<branch IB="0.0100" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.0887" sigma_E0="0.0020" dJpi="1"/>
-		<branch IB="0.3600" sigma_IB="0.0300" IE="0.0003" sigma_IE="0.0000" end_point_E="6.3018" sigma_E0="0.0010" dJpi="0"/>
-		<branch IB="0.0015" sigma_IB="0.0006" IE="0.0000" sigma_IE="0.0000" end_point_E="4.3645" sigma_E0="0.0209" dJpi="1,0,1"/>
-		<branch IB="0.0006" sigma_IB="0.0003" IE="0.0000" sigma_IE="0.0000" end_point_E="3.4795" sigma_E0="0.0209" dJpi="1,0,1"/>
+	<isotope name="K35" isotope="190350" Q="11.8744" HL="0.17500000000000002" Ex="0.0">
+		<branch IB="0.1900" sigma_IB="0.0400" IE="0.0000" sigma_IE="0.0000" end_point_E="11.8744" sigma_E0="0.0009" dJpi="0"/>
+		<branch IB="0.0220" sigma_IB="0.0070" IE="0.0000" sigma_IE="0.0000" end_point_E="10.6904" sigma_E0="0.0011" dJpi="1"/>
+		<branch IB="0.1190" sigma_IB="0.0090" IE="0.0000" sigma_IE="0.0000" end_point_E="10.1237" sigma_E0="0.0011" dJpi="1"/>
+		<branch IB="0.0040" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="9.2364" sigma_E0="0.0012" dJpi="0"/>
+		<branch IB="0.2600" sigma_IB="0.0220" IE="0.0001" sigma_IE="0.0000" end_point_E="8.8916" sigma_E0="0.0010" dJpi="1"/>
+		<branch IB="0.0056" sigma_IB="0.0033" IE="0.0000" sigma_IE="0.0000" end_point_E="7.8094" sigma_E0="0.0013" dJpi="1,0,1"/>
+		<branch IB="0.0070" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.3462" sigma_E0="0.0013" dJpi="1,0,1"/>
+		<branch IB="0.0210" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.1485" sigma_E0="0.0015" dJpi="1"/>
+		<branch IB="0.0100" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.0886" sigma_E0="0.0020" dJpi="1,0,1"/>
+		<branch IB="0.3630" sigma_IB="0.0240" IE="0.0003" sigma_IE="0.0000" end_point_E="6.3017" sigma_E0="0.0010" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="5.5264" sigma_E0="0.0119" dJpi="1,0,1"/>
+		<branch IB="0.0009" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="4.3564" sigma_E0="0.0119" dJpi="1,0,1"/>
+		<branch IB="0.0006" sigma_IB="0.0003" IE="0.0000" sigma_IE="0.0000" end_point_E="3.4814" sigma_E0="0.0209" dJpi="1,0,1"/>
 	</isotope>
-	<isotope name="Ca35" isotope="200350" Q="15.961" HL="0.0257" Ex="0.0"/>
+	<isotope name="Ca35" isotope="200350" Q="15.95" HL="0.0257" Ex="0.0">
+		<branch IB="0.4820" sigma_IB="0.0130" IE="0.0000" sigma_IE="0.0000" end_point_E="14.3970" sigma_E0="0.1150" dJpi="0"/>
+		<branch IB="0.0300" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="12.1690" sigma_E0="0.1360" dJpi="0,1"/>
+		<branch IB="0.0380" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="11.9320" sigma_E0="0.1470" dJpi="0,1"/>
+		<branch IB="0.0540" sigma_IB="0.0090" IE="0.0000" sigma_IE="0.0000" end_point_E="11.4300" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0290" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="11.1620" sigma_E0="0.1590" dJpi="0,1"/>
+		<branch IB="0.1010" sigma_IB="0.0070" IE="0.0000" sigma_IE="0.0000" end_point_E="10.9680" sigma_E0="0.1230" dJpi="0,1"/>
+		<branch IB="0.0390" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="10.7010" sigma_E0="0.1830" dJpi="0,1"/>
+		<branch IB="0.0220" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="10.4570" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0072" sigma_IB="0.0018" IE="0.0000" sigma_IE="0.0000" end_point_E="10.4170" sigma_E0="0.1590" dJpi="0,1"/>
+		<branch IB="0.0061" sigma_IB="0.0015" IE="0.0000" sigma_IE="0.0000" end_point_E="10.2400" sigma_E0="0.1590" dJpi="0,1"/>
+		<branch IB="0.0100" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="10.2340" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0142" sigma_IB="0.0017" IE="0.0000" sigma_IE="0.0000" end_point_E="10.0850" sigma_E0="0.1480" dJpi="0,1"/>
+		<branch IB="0.0139" sigma_IB="0.0019" IE="0.0000" sigma_IE="0.0000" end_point_E="9.8610" sigma_E0="0.1720" dJpi="0,1"/>
+		<branch IB="0.0200" sigma_IB="0.0070" IE="0.0000" sigma_IE="0.0000" end_point_E="9.6480" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0290" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="9.6150" sigma_E0="0.1830" dJpi="0,1"/>
+		<branch IB="0.0108" sigma_IB="0.0017" IE="0.0000" sigma_IE="0.0000" end_point_E="9.3650" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0110" sigma_IB="0.0020" IE="0.0000" sigma_IE="0.0000" end_point_E="8.1370" sigma_E0="0.1100" dJpi="0"/>
+		<branch IB="0.0840" sigma_IB="0.0040" IE="0.0001" sigma_IE="0.0000" end_point_E="6.7820" sigma_E0="0.1330" dJpi="0"/>
+	</isotope>
 	<isotope name="Cl36" isotope="170360" Q="1.1421400000000002" HL="9492336000000.0" Ex="0.0">
 		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0189" sigma_IE="0.0010" end_point_E="1.1421" sigma_E0="0.0002" dJpi="2"/>
 	</isotope>
@@ -930,6 +953,7 @@
 		<branch IB="0.0260" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="7.1520" sigma_E0="0.1720" dJpi="1"/>
 		<branch IB="0.0200" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="7.0210" sigma_E0="0.1710" dJpi="1"/>
 		<branch IB="0.0077" sigma_IB="0.0017" IE="0.0000" sigma_IE="0.0000" end_point_E="6.8510" sigma_E0="0.1790" dJpi="1"/>
+		<branch IB="0.0140" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="6.7750" sigma_E0="0.1750" dJpi="0"/>
 		<branch IB="0.0150" sigma_IB="0.0030" IE="0.0000" sigma_IE="0.0000" end_point_E="6.6560" sigma_E0="0.1820" dJpi="1"/>
 		<branch IB="0.0103" sigma_IB="0.0025" IE="0.0000" sigma_IE="0.0000" end_point_E="6.5900" sigma_E0="0.1890" dJpi="1"/>
 		<branch IB="0.0011" sigma_IB="0.0011" IE="0.0000" sigma_IE="0.0000" end_point_E="6.4490" sigma_E0="0.1890" dJpi="0"/>
@@ -1856,113 +1880,115 @@
 		<branch IB="0.0520" sigma_IB="0.0160" IE="0.0014" sigma_IE="0.0004" end_point_E="4.3412" sigma_E0="0.0023" dJpi="1"/>
 		<branch IB="0.9100" sigma_IB="0.0400" IE="0.0260" sigma_IE="0.0010" end_point_E="4.2792" sigma_E0="0.0022" dJpi="1"/>
 	</isotope>
-	<isotope name="Ge69" isotope="320690" Q="2.2271" HL="140580.0" Ex="0.0">
-		<branch IB="0.2100" sigma_IB="0.0500" IE="0.1000" sigma_IE="0.0300" end_point_E="2.2271" sigma_E0="0.0005" dJpi="1"/>
-		<branch IB="0.0230" sigma_IB="0.0030" IE="0.1000" sigma_IE="0.0150" end_point_E="1.6530" sigma_E0="0.0006" dJpi="0"/>
-		<branch IB="0.0026" sigma_IB="0.0004" IE="0.1150" sigma_IE="0.0160" end_point_E="1.3551" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.3700" sigma_IE="0.0400" end_point_E="1.1203" sigma_E0="0.0006" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0440" sigma_IE="0.0070" end_point_E="0.8905" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0018" sigma_IE="0.0003" end_point_E="0.7391" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0077" sigma_IE="0.0010" end_point_E="0.7012" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0008" sigma_IE="0.0001" end_point_E="0.5038" sigma_E0="0.0007" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0071" sigma_IE="0.0009" end_point_E="0.3356" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0126" sigma_IE="0.0016" end_point_E="0.3031" sigma_E0="0.0006" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0063" sigma_IE="0.0008" end_point_E="0.2034" sigma_E0="0.0006" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.1822" sigma_E0="0.0009" dJpi="0"/>
+	<isotope name="Ge69" isotope="320690" Q="2.2271" HL="140184.0" Ex="0.0">
+		<branch IB="0.2100" sigma_IB="0.0280" IE="0.1000" sigma_IE="0.0100" end_point_E="2.2271" sigma_E0="0.0006" dJpi="1"/>
+		<branch IB="0.0239" sigma_IB="0.0025" IE="0.1000" sigma_IE="0.0130" end_point_E="1.6530" sigma_E0="0.0007" dJpi="0"/>
+		<branch IB="0.0027" sigma_IB="0.0003" IE="0.1150" sigma_IE="0.0110" end_point_E="1.3551" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.3700" sigma_IE="0.0190" end_point_E="1.1203" sigma_E0="0.0007" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0440" sigma_IE="0.0040" end_point_E="0.8905" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0018" sigma_IE="0.0002" end_point_E="0.7391" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0077" sigma_IE="0.0004" end_point_E="0.7012" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0008" sigma_IE="0.0001" end_point_E="0.5038" sigma_E0="0.0008" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0071" sigma_IE="0.0004" end_point_E="0.3356" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0127" sigma_IE="0.0006" end_point_E="0.3031" sigma_E0="0.0007" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0063" sigma_IE="0.0004" end_point_E="0.2034" sigma_E0="0.0007" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.1822" sigma_E0="0.0006" dJpi="0"/>
 	</isotope>
 	<isotope name="As69" isotope="330690" Q="3.99" HL="912.0" Ex="0.0">
-		<branch IB="0.7330" sigma_IB="0.0090" IE="0.0247" sigma_IE="0.0008" end_point_E="3.9900" sigma_E0="0.0300" dJpi="0"/>
-		<branch IB="0.1400" sigma_IB="0.0050" IE="0.0060" sigma_IE="0.0003" end_point_E="3.7573" sigma_E0="0.0300" dJpi="1"/>
-		<branch IB="0.0076" sigma_IB="0.0008" IE="0.0004" sigma_IE="0.0000" end_point_E="3.6159" sigma_E0="0.0301" dJpi="1"/>
-		<branch IB="0.0070" sigma_IB="0.0007" IE="0.0009" sigma_IE="0.0001" end_point_E="3.5921" sigma_E0="0.0301" dJpi="2-"/>
-		<branch IB="0.0064" sigma_IB="0.0009" IE="0.0006" sigma_IE="0.0001" end_point_E="3.1775" sigma_E0="0.0301" dJpi="0-"/>
-		<branch IB="0.0052" sigma_IB="0.0005" IE="0.0005" sigma_IE="0.0001" end_point_E="3.1278" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0048" sigma_IB="0.0006" IE="0.0005" sigma_IE="0.0001" end_point_E="3.0566" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0041" sigma_IB="0.0002" IE="0.0006" sigma_IE="0.0000" end_point_E="2.8299" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0052" sigma_IB="0.0004" IE="0.0008" sigma_IE="0.0001" end_point_E="2.7939" sigma_E0="0.0301" dJpi="0"/>
-		<branch IB="0.0034" sigma_IB="0.0003" IE="0.0007" sigma_IE="0.0001" end_point_E="2.6827" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0021" sigma_IB="0.0002" IE="0.0005" sigma_IE="0.0001" end_point_E="2.5750" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0017" sigma_IB="0.0001" IE="0.0005" sigma_IE="0.0000" end_point_E="2.5110" sigma_E0="0.0303" dJpi="1"/>
-		<branch IB="0.0009" sigma_IB="0.0001" IE="0.0003" sigma_IE="0.0000" end_point_E="2.4503" sigma_E0="0.0304" dJpi="1"/>
-		<branch IB="0.0025" sigma_IB="0.0002" IE="0.0009" sigma_IE="0.0001" end_point_E="2.3789" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0046" sigma_IB="0.0004" IE="0.0017" sigma_IE="0.0002" end_point_E="2.3757" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0065" sigma_IB="0.0005" IE="0.0036" sigma_IE="0.0003" end_point_E="2.2229" sigma_E0="0.0301" dJpi="1"/>
-		<branch IB="0.0017" sigma_IB="0.0001" IE="0.0013" sigma_IE="0.0001" end_point_E="2.0990" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0019" sigma_IB="0.0002" IE="0.0021" sigma_IE="0.0002" end_point_E="1.9893" sigma_E0="0.0303" dJpi="0"/>
-		<branch IB="0.0011" sigma_IB="0.0002" IE="0.0031" sigma_IE="0.0004" end_point_E="1.7536" sigma_E0="0.0303" dJpi="1"/>
-		<branch IB="0.0012" sigma_IB="0.0002" IE="0.0037" sigma_IE="0.0003" end_point_E="1.7432" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0002" end_point_E="1.3952" sigma_E0="0.0303" dJpi="1,0"/>
+		<branch IB="0.7277" sigma_IB="0.0038" IE="0.0253" sigma_IE="0.0012" end_point_E="3.9900" sigma_E0="0.0300" dJpi="0"/>
+		<branch IB="0.1447" sigma_IB="0.0035" IE="0.0064" sigma_IE="0.0003" end_point_E="3.7573" sigma_E0="0.0300" dJpi="1"/>
+		<branch IB="0.0077" sigma_IB="0.0012" IE="0.0004" sigma_IE="0.0001" end_point_E="3.6159" sigma_E0="0.0301" dJpi="1"/>
+		<branch IB="0.0072" sigma_IB="0.0011" IE="0.0010" sigma_IE="0.0001" end_point_E="3.5921" sigma_E0="0.0301" dJpi="2-"/>
+		<branch IB="0.0067" sigma_IB="0.0013" IE="0.0006" sigma_IE="0.0001" end_point_E="3.1775" sigma_E0="0.0301" dJpi="0-"/>
+		<branch IB="0.0054" sigma_IB="0.0005" IE="0.0005" sigma_IE="0.0001" end_point_E="3.1278" sigma_E0="0.0302" dJpi="1"/>
+		<branch IB="0.0050" sigma_IB="0.0010" IE="0.0006" sigma_IE="0.0001" end_point_E="3.0566" sigma_E0="0.0302" dJpi="0"/>
+		<branch IB="0.0042" sigma_IB="0.0002" IE="0.0007" sigma_IE="0.0001" end_point_E="2.8299" sigma_E0="0.0302" dJpi="2,1"/>
+		<branch IB="0.0053" sigma_IB="0.0004" IE="0.0009" sigma_IE="0.0001" end_point_E="2.7939" sigma_E0="0.0301" dJpi="0"/>
+		<branch IB="0.0036" sigma_IB="0.0007" IE="0.0007" sigma_IE="0.0001" end_point_E="2.6827" sigma_E0="0.0302" dJpi="1"/>
+		<branch IB="0.0022" sigma_IB="0.0005" IE="0.0005" sigma_IE="0.0001" end_point_E="2.5750" sigma_E0="0.0302" dJpi="0"/>
+		<branch IB="0.0004" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0005" end_point_E="2.5590" sigma_E0="0.0304" dJpi="2"/>
+		<branch IB="0.0018" sigma_IB="0.0001" IE="0.0005" sigma_IE="0.0000" end_point_E="2.5110" sigma_E0="0.0303" dJpi="1"/>
+		<branch IB="0.0010" sigma_IB="0.0004" IE="0.0004" sigma_IE="0.0001" end_point_E="2.4502" sigma_E0="0.0302" dJpi="1"/>
+		<branch IB="0.0025" sigma_IB="0.0005" IE="0.0010" sigma_IE="0.0001" end_point_E="2.3789" sigma_E0="0.0302" dJpi="0"/>
+		<branch IB="0.0047" sigma_IB="0.0005" IE="0.0019" sigma_IE="0.0002" end_point_E="2.3757" sigma_E0="0.0302" dJpi="1"/>
+		<branch IB="0.0067" sigma_IB="0.0005" IE="0.0038" sigma_IE="0.0003" end_point_E="2.2229" sigma_E0="0.0301" dJpi="1"/>
+		<branch IB="0.0017" sigma_IB="0.0001" IE="0.0014" sigma_IE="0.0001" end_point_E="2.0990" sigma_E0="0.0302" dJpi="1"/>
+		<branch IB="0.0019" sigma_IB="0.0002" IE="0.0023" sigma_IE="0.0002" end_point_E="1.9893" sigma_E0="0.0303" dJpi="0"/>
+		<branch IB="0.0011" sigma_IB="0.0002" IE="0.0033" sigma_IE="0.0006" end_point_E="1.7536" sigma_E0="0.0303" dJpi="1"/>
+		<branch IB="0.0013" sigma_IB="0.0002" IE="0.0039" sigma_IE="0.0003" end_point_E="1.7432" sigma_E0="0.0302" dJpi="0"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0017" sigma_IE="0.0002" end_point_E="1.3952" sigma_E0="0.0302" dJpi="1,0"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0014" sigma_IE="0.0002" end_point_E="1.2545" sigma_E0="0.0302" dJpi="1"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0004" end_point_E="1.2170" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0004" end_point_E="1.0432" sigma_E0="0.0304" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0004" end_point_E="1.0432" sigma_E0="0.0304" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0017" sigma_IE="0.0002" end_point_E="1.0093" sigma_E0="0.0303" dJpi="1"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0003" end_point_E="0.5566" sigma_E0="0.0303" dJpi="1,0,1"/>
 	</isotope>
 	<isotope name="Se69" isotope="340690" Q="6.68" HL="27.4" Ex="0.0">
-		<branch IB="0.0900" sigma_IB="0.0700" IE="0.0005" sigma_IE="0.0004" end_point_E="6.5820" sigma_E0="0.0300" dJpi="1"/>
-		<branch IB="0.3200" sigma_IB="0.0400" IE="0.0019" sigma_IE="0.0002" end_point_E="6.5155" sigma_E0="0.0301" dJpi="0,1"/>
-		<branch IB="0.0080" sigma_IB="0.0070" IE="0.0001" sigma_IE="0.0001" end_point_E="6.1827" sigma_E0="0.0301" dJpi="0-"/>
-		<branch IB="0.2270" sigma_IB="0.0250" IE="0.0020" sigma_IE="0.0002" end_point_E="5.8906" sigma_E0="0.0301" dJpi="0,1"/>
-		<branch IB="0.0090" sigma_IB="0.0050" IE="0.0001" sigma_IE="0.0001" end_point_E="5.7464" sigma_E0="0.0302" dJpi="0-"/>
-		<branch IB="0.0090" sigma_IB="0.0090" IE="0.0001" sigma_IE="0.0001" end_point_E="5.6040" sigma_E0="0.0302" dJpi="0-"/>
-		<branch IB="0.0310" sigma_IB="0.0040" IE="0.0005" sigma_IE="0.0001" end_point_E="4.9892" sigma_E0="0.0303" dJpi="0-"/>
-		<branch IB="0.0180" sigma_IB="0.0050" IE="0.0003" sigma_IE="0.0001" end_point_E="4.9358" sigma_E0="0.0306" dJpi="0-"/>
-		<branch IB="0.0790" sigma_IB="0.0090" IE="0.0014" sigma_IE="0.0002" end_point_E="4.8151" sigma_E0="0.0303" dJpi="0-"/>
-		<branch IB="0.0170" sigma_IB="0.0090" IE="0.0004" sigma_IE="0.0002" end_point_E="4.5609" sigma_E0="0.0307" dJpi="0-"/>
-		<branch IB="0.0330" sigma_IB="0.0040" IE="0.0008" sigma_IE="0.0001" end_point_E="4.5301" sigma_E0="0.0305" dJpi="0-"/>
+		<branch IB="0.0900" sigma_IB="0.0500" IE="0.0005" sigma_IE="0.0003" end_point_E="6.5820" sigma_E0="0.0301" dJpi="1"/>
+		<branch IB="0.2900" sigma_IB="0.0400" IE="0.0017" sigma_IE="0.0002" end_point_E="6.5155" sigma_E0="0.0301" dJpi="0,1"/>
+		<branch IB="0.0120" sigma_IB="0.0060" IE="0.0001" sigma_IE="0.0000" end_point_E="6.1827" sigma_E0="0.0301" dJpi="0-"/>
+		<branch IB="0.2100" sigma_IB="0.0300" IE="0.0018" sigma_IE="0.0002" end_point_E="5.8906" sigma_E0="0.0301" dJpi="0,1"/>
+		<branch IB="0.0090" sigma_IB="0.0050" IE="0.0001" sigma_IE="0.0001" end_point_E="5.7466" sigma_E0="0.0302" dJpi="0-"/>
+		<branch IB="0.0110" sigma_IB="0.0050" IE="0.0001" sigma_IE="0.0001" end_point_E="5.6040" sigma_E0="0.0302" dJpi="0-"/>
+		<branch IB="0.0320" sigma_IB="0.0030" IE="0.0005" sigma_IE="0.0001" end_point_E="4.9892" sigma_E0="0.0303" dJpi="0-"/>
+		<branch IB="0.0230" sigma_IB="0.0030" IE="0.0004" sigma_IE="0.0001" end_point_E="4.9357" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.1040" sigma_IB="0.0100" IE="0.0019" sigma_IE="0.0002" end_point_E="4.8152" sigma_E0="0.0303" dJpi="0-"/>
+		<branch IB="0.0300" sigma_IB="0.0130" IE="0.0007" sigma_IE="0.0003" end_point_E="4.5609" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.0330" sigma_IB="0.0040" IE="0.0008" sigma_IE="0.0001" end_point_E="4.5300" sigma_E0="0.0305" dJpi="0-"/>
 		<branch IB="0.0033" sigma_IB="0.0009" IE="0.0001" sigma_IE="0.0000" end_point_E="4.4960" sigma_E0="0.0310" dJpi="0-"/>
-		<branch IB="0.0170" sigma_IB="0.0030" IE="0.0004" sigma_IE="0.0001" end_point_E="4.3333" sigma_E0="0.0304" dJpi="0-"/>
-		<branch IB="0.0610" sigma_IB="0.0070" IE="0.0018" sigma_IE="0.0002" end_point_E="4.2709" sigma_E0="0.0302" dJpi="0-"/>
-		<branch IB="0.0210" sigma_IB="0.0030" IE="0.0007" sigma_IE="0.0001" end_point_E="4.1470" sigma_E0="0.0304" dJpi="0-"/>
-		<branch IB="0.0114" sigma_IB="0.0018" IE="0.0005" sigma_IE="0.0001" end_point_E="3.8071" sigma_E0="0.0310" dJpi="0-"/>
-		<branch IB="0.0094" sigma_IB="0.0018" IE="0.0005" sigma_IE="0.0001" end_point_E="3.6487" sigma_E0="0.0304" dJpi="0-"/>
-		<branch IB="0.0089" sigma_IB="0.0013" IE="0.0006" sigma_IE="0.0001" end_point_E="3.5355" sigma_E0="0.0308" dJpi="0-"/>
-		<branch IB="0.0028" sigma_IB="0.0007" IE="0.0002" sigma_IE="0.0001" end_point_E="3.4599" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.0173" sigma_IB="0.0023" IE="0.0005" sigma_IE="0.0001" end_point_E="4.3333" sigma_E0="0.0305" dJpi="0-"/>
+		<branch IB="0.0570" sigma_IB="0.0050" IE="0.0017" sigma_IE="0.0001" end_point_E="4.2710" sigma_E0="0.0303" dJpi="0-"/>
+		<branch IB="0.0210" sigma_IB="0.0030" IE="0.0007" sigma_IE="0.0001" end_point_E="4.1471" sigma_E0="0.0303" dJpi="0-"/>
+		<branch IB="0.0114" sigma_IB="0.0016" IE="0.0005" sigma_IE="0.0001" end_point_E="3.8070" sigma_E0="0.0310" dJpi="0-"/>
+		<branch IB="0.0109" sigma_IB="0.0017" IE="0.0006" sigma_IE="0.0001" end_point_E="3.6488" sigma_E0="0.0304" dJpi="0-"/>
+		<branch IB="0.0089" sigma_IB="0.0011" IE="0.0006" sigma_IE="0.0001" end_point_E="3.5354" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.0028" sigma_IB="0.0006" IE="0.0002" sigma_IE="0.0000" end_point_E="3.4599" sigma_E0="0.0307" dJpi="0-"/>
 		<branch IB="0.0049" sigma_IB="0.0006" IE="0.0004" sigma_IE="0.0001" end_point_E="3.3334" sigma_E0="0.0304" dJpi="0-"/>
-		<branch IB="0.0040" sigma_IB="0.0007" IE="0.0003" sigma_IE="0.0001" end_point_E="3.2854" sigma_E0="0.0305" dJpi="0-"/>
-		<branch IB="0.0019" sigma_IB="0.0004" IE="0.0002" sigma_IE="0.0000" end_point_E="3.2111" sigma_E0="0.0307" dJpi="0-"/>
-		<branch IB="0.0010" sigma_IB="0.0003" IE="0.0001" sigma_IE="0.0000" end_point_E="3.0284" sigma_E0="0.0310" dJpi="0-"/>
-		<branch IB="0.0021" sigma_IB="0.0004" IE="0.0005" sigma_IE="0.0001" end_point_E="2.6804" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.0039" sigma_IB="0.0006" IE="0.0003" sigma_IE="0.0001" end_point_E="3.2854" sigma_E0="0.0305" dJpi="0-"/>
+		<branch IB="0.0019" sigma_IB="0.0003" IE="0.0002" sigma_IE="0.0000" end_point_E="3.2111" sigma_E0="0.0307" dJpi="0-"/>
+		<branch IB="0.0010" sigma_IB="0.0002" IE="0.0001" sigma_IE="0.0000" end_point_E="3.0284" sigma_E0="0.0310" dJpi="0-"/>
+		<branch IB="0.0020" sigma_IB="0.0003" IE="0.0005" sigma_IE="0.0001" end_point_E="2.6804" sigma_E0="0.0307" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="2.0310" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.9330" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.8090" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.7450" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.6960" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.6300" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.5780" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.5190" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.4520" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.4070" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3660" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3110" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.2640" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.2280" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.2000" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.1470" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.1100" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.0740" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.0230" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.9850" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.9390" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.8800" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.8390" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.8010" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.7570" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.7300" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.6860" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.6500" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.5990" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.5440" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4830" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4410" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4070" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.3580" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.2930" sigma_E0="0.0630" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.1950" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.9040" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.7800" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.7160" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.6670" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.6010" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.5490" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.4900" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.4230" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3780" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.3370" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.2820" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.2350" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.1990" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.1710" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.1180" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.0810" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="1.0450" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.9940" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.9560" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.9100" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.8510" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.8100" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.7720" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.7280" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.7010" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.6570" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.6210" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.5700" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.5150" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4540" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4120" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.3780" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.3290" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.2640" sigma_E0="0.0630" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.1660" sigma_E0="0.0630" dJpi="0-"/>
 	</isotope>
-	<isotope name="Kr69" isotope="360690" Q="13.68" HL="0.028" Ex="0.0">
-		<branch IB="0.0240" sigma_IB="0.0050" IE="0.0000" sigma_IE="0.0000" end_point_E="13.6800" sigma_E0="0.0000" dJpi="0"/>
-		<branch IB="0.5200" sigma_IB="0.0600" IE="0.0008" sigma_IE="0.0001" end_point_E="10.5270" sigma_E0="0.0550" dJpi="0"/>
+	<isotope name="Kr69" isotope="360690" Q="14.12" HL="0.027899999999999998" Ex="0.0">
+		<branch IB="0.0190" sigma_IB="0.0040" IE="0.0000" sigma_IE="0.0000" end_point_E="14.1200" sigma_E0="0.0000" dJpi="0"/>
+		<branch IB="0.0050" sigma_IB="0.0010" IE="0.0000" sigma_IE="0.0000" end_point_E="13.9740" sigma_E0="0.0550" dJpi="1"/>
+		<branch IB="0.5200" sigma_IB="0.0600" IE="0.0007" sigma_IE="0.0001" end_point_E="10.9680" sigma_E0="0.0470" dJpi="0"/>
 	</isotope>
 	<isotope name="Ga70" isotope="310700" Q="0.6546000000000001" HL="1268.4" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="1.0000" sigma_IE="0.0000" end_point_E="0.6546" sigma_E0="0.0016" dJpi="1"/>
@@ -5393,6 +5419,7 @@
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.9200" sigma_IE="0.0300" end_point_E="0.2978" sigma_E0="0.0031" dJpi="1"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0810" sigma_IE="0.0060" end_point_E="0.1028" sigma_E0="0.0031" dJpi="1"/>
 	</isotope>
+	<isotope name="Cd106" isotope="481060" Q="2.77" HL="0.0" Ex="0.0"/>
 	<isotope name="In106" isotope="491060" Q="6.526" HL="372.0" Ex="0.0">
 		<branch IB="0.0700" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="5.8934" sigma_E0="0.0111" dJpi="5"/>
 		<branch IB="0.1000" sigma_IB="0.0600" IE="0.0000" sigma_IE="0.0000" end_point_E="5.0323" sigma_E0="0.0111" dJpi="3"/>
@@ -8919,142 +8946,145 @@
 		<branch IB="0.1350" sigma_IB="0.0140" IE="0.0208" sigma_IE="0.0021" end_point_E="6.5144" sigma_E0="0.0104" dJpi="1"/>
 	</isotope>
 	<isotope name="Tm147" isotope="691470" Q="10.63" HL="0.58" Ex="0.0"/>
-	<isotope name="Eu148" isotope="631480" Q="3.037" HL="4708800.0" Ex="0.0">
-		<branch IB="0.0009" sigma_IB="0.0007" IE="0.0400" sigma_IE="0.0300" end_point_E="1.9420" sigma_E0="0.0300" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1270" sigma_IE="0.0230" end_point_E="1.3035" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0262" sigma_IE="0.0018" end_point_E="1.1422" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1020" sigma_IE="0.0040" end_point_E="1.1311" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0443" sigma_IE="0.0016" end_point_E="1.0056" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0334" sigma_IE="0.0010" end_point_E="0.9414" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0270" sigma_IE="0.0030" end_point_E="0.9259" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0003" end_point_E="0.9084" sigma_E0="0.0101" dJpi="2"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1720" sigma_IE="0.0230" end_point_E="0.8895" sigma_E0="0.0100" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0135" sigma_IE="0.0004" end_point_E="0.8429" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0940" sigma_IE="0.0030" end_point_E="0.8228" sigma_E0="0.0100" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0029" sigma_IE="0.0005" end_point_E="0.8089" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0241" sigma_IE="0.0009" end_point_E="0.7096" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.6978" sigma_E0="0.0102" dJpi="2"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0063" sigma_IE="0.0002" end_point_E="0.6626" sigma_E0="0.0100" dJpi="0-,1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0001" end_point_E="0.6466" sigma_E0="0.0101" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="0.6452" sigma_E0="0.0101" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0251" sigma_IE="0.0007" end_point_E="0.5470" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0420" sigma_IE="0.0030" end_point_E="0.5126" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.5046" sigma_E0="0.0100" dJpi="1,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0003" end_point_E="0.4662" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0048" sigma_IE="0.0001" end_point_E="0.4531" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0144" sigma_IE="0.0006" end_point_E="0.3958" sigma_E0="0.0100" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0022" sigma_IE="0.0001" end_point_E="0.3639" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="0.3618" sigma_E0="0.0101" dJpi="2-,1-,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0076" sigma_IE="0.0003" end_point_E="0.3535" sigma_E0="0.0100" dJpi="1,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0093" sigma_IE="0.0004" end_point_E="0.3385" sigma_E0="0.0100" dJpi="0,1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0021" sigma_IE="0.0001" end_point_E="0.3351" sigma_E0="0.0100" dJpi="1,2"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0028" sigma_IE="0.0001" end_point_E="0.3237" sigma_E0="0.0100" dJpi="2-,1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0018" sigma_IE="0.0001" end_point_E="0.3210" sigma_E0="0.0100" dJpi="1-,0-,1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0134" sigma_IE="0.0004" end_point_E="0.3135" sigma_E0="0.0100" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0002" end_point_E="0.3097" sigma_E0="0.0101" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0000" end_point_E="0.3026" sigma_E0="0.0102" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0848" sigma_IE="0.0023" end_point_E="0.2353" sigma_E0="0.0100" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0080" sigma_IE="0.0003" end_point_E="0.2214" sigma_E0="0.0100" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0698" sigma_IE="0.0020" end_point_E="0.2063" sigma_E0="0.0100" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0001" end_point_E="0.1759" sigma_E0="0.0100" dJpi="1,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0001" end_point_E="0.1082" sigma_E0="0.0100" dJpi="1-,0-,1-"/>
+	<isotope name="Eu148" isotope="631480" Q="3.039" HL="4708800.0" Ex="0.0">
+		<branch IB="0.0009" sigma_IB="0.0007" IE="0.0390" sigma_IE="0.0300" end_point_E="1.9420" sigma_E0="0.0300" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1270" sigma_IE="0.0260" end_point_E="1.3055" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0263" sigma_IE="0.0018" end_point_E="1.1442" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1020" sigma_IE="0.0040" end_point_E="1.1331" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0443" sigma_IE="0.0016" end_point_E="1.0076" sigma_E0="0.0100" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0340" sigma_IE="0.0015" end_point_E="0.9434" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0280" sigma_IE="0.0040" end_point_E="0.9279" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0004" end_point_E="0.9104" sigma_E0="0.0101" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1700" sigma_IE="0.0300" end_point_E="0.8915" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0134" sigma_IE="0.0004" end_point_E="0.8449" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0940" sigma_IE="0.0030" end_point_E="0.8248" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0036" sigma_IE="0.0008" end_point_E="0.8109" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0240" sigma_IE="0.0010" end_point_E="0.7116" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.6998" sigma_E0="0.0102" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0063" sigma_IE="0.0003" end_point_E="0.6646" sigma_E0="0.0100" dJpi="0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0001" end_point_E="0.6486" sigma_E0="0.0101" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0001" end_point_E="0.6472" sigma_E0="0.0101" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0251" sigma_IE="0.0007" end_point_E="0.5490" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0420" sigma_IE="0.0030" end_point_E="0.5146" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.5066" sigma_E0="0.0100" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0039" sigma_IE="0.0004" end_point_E="0.4682" sigma_E0="0.0100" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0048" sigma_IE="0.0001" end_point_E="0.4551" sigma_E0="0.0100" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0144" sigma_IE="0.0006" end_point_E="0.3978" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0022" sigma_IE="0.0001" end_point_E="0.3659" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0001" end_point_E="0.3638" sigma_E0="0.0101" dJpi="2-,1-,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0070" sigma_IE="0.0007" end_point_E="0.3555" sigma_E0="0.0100" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0088" sigma_IE="0.0007" end_point_E="0.3405" sigma_E0="0.0100" dJpi="0,1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0021" sigma_IE="0.0001" end_point_E="0.3371" sigma_E0="0.0100" dJpi="1,2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0028" sigma_IE="0.0001" end_point_E="0.3257" sigma_E0="0.0100" dJpi="2-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0018" sigma_IE="0.0001" end_point_E="0.3230" sigma_E0="0.0100" dJpi="1-,0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0133" sigma_IE="0.0005" end_point_E="0.3155" sigma_E0="0.0100" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0001" end_point_E="0.3117" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0001" end_point_E="0.3046" sigma_E0="0.0102" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0848" sigma_IE="0.0022" end_point_E="0.2373" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0074" sigma_IE="0.0007" end_point_E="0.2234" sigma_E0="0.0100" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0698" sigma_IE="0.0020" end_point_E="0.2083" sigma_E0="0.0100" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0029" sigma_IE="0.0001" end_point_E="0.1779" sigma_E0="0.0100" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.1102" sigma_E0="0.0100" dJpi="1-,0-,1-"/>
 	</isotope>
-	<isotope name="Tb148" isotope="651480" Q="5.738" HL="3600.0" Ex="0.0">
-		<branch IB="0.0300" sigma_IB="0.0000" IE="0.0150" sigma_IE="0.0000" end_point_E="5.7380" sigma_E0="0.0130" dJpi="2-"/>
-		<branch IB="0.2180" sigma_IB="0.0130" IE="0.0750" sigma_IE="0.0050" end_point_E="4.9536" sigma_E0="0.0130" dJpi="0-"/>
-		<branch IB="0.0630" sigma_IB="0.0030" IE="0.0320" sigma_IE="0.0020" end_point_E="4.4645" sigma_E0="0.0130" dJpi="1"/>
-		<branch IB="0.0279" sigma_IB="0.0010" IE="0.0422" sigma_IE="0.0015" end_point_E="4.3216" sigma_E0="0.0130" dJpi="2-"/>
-		<branch IB="0.0936" sigma_IB="0.0018" IE="0.0834" sigma_IE="0.0016" end_point_E="3.7500" sigma_E0="0.3000" dJpi="0-"/>
-		<branch IB="0.0105" sigma_IB="0.0006" IE="0.0098" sigma_IE="0.0006" end_point_E="3.8250" sigma_E0="0.0131" dJpi="2"/>
-		<branch IB="0.0182" sigma_IB="0.0004" IE="0.0233" sigma_IE="0.0005" end_point_E="3.5493" sigma_E0="0.0130" dJpi="0-"/>
-		<branch IB="0.0084" sigma_IB="0.0004" IE="0.0115" sigma_IE="0.0006" end_point_E="3.5044" sigma_E0="0.0130" dJpi="1"/>
-		<branch IB="0.0072" sigma_IB="0.0002" IE="0.0108" sigma_IE="0.0003" end_point_E="3.4270" sigma_E0="0.0130" dJpi="0-"/>
-		<branch IB="0.0039" sigma_IB="0.0003" IE="0.0068" sigma_IE="0.0006" end_point_E="3.3139" sigma_E0="0.0131" dJpi="1-,2-"/>
-		<branch IB="0.0073" sigma_IB="0.0005" IE="0.0140" sigma_IE="0.0009" end_point_E="3.2343" sigma_E0="0.0131" dJpi="1-,0-,1"/>
-		<branch IB="0.0089" sigma_IB="0.0004" IE="0.0171" sigma_IE="0.0007" end_point_E="3.2322" sigma_E0="0.0130" dJpi="1"/>
-		<branch IB="0.0014" sigma_IB="0.0001" IE="0.0084" sigma_IE="0.0006" end_point_E="3.2160" sigma_E0="0.0131" dJpi="2-"/>
-		<branch IB="0.0082" sigma_IB="0.0004" IE="0.0186" sigma_IE="0.0010" end_point_E="3.1234" sigma_E0="0.0130" dJpi="0-"/>
-		<branch IB="0.0017" sigma_IB="0.0001" IE="0.0041" sigma_IE="0.0002" end_point_E="3.1052" sigma_E0="0.0131" dJpi="3"/>
-		<branch IB="0.0037" sigma_IB="0.0001" IE="0.0095" sigma_IE="0.0003" end_point_E="3.0379" sigma_E0="0.0131" dJpi="1,0-"/>
-		<branch IB="0.0034" sigma_IB="0.0002" IE="0.0117" sigma_IE="0.0006" end_point_E="2.8651" sigma_E0="0.0131" dJpi="0,1-,2-"/>
-		<branch IB="0.0020" sigma_IB="0.0002" IE="0.0071" sigma_IE="0.0009" end_point_E="2.8517" sigma_E0="0.0131" dJpi="0-,1-,2-"/>
-		<branch IB="0.0043" sigma_IB="0.0002" IE="0.0156" sigma_IE="0.0006" end_point_E="2.8225" sigma_E0="0.0131" dJpi="1"/>
-		<branch IB="0.0008" sigma_IB="0.0001" IE="0.0042" sigma_IE="0.0006" end_point_E="2.6619" sigma_E0="0.0132" dJpi="0-"/>
-		<branch IB="0.0020" sigma_IB="0.0002" IE="0.0104" sigma_IE="0.0008" end_point_E="2.6484" sigma_E0="0.0131" dJpi="1,0-"/>
-		<branch IB="0.0017" sigma_IB="0.0001" IE="0.0096" sigma_IE="0.0007" end_point_E="2.6071" sigma_E0="0.0132" dJpi="1-,0-"/>
-		<branch IB="0.0004" sigma_IB="0.0001" IE="0.0035" sigma_IE="0.0004" end_point_E="2.4430" sigma_E0="0.0132" dJpi="1-,0-"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0045" sigma_IE="0.0005" end_point_E="2.1631" sigma_E0="0.0132" dJpi="1,0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0055" sigma_IE="0.0022" end_point_E="1.6870" sigma_E0="0.0136" dJpi="0-,1-,2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0060" sigma_IE="0.0007" end_point_E="1.6698" sigma_E0="0.0132" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0081" sigma_IE="0.0006" end_point_E="1.1957" sigma_E0="0.0132" dJpi="0-"/>
+	<isotope name="Tb148" isotope="651480" Q="5.732" HL="3600.0" Ex="0.0">
+		<branch IB="0.0330" sigma_IB="0.0000" IE="0.0170" sigma_IE="0.0000" end_point_E="5.7320" sigma_E0="0.0130" dJpi="2-"/>
+		<branch IB="0.2110" sigma_IB="0.0000" IE="0.0790" sigma_IE="0.0000" end_point_E="4.9476" sigma_E0="0.0130" dJpi="0-"/>
+		<branch IB="0.0650" sigma_IB="0.0000" IE="0.0350" sigma_IE="0.0000" end_point_E="4.4585" sigma_E0="0.0130" dJpi="1"/>
+		<branch IB="0.0280" sigma_IB="0.0000" IE="0.0450" sigma_IE="0.0000" end_point_E="4.3156" sigma_E0="0.0130" dJpi="2-"/>
+		<branch IB="0.0920" sigma_IB="0.0000" IE="0.0880" sigma_IE="0.0000" end_point_E="3.8686" sigma_E0="0.0130" dJpi="0-"/>
+		<branch IB="0.0040" sigma_IB="0.0000" IE="0.0100" sigma_IE="0.0000" end_point_E="3.8190" sigma_E0="0.0131" dJpi="2"/>
+		<branch IB="0.0180" sigma_IB="0.0000" IE="0.0240" sigma_IE="0.0000" end_point_E="3.5433" sigma_E0="0.0130" dJpi="0-"/>
+		<branch IB="0.0060" sigma_IB="0.0000" IE="0.0090" sigma_IE="0.0000" end_point_E="3.4984" sigma_E0="0.0130" dJpi="1"/>
+		<branch IB="0.0070" sigma_IB="0.0000" IE="0.0110" sigma_IE="0.0000" end_point_E="3.4210" sigma_E0="0.0130" dJpi="0-"/>
+		<branch IB="0.0030" sigma_IB="0.0000" IE="0.0050" sigma_IE="0.0000" end_point_E="3.3079" sigma_E0="0.0131" dJpi="1-,2-"/>
+		<branch IB="0.0070" sigma_IB="0.0000" IE="0.0140" sigma_IE="0.0000" end_point_E="3.2283" sigma_E0="0.0130" dJpi="1-,0-,1"/>
+		<branch IB="0.0080" sigma_IB="0.0000" IE="0.0180" sigma_IE="0.0000" end_point_E="3.2262" sigma_E0="0.0130" dJpi="1"/>
+		<branch IB="0.0013" sigma_IB="0.0000" IE="0.0087" sigma_IE="0.0000" end_point_E="3.2100" sigma_E0="0.0131" dJpi="2-"/>
+		<branch IB="0.0080" sigma_IB="0.0000" IE="0.0190" sigma_IE="0.0000" end_point_E="3.1174" sigma_E0="0.0130" dJpi="0-"/>
+		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0057" sigma_IE="0.0000" end_point_E="3.0992" sigma_E0="0.0131" dJpi="3"/>
+		<branch IB="0.0035" sigma_IB="0.0000" IE="0.0095" sigma_IE="0.0000" end_point_E="3.0319" sigma_E0="0.0131" dJpi="1,0-"/>
+		<branch IB="0.0050" sigma_IB="0.0000" IE="0.0170" sigma_IE="0.0000" end_point_E="2.8591" sigma_E0="0.0131" dJpi="0,1-,2-"/>
+		<branch IB="0.0019" sigma_IB="0.0000" IE="0.0071" sigma_IE="0.0000" end_point_E="2.8457" sigma_E0="0.0131" dJpi="0-,1-,2-"/>
+		<branch IB="0.0040" sigma_IB="0.0000" IE="0.0160" sigma_IE="0.0000" end_point_E="2.8165" sigma_E0="0.0131" dJpi="1"/>
+		<branch IB="0.0008" sigma_IB="0.0000" IE="0.0042" sigma_IE="0.0000" end_point_E="2.6559" sigma_E0="0.0132" dJpi="0-"/>
+		<branch IB="0.0016" sigma_IB="0.0000" IE="0.0084" sigma_IE="0.0000" end_point_E="2.6423" sigma_E0="0.0131" dJpi="1,0-"/>
+		<branch IB="0.0016" sigma_IB="0.0000" IE="0.0094" sigma_IE="0.0000" end_point_E="2.6011" sigma_E0="0.0132" dJpi="1-,0-"/>
+		<branch IB="0.0004" sigma_IB="0.0000" IE="0.0036" sigma_IE="0.0000" end_point_E="2.4370" sigma_E0="0.0132" dJpi="1-,0-"/>
+		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0047" sigma_IE="0.0000" end_point_E="2.1571" sigma_E0="0.0132" dJpi="1,0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0055" sigma_IE="0.0000" end_point_E="1.6810" sigma_E0="0.0136" dJpi="0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0060" sigma_IE="0.0000" end_point_E="1.6638" sigma_E0="0.0132" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0080" sigma_IE="0.0000" end_point_E="1.1897" sigma_E0="0.0132" dJpi="0-,1-"/>
 	</isotope>
-	<isotope name="Tb148m1" isotope="651481" Q="5.8281" HL="132.0" Ex="0.0901">
-		<branch IB="0.0125" sigma_IB="0.0002" IE="0.0096" sigma_IE="0.0002" end_point_E="4.0172" sigma_E0="0.0131" dJpi="3"/>
-		<branch IB="0.2790" sigma_IB="0.0040" IE="0.6220" sigma_IE="0.0040" end_point_E="3.0300" sigma_E0="0.0300" dJpi="1"/>
-		<branch IB="0.0054" sigma_IB="0.0001" IE="0.0120" sigma_IE="0.0002" end_point_E="3.1335" sigma_E0="0.0132" dJpi="0-"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0000" end_point_E="3.0456" sigma_E0="0.0132" dJpi="0"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0034" sigma_IE="0.0000" end_point_E="2.8920" sigma_E0="0.0134" dJpi="2-"/>
-		<branch IB="0.0010" sigma_IB="0.0000" IE="0.0039" sigma_IE="0.0000" end_point_E="2.7986" sigma_E0="0.0132" dJpi="1-"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0000" end_point_E="2.6756" sigma_E0="0.0132" dJpi="1-"/>
-		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0000" end_point_E="2.6712" sigma_E0="0.0134" dJpi="0"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="2.4704" sigma_E0="0.0133" dJpi="0"/>
-		<branch IB="0.0006" sigma_IB="0.0000" IE="0.0054" sigma_IE="0.0000" end_point_E="2.3502" sigma_E0="0.0134" dJpi="1,0"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0000" end_point_E="2.3260" sigma_E0="0.0134" dJpi="0"/>
-		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0047" sigma_IE="0.0000" end_point_E="2.1823" sigma_E0="0.0132" dJpi="1"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0033" sigma_IE="0.0000" end_point_E="2.0198" sigma_E0="0.0132" dJpi="1"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0022" sigma_IE="0.0000" end_point_E="1.9595" sigma_E0="0.0132" dJpi="0"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0046" sigma_IE="0.0000" end_point_E="1.8377" sigma_E0="0.0132" dJpi="1,0,1"/>
-		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0226" sigma_IE="0.0000" end_point_E="1.7089" sigma_E0="0.0132" dJpi="1,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0032" sigma_IE="0.0000" end_point_E="1.6579" sigma_E0="0.0132" dJpi="1,0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0000" end_point_E="1.5568" sigma_E0="0.0134" dJpi="0"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0180" sigma_IE="0.0000" end_point_E="1.5162" sigma_E0="0.0132" dJpi="1,0,1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0115" sigma_IE="0.0000" end_point_E="1.4192" sigma_E0="0.0132" dJpi="1"/>
+	<isotope name="Tb148m1" isotope="651481" Q="5.8221" HL="132.0" Ex="0.0901">
+		<branch IB="0.2600" sigma_IB="0.0500" IE="0.6300" sigma_IE="0.1700" end_point_E="3.1288" sigma_E0="0.0131" dJpi="1"/>
+		<branch IB="0.0050" sigma_IB="0.0015" IE="0.0120" sigma_IE="0.0048" end_point_E="3.1275" sigma_E0="0.0132" dJpi="0-"/>
+		<branch IB="0.0003" sigma_IB="0.0002" IE="0.0009" sigma_IE="0.0008" end_point_E="3.0396" sigma_E0="0.0132" dJpi="0"/>
+		<branch IB="0.0003" sigma_IB="0.0001" IE="0.0033" sigma_IE="0.0007" end_point_E="2.8860" sigma_E0="0.0133" dJpi="2-"/>
+		<branch IB="0.0009" sigma_IB="0.0003" IE="0.0039" sigma_IE="0.0014" end_point_E="2.7926" sigma_E0="0.0132" dJpi="1-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="2.7765" sigma_E0="0.0133" dJpi="0"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0002" end_point_E="2.6934" sigma_E0="0.0133" dJpi="0"/>
+		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0002" end_point_E="2.6696" sigma_E0="0.0132" dJpi="1-"/>
+		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0003" end_point_E="2.6652" sigma_E0="0.0133" dJpi="0"/>
+		<branch IB="0.0001" sigma_IB="0.0001" IE="0.0010" sigma_IE="0.0007" end_point_E="2.4644" sigma_E0="0.0132" dJpi="0"/>
+		<branch IB="0.0005" sigma_IB="0.0001" IE="0.0054" sigma_IE="0.0012" end_point_E="2.3442" sigma_E0="0.0133" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0002" end_point_E="2.3200" sigma_E0="0.0133" dJpi="0"/>
+		<branch IB="0.0003" sigma_IB="0.0000" IE="0.0046" sigma_IE="0.0008" end_point_E="2.1763" sigma_E0="0.0132" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0001" end_point_E="2.1558" sigma_E0="0.0133" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0001" end_point_E="2.0638" sigma_E0="0.0133" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0033" sigma_IE="0.0004" end_point_E="2.0138" sigma_E0="0.0132" dJpi="1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0022" sigma_IE="0.0005" end_point_E="1.9535" sigma_E0="0.0132" dJpi="1,0,1"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0045" sigma_IE="0.0006" end_point_E="1.8317" sigma_E0="0.0132" dJpi="1,0,1"/>
+		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0223" sigma_IE="0.0024" end_point_E="1.7029" sigma_E0="0.0132" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0032" sigma_IE="0.0004" end_point_E="1.6519" sigma_E0="0.0132" dJpi="1,0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0003" end_point_E="1.5508" sigma_E0="0.0133" dJpi="1,0,1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0177" sigma_IE="0.0021" end_point_E="1.5102" sigma_E0="0.0132" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0113" sigma_IE="0.0013" end_point_E="1.4132" sigma_E0="0.0132" dJpi="1"/>
 	</isotope>
 	<isotope name="Dy148" isotope="661480" Q="2.678" HL="198.0" Ex="0.0">
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="2.5684" sigma_E0="0.0109" dJpi="4-"/>
-		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0020" sigma_IE="0.0000" end_point_E="2.4995" sigma_E0="0.0105" dJpi="2"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0000" end_point_E="2.4825" sigma_E0="0.0110" dJpi="3-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="2.3971" sigma_E0="0.0107" dJpi="3"/>
-		<branch IB="0.0375" sigma_IB="0.0000" IE="0.9310" sigma_IE="0.0000" end_point_E="2.0320" sigma_E0="0.0600" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="2.0202" sigma_E0="0.0107" dJpi="3-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0000" end_point_E="1.8832" sigma_E0="0.0105" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="1.7274" sigma_E0="0.0106" dJpi="2-,1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0160" sigma_IE="0.0000" end_point_E="1.4307" sigma_E0="0.0106" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0000" end_point_E="1.4018" sigma_E0="0.0108" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0014" sigma_IE="0.0000" end_point_E="1.3453" sigma_E0="0.0110" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0000" end_point_E="1.3119" sigma_E0="0.0107" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0025" sigma_IE="0.0000" end_point_E="1.0355" sigma_E0="0.0107" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0000" end_point_E="0.8497" sigma_E0="0.0109" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0052" sigma_IE="0.0000" end_point_E="0.8375" sigma_E0="0.0107" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="2.5684" sigma_E0="0.0104" dJpi="4-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0000" end_point_E="2.4996" sigma_E0="0.0102" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="2.4825" sigma_E0="0.0105" dJpi="3-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="2.3974" sigma_E0="0.0103" dJpi="3"/>
+		<branch IB="0.0360" sigma_IB="0.0000" IE="0.9320" sigma_IE="0.0000" end_point_E="2.0320" sigma_E0="0.0600" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="2.0202" sigma_E0="0.0103" dJpi="3-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0000" end_point_E="1.8832" sigma_E0="0.0103" dJpi="1-,2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="1.7274" sigma_E0="0.0103" dJpi="2-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0160" sigma_IE="0.0000" end_point_E="1.4307" sigma_E0="0.0104" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0000" end_point_E="1.4011" sigma_E0="0.0105" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0014" sigma_IE="0.0000" end_point_E="1.3453" sigma_E0="0.0105" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0000" end_point_E="1.3120" sigma_E0="0.0104" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0024" sigma_IE="0.0000" end_point_E="1.0356" sigma_E0="0.0103" dJpi="1-,0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0000" end_point_E="0.8494" sigma_E0="0.0106" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0052" sigma_IE="0.0000" end_point_E="0.8375" sigma_E0="0.0103" dJpi="0-,1"/>
 	</isotope>
-	<isotope name="Ho148" isotope="671480" Q="9.86" HL="2.2" Ex="0.0">
-		<branch IB="0.8910" sigma_IB="0.0140" IE="0.0350" sigma_IE="0.0011" end_point_E="9.8600" sigma_E0="0.0800" dJpi="1"/>
-		<branch IB="0.0690" sigma_IB="0.0130" IE="0.0050" sigma_IE="0.0010" end_point_E="8.1823" sigma_E0="0.0803" dJpi="1"/>
+	<isotope name="Ho148" isotope="671480" Q="9.87" HL="2.2" Ex="0.0">
+		<branch IB="0.8910" sigma_IB="0.0140" IE="0.0349" sigma_IE="0.0011" end_point_E="9.8700" sigma_E0="0.0800" dJpi="1"/>
+		<branch IB="0.0690" sigma_IB="0.0130" IE="0.0049" sigma_IE="0.0009" end_point_E="8.1923" sigma_E0="0.0803" dJpi="1"/>
 	</isotope>
-	<isotope name="Ho148" isotope="671480" Q="9.86" HL="9.59" Ex="0.0">
-		<branch IB="0.0920" sigma_IB="0.0090" IE="0.0087" sigma_IE="0.0009" end_point_E="7.5103" sigma_E0="0.0802" dJpi="0"/>
-		<branch IB="0.0360" sigma_IB="0.0030" IE="0.0036" sigma_IE="0.0003" end_point_E="7.4322" sigma_E0="0.0802" dJpi="1-"/>
-		<branch IB="0.0310" sigma_IB="0.0030" IE="0.0034" sigma_IE="0.0003" end_point_E="7.1277" sigma_E0="0.0802" dJpi="1-"/>
-		<branch IB="0.0234" sigma_IB="0.0022" IE="0.0026" sigma_IE="0.0003" end_point_E="7.1207" sigma_E0="0.0803" dJpi="2"/>
-		<branch IB="0.0071" sigma_IB="0.0021" IE="0.0008" sigma_IE="0.0003" end_point_E="7.0263" sigma_E0="0.0803" dJpi="3-"/>
-		<branch IB="0.1350" sigma_IB="0.0030" IE="0.0161" sigma_IE="0.0007" end_point_E="7.0060" sigma_E0="0.0803" dJpi="0-,1"/>
-		<branch IB="0.0670" sigma_IB="0.0080" IE="0.0085" sigma_IE="0.0011" end_point_E="6.8904" sigma_E0="0.0802" dJpi="0-,1-,2"/>
-		<branch IB="0.0082" sigma_IB="0.0020" IE="0.0011" sigma_IE="0.0003" end_point_E="6.8647" sigma_E0="0.0802" dJpi="1"/>
-		<branch IB="0.0224" sigma_IB="0.0016" IE="0.0030" sigma_IE="0.0003" end_point_E="6.7444" sigma_E0="0.0803" dJpi="1-,2"/>
-		<branch IB="0.0228" sigma_IB="0.0015" IE="0.0032" sigma_IE="0.0002" end_point_E="6.6883" sigma_E0="0.0803" dJpi="0-,1-,2"/>
-		<branch IB="0.0223" sigma_IB="0.0017" IE="0.0031" sigma_IE="0.0003" end_point_E="6.6714" sigma_E0="0.0802" dJpi="0-,1-,2"/>
-		<branch IB="0.0205" sigma_IB="0.0014" IE="0.0030" sigma_IE="0.0002" end_point_E="6.5803" sigma_E0="0.0803" dJpi="1"/>
-		<branch IB="0.0228" sigma_IB="0.0013" IE="0.0034" sigma_IE="0.0002" end_point_E="6.5368" sigma_E0="0.0803" dJpi="1"/>
-		<branch IB="0.0188" sigma_IB="0.0011" IE="0.0028" sigma_IE="0.0002" end_point_E="6.5323" sigma_E0="0.0805" dJpi="0"/>
-		<branch IB="0.0092" sigma_IB="0.0014" IE="0.0014" sigma_IE="0.0002" end_point_E="6.4549" sigma_E0="0.0805" dJpi="3"/>
-		<branch IB="0.0300" sigma_IB="0.0030" IE="0.0058" sigma_IE="0.0005" end_point_E="6.1044" sigma_E0="0.0803" dJpi="0-,1-,2"/>
-		<branch IB="0.0950" sigma_IB="0.0030" IE="0.0250" sigma_IE="0.0014" end_point_E="5.5705" sigma_E0="0.0802" dJpi="0-,1-,2"/>
-		<branch IB="0.0215" sigma_IB="0.0020" IE="0.0061" sigma_IE="0.0006" end_point_E="5.4672" sigma_E0="0.0803" dJpi="0-,1-,2"/>
-		<branch IB="0.0087" sigma_IB="0.0010" IE="0.0025" sigma_IE="0.0003" end_point_E="5.4001" sigma_E0="0.0805" dJpi="0-,1-,2"/>
-		<branch IB="0.0137" sigma_IB="0.0013" IE="0.0046" sigma_IE="0.0005" end_point_E="5.2257" sigma_E0="0.0805" dJpi="0-,1-,2"/>
-		<branch IB="0.0181" sigma_IB="0.0014" IE="0.0065" sigma_IE="0.0006" end_point_E="5.0980" sigma_E0="0.0804" dJpi="0-,1-,2"/>
-		<branch IB="0.0085" sigma_IB="0.0010" IE="0.0038" sigma_IE="0.0005" end_point_E="4.8053" sigma_E0="0.0805" dJpi="0-,1-,2"/>
-		<branch IB="0.0113" sigma_IB="0.0010" IE="0.0060" sigma_IE="0.0006" end_point_E="4.5990" sigma_E0="0.0805" dJpi="0-,1-,2"/>
+	<isotope name="Ho148" isotope="671480" Q="9.87" HL="9.59" Ex="0.0">
+		<branch IB="0.0950" sigma_IB="0.0000" IE="0.0100" sigma_IE="0.0000" end_point_E="7.5203" sigma_E0="0.0802" dJpi="0"/>
+		<branch IB="0.0360" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="7.4422" sigma_E0="0.0802" dJpi="1-"/>
+		<branch IB="0.0310" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="7.1377" sigma_E0="0.0802" dJpi="1-"/>
+		<branch IB="0.0200" sigma_IB="0.0000" IE="0.0060" sigma_IE="0.0000" end_point_E="7.1307" sigma_E0="0.0803" dJpi="2"/>
+		<branch IB="0.0050" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="7.0363" sigma_E0="0.0803" dJpi="3-"/>
+		<branch IB="0.1330" sigma_IB="0.0000" IE="0.0180" sigma_IE="0.0000" end_point_E="7.0160" sigma_E0="0.0803" dJpi="1,0,1"/>
+		<branch IB="0.0670" sigma_IB="0.0000" IE="0.0090" sigma_IE="0.0000" end_point_E="6.9004" sigma_E0="0.0802" dJpi="1,0"/>
+		<branch IB="0.0080" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="6.8747" sigma_E0="0.0802" dJpi="1-,0"/>
+		<branch IB="0.0220" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="6.7544" sigma_E0="0.0803" dJpi="1"/>
+		<branch IB="0.0230" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="6.6983" sigma_E0="0.0803" dJpi="1-,0"/>
+		<branch IB="0.0220" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="6.6814" sigma_E0="0.0802" dJpi="1-,0"/>
+		<branch IB="0.0210" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="6.5903" sigma_E0="0.0803" dJpi="0,1"/>
+		<branch IB="0.0220" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="6.5468" sigma_E0="0.0803" dJpi="0-,1"/>
+		<branch IB="0.0190" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="6.5423" sigma_E0="0.0805" dJpi="1-,0"/>
+		<branch IB="0.0090" sigma_IB="0.0000" IE="0.0020" sigma_IE="0.0000" end_point_E="6.4649" sigma_E0="0.0805" dJpi="0,1-"/>
+		<branch IB="0.0300" sigma_IB="0.0000" IE="0.0060" sigma_IE="0.0000" end_point_E="6.1144" sigma_E0="0.0803" dJpi="1-,0"/>
+		<branch IB="0.0930" sigma_IB="0.0000" IE="0.0270" sigma_IE="0.0000" end_point_E="5.5805" sigma_E0="0.0802" dJpi="1-,0"/>
+		<branch IB="0.0210" sigma_IB="0.0000" IE="0.0070" sigma_IE="0.0000" end_point_E="5.4772" sigma_E0="0.0803" dJpi="0-,1"/>
+		<branch IB="0.0080" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0000" end_point_E="5.4101" sigma_E0="0.0805" dJpi="1-,0-,1-"/>
+		<branch IB="0.0130" sigma_IB="0.0000" IE="0.0050" sigma_IE="0.0000" end_point_E="5.2357" sigma_E0="0.0805" dJpi="1-,0"/>
+		<branch IB="0.0180" sigma_IB="0.0000" IE="0.0070" sigma_IE="0.0000" end_point_E="5.1080" sigma_E0="0.0804" dJpi="1-,0"/>
+		<branch IB="0.0080" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="4.8153" sigma_E0="0.0805" dJpi="1-,0-,1"/>
+		<branch IB="0.0110" sigma_IB="0.0000" IE="0.0060" sigma_IE="0.0000" end_point_E="4.6090" sigma_E0="0.0805" dJpi="1-,0-,1"/>
 	</isotope>
 	<isotope name="Er148" isotope="681480" Q="6.51" HL="4.6" Ex="0.0"/>
 	<isotope name="Tm148" isotope="691480" Q="12.714" HL="0.7" Ex="0.0"/>
@@ -10859,6 +10889,7 @@
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="0.3581" sigma_E0="0.0033" dJpi="1"/>
 	</isotope>
 	<isotope name="Ho162m1" isotope="671621" Q="2.24687" HL="4020.0" Ex="0.10587"/>
+	<isotope name="Er162" isotope="681620" Q="1.84696" HL="0.0" Ex="0.0"/>
 	<isotope name="Tm162" isotope="691620" Q="4.857" HL="1302.0" Ex="0.0"/>
 	<isotope name="Tm162" isotope="691620" Q="4.857" HL="24.3" Ex="0.0"/>
 	<isotope name="Yb162" isotope="701620" Q="1.66" HL="1132.2" Ex="0.0">
@@ -11420,36 +11451,35 @@
 		<branch IB="0.0370" sigma_IB="0.0040" IE="0.0100" sigma_IE="0.0010" end_point_E="6.6699" sigma_E0="0.0305" dJpi="0"/>
 		<branch IB="0.0170" sigma_IB="0.0020" IE="0.0048" sigma_IE="0.0007" end_point_E="6.6201" sigma_E0="0.0305" dJpi="0"/>
 	</isotope>
-	<isotope name="Yb169" isotope="701690" Q="0.91" HL="2766355.2" Ex="0.0">
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0610" sigma_IE="0.0100" end_point_E="0.5939" sigma_E0="0.0040" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.5779" sigma_E0="0.0040" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.5650" sigma_E0="0.0040" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.8110" sigma_IE="0.0090" end_point_E="0.5307" sigma_E0="0.0040" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4799" sigma_E0="0.0040" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0001" end_point_E="0.4765" sigma_E0="0.0040" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1227" sigma_IE="0.0016" end_point_E="0.4371" sigma_E0="0.0040" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.4350" sigma_E0="0.0040" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.2632" sigma_E0="0.0040" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.1282" sigma_E0="0.0040" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.0316" sigma_E0="0.0041" dJpi="0"/>
+	<isotope name="Yb169" isotope="701690" Q="0.8991" HL="2766182.4" Ex="0.0">
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0610" sigma_IE="0.0090" end_point_E="0.5830" sigma_E0="0.0008" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.5670" sigma_E0="0.0008" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.5541" sigma_E0="0.0008" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.8080" sigma_IE="0.0090" end_point_E="0.5198" sigma_E0="0.0008" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="0.4690" sigma_E0="0.0008" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0001" end_point_E="0.4656" sigma_E0="0.0008" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1239" sigma_IE="0.0017" end_point_E="0.4262" sigma_E0="0.0008" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0000" sigma_IE="0.0000" end_point_E="0.2523" sigma_E0="0.0008" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0090" sigma_IE="0.0060" end_point_E="0.1173" sigma_E0="0.0008" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0026" sigma_IE="0.0013" end_point_E="0.0207" sigma_E0="0.0009" dJpi="0"/>
 	</isotope>
 	<isotope name="Lu169" isotope="711690" Q="2.293" HL="122616.00000000001" Ex="0.0">
-		<branch IB="0.0054" sigma_IB="0.0005" IE="0.1000" sigma_IE="0.0090" end_point_E="2.2930" sigma_E0="0.0030" dJpi="0"/>
+		<branch IB="0.0051" sigma_IB="0.0005" IE="0.1000" sigma_IE="0.0100" end_point_E="2.2930" sigma_E0="0.0030" dJpi="0"/>
 		<branch IB="0.0005" sigma_IB="0.0002" IE="0.0160" sigma_IE="0.0060" end_point_E="2.1018" sigma_E0="0.0030" dJpi="1-"/>
 		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0046" sigma_IE="0.0000" end_point_E="2.0492" sigma_E0="0.0030" dJpi="0-"/>
 		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0037" sigma_IE="0.0000" end_point_E="2.0287" sigma_E0="0.0030" dJpi="1-"/>
-		<branch IB="0.0002" sigma_IB="0.0001" IE="0.0080" sigma_IE="0.0040" end_point_E="2.0144" sigma_E0="0.0030" dJpi="0-"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0078" sigma_IE="0.0020" end_point_E="1.9035" sigma_E0="0.0030" dJpi="1-"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0100" sigma_IE="0.0008" end_point_E="1.7232" sigma_E0="0.0030" dJpi="1-"/>
+		<branch IB="0.0002" sigma_IB="0.0001" IE="0.0108" sigma_IE="0.0040" end_point_E="2.0144" sigma_E0="0.0030" dJpi="0-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0078" sigma_IE="0.0031" end_point_E="1.9035" sigma_E0="0.0030" dJpi="1-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0098" sigma_IE="0.0008" end_point_E="1.7232" sigma_E0="0.0030" dJpi="1-"/>
 		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0205" sigma_IE="0.0007" end_point_E="1.6452" sigma_E0="0.0030" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0027" sigma_IE="0.0015" end_point_E="1.6335" sigma_E0="0.0031" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0067" sigma_IE="0.0010" end_point_E="1.5441" sigma_E0="0.0030" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0064" sigma_IE="0.0010" end_point_E="1.5441" sigma_E0="0.0030" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0054" sigma_IE="0.0011" end_point_E="1.5312" sigma_E0="0.0030" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0062" sigma_IE="0.0007" end_point_E="1.4859" sigma_E0="0.0030" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0009" end_point_E="1.4413" sigma_E0="0.0035" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0061" sigma_IE="0.0007" end_point_E="1.4859" sigma_E0="0.0030" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0010" end_point_E="1.4413" sigma_E0="0.0035" dJpi="2-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0049" sigma_IE="0.0002" end_point_E="1.4062" sigma_E0="0.0030" dJpi="1"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0014" sigma_IE="0.0002" end_point_E="1.3816" sigma_E0="0.0031" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0033" sigma_IE="0.0007" end_point_E="1.3638" sigma_E0="0.0030" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0034" sigma_IE="0.0007" end_point_E="1.3638" sigma_E0="0.0030" dJpi="2-"/>
 		<branch IB="0.0001" sigma_IB="0.0000" IE="0.2520" sigma_IE="0.0070" end_point_E="1.3324" sigma_E0="0.0030" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0067" sigma_IE="0.0005" end_point_E="1.2222" sigma_E0="0.0030" dJpi="0"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0314" sigma_IE="0.0010" end_point_E="1.2147" sigma_E0="0.0030" dJpi="1-"/>
@@ -11486,14 +11516,14 @@
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0001" end_point_E="0.1920" sigma_E0="0.0031" dJpi="1,0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.1576" sigma_E0="0.0034" dJpi="0"/>
 	</isotope>
-	<isotope name="Hf169" isotope="721690" Q="3.36" HL="194.4" Ex="0.0">
-		<branch IB="0.0100" sigma_IB="0.0000" IE="0.0400" sigma_IE="0.0000" end_point_E="3.3600" sigma_E0="0.0280" dJpi="1-"/>
-		<branch IB="0.0100" sigma_IB="0.0000" IE="0.0400" sigma_IE="0.0000" end_point_E="3.1733" sigma_E0="0.0286" dJpi="0-"/>
-		<branch IB="0.1300" sigma_IB="0.0000" IE="0.7500" sigma_IE="0.0000" end_point_E="2.8671" sigma_E0="0.0281" dJpi="1"/>
+	<isotope name="Hf169" isotope="721690" Q="3.366" HL="194.4" Ex="0.0">
+		<branch IB="0.0120" sigma_IB="0.0000" IE="0.0370" sigma_IE="0.0000" end_point_E="3.3660" sigma_E0="0.0280" dJpi="1-"/>
+		<branch IB="0.0100" sigma_IB="0.0000" IE="0.0400" sigma_IE="0.0000" end_point_E="3.1793" sigma_E0="0.0286" dJpi="0-"/>
+		<branch IB="0.1210" sigma_IB="0.0000" IE="0.7590" sigma_IE="0.0000" end_point_E="2.8731" sigma_E0="0.0281" dJpi="1"/>
 	</isotope>
 	<isotope name="Ta169" isotope="731690" Q="4.43" HL="294.0" Ex="0.0"/>
-	<isotope name="W169" isotope="741690" Q="5.37" HL="74.0" Ex="0.0"/>
-	<isotope name="Re169" isotope="751690" Q="6.53" HL="8.1" Ex="0.0"/>
+	<isotope name="W169" isotope="741690" Q="5.37" HL="75.0" Ex="0.0"/>
+	<isotope name="Re169" isotope="751690" Q="6.509" HL="8.1" Ex="0.0"/>
 	<isotope name="Tm170" isotope="691700" Q="0.3128" HL="11111040.0" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0001" end_point_E="0.3128" sigma_E0="0.0018" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0000" end_point_E="0.2341" sigma_E0="0.0023" dJpi="1-"/>
@@ -11846,44 +11876,47 @@
 	<isotope name="Os174" isotope="761740" Q="3.7" HL="44.0" Ex="0.0"/>
 	<isotope name="Ir174" isotope="771740" Q="9.0" HL="7.9" Ex="0.0"/>
 	<isotope name="Ir174m1" isotope="771741" Q="9.193" HL="4.9" Ex="0.193"/>
-	<isotope name="Hf175" isotope="721750" Q="0.6868" HL="6048000.0" Ex="0.0">
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0700" sigma_IE="0.0000" end_point_E="0.6868" sigma_E0="0.0019" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.8000" sigma_IE="0.0300" end_point_E="0.3434" sigma_E0="0.0020" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0001" end_point_E="0.3335" sigma_E0="0.0021" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1700" sigma_IE="0.0300" end_point_E="0.2540" sigma_E0="0.0020" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0002" end_point_E="0.1722" sigma_E0="0.0022" dJpi="1"/>
+	<isotope name="Hf175" isotope="721750" Q="0.6839" HL="6104160.000000001" Ex="0.0">
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0500" sigma_IE="0.0500" end_point_E="0.6839" sigma_E0="0.0020" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0015" sigma_IE="0.0005" end_point_E="0.5701" sigma_E0="0.0020" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.7800" sigma_IE="0.0400" end_point_E="0.3405" sigma_E0="0.0020" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0015" sigma_IE="0.0003" end_point_E="0.3303" sigma_E0="0.0021" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1700" sigma_IE="0.0140" end_point_E="0.2511" sigma_E0="0.0020" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0002" end_point_E="0.1690" sigma_E0="0.0022" dJpi="1"/>
 	</isotope>
-	<isotope name="Ta175" isotope="731750" Q="2.08" HL="37800.0" Ex="0.0">
-		<branch IB="0.0022" sigma_IB="0.0000" IE="0.1200" sigma_IE="0.0000" end_point_E="1.9985" sigma_E0="0.0301" dJpi="0-"/>
-		<branch IB="0.0010" sigma_IB="0.0003" IE="0.0810" sigma_IE="0.0200" end_point_E="1.8941" sigma_E0="0.0301" dJpi="1-"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0370" sigma_IE="0.0030" end_point_E="1.8836" sigma_E0="0.0301" dJpi="2-"/>
-		<branch IB="0.0015" sigma_IB="0.0003" IE="0.2630" sigma_IE="0.0180" end_point_E="1.7317" sigma_E0="0.0301" dJpi="0-"/>
-		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0210" sigma_IE="0.0080" end_point_E="1.7045" sigma_E0="0.0302" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0031" sigma_IE="0.0010" end_point_E="1.6739" sigma_E0="0.0303" dJpi="1-"/>
-		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0590" sigma_IE="0.0040" end_point_E="1.6050" sigma_E0="0.0301" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0022" sigma_IE="0.0000" end_point_E="1.3474" sigma_E0="0.0304" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0031" sigma_IE="0.0006" end_point_E="1.2727" sigma_E0="0.0304" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0017" sigma_IE="0.0000" end_point_E="1.0199" sigma_E0="0.0305" dJpi="1,0,1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0053" sigma_IE="0.0015" end_point_E="0.9557" sigma_E0="0.0303" dJpi="0,1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0700" sigma_IE="0.0050" end_point_E="0.8741" sigma_E0="0.0302" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0540" sigma_IE="0.0050" end_point_E="0.8551" sigma_E0="0.0302" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0380" sigma_IE="0.0040" end_point_E="0.8314" sigma_E0="0.0302" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0280" sigma_IE="0.0030" end_point_E="0.6137" sigma_E0="0.0303" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0150" sigma_IE="0.0030" end_point_E="0.6113" sigma_E0="0.0305" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0410" sigma_IE="0.0030" end_point_E="0.4738" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0246" sigma_IE="0.0019" end_point_E="0.4211" sigma_E0="0.0302" dJpi="1,0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0065" sigma_IE="0.0006" end_point_E="0.3332" sigma_E0="0.0305" dJpi="1,0,1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0760" sigma_IE="0.0060" end_point_E="0.2867" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0232" sigma_IE="0.0020" end_point_E="0.2771" sigma_E0="0.0303" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0311" sigma_IE="0.0022" end_point_E="0.2616" sigma_E0="0.0302" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0460" sigma_IE="0.0030" end_point_E="0.2542" sigma_E0="0.0302" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0061" sigma_IE="0.0009" end_point_E="0.1922" sigma_E0="0.0303" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0600" sigma_IE="0.0070" end_point_E="0.1861" sigma_E0="0.0302" dJpi="1"/>
+	<isotope name="Ta175" isotope="731750" Q="2.073" HL="37800.0" Ex="0.0">
+		<branch IB="0.0025" sigma_IB="0.0000" IE="0.1475" sigma_IE="0.0000" end_point_E="1.9915" sigma_E0="0.0281" dJpi="0-"/>
+		<branch IB="0.0009" sigma_IB="0.0004" IE="0.0830" sigma_IE="0.0290" end_point_E="1.8871" sigma_E0="0.0281" dJpi="1-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0259" sigma_IE="0.0000" end_point_E="1.8766" sigma_E0="0.0281" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0040" sigma_IE="0.0000" end_point_E="1.8655" sigma_E0="0.0281" dJpi="0"/>
+		<branch IB="0.0014" sigma_IB="0.0003" IE="0.2750" sigma_IE="0.0330" end_point_E="1.7247" sigma_E0="0.0281" dJpi="0-"/>
+		<branch IB="0.0001" sigma_IB="0.0000" IE="0.0170" sigma_IE="0.0070" end_point_E="1.6975" sigma_E0="0.0282" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0032" sigma_IE="0.0014" end_point_E="1.6669" sigma_E0="0.0283" dJpi="1-"/>
+		<branch IB="0.0002" sigma_IB="0.0000" IE="0.0650" sigma_IE="0.0080" end_point_E="1.5980" sigma_E0="0.0281" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="1.4440" sigma_E0="0.0283" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0025" sigma_IE="0.0000" end_point_E="1.3404" sigma_E0="0.0284" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0032" sigma_IE="0.0009" end_point_E="1.2656" sigma_E0="0.0284" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0018" sigma_IE="0.0000" end_point_E="1.0126" sigma_E0="0.0284" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0056" sigma_IE="0.0021" end_point_E="0.9487" sigma_E0="0.0283" dJpi="0,1,2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0760" sigma_IE="0.0100" end_point_E="0.8670" sigma_E0="0.0282" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0560" sigma_IE="0.0080" end_point_E="0.8480" sigma_E0="0.0282" dJpi="0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0330" sigma_IE="0.0090" end_point_E="0.8244" sigma_E0="0.0282" dJpi="0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0260" sigma_IE="0.0070" end_point_E="0.6068" sigma_E0="0.0282" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0160" sigma_IE="0.0060" end_point_E="0.6041" sigma_E0="0.0285" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0430" sigma_IE="0.0060" end_point_E="0.4667" sigma_E0="0.0282" dJpi="1,2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0245" sigma_IE="0.0034" end_point_E="0.4141" sigma_E0="0.0282" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0071" sigma_IE="0.0009" end_point_E="0.3263" sigma_E0="0.0285" dJpi="1,0,1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0790" sigma_IE="0.0100" end_point_E="0.2796" sigma_E0="0.0282" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0240" sigma_IE="0.0000" end_point_E="0.2700" sigma_E0="0.0283" dJpi="0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0310" sigma_IE="0.0070" end_point_E="0.2546" sigma_E0="0.0282" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0460" sigma_IE="0.0060" end_point_E="0.2472" sigma_E0="0.0282" dJpi="1,0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0064" sigma_IE="0.0016" end_point_E="0.1852" sigma_E0="0.0283" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0600" sigma_IE="0.0150" end_point_E="0.1789" sigma_E0="0.0282" dJpi="1"/>
 	</isotope>
 	<isotope name="W175" isotope="741750" Q="2.78" HL="2112.0" Ex="0.0"/>
 	<isotope name="Re175" isotope="751750" Q="4.34" HL="353.4" Ex="0.0"/>
 	<isotope name="Os175" isotope="761750" Q="5.18" HL="84.0" Ex="0.0"/>
-	<isotope name="Ir175" isotope="771750" Q="6.676" HL="9.0" Ex="0.0"/>
+	<isotope name="Ir175" isotope="771750" Q="6.711" HL="9.0" Ex="0.0"/>
 	<isotope name="Lu176m1" isotope="711761" Q="0.2298" HL="13086.0" Ex="0.123">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0001" end_point_E="0.2298" sigma_E0="0.0016" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0001" end_point_E="0.1477" sigma_E0="0.0016" dJpi="1-"/>
@@ -14691,14 +14724,30 @@
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0008" sigma_IE="0.0001" end_point_E="0.1352" sigma_E0="0.0041" dJpi="1,2-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0002" end_point_E="0.1291" sigma_E0="0.0041" dJpi="1"/>
 	</isotope>
-	<isotope name="Pa229" isotope="912290" Q="0.311" HL="129600.0" Ex="0.0">
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.9300" sigma_IE="0.0100" end_point_E="0.3110" sigma_E0="0.0030" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0090" sigma_IE="0.0070" end_point_E="0.2818" sigma_E0="0.0031" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0640" sigma_IE="0.0080" end_point_E="0.2686" sigma_E0="0.0031" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0020" sigma_IE="0.0001" end_point_E="0.1646" sigma_E0="0.0031" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0020" sigma_IE="0.0001" end_point_E="0.1628" sigma_E0="0.0031" dJpi="1-"/>
+	<isotope name="Pa229" isotope="912290" Q="0.311" HL="133056.0" Ex="0.0">
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.9310" sigma_IE="0.0110" end_point_E="0.3110" sigma_E0="0.0040" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0030" sigma_IE="0.0030" end_point_E="0.2818" sigma_E0="0.0040" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0620" sigma_IE="0.0100" end_point_E="0.2686" sigma_E0="0.0040" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0021" sigma_IE="0.0001" end_point_E="0.1646" sigma_E0="0.0040" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0021" sigma_IE="0.0001" end_point_E="0.1628" sigma_E0="0.0040" dJpi="1-"/>
 	</isotope>
-	<isotope name="U229" isotope="922290" Q="1.305" HL="3480.0" Ex="0.0"/>
+	<isotope name="U229" isotope="922290" Q="1.314" HL="3468.0" Ex="0.0">
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.4000" sigma_IE="0.0000" end_point_E="1.3140" sigma_E0="0.0070" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.2900" sigma_IE="0.0000" end_point_E="1.1915" sigma_E0="0.0070" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1000" sigma_IE="0.0000" end_point_E="1.1693" sigma_E0="0.0070" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1100" sigma_IE="0.0000" end_point_E="1.1030" sigma_E0="0.0070" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0130" sigma_IE="0.0000" end_point_E="1.0722" sigma_E0="0.0070" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0120" sigma_IE="0.0000" end_point_E="1.0613" sigma_E0="0.0070" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="1.0283" sigma_E0="0.0072" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0130" sigma_IE="0.0000" end_point_E="1.0091" sigma_E0="0.0071" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0280" sigma_IE="0.0000" end_point_E="0.8552" sigma_E0="0.0070" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0066" sigma_IE="0.0000" end_point_E="0.8240" sigma_E0="0.0070" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0091" sigma_IE="0.0000" end_point_E="0.7523" sigma_E0="0.0071" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0172" sigma_IE="0.0000" end_point_E="0.5689" sigma_E0="0.0071" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0016" sigma_IE="0.0000" end_point_E="0.5147" sigma_E0="0.0071" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0027" sigma_IE="0.0000" end_point_E="0.4299" sigma_E0="0.0072" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0019" sigma_IE="0.0000" end_point_E="0.2555" sigma_E0="0.0072" dJpi="0-"/>
+	</isotope>
 	<isotope name="Pa230" isotope="912300" Q="1.311" HL="1503359.9999999998" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.2400" sigma_IE="0.0500" end_point_E="1.2578" sigma_E0="0.0030" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0130" sigma_IE="0.0050" end_point_E="0.8028" sigma_E0="0.0030" dJpi="1"/>
@@ -14749,21 +14798,24 @@
 	</isotope>
 	<isotope name="Pu233" isotope="942330" Q="2.1" HL="1254.0" Ex="0.0"/>
 	<isotope name="Np234" isotope="932340" Q="1.81" HL="380160.00000000006" Ex="0.0">
-		<branch IB="0.0005" sigma_IB="0.0001" IE="0.2600" sigma_IE="0.0300" end_point_E="1.8100" sigma_E0="0.0080" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0670" sigma_IE="0.0040" end_point_E="1.0237" sigma_E0="0.0080" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0170" sigma_IE="0.0020" end_point_E="1.0002" sigma_E0="0.0080" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0025" sigma_IE="0.0011" end_point_E="0.8206" sigma_E0="0.0080" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0160" sigma_IE="0.0010" end_point_E="0.7655" sigma_E0="0.0080" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1020" sigma_IE="0.0050" end_point_E="0.5727" sigma_E0="0.0080" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0870" sigma_IE="0.0050" end_point_E="0.3746" sigma_E0="0.0080" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0001" end_point_E="0.3529" sigma_E0="0.0083" dJpi="2-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0001" end_point_E="0.3091" sigma_E0="0.0081" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0001" end_point_E="0.2998" sigma_E0="0.0081" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1700" sigma_IE="0.0090" end_point_E="0.2393" sigma_E0="0.0080" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.2900" sigma_IE="0.0100" end_point_E="0.2082" sigma_E0="0.0080" dJpi="1"/>
+		<branch IB="0.0005" sigma_IB="0.0000" IE="0.2455" sigma_IE="0.0000" end_point_E="1.8100" sigma_E0="0.0080" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0000" end_point_E="1.6667" sigma_E0="0.0081" dJpi="4"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0681" sigma_IE="0.0026" end_point_E="1.0237" sigma_E0="0.0080" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0086" sigma_IE="0.0000" end_point_E="1.0002" sigma_E0="0.0080" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0020" sigma_IE="0.0000" end_point_E="0.9583" sigma_E0="0.0080" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0014" sigma_IE="0.0002" end_point_E="0.8833" sigma_E0="0.0081" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0023" sigma_IE="0.0000" end_point_E="0.8206" sigma_E0="0.0080" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0162" sigma_IE="0.0015" end_point_E="0.7655" sigma_E0="0.0080" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1025" sigma_IE="0.0031" end_point_E="0.5727" sigma_E0="0.0080" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0882" sigma_IE="0.0027" end_point_E="0.3746" sigma_E0="0.0080" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="0.3529" sigma_E0="0.0083" dJpi="2-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0000" end_point_E="0.3091" sigma_E0="0.0081" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0000" end_point_E="0.2998" sigma_E0="0.0081" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.1720" sigma_IE="0.0060" end_point_E="0.2393" sigma_E0="0.0080" dJpi="1"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.2960" sigma_IE="0.0050" end_point_E="0.2082" sigma_E0="0.0080" dJpi="1"/>
 	</isotope>
-	<isotope name="Pu234" isotope="942340" Q="0.393" HL="31680.000000000004" Ex="0.0"/>
-	<isotope name="Am234" isotope="952340" Q="4.18" HL="139.2" Ex="0.0"/>
+	<isotope name="Pu234" isotope="942340" Q="0.395" HL="31680.000000000004" Ex="0.0"/>
+	<isotope name="Am234" isotope="952340" Q="4.112" HL="139.2" Ex="0.0"/>
 	<isotope name="Np235" isotope="932350" Q="0.124" HL="34231680.0" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.9790" sigma_IE="0.0000" end_point_E="0.1240" sigma_E0="0.0009" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0010" sigma_IE="0.0000" end_point_E="0.1239" sigma_E0="0.0009" dJpi="2"/>
@@ -14870,21 +14922,18 @@
 	<isotope name="Am240" isotope="952400" Q="1.385" HL="182880.0" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0100" sigma_IE="0.0000" end_point_E="1.3421" sigma_E0="0.0140" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0100" sigma_IE="0.0000" end_point_E="1.2432" sigma_E0="0.0141" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.7876" sigma_E0="0.0141" dJpi="2"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0001" end_point_E="0.7360" sigma_E0="0.0145" dJpi="0"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.6426" sigma_E0="0.0147" dJpi="2"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0000" end_point_E="0.4846" sigma_E0="0.0141" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.7870" sigma_E0="0.0149" dJpi="2"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0003" sigma_IE="0.0001" end_point_E="0.7356" sigma_E0="0.0146" dJpi="0"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.4835" sigma_E0="0.0149" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0009" sigma_IE="0.0001" end_point_E="0.4260" sigma_E0="0.0142" dJpi="1"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0001" end_point_E="0.3927" sigma_E0="0.0147" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0011" sigma_IE="0.0001" end_point_E="0.3925" sigma_E0="0.0148" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0004" sigma_IE="0.0001" end_point_E="0.3828" sigma_E0="0.0143" dJpi="0"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="0.2475" sigma_E0="0.0143" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0006" sigma_IE="0.0000" end_point_E="0.2071" sigma_E0="0.0142" dJpi="0-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0007" sigma_IE="0.0000" end_point_E="0.2071" sigma_E0="0.0142" dJpi="0-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0002" sigma_IE="0.0000" end_point_E="0.1619" sigma_E0="0.0142" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.1527" sigma_E0="0.0146" dJpi="1-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0000" end_point_E="0.1229" sigma_E0="0.0143" dJpi="0-"/>
-		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.0479" sigma_E0="0.0143" dJpi="1-,0-,1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0001" sigma_IE="0.0000" end_point_E="0.1529" sigma_E0="0.0147" dJpi="1-"/>
+		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0005" sigma_IE="0.0000" end_point_E="0.1228" sigma_E0="0.0143" dJpi="0-"/>
 	</isotope>
-	<isotope name="Bk240" isotope="972400" Q="3.94" HL="288.0" Ex="0.0"/>
 	<isotope name="Cm241" isotope="962410" Q="0.7674" HL="2833919.9999999995" Ex="0.0">
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.2600" sigma_IE="0.0600" end_point_E="0.2956" sigma_E0="0.0012" dJpi="1-"/>
 		<branch IB="0.0000" sigma_IB="0.0000" IE="0.0230" sigma_IE="0.0210" end_point_E="0.2630" sigma_E0="0.0012" dJpi="2-"/>

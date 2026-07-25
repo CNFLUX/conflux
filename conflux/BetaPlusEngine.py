@@ -742,7 +742,7 @@ class BetaIstp(Spectrum):
     def decay_time_adjust(self, begin, end):
         """
         Calculate the percentage of isotope decayed in the given time window.
-        
+
         :param begin: the beginning of the window (s)
         :type begin: float
         :param end: the end of the window (s)
@@ -750,6 +750,9 @@ class BetaIstp(Spectrum):
         :return: The fraction of isotope decayed (from 0 to 1)
         :rtype: float
         """
+        # Skip calculation if half-life is invalid
+        if self.HL <= 0:
+            return 0.0
         return 2**(-begin/self.HL) - 2**(-end/self.HL)
 
     def daughterZAI(self, gen):
@@ -767,7 +770,7 @@ class BetaIstp(Spectrum):
         """
         Calculate the fraction of decays completed at a generation in a decay chain.
         The list HLs contains all half lives of the this isotope and all its antecedents.
-        
+
         :param t: time for which to calculate decay fraction (in same units as HLs)
         :type t: float
         :param HLs: half-lives of all decays in chain (in same units as t)
@@ -777,7 +780,11 @@ class BetaIstp(Spectrum):
         """
 
         rate = 1
-        for HL in HLs: rate *= 1 - 2**(-t/HL)
+        for HL in HLs:
+            # Skip invalid half-lives
+            if HL <= 0:
+                return 0.0
+            rate *= 1 - 2**(-t/HL)
         return rate
     
     def CalcDecayChain(self, betaSpectraDB, time):
@@ -802,6 +809,12 @@ class BetaIstp(Spectrum):
         # Look for the decay daughters; if they are also beta-unstable, continue to the next generation
         while self.daughterZAI(generation) in betaSpectraDB.istplist.keys():
             currentistp = betaSpectraDB.istplist[self.daughterZAI(generation)]
+
+            # Skip isotopes with invalid half-life and stop chain calculation
+            if currentistp.HL <= 0:
+                print(f"WARNING: Skipping decay chain calculation - isotope {currentistp.name} (ZAI={currentistp.ZAI}) has invalid HL={currentistp.HL}")
+                return self.decay_chain_spectrum, self.decay_chain_uncertainty
+
             isotopes.append(self.daughterZAI(generation))
             HLs.append(currentistp.HL)
 
@@ -845,8 +858,8 @@ class BetaPlusEngine:
     """A list of isotopes. If the inputlist is not given, load the entire betaDB from the default betaDB."""
     istplist: dict
     """A dictionary of isotopes. istplist contain keys as the ZAI number of the isotope and values being :class:`conflux.BetaEngine.BetaIstp`"""
-    targetDB: str = CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml"
-    """The file name of beta decay data base, defaults to CONFLUX_DB+`/betaDB/ENSDFbetaDB_EC_250804.xml'"""
+    targetDB: str = CONFLUX_DB+"/betaDB/ENSDF_betaDB_EC_260707.xml"
+    """The file name of beta decay data base, defaults to CONFLUX_DB+`/betaDB/ENSDF_betaDB_EC_260707.xml'"""
     xbins: np.ndarray
     """The spectrum range and binning, defaults to np.arange(0, 20, 0.1) (MeV)"""
     custom_func: callable = None
@@ -858,7 +871,7 @@ class BetaPlusEngine:
     
     def __init__(self, 
                  inputlist=None, 
-                 targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml",
+                 targetDB=CONFLUX_DB+"/betaDB/ENSDF_betaDB_EC_260707.xml",
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None,
                  numass=0,
@@ -874,11 +887,11 @@ class BetaPlusEngine:
 
         self.LoadBetaDB(targetDB)   # loadBetaDB automatically
         
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml", missingBranch = 3):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDF_betaDB_EC_260707.xml", missingBranch = 3):
         """
         Load default or input betaDB to obtain beta decay informtion. A customed DB must follow the same format as the default DB.
         
-        :param targetDB: The file name of beta decay data base, defaults to CONFLUX_DB+"/betaDB/ENSDFbetaDB_EC_250804.xml"
+        :param targetDB: The file name of beta decay data base, defaults to CONFLUX_DB+"/betaDB/ENSDF_betaDB_EC_260707.xml"
         :type targetDB: str, optional
         :param missingBranch: Determine how many branches there are in a missing isotope, defaults to 3
         :type missingBranch: int, optional
@@ -904,6 +917,10 @@ class BetaPlusEngine:
             Q = float(isotope.attrib['Q'])
             HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
+
+            # Skip isotopes with unknown or invalid half-life (HL <= 0)
+            if HL <= 0:
+                continue
 
             # if input list is not given, include all isotopes
             if not useInputList:

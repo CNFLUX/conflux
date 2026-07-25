@@ -106,8 +106,9 @@ def ENDF6FPYreader(filename):
 
                 else:
 
-                    # reading CONT []
-                    if (len(CONT) <= NFPi[i] and  NFPi[i]>0):
+                        # reading CONT []
+                    # Add bounds check to prevent index errors
+                    if (i < len(NFPi) and len(CONT) <= NFPi[i] and  NFPi[i]>0):
                         if len(CONT) == 0:
                             datacache = [int(data[0]), float(data[1]), float(data[2]), float(data[3])]
                             if datacache[0] != 0:
@@ -134,14 +135,15 @@ def ENDF6FPYreader(filename):
                                 xmloutput.editCONT(CONT[-1])
                         if (len(CONT[-1]) != 4): continue
 
-                    if (len(CONT) == NFPi[i] > 0 ):
+                    # Add bounds check here too
+                    if (i < len(NFPi) and len(CONT) == NFPi[i] > 0 ):
                         print(len(CONT), CONT[-1])
                         CONT=[]
                         i+=1
                         continue
 
                     # reading the LIST []
-                    if (i < LEplus1 and len(CONT) == NFPi[i] == 0):
+                    if (i < LEplus1 and i < len(NFPi) and len(CONT) == NFPi[i] == 0):
                         Ei[i] = (data[0])
                         Ii[i] = int(data[2])
                         NNi[i] = int(data[4])
@@ -173,7 +175,8 @@ def ENDF6FPYreader(filename):
 
                 else:
                     # reading CONT
-                    if (len(CONT) <= NFPi[i] and  NFPi[i]>0):
+                    # Add bounds check to prevent index errors
+                    if (i < len(NFPi) and len(CONT) <= NFPi[i] and  NFPi[i]>0):
                         if len(CONT) == 0:
                             datacache = [int(data[0]), float(data[1]), float(data[2]), float(data[3])]
                             if datacache[0] != 0:
@@ -200,14 +203,15 @@ def ENDF6FPYreader(filename):
                                 xmloutput.editCONT(CONT[-1])
                         if (len(CONT[-1]) != 4): continue
 
-                    if (len(CONT) == NFPi[i] > 0 ):
+                    # Add bounds check here too
+                    if (i < len(NFPi) and len(CONT) == NFPi[i] > 0 ):
                         print(len(CONT), CONT[-1])
                         CONT=[]
                         i+=1
                         continue
 
                     # reading the LIST
-                    if (i < LEplus1 and len(CONT) == NFPi[i] == 0):
+                    if (i < LEplus1 and i < len(NFPi) and len(CONT) == NFPi[i] == 0):
                         Ei[i] = (data[0])
                         Ii[i] = int(data[2])
                         NNi[i] = int(data[4])

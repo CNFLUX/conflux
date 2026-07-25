@@ -1,3 +1,15 @@
 build/
 conflux.egg-info/
 conflux/__pycache__/
+
+# Legacy database files (replaced by versioned databases)
+data/betaDB/betaDB.dat
+data/betaDB/betaDB.xml
+data/betaDB/ENDF_betaDB.xml
+data/betaDB/ENSDFbetaDB_EC.xml
+data/betaDB/betaDBXmlGen.py
+
+# Unversioned/intermediate database files
+data/betaDB/ENSDFbetaDB_EC.xml
+data/betaDB/XUNDL_betaDB_260101.xml
+ENSDFbetaDB2.xml
