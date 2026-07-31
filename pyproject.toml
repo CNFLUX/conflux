@@ -51,8 +51,11 @@ conflux-setup = "conflux.cli_setup:main"
 conflux-update-endf = "update_endf_database:main"
 
 [tool.setuptools]
-packages = ["conflux"]
 include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["conflux*"]
 
 # Only parser scripts are bundled in the pip package (~47 KB).
 # These are needed by conflux-setup to parse ENSDF files.
