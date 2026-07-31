@@ -20,9 +20,12 @@ setup(
     package_data={
         'conflux': [
             'data/fissionDB/ENDF/*.xml',
+            'data/fissionDB/ENDF/*.py',
             'data/fissionDB/JEFF/*.xml',
+            'data/fissionDB/JEFF/*.py',
             'data/betaDB/*.xml',
             'data/betaDB/*.csv',
+            'data/betaDB/*.py',
             'data/example_models/*.json',
         ],
     },

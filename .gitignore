@@ -1,6 +1,14 @@
 build/
+dist/
 conflux.egg-info/
 conflux/__pycache__/
+
+# Keep all data files in git repo (they are NOT bundled in pip package)
+# conflux-setup will copy them from installation location to CONFLUX_DB
+#
+# Only ignore very large files that should be downloaded:
+data/fissionDB/**/*cov*.csv
+data/fissionDB/**/*corr*.csv
 
 # Legacy database files (replaced by versioned databases)
 data/betaDB/betaDB.dat
@@ -13,3 +21,6 @@ data/betaDB/betaDBXmlGen.py
 data/betaDB/ENSDFbetaDB_EC.xml
 data/betaDB/XUNDL_betaDB_260101.xml
 ENSDFbetaDB2.xml
+
+# Archived documentation
+.archived_docs/

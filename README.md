@@ -22,33 +22,45 @@ calculation:
 - Beta-conversion mode,
 - Neutrino data mode.
   
-## Installation:
-Follow these steps to set up the project locally:
-1. Clone the repository
-2. Execute:
-`cd <cloned_repository>`\
-`pip3 install ./conflux`
-4. In the system environment setup, such as `$HOME/.bashrc`, add:\
-`export CONFLUX_DB=</path/to/conflux>/data` on Linux or MacOS\
-`set CONFLUX_DB=</path/to/conflux>/data` on Windows\
-this will setup the nuclear databases necessary for the reactor neutrino calculation.
+## Installation
 
-## Databases:
-CONFLUX provides python executables to download and parse nucleaer databases including 
-[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1), 
-[JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html), 
-[JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html),
-for fission for fission product yield calculation, and
-[ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/),
-for beta decay and neutrino spectrum measurement.
-All databases are saved in the `$CONFLUX_DB` folder, in `xml` format. For databases different from the CONFLUX prepackaged version, download the database and run:\
-`python3 $CONFLUX_DB/fissionDB/ENDF/FPYParserENDF.py <ENDF-6 format database folder>`\
-to parse fission product yield data into the CONFLUX xml format, and\
-`python3 $CONFLUX_DB/betaDB/ENSDFparser.py <ENSDF database folder>`\
-to parse beta decay data into the CONFLUX xml format.
+### Quick Start
 
-CONFLUX also uses correlation and covariance matrix from [FYCOM](https://nucleardata.berkeley.edu/FYCoM/). Run\
-`python3 CovMatDownloader.py` to download the database. This data is in csv file due to its size.
+For most users, this is all you need:
+
+```bash
+# 1. Install CONFLUX
+pip install .
+
+# 2. Run setup wizard
+conflux-setup
+
+# 3. Verify installation
+python -c "import conflux; print('CONFLUX installed successfully!')"
+```
+
+The `conflux-setup` wizard will guide you through database configuration automatically.
+
+For detailed installation instructions, see [INSTALL.md](INSTALL.md).
+
+## Databases
+
+CONFLUX uses nuclear databases for reactor neutrino flux calculations:
+
+### Fission Product Yields
+- **[ENDF](https://www.nndc.bnl.gov/endf-releases/?version=B-VIII.1)** - Primary database (auto-downloaded by setup)
+- **[JEFF](https://www.oecd-nea.org/dbdata/jeff/jeff33/index.html)** - Alternative European database
+- **[JENDL](https://wwwndc.jaea.go.jp/jendl/jendl.html)** - Alternative Japanese database
+
+### Beta Decay Data
+- **[ENSDF](https://www.nndc.bnl.gov/ensdfarchivals/)** - Evaluated Nuclear Structure Data File
+
+### Covariance Data
+- **[FYCoM](https://nucleardata.berkeley.edu/FYCoM/)** - Fission Yield Covariance Matrices
+
+The `conflux-setup` wizard handles database downloads and parsing automatically. All databases are stored in `$CONFLUX_DB` in XML format.
+
+For advanced usage and manual parsing, see [INSTALL.md](INSTALL.md).
 
 ##  Usage:
 

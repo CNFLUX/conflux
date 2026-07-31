@@ -1,0 +1,61 @@
+# Database Version Configuration
+
+## CONFLUX_DB Environment Variable
+
+**Database files are NOT bundled in the package.** Users must:
+
+1. **Set `CONFLUX_DB` environment variable** to your database directory:
+   ```bash
+   export CONFLUX_DB="/path/to/your/database"
+   ```
+
+2. **Run the setup wizard** to download/copy database files:
+   ```bash
+   conflux-setup
+   ```
+
+This keeps the pip package lightweight (~few MB instead of ~3.6 GB).
+
+## How to Update Database Version
+
+When you update the ENSDF database (e.g., from version 250804 to 260707):
+
+1. **Update one line in `config.py`:**
+
+   ```python
+   BETA_DB_VERSION = "260707"  # Change this to your new version
+   ```
+
+   That's it! All engines (BetaEngine, BetaPlusEngine, etc.) will automatically use the new database.
+
+2. **Users run conflux-setup** to download the new database files to their `CONFLUX_DB` directory
+
+## Configuration Variables
+
+The following variables are automatically configured based on `BETA_DB_VERSION`:
+
+- **`BETA_DB_FILENAME`**: `ENSDF_betaDB_{VERSION}.xml`
+- **`BETA_DB_EC_FILENAME`**: `ENSDF_betaDB_EC_{VERSION}.xml`
+- **`BETA_DB_PATH`**: Full path to B⁻ decay database
+- **`BETA_DB_EC_PATH`**: Full path to EC/B⁺ decay database
+
+## Example
+
+```python
+# In config.py
+BETA_DB_VERSION = "270101"  # Update to January 1, 2027 version
+
+# Automatically generates:
+# - BETA_DB_FILENAME = "ENSDF_betaDB_270101.xml"
+# - BETA_DB_EC_FILENAME = "ENSDF_betaDB_EC_270101.xml"
+# - BETA_DB_PATH = "/path/to/conflux/data/betaDB/ENSDF_betaDB_270101.xml"
+# - BETA_DB_EC_PATH = "/path/to/conflux/data/betaDB/ENSDF_betaDB_EC_270101.xml"
+```
+
+## Database Naming Convention
+
+Database files should follow this naming pattern:
+- **B⁻ decay**: `ENSDF_betaDB_YYMMDD.xml`
+- **EC/B⁺ decay**: `ENSDF_betaDB_EC_YYMMDD.xml`
+
+Where `YYMMDD` is the date of the ENSDF release (e.g., 260707 = July 7, 2026).

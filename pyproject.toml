@@ -52,13 +52,20 @@ conflux-update-endf = "update_endf_database:main"
 
 [tool.setuptools]
 packages = ["conflux"]
-include-package-data = true
+include-package-data = false
+
+# Only parser scripts are bundled in the pip package (~47 KB).
+# These are needed by conflux-setup to parse ENSDF files.
+#
+# All other data files remain in git repository only:
+# - For editable installs: conflux-setup copies from your git repo
+# - For PyPI installs: conflux-setup downloads from NNDC/online sources
 
 [tool.setuptools.package-data]
 conflux = [
-    "data/fissionDB/ENDF/*.xml",
-    "data/fissionDB/JEFF/*.xml",
-    "data/betaDB/*.xml",
-    "data/betaDB/*.csv",
-    "data/example_models/*.json",
+    "data/betaDB/*.py",
+    "data/betaDB/*.csv",  # Small reference files like Z_to_element.csv
+    "data/fissionDB/*.py",  # Unified FPY parser
+    "data/fissionDB/ENDF/*.py",  # Legacy ENDF parser (for compatibility)
+    "data/fissionDB/JEFF/*.py",  # Legacy JEFF parser (for compatibility)
 ]
