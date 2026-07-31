@@ -51,24 +51,52 @@ conflux-setup = "conflux.cli_setup:main"
 conflux-update-endf = "update_endf_database:main"
 
 [tool.setuptools]
-include-package-data = false
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["conflux*"]
 
-# Only parser scripts are bundled in the pip package (~47 KB).
-# These are needed by conflux-setup to parse ENSDF files.
+# Bundle all essential data (~80 MB) for dumb-proof installation.
+# Users get working databases immediately without manual setup.
 #
-# All other data files remain in git repository only:
-# - For editable installs: conflux-setup copies from your git repo
-# - For PyPI installs: conflux-setup downloads from NNDC/online sources
+# Included:
+# - Beta decay databases (betaDB/*.xml) - 3.7 MB
+# - Fission product yields (fissionDB/*/*.xml) - 14 MB
+# - Default neutrino spectra (data/*.csv) - 58 MB
+# - Parser scripts and reference data
+# - Example models
+#
+# Excluded (too large):
+# - Covariance matrices (*cov*.csv, *corr*.csv) - 3.5 GB
+#   Users can download these via conflux-setup if needed
 
 [tool.setuptools.package-data]
 conflux = [
+    # Parser scripts
     "data/betaDB/*.py",
-    "data/betaDB/*.csv",  # Small reference files like Z_to_element.csv
-    "data/fissionDB/*.py",  # Unified FPY parser
-    "data/fissionDB/ENDF/*.py",  # Legacy ENDF parser (for compatibility)
-    "data/fissionDB/JEFF/*.py",  # Legacy JEFF parser (for compatibility)
+    "data/fissionDB/*.py",
+    "data/fissionDB/ENDF/*.py",
+    "data/fissionDB/JEFF/*.py",
+
+    # Beta decay databases
+    "data/betaDB/*.xml",
+    "data/betaDB/*.csv",
+
+    # Fission product yield databases (XML only, no covariances)
+    "data/fissionDB/ENDF/*.xml",
+    "data/fissionDB/JEFF/*.xml",
+
+    # Default neutrino spectra
+    "data/*.csv",
+    "data/*.py",
+
+    # Other databases
+    "data/conversionDB/*.csv",
+    "data/conversionDB/*.py",
+    "data/neutrinoDB/*.csv",
+    "data/neutrinoDB/*.py",
+
+    # Example models
+    "data/example_models/*.json",
 ]

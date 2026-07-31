@@ -3,10 +3,8 @@ dist/
 conflux.egg-info/
 conflux/__pycache__/
 
-# Keep all data files in git repo (they are NOT bundled in pip package)
-# conflux-setup will copy them from installation location to CONFLUX_DB
-#
-# Only ignore very large files that should be downloaded:
+# Bundle essential data (~80 MB) in pip package for dumb-proof installation
+# Only exclude covariance matrices (too large - 3.5 GB)
 data/fissionDB/**/*cov*.csv
 data/fissionDB/**/*corr*.csv
 
@@ -17,10 +15,11 @@ data/betaDB/ENDF_betaDB.xml
 data/betaDB/ENSDFbetaDB_EC.xml
 data/betaDB/betaDBXmlGen.py
 
-# Unversioned/intermediate database files
-data/betaDB/ENSDFbetaDB_EC.xml
-data/betaDB/XUNDL_betaDB_260101.xml
+# Intermediate database files
 ENSDFbetaDB2.xml
 
 # Archived documentation
 .archived_docs/
+
+# Scratch directory for untracked/testing files
+.scratch/

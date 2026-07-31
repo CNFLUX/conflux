@@ -17,18 +17,8 @@ setup(
     },
 
     packages=find_packages(),
-    package_data={
-        'conflux': [
-            'data/fissionDB/ENDF/*.xml',
-            'data/fissionDB/ENDF/*.py',
-            'data/fissionDB/JEFF/*.xml',
-            'data/fissionDB/JEFF/*.py',
-            'data/betaDB/*.xml',
-            'data/betaDB/*.csv',
-            'data/betaDB/*.py',
-            'data/example_models/*.json',
-        ],
-    },
+    # Use MANIFEST.in to control what data files are included
+    # include_package_data=True means: include everything in MANIFEST.in
     include_package_data=True,
     entry_points={
         'console_scripts': [
