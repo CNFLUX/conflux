@@ -13,7 +13,7 @@ from scipy.integrate import solve_ivp
 from scipy.linalg import expm
 
 """CONFLUX modules."""
-from conflux.config import CONFLUX_DB, BETA_DB_PATH
+from conflux.config import BETA_DB_PATH
 from conflux.Basic import Spectrum, integrate_trapezoid
 from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
@@ -943,9 +943,18 @@ class BetaEngine:
         df.to_csv(filename, index=False)
             
     def LoadFile(self, filename):
+        from conflux.FPYEngine import rebin_spectrum
+
         df = pd.read_csv(filename)
-        self.xbins = df["xbins"].values
-        
+        loaded_xbins = df["xbins"].values
+
+        # Check if we need to rebin the loaded data
+        need_rebin = len(loaded_xbins) != len(self.xbins) or not np.allclose(loaded_xbins, self.xbins)
+
+        if not need_rebin:
+            # Direct load when bins match
+            self.xbins = loaded_xbins
+
         for col in df.columns:
             if col == "xbins":
                 continue
@@ -957,9 +966,24 @@ class BetaEngine:
                 if key not in self.istplist.keys():
                     newistp = BetaIstp(Z, A, I, Q=0, HL=np.inf, name="", xbins=self.xbins)
                     self.istplist[key] = newistp
-                self.istplist[key].spectrum=df[col].values
+
+                # Load spectrum and rebin if necessary
+                loaded_spectrum = df[col].values
+                if need_rebin:
+                    self.istplist[key].spectrum = rebin_spectrum(loaded_xbins, loaded_spectrum, self.xbins)
+                else:
+                    self.istplist[key].spectrum = loaded_spectrum
+
             elif col.endswith("_unc"):
                 key = int(col[:-4])
-                self.istplist[key].uncertainty=df[col].values 
-                
+                loaded_uncertainty = df[col].values
+
+                # Rebin uncertainty if necessary
+                if need_rebin:
+                    self.istplist[key].uncertainty = rebin_spectrum(loaded_xbins, loaded_uncertainty, self.xbins)
+                else:
+                    self.istplist[key].uncertainty = loaded_uncertainty
+
         print(f"Loaded spectra and uncertainties from {filename}")
+        if need_rebin:
+            print(f"Rebinned data from {len(loaded_xbins)} to {len(self.xbins)} bins")

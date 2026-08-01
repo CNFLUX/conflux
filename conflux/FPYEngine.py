@@ -21,6 +21,35 @@ from tqdm import tqdm
 from conflux.config import CONFLUX_DB
 from conflux.Basic import Spectrum
 
+def rebin_spectrum(old_xbins, old_spectrum, new_xbins):
+    """
+    Rebin a spectrum from old_xbins to new_xbins using linear interpolation.
+    Handles both upsampling and downsampling while preserving the integral.
+
+    Parameters:
+        old_xbins: Original energy bins
+        old_spectrum: Spectrum values at old_xbins
+        new_xbins: Target energy bins
+
+    Returns:
+        Rebinned spectrum at new_xbins
+    """
+    # Use numpy's interpolation, with extrapolation set to 0 outside the range
+    new_spectrum = np.interp(new_xbins, old_xbins, old_spectrum, left=0, right=0)
+
+    # Preserve the integral by scaling (use trapezoid for numpy >= 2.0, trapz for older versions)
+    try:
+        old_integral = np.trapezoid(old_spectrum, old_xbins)
+        new_integral = np.trapezoid(new_spectrum, new_xbins)
+    except AttributeError:
+        old_integral = np.trapz(old_spectrum, old_xbins)
+        new_integral = np.trapz(new_spectrum, new_xbins)
+
+    if new_integral > 0:
+        new_spectrum *= (old_integral / new_integral)
+
+    return new_spectrum
+
 
 # Class that counts fission products of a specified fission isotope
 class FissionIstp(Spectrum):
@@ -376,6 +405,12 @@ class FissionIstp(Spectrum):
                 thisistp.CalcDecayChain(betaSpectraDB, time)
                 betaSpectraList[FPZAI] = thisistp.decay_chain_spectrum
                 betaUncertainty[FPZAI] = thisistp.decay_chain_uncertainty
+
+            # Check if rebinning is needed due to bin size mismatch
+            if len(betaSpectraList[FPZAI]) != self.nbin:
+                # Rebin the spectrum and uncertainty to match the expected binning
+                betaSpectraList[FPZAI] = rebin_spectrum(thisistp.xbins, betaSpectraList[FPZAI], self.xbins)
+                betaUncertainty[FPZAI] = rebin_spectrum(thisistp.xbins, betaUncertainty[FPZAI], self.xbins)
 
             self.spectrum += betaSpectraList[FPZAI]*thisyield
 
