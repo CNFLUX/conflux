@@ -1,0 +1,6 @@
+{
+    "Calculation_Type": "Summation",
+    "Energy_Range": [0.0,15.0],
+    "Isotopes": ["U235","Pu241"],
+    "Fraction": [0.5, 0.5]
+}

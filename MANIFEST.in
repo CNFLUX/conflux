@@ -1,0 +1,62 @@
+# MANIFEST.in - Include non-Python files in distribution
+
+# Documentation
+include README.md
+include INSTALL.md
+include LICENSE
+include CHANGELOG.md
+
+# Configuration
+include setup.py
+include setup.cfg
+include pyproject.toml
+
+# Scripts
+include update_endf_database.py
+include update_endf.sh
+
+# Include all essential data files for dumb-proof installation (~80 MB)
+# Users get working databases immediately without manual setup
+#
+# Note: data/ is outside the conflux package but accessed via symlink
+
+# Parser scripts and reference data
+include data/betaDB/*.py
+include data/betaDB/*.csv
+include data/fissionDB/*.py
+include data/fissionDB/ENDF/*.py
+include data/fissionDB/JEFF/*.py
+
+# Beta decay databases
+include data/betaDB/*.xml
+
+# Fission product yield databases (XML only, no covariances)
+include data/fissionDB/ENDF/*.xml
+include data/fissionDB/JEFF/*.xml
+
+# Default neutrino spectra
+include data/*.csv
+include data/*.py
+
+# Other databases
+recursive-include data/conversionDB *.csv *.py
+recursive-include data/neutrinoDB *.csv *.py
+
+# Example models (CSV and Python files)
+recursive-include data/example_models *.csv *.py
+
+# Exclude covariance matrices (too large - 3.5 GB)
+global-exclude *cov*.csv
+global-exclude *corr*.csv
+
+# Examples
+recursive-include examples *.py
+recursive-include examples *.json
+recursive-include examples *.csv
+
+# Exclude compiled and temporary files
+global-exclude *.py[cod]
+global-exclude __pycache__
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude *.egg-info
