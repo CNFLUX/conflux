@@ -240,8 +240,12 @@ def get_default_db_path():
     """
     Get default database path
 
-    For editable installs: Returns the git repo's data directory directly
-    For PyPI installs: Returns ~/.conflux/data (will need to download data)
+    Always returns the installation's data directory if it exists.
+    This way CONFLUX_DB defaults to where the data is bundled.
+
+    For editable installs: Returns git repo's data directory
+    For regular installs: Returns site-packages/conflux/data
+    Fallback: ~/.conflux/data (only if no installation found)
     """
     try:
         import conflux
@@ -252,12 +256,12 @@ def get_default_db_path():
         package_dir = Path(conflux.__file__).parent
         data_dir = package_dir / "data"
 
-        # Check if this is an editable install with data directory
-        if data_dir.exists() and (data_dir / "betaDB").exists():
-            # Editable install - use the git repo's data directly
+        # Always use installation's data directory if it exists
+        if data_dir.exists():
             return data_dir
         else:
-            # PyPI install - use home directory
+            # No data bundled - fallback to home directory
+            # (This shouldn't happen with dumb-proof installation)
             return Path.home() / ".conflux" / "data"
     except:
         # Fallback to user's home directory
