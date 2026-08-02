@@ -45,8 +45,15 @@ def rebin_spectrum(old_xbins, old_spectrum, new_xbins):
         old_integral = np.trapz(old_spectrum, old_xbins)
         new_integral = np.trapz(new_spectrum, new_xbins)
 
-    if new_integral > 0:
-        new_spectrum *= (old_integral / new_integral)
+    # Only rescale if both integrals are non-zero and finite to avoid 0/0 = NaN or inf
+    if new_integral > 0 and old_integral > 0 and np.isfinite(old_integral) and np.isfinite(new_integral):
+        scale_factor = old_integral / new_integral
+        if np.isfinite(scale_factor):
+            new_spectrum *= scale_factor
+    elif old_integral > 0 and new_integral == 0:
+        # Interpolation lost the integral (shouldn't happen with proper bins)
+        # Keep the interpolated result as-is
+        pass
 
     return new_spectrum
 

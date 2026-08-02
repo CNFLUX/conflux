@@ -13,7 +13,7 @@ from scipy.integrate import solve_ivp
 from scipy.linalg import expm
 
 """CONFLUX modules."""
-from conflux.config import BETA_DB_PATH
+from conflux.config import BETA_DB_PATH, CONFLUX_DB
 from conflux.Basic import Spectrum, integrate_trapezoid
 from conflux.bsg.Constants import ELECTRON_MASS_MEV, NATURAL_LENGTH
 from conflux.bsg.SpectralFunctions import (phase_space, 
