@@ -60,6 +60,16 @@ CONFLUX uses nuclear databases for reactor neutrino flux calculations:
 
 The `conflux-setup` wizard handles database downloads and parsing automatically. All databases are stored in `$CONFLUX_DB` in XML format.
 
+**Note:** As of version 1.1.3, `CONFLUX_DB` is **optional**:
+- Default: Uses bundled databases (no setup required)
+- Custom: Set `export CONFLUX_DB="/path/to/databases"` for custom location
+
+```python
+# Check current database location
+from conflux.config import CONFLUX_DB
+print(f"Database location: {CONFLUX_DB}")
+```
+
 For advanced usage and manual parsing, see [INSTALL.md](INSTALL.md).
 
 ##  Usage:

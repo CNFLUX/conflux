@@ -30,6 +30,15 @@ python -c "import conflux; print('CONFLUX version:', conflux.__version__)"
 
 That's it! The setup wizard will guide you through database configuration.
 
+**Note:** Starting from version 1.1.3, the `CONFLUX_DB` environment variable is **optional**. 
+- If **not set**, CONFLUX automatically uses the data bundled with the package.
+- If **set**, CONFLUX uses your custom database location.
+
+This allows you to:
+- Use the package immediately after installation (no setup needed)
+- Optionally point to custom/updated databases by setting `CONFLUX_DB`
+- Maintain multiple database versions for different projects
+
 ---
 
 ## Detailed Installation
@@ -235,6 +244,46 @@ Download ENSDF from https://www.nndc.bnl.gov/ensdf/ and place in:
 - More complex setup
 
 ### Advanced Setup Options
+
+#### Using Custom Database Locations
+
+CONFLUX supports custom database locations via the `CONFLUX_DB` environment variable. This is useful for:
+- Testing new database versions
+- Using organization-specific databases  
+- Sharing databases across multiple projects
+- Storing large databases on external drives
+
+**To use a custom database location:**
+
+```bash
+# Temporary (current session only)
+export CONFLUX_DB="/path/to/your/custom/databases"
+
+# Permanent (add to ~/.zshrc or ~/.bashrc)
+echo 'export CONFLUX_DB="/path/to/your/custom/databases"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**Required directory structure:**
+```
+$CONFLUX_DB/
+├── betaDB/
+│   ├── ENSDF_betaDB_260707.xml
+│   └── ENSDF_betaDB_EC_260707.xml
+├── fissionDB/
+│   ├── ENDF/
+│   └── JEFF/
+├── conversionDB/
+├── example_models/
+├── default_neutrino_spectra.csv
+└── default_ec_neutrino_spectra.csv
+```
+
+**Finding the current database location:**
+```python
+from conflux.config import CONFLUX_DB
+print(f"Current database location: {CONFLUX_DB}")
+```
 
 #### Specify Custom Database Path
 

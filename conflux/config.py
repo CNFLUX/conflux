@@ -5,9 +5,21 @@
 
 import os
 
-# Load environment variables and provide default values if needed
-# For editable installs: defaults to installation's data directory
-# For PyPI installs: defaults to ~/.conflux/data (run conflux-setup to configure)
+# Database location configuration
+# CONFLUX_DB environment variable is OPTIONAL:
+#   - If SET: Use the specified custom database location
+#   - If NOT SET: Auto-detect from package installation
+#
+# This allows users to:
+#   1. Use the package immediately after install (no setup needed)
+#   2. Optionally point to custom/updated databases
+#   3. Test different database versions easily
+#
+# To use a custom location:
+#   export CONFLUX_DB="/path/to/your/databases"
+#
+# To check current location:
+#   python -c "from conflux.config import CONFLUX_DB; print(CONFLUX_DB)"
 try:
     CONFLUX_DB = os.environ["CONFLUX_DB"]
 except KeyError:

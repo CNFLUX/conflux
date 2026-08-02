@@ -20,6 +20,10 @@ setup(
     # Use MANIFEST.in to control what data files are included
     # include_package_data=True means: include everything in MANIFEST.in
     include_package_data=True,
+    # Explicitly exclude covariance matrices (too large - 3.5 GB)
+    exclude_package_data={
+        '': ['*cov*.csv', '*corr*.csv'],
+    },
     entry_points={
         'console_scripts': [
             'conflux-setup=conflux.cli_setup:main',

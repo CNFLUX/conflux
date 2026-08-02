@@ -18,32 +18,32 @@ include update_endf.sh
 # Include all essential data files for dumb-proof installation (~80 MB)
 # Users get working databases immediately without manual setup
 #
-# Note: data/ is outside the conflux package but accessed via symlink
+# Note: data/ is now inside the conflux package
 
 # Parser scripts and reference data
-include data/betaDB/*.py
-include data/betaDB/*.csv
-include data/fissionDB/*.py
-include data/fissionDB/ENDF/*.py
-include data/fissionDB/JEFF/*.py
+include conflux/data/betaDB/*.py
+include conflux/data/betaDB/*.csv
+include conflux/data/fissionDB/*.py
+include conflux/data/fissionDB/ENDF/*.py
+include conflux/data/fissionDB/JEFF/*.py
 
 # Beta decay databases
-include data/betaDB/*.xml
+include conflux/data/betaDB/*.xml
 
 # Fission product yield databases (XML only, no covariances)
-include data/fissionDB/ENDF/*.xml
-include data/fissionDB/JEFF/*.xml
+include conflux/data/fissionDB/ENDF/*.xml
+include conflux/data/fissionDB/JEFF/*.xml
 
 # Default neutrino spectra
-include data/*.csv
-include data/*.py
+include conflux/data/*.csv
+include conflux/data/*.py
 
 # Other databases
-recursive-include data/conversionDB *.csv *.py
-recursive-include data/neutrinoDB *.csv *.py
+recursive-include conflux/data/conversionDB *.csv *.py
+recursive-include conflux/data/neutrinoDB *.csv *.py
 
 # Example models (CSV and Python files)
-recursive-include data/example_models *.csv *.py
+recursive-include conflux/data/example_models *.csv *.py
 
 # Exclude covariance matrices (too large - 3.5 GB)
 global-exclude *cov*.csv
