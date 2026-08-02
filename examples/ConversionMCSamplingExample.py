@@ -1,3 +1,4 @@
+from conflux.config import CONFLUX_DB
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.ConversionEngine import ConversionEngine, BetaData
 import matplotlib.pyplot as plt
@@ -16,8 +17,7 @@ if __name__ == "__main__":
 
 
     #Load the beta information from the ConversionDB directory
-    #(change this to the local directory for U_235_e_2014.csv)
-    beta235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    beta235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
 
     #Initialize a U235 Fission Isotope with incident neutron energy of 0 (Thermal)
     U235 = FissionIstp(92,235, Ei=0)

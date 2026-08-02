@@ -1,3 +1,4 @@
+from conflux.config import CONFLUX_DB
 from conflux.BetaEngine import BetaEngine
 from conflux.FPYEngine import FissionModel, FissionIstp
 from conflux.SumEngine import SumEngine
@@ -7,9 +8,8 @@ import numpy as np
 
 if __name__ == "__main__":
 
-    #Load data into the simulation (Change this directory location to the location
-    #Of U_235_e_2014.csv on the host machine, which is in the data folder)
-    betaU235 = BetaData("../data/conversionDB/U_235_e_2014.csv")
+    #Load data into the simulation
+    betaU235 = BetaData(CONFLUX_DB+"/conversionDB/U_235_e_2014.csv")
     U235 = FissionIstp(92, 235, Ei = 0)
     U235.LoadFissionDB()
     U235.LoadCorrelation()
