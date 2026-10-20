@@ -121,6 +121,13 @@ The wizard will:
    - Verifies all dependencies
    - Confirms database setup
 
+Each run writes a plain-text log to `~/.conflux/logs/`. To choose a
+different location, pass `--log-file`:
+
+```bash
+conflux-setup --log-file /path/to/conflux-setup.log
+```
+
 ### Step 3: Activate Environment
 
 Reload your shell configuration:

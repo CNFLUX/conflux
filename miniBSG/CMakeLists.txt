@@ -6,6 +6,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 find_package(GSL REQUIRED)
 LIST(APPEND EXTLIBS ${GSL_LIBRARIES})
+include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 
 find_package(ROOT REQUIRED COMPONENTS MathCore MathMore)
 LIST(APPEND EXTLIBS ${ROOT_LIBRARIES})
@@ -16,5 +17,11 @@ file(GLOB DIRSRC ${PROJECT_SOURCE_DIR}/*.c*)
 LIST(APPEND SOURCE_FILES ${DIRSRC})
 
 add_library(BSG SHARED ${SOURCE_FILES})
-target_compile_features(BSG PUBLIC cxx_std_14)
+target_compile_features(BSG PUBLIC cxx_std_17)
 target_link_libraries(BSG ${EXTLIBS})
+
+# Set library output name to libBSG.so on all platforms for consistency
+set_target_properties(BSG PROPERTIES
+    OUTPUT_NAME "BSG"
+    SUFFIX ".so"
+)

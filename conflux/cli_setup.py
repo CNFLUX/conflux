@@ -14,11 +14,59 @@ import os
 import sys
 import argparse
 import json
+import atexit
+import re
+from datetime import datetime
 from pathlib import Path
 import urllib.request
 import zipfile
 import shutil
 import subprocess
+
+
+ANSI_ESCAPE = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
+
+
+class SetupLogTee:
+    """Write setup output to the terminal and a plain-text log file."""
+
+    def __init__(self, terminal, log_file):
+        self.terminal = terminal
+        self.log_file = log_file
+
+    def write(self, text):
+        self.terminal.write(text)
+        self.log_file.write(ANSI_ESCAPE.sub('', text))
+        return len(text)
+
+    def flush(self):
+        self.terminal.flush()
+        self.log_file.flush()
+
+
+def start_setup_log(log_path):
+    """Record terminal output in a persistent, plain-text setup log."""
+    log_path = Path(log_path).expanduser()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_file = log_path.open("w", encoding="utf-8")
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    sys.stdout = SetupLogTee(original_stdout, log_file)
+    sys.stderr = SetupLogTee(original_stderr, log_file)
+
+    def close_log():
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+        log_file.close()
+
+    atexit.register(close_log)
+    return log_path
+
+
+def default_log_path():
+    """Return a per-run log location outside the installed package."""
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return Path.home() / ".conflux" / "logs" / f"setup-{timestamp}-{os.getpid()}.log"
 
 try:
     import fortranformat
@@ -68,16 +116,18 @@ def get_user_input(prompt, default=None):
         prompt = f"{prompt}: "
 
     response = input(prompt).strip()
-    return response if response else default
+    value = response if response else default
+    print_info(f"Selected: {value}")
+    return value
 
 def get_yes_no(prompt, default=True):
     """Get yes/no response from user"""
     default_str = "Y/n" if default else "y/N"
     response = input(f"{prompt} [{default_str}]: ").strip().lower()
 
-    if not response:
-        return default
-    return response in ['y', 'yes']
+    value = default if not response else response in ['y', 'yes']
+    print_info(f"Selected: {'yes' if value else 'no'}")
+    return value
 
 def parse_endf_inline(endf_dir, output_dir):
     """
@@ -1390,8 +1440,14 @@ def download_covariance_matrices(db_path):
         print_error(f"Failed to download covariance matrices: {e}")
         return False
 
-def verify_installation():
-    """Verify CONFLUX installation"""
+def verify_installation(db_path=None):
+    """Verify CONFLUX installation and the selected database location.
+
+    Args:
+        db_path: Database path selected by the setup wizard.  When omitted,
+            use ``CONFLUX_DB`` if it is set, otherwise the bundled package
+            data directory.
+    """
     print_info("Verifying installation...")
 
     checks = []
@@ -1465,35 +1521,39 @@ def verify_installation():
                 print_error(f"Missing dependency: {package}")
                 checks.append(False)
 
-    # Check CONFLUX_DB
-    db_path = os.environ.get('CONFLUX_DB')
-    if db_path:
-        print_success(f"CONFLUX_DB set: {db_path}")
-        if Path(db_path).exists():
-            print_success(f"Database directory exists")
-            checks.append(True)
-        else:
-            print_warning(f"Database directory does not exist yet")
-            checks.append(True)
+    # Check the database path.  A normal installation works without an
+    # environment variable, using the data bundled in the package.
+    selected_db_path = Path(db_path).expanduser() if db_path else None
+    configured_db_path = os.environ.get('CONFLUX_DB')
+    if selected_db_path is not None:
+        print_success(f"Database path selected by setup: {selected_db_path}")
+    elif configured_db_path:
+        selected_db_path = Path(configured_db_path).expanduser()
+        print_success(f"CONFLUX_DB set: {selected_db_path}")
     else:
-        print_warning("CONFLUX_DB not set (optional)")
+        selected_db_path = get_default_db_path()
+        print_info(f"CONFLUX_DB not set; using bundled database: {selected_db_path}")
+
+    if selected_db_path.exists():
+        print_success("Database directory exists")
+        checks.append(True)
+    else:
+        print_warning(f"Database directory does not exist yet: {selected_db_path}")
         checks.append(True)
 
     # Check database files
-    if db_path:
-        db_path = Path(db_path)
-        endf_dir = db_path / "fissionDB" / "ENDF"
-        if endf_dir.exists():
-            xml_files = list(endf_dir.glob("*.xml"))
-            if xml_files:
-                print_success(f"Found {len(xml_files)} ENDF database files")
-                checks.append(True)
-            else:
-                print_warning("No ENDF database files found")
-                checks.append(False)
+    endf_dir = selected_db_path / "fissionDB" / "ENDF"
+    if endf_dir.exists():
+        xml_files = list(endf_dir.glob("*.xml"))
+        if xml_files:
+            print_success(f"Found {len(xml_files)} ENDF database files")
+            checks.append(True)
         else:
-            print_warning("ENDF database not installed")
+            print_warning("No ENDF database files found")
             checks.append(False)
+    else:
+        print_warning("ENDF database not installed")
+        checks.append(False)
 
     print()
     if all(checks):
@@ -1528,7 +1588,7 @@ def interactive_setup():
         install_data_dir = Path(conflux.__file__).parent / "data"
         if install_data_dir.exists() and default_path == install_data_dir:
             print_success(f"Using installation's data directory: {default_path}")
-            print_info("(Editable install detected - no copying needed)")
+            print_info("(Bundled package data; no copying needed)")
         else:
             print_info(f"Default database path: {default_path}")
     else:
@@ -1635,7 +1695,7 @@ def interactive_setup():
             print_warning("No database files found in CONFLUX_DB")
             print_info("You may need to download databases manually")
 
-    verify_installation()
+    verify_installation(db_path)
 
     # Final message
     print_header("Setup Complete!")
@@ -1765,7 +1825,19 @@ Examples:
         help="Database path (for all database setup options)"
     )
 
+    parser.add_argument(
+        "--log-file",
+        metavar="PATH",
+        help="Write setup output to PATH (default: ~/.conflux/logs/setup-<timestamp>.log)"
+    )
+
     args = parser.parse_args()
+
+    try:
+        log_path = start_setup_log(args.log_file or default_log_path())
+        print_info(f"Setup log: {log_path}")
+    except OSError as error:
+        print_warning(f"Could not create setup log: {error}")
 
     # Handle non-interactive modes
     if args.verify:

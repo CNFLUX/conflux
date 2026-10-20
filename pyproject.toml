@@ -52,6 +52,7 @@ conflux-update-endf = "update_endf_database:main"
 
 [tool.setuptools]
 include-package-data = true
+py-modules = ["update_endf_database"]
 
 [tool.setuptools.packages.find]
 where = ["."]

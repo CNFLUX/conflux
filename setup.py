@@ -17,6 +17,7 @@ setup(
     },
 
     packages=find_packages(),
+    py_modules=['update_endf_database'],
     # Use MANIFEST.in to control what data files are included
     # include_package_data=True means: include everything in MANIFEST.in
     include_package_data=True,
