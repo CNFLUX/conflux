@@ -17,8 +17,8 @@ from os import listdir
 import csv
 import numpy as np
 import re
+from pathlib import Path
 from tqdm import tqdm
-from conflux import get_package_data
 
 # define time units to convert all half-lives in seconds
 tu = {'NS':1e-9, 'US':1e-6, 'MS':1e-3, 'S':1}
@@ -39,8 +39,7 @@ def is_number(s):
 # global method to generate a dictionary of element and Z
 def element_to_Z():
     zdict = {}
-    # Use package helper to access data files (works with both editable and regular installs)
-    csv_path = get_package_data('data/betaDB/Z_to_element.csv')
+    csv_path = Path(__file__).with_name('Z_to_element.csv')
     with open(csv_path, 'r') as csvinput:
         csvreader = csv.reader(csvinput, delimiter=',')
         for row in csvreader:
@@ -185,7 +184,8 @@ class XMLedit:
         self.root.appendChild(self.DB)
 
     # beta-decay isotopes
-    def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = 0.0, Ex = '0.0'):
+    def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = 0.0,
+                      Ex = '0.0', beta_frac = '1.0'):
         # Keep isotopes with HL=0 (unknown half-life) in database
         # Calculation engines should check HL before computing decay
         self.isotope = self.root.createElement('isotope')
@@ -194,6 +194,7 @@ class XMLedit:
         self.isotope.setAttribute('Q', str(Q))
         self.isotope.setAttribute('HL', str(HL))
         self.isotope.setAttribute('Ex', str(Ex))
+        self.isotope.setAttribute('beta_frac', str(beta_frac))
         self.DB.appendChild(self.isotope)
 
     # decay branches of the isotope
@@ -269,9 +270,23 @@ class DecayBranch:
     def __init__(self, line):
         self.E0 = float(line[9:19].strip())/1e3 if is_number(line[9:19]) else 0
         self.sigma_E0 = transUncert(line[9:19].strip(), line[19:21].strip())/1e3 if is_number(line[19:21]) else 0
-        self.fraction = float(line[21:29].strip())/100 if is_number(line[21:29]) else 1
+        # A blank ENSDF beta-intensity field is unknown, not a 100% branch.
+        # BetaEngine distributes the unassigned fraction across zero-fraction
+        # branches after all known fractions for the isotope are loaded.
+        self.fraction = float(line[21:29].strip())/100 if is_number(line[21:29]) else 0
         self.sigma_frac = transUncert(line[21:29].strip(), line[29:31].strip())/100 if is_number(line[29:31]) else 0
         self.forbidden = line[77:79].strip() if not line[77:79].isspace() else "0"
+
+
+class DecayNormalization:
+    """ENSDF normalization record for a beta-decay dataset.
+
+    BR is the fraction of parent decays represented by this decay mode.  NB
+    scales the relative beta intensities in the B records to that basis.
+    """
+    def __init__(self, line):
+        self.beta_frac = float(line[31:39].strip()) if is_number(line[31:39]) else 1.0
+        self.beta_norm = float(line[41:49].strip()) if is_number(line[41:49]) else 1.0
 
 def ENSDFbeta(fileList, output_name):
     xmloutput = XMLedit()
@@ -282,6 +297,9 @@ def ENSDFbeta(fileList, output_name):
         betabool = False
         beginlevel = 0.
         isomer = 0
+        beta_norm = 1.0
+        beta_frac = 1.0
+        have_parent = False
         for line in inputfile.readlines():
 
             if line.isspace():
@@ -301,6 +319,9 @@ def ENSDFbeta(fileList, output_name):
             if MT == "   " and contains_any(line, betatag) and not contains_any(line, excludetag):
                 lastline = line
                 betabool = True
+                beta_norm = 1.0
+                beta_frac = 1.0
+                have_parent = False
 
             if betabool == True:
                 # save information of the parent isotope
@@ -321,8 +342,16 @@ def ENSDFbeta(fileList, output_name):
                     # save the parent isotope information
                     istpname = decayparent.name
                     if isomer>0: istpname = decayparent.name+f"m{isomer}"
-                    xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL, decayparent.level)
+                    xmloutput.createIsotope(decayparent.name, ZAI, decayparent.Emax, decayparent.HL,
+                                            decayparent.level, beta_frac)
+                    have_parent = True
                     lastline = line
+                elif MT == "  N":
+                    normalization = DecayNormalization(line)
+                    beta_frac = normalization.beta_frac
+                    beta_norm = normalization.beta_norm
+                    if have_parent:
+                        xmloutput.isotope.setAttribute('beta_frac', str(beta_frac))
                 elif MT == "  L":
                     lastline = line
                 elif MT == "  B" and "  B" not in lastline:
@@ -347,10 +376,10 @@ def ENSDFbeta(fileList, output_name):
                         else:
                             forbid_str = forbid_str+","+dspin_str
                     # save the decay branch information
-                    xmloutput.editBranch(str("{:.4f}".format(decaybranch.fraction)), 
+                    xmloutput.editBranch(str("{:.4f}".format(decaybranch.fraction * beta_norm)),
                                          str("{:.4f}".format(decaybranch.E0)), 
                                          forbid_str, 
-                                         str("{:.4f}".format(decaybranch.sigma_frac)), 
+                                         str("{:.4f}".format(decaybranch.sigma_frac * beta_norm)),
                                          str("{:.4f}".format(decaybranch.sigma_E0)))
                     lastline = line
 

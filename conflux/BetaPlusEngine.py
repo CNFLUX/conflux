@@ -917,6 +917,7 @@ class BetaPlusEngine:
             Q = float(isotope.attrib['Q'])
             HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
+            beta_frac = float(isotope.attrib.get('beta_frac', 1.0))
 
             # Skip isotopes with unknown or invalid half-life (HL <= 0)
             if HL <= 0:
@@ -944,13 +945,14 @@ class BetaPlusEngine:
                 if len(isotope) < 1:
                     betaIstp.missing = True
                     for i in range(missingBranch):
-                        misfrac = 1./missingBranch
+                        misfrac = beta_frac/missingBranch
                         misE0 = betaIstp.Q/missingBranch*(i+1)
                         betaIstp.EditBranch(misE0, E0=misE0, beta_fraction=misfrac)
                     self.istplist[ZAI] = betaIstp
                     continue
 
-                # some isotopes contain summed branch fraction greater than 1
+                # Some evaluations contain a summed EC/beta-plus branch
+                # fraction greater than their decay-mode branching ratio.
                 # prepare to normalize
                 fracsum = 0
 
@@ -989,8 +991,12 @@ class BetaPlusEngine:
                     sigma_bfrac = float(branch.attrib['sigma_IB'])
                     ec_fraction = float(branch.attrib['IE'])
                     sigma_ecfrac = float(branch.attrib['sigma_IE'])
-                    if fracsum > 1:
-                        beta_fraction /= fracsum
+                    if fracsum > beta_frac and fracsum > 0:
+                        scale = beta_frac/fracsum
+                        beta_fraction *= scale
+                        sigma_bfrac *= scale
+                        ec_fraction *= scale
+                        sigma_ecfrac *= scale
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, 
                                             beta_fraction,

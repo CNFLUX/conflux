@@ -807,6 +807,7 @@ class BetaEngine:
             Q = float(isotope.attrib['Q'])
             HL = float(isotope.attrib['HL'])
             name = isotope.attrib['name']
+            beta_frac = float(isotope.attrib.get('beta_frac', 1.0))
 
             # Skip isotopes with unknown or invalid half-life (HL <= 0)
             if HL <= 0:
@@ -834,18 +835,22 @@ class BetaEngine:
                 if len(isotope) < 1:
                     betaIstp.missing = True
                     for i in range(missingBranch):
-                        misfrac = 1./missingBranch
+                        misfrac = beta_frac/missingBranch
                         misE0 = betaIstp.Q/missingBranch*(i+1)
                         betaIstp.EditBranch(misE0, E0=misE0, fraction=misfrac)
                     self.istplist[ZAI] = betaIstp
                     continue
 
-                # some isotopes contain summed branch fraction greater than 1
-                # prepare to normalize
-                fracsum = 0
-                for branch in isotope:
-                    fraction = float(branch.attrib['fraction'])
-                    fracsum += fraction
+                # A zero fraction represents a branch whose ENSDF intensity is
+                # unknown.  Share the remaining beta-decay fraction equally
+                # among those branches.  When reported fractions exceed one,
+                # retain the existing normalization behavior instead.
+                fractions = [float(branch.attrib['fraction']) for branch in isotope]
+                fracsum = sum(fractions)
+                missing_fraction_count = sum(fraction == 0 for fraction in fractions)
+                inferred_fraction = 0
+                if fracsum <= beta_frac and missing_fraction_count:
+                    inferred_fraction = (beta_frac - fracsum) / missing_fraction_count
 
                 # actually assign values from database to branches
                 for branch in isotope:
@@ -874,11 +879,14 @@ class BetaEngine:
                                     forbiddenness = i
 
                     # assign fraction values to branches
-                    # normalize if greater than one
+                    # Normalize over-complete evaluations; otherwise assign
+                    # the unreported remainder to zero-fraction branches.
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
-                    if fracsum > 1:
-                        fraction /= fracsum
+                    if fracsum > beta_frac and fracsum > 0:
+                        fraction *= beta_frac/fracsum
+                    elif fraction == 0:
+                        fraction = inferred_fraction
 
                     betaBranch = BetaBranch(Z, A, I, Q, E0, sigma_E0, fraction,
                                             sigma_frac, forbiddenness,
