@@ -73,8 +73,7 @@ for key in fissile_istps.keys():
         print(f"Calculting burst fission spectrum of {key}")
         for i in range(len(logedges)):
             tau = logedges[i]
-            fissile_istps[key].CalcBetaSpectra(betaSpectraDB, 
-                                               processMissing=False,  
+            fissile_istps[key].CalcBetaSpectra(betaSpectraDB,
                                                time=tau, silent=False)
             spectrum[i] = (fissile_istps[key].spectrum)
             uncertainty[i] = (fissile_istps[key].uncertainty)

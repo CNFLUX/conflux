@@ -18,7 +18,7 @@ test_flux = m_TNT * fissions_per_ton
 xbins = np.arange(0, 13, 0.1)
 
 # Calculate beta spectra of all beta unstable isotopes
-betaSpectraDB = BetaEngine(xbins=xbins)
+betaSpectraDB = BetaEngine(xbins=xbins, process_missing=False)
 filename = "fission_burst.csv"
 try:
     with open(filename, "r") as file:
@@ -62,7 +62,7 @@ def spectrum_t(u):
     if eval_count % 1000 == 0:
         print(f"g called {eval_count}×, latest u = {u:.6f}")
     t = 10**u
-    U2351.CalcBetaSpectra(betaSpectraDB, processMissing=False,  time=t, silent=True)
+    U2351.CalcBetaSpectra(betaSpectraDB, time=t, silent=True)
     return U2351.spectrum*t*np.log(10)
 
 # logedges = np.array([-30, -2, -1, 0, 1, 2, 3, 4, 5, 6])

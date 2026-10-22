@@ -38,6 +38,25 @@ def is_number(s):
     except ValueError:
         return False
 
+
+def is_tentative(value):
+    return '(' in value or ')' in value
+
+
+def parse_number(value, default=0.0):
+    value = value.strip().replace('(', '').replace(')', '')
+    return float(value) if is_number(value) else default
+
+
+def classify_provenance(comment):
+    """Return only explicit ENSDF provenance; unmarked data stay evaluated."""
+    text = comment.upper()
+    if re.search(r'\b(THEOR(?:Y|ETICAL)?|CALC(?:ULAT(?:E|ED|ION))?|QRPA|SHELL MODEL|MODEL)\b', text):
+        return 'theoretical'
+    if re.search(r'\b(EXPERIMENTAL VALUE|MEASURED VALUE|FROM EXPERIMENT|EXPT\.?(?: VALUE)?)\b', text):
+        return 'experimental'
+    return 'evaluated_unspecified'
+
 # global method to generate a dictionary of element and Z
 def element_to_Z():
     zdict = {}
@@ -323,7 +342,8 @@ class XMLedit:
 
     # beta-decay isotopes
     def createIsotope(self, istpName, isotopeID, Q = '0.0', HL = 0.0,
-                      Ex = '0.0', beta_frac = '1.0'):
+                      Ex = '0.0', beta_frac = '1.0', tentative = False,
+                      provenance = 'evaluated_unspecified'):
         # Keep isotopes with HL=0 (unknown half-life) in database
         # Calculation engines should check HL before computing decay
         self.isotope = self.root.createElement('isotope')
@@ -333,10 +353,14 @@ class XMLedit:
         self.isotope.setAttribute('HL', str(HL))
         self.isotope.setAttribute('Ex', str(Ex))
         self.isotope.setAttribute('beta_frac', str(beta_frac))
+        self.isotope.setAttribute('tentative', str(tentative).lower())
+        self.isotope.setAttribute('provenance', provenance)
+        self.isotope.setAttribute('provenance_scope', 'dataset_comment')
         self.DB.appendChild(self.isotope)
 
     # decay branches of the isotope
-    def editBranch(self, IB, IE, end_point_E, dJpi, sigma_IB='0.0', sigma_IE='0.0', sigma_E0='0.0'):
+    def editBranch(self, IB, IE, end_point_E, dJpi, sigma_IB='0.0', sigma_IE='0.0', sigma_E0='0.0',
+                   tentative=False, provenance='evaluated_unspecified'):
         branch = self.root.createElement('branch')
         branch.setAttribute('IB', str(IB))
         branch.setAttribute('sigma_IB', str(sigma_IB))
@@ -345,6 +369,9 @@ class XMLedit:
         branch.setAttribute('end_point_E', str(end_point_E))
         branch.setAttribute('sigma_E0', str(sigma_E0))
         branch.setAttribute('dJpi', str(dJpi))
+        branch.setAttribute('tentative', str(tentative).lower())
+        branch.setAttribute('provenance', provenance)
+        branch.setAttribute('provenance_scope', 'dataset_comment')
         self.isotope.appendChild(branch)
 
     def saveXML(self, save_path_file):
@@ -360,6 +387,8 @@ class ParentIstp:
         element = line[3:5].capitalize().strip()
         self.name = element+line[:3].strip()
         self.Z = int(elementdict[element])
+        self.Jpi_raw = line[21:39]
+        self.tentative = any(is_tentative(line[a:b]) for a, b in ((9, 19), (21, 39), (39, 49), (64, 76)))
         leveltxt = line[9:19].strip()
 
         leveltxt = re.sub(r"[^0-9.]", "", leveltxt)
@@ -379,13 +408,15 @@ class ParentIstp:
                 life = float(hl_array[0])
                 unit = tu[hl_array[1]]
                 self.HL = life*unit
-        self.Emax = float(line[64:74].strip())/1e3+float(leveltxt)/1e3
+        self.Emax = parse_number(line[64:74])/1e3+float(leveltxt)/1e3
         self.d_Emax = transUncert(line[64:74].strip(), line[74:76].strip())/1e3
         self.pi, self.J = convert_J(line[21:39])
 
 # class to save information of the level before decay
 class DecayLevel:
     def __init__(self, line):
+        self.Jpi_raw = line[21:39]
+        self.tentative = is_tentative(line[9:19]) or is_tentative(self.Jpi_raw)
         if (is_number(line[9:19].strip())):
             self.level = float(line[9:19].strip())/1e3 #convert to MeV
         elif (is_number(line[9:19].strip().replace('+X',''))):
@@ -403,10 +434,11 @@ class DecayLevel:
 # class to save information of decay branches
 class DecayBranch:
     def __init__(self, line):
-        self.E0 = float(line[9:19].strip())/1e3 if is_number(line[9:19]) else 0.
+        self.tentative = any(is_tentative(line[a:b]) for a, b in ((9, 19), (21, 29), (31, 39)))
+        self.E0 = parse_number(line[9:19])/1e3 if is_number(line[9:19].strip().replace('(', '').replace(')', '')) else 0.
         self.sigma_E0 = transUncert(line[9:19].strip(), line[19:21].strip())/1e3 if is_number(line[19:21]) else 0.
-        self.IB = float(line[21:29].strip())/100 if is_number(line[21:29]) else 0.
-        self.IE = float(line[31:39].strip())/100 if is_number(line[31:39]) else 0.
+        self.IB = parse_number(line[21:29])/100 if is_number(line[21:29].strip().replace('(', '').replace(')', '')) else 0.
+        self.IE = parse_number(line[31:39])/100 if is_number(line[31:39].strip().replace('(', '').replace(')', '')) else 0.
         # if not is_number(line[21:29]) and not is_number(line[31:39]):
         #     self.IB = 0.5
         #     self.IE = 0.5
@@ -439,6 +471,7 @@ def ENSDFbeta(fileList, output_name):
         beta_norm = 1.0
         beta_frac = 1.0
         have_parent = False
+        provenance = 'evaluated_unspecified'
         for line in inputfile.readlines():
 
             if line.isspace():
@@ -462,8 +495,13 @@ def ENSDFbeta(fileList, output_name):
                 beta_norm = 1.0
                 beta_frac = 1.0
                 have_parent = False
+                provenance = 'evaluated_unspecified'
 
             if betabool == True:
+                if len(line) > 6 and line[6].lower() == 'c' and not have_parent:
+                    comment_provenance = classify_provenance(line[8:])
+                    if provenance == 'evaluated_unspecified' and comment_provenance != provenance:
+                        provenance = comment_provenance
                 # save information of the parent isotope
                 if MT == "  P":
                     decayparent = ParentIstp(line)
@@ -484,7 +522,8 @@ def ENSDFbeta(fileList, output_name):
                     istpname = decayparent.name
                     if isomer>0: istpname = istpname+f"m{isomer}"
                     xmloutput.createIsotope(istpname, ZAI, decayparent.Emax, decayparent.HL,
-                                            decayparent.level, beta_frac)
+                                            decayparent.level, beta_frac,
+                                            decayparent.tentative, provenance)
                     have_parent = True
                     lastline = line
                 elif MT == "  N":
@@ -528,7 +567,9 @@ def ENSDFbeta(fileList, output_name):
                                             forbid_str,
                                             str("{:.4f}".format(decaybranch.sigma_IB * beta_norm)),
                                             str("{:.4f}".format(decaybranch.sigma_IE * beta_norm)),
-                                            str("{:.4f}".format(decaybranch.sigma_E0)))
+                                            str("{:.4f}".format(decaybranch.sigma_E0)),
+                                            decayparent.tentative or decaydaughter.tentative or decaybranch.tentative,
+                                            provenance)
                     lastline = line
                     #print(lastline)
 

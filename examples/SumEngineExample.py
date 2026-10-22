@@ -16,7 +16,7 @@ if __name__  == "__main__":
     xbins = e
 
     # Calculate beta spectra of all beta unstable isotopes
-    betaSpectraDB = BetaEngine(xbins=xbins)
+    betaSpectraDB = BetaEngine(xbins=xbins, process_missing=True, use_xundl=True)
     # trying to load the default neutrino spectra. If not found, calculate the data
     filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
     try:
@@ -48,7 +48,7 @@ if __name__  == "__main__":
     #Total spectrum. If I add multiple isotopes to the Summation Engine, I will need each isotopes individual
     #Spectrum to be able to calcualte the total spectrum. I will get an error if I do not do this step before
     #Trying to add the isotope to the SummationEngine
-    U235.CalcBetaSpectra(betaSpectraDB=betaSpectraDB, processMissing=True)
+    U235.CalcBetaSpectra(betaSpectraDB=betaSpectraDB)
 
     #Finally, we are going to load up a summation engine, with the Beta Spectra Database that we just
     #Calculated as an input. As a default, the Summation engine calculates the neutrino specturm,

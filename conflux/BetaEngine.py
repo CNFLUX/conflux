@@ -35,6 +35,39 @@ from ctypes import *
 
 libBSG = None
 
+
+def _match_xundl_zero_branches(ensdf_isotope, xundl_isotope, q_ensdf,
+                               q_xundl, tolerance=0.002):
+    """Match ENSDF zero-intensity branches to XUNDL by daughter excitation.
+
+    Endpoint energies can differ when the two evaluations use different Q
+    values.  The stable comparison is Ex = Qbeta - E0.  A mapping is returned
+    only when every zero-fraction ENSDF branch has a unique XUNDL partner.
+    """
+    zero_indices = [i for i, branch in enumerate(ensdf_isotope)
+                    if float(branch.attrib['fraction']) == 0]
+    if not zero_indices:
+        return {}
+
+    candidates = []
+    for ensdf_index in zero_indices:
+        ensdf_branch = ensdf_isotope[ensdf_index]
+        ensdf_ex = q_ensdf - float(ensdf_branch.attrib['end_point_E'])
+        for xundl_index, xundl_branch in enumerate(xundl_isotope):
+            xundl_ex = q_xundl - float(xundl_branch.attrib['end_point_E'])
+            difference = abs(ensdf_ex - xundl_ex)
+            if difference <= tolerance:
+                candidates.append((difference, ensdf_index, xundl_index))
+
+    matches = {}
+    used_xundl = set()
+    for _, ensdf_index, xundl_index in sorted(candidates):
+        if ensdf_index not in matches and xundl_index not in used_xundl:
+            matches[ensdf_index] = xundl_index
+            used_xundl.add(xundl_index)
+
+    return matches if len(matches) == len(zero_indices) else {}
+
 def init_libBSG(libname = "libBSG.so"):
     global libBSG
     libBSG = cdll.LoadLibrary(libname)
@@ -765,7 +798,10 @@ class BetaEngine:
                  xbins=np.arange(0, 20, 0.1),
                  custom_func=None,
                  numass=0,
-                 mixing=0):
+                 mixing=0,
+                 process_missing=False,
+                 use_xundl=False,
+                 xundlDB=CONFLUX_DB+"/betaDB/XUNDL_betaDB_260101.xml"):
         """Constructor method."""
         self.inputlist = inputlist
         self.istplist = {}
@@ -775,9 +811,12 @@ class BetaEngine:
         self.numass = numass
         self.mixing = mixing
 
-        self.LoadBetaDB(targetDB)   # loadBetaDB automatically
+        self.LoadBetaDB(targetDB, process_missing=process_missing,
+                        use_xundl=use_xundl, xundlDB=xundlDB)
         
-    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDF_betaDB_260707.xml", missingBranch = 3):
+    def LoadBetaDB(self, targetDB=CONFLUX_DB+"/betaDB/ENSDF_betaDB_260707.xml",
+                   missingBranch=3, process_missing=False, use_xundl=False,
+                   xundlDB=CONFLUX_DB+"/betaDB/XUNDL_betaDB_260101.xml"):
         """
         Load default or input betaDB to obtain beta decay informtion. A customed DB must follow the same format as the default DB.
         
@@ -785,6 +824,12 @@ class BetaEngine:
         :type targetDB: str, optional
         :param missingBranch: Determine how many branches there are in a missing isotope, defaults to 3
         :type missingBranch: int, optional
+        :param process_missing: Complete unresolved ENSDF branch data, defaults to False
+        :type process_missing: bool, optional
+        :param use_xundl: Supplement zero-fraction ENSDF branches with XUNDL, defaults to False
+        :type use_xundl: bool, optional
+        :param xundlDB: XUNDL beta-decay database used when ``use_xundl`` is True
+        :type xundlDB: str, optional
 
         """
         # empty the existing isotope list before filling loading the DB
@@ -801,8 +846,14 @@ class BetaEngine:
 
         tree = ET.parse(targetDB)
         root = tree.getroot()
+        xundl_by_zai = {}
+        if use_xundl:
+            xundl_root = ET.parse(xundlDB).getroot()
+            xundl_by_zai = {int(isotope.attrib['isotope']): isotope
+                             for isotope in xundl_root}
         for isotope in root:
             ZAI = int(isotope.attrib['isotope'])
+            source_zai = ZAI
             if ZAI == 10: continue # ignoring single neutrons
             Q = float(isotope.attrib['Q'])
             HL = float(isotope.attrib['HL'])
@@ -829,15 +880,33 @@ class BetaEngine:
                     I += 1
                     ZAI += 1
 
+                # A completely branchless ENSDF isotope can use the XUNDL
+                # evaluation as a whole.  Otherwise XUNDL can only fill
+                # zero-fraction ENSDF branches below.
+                branch_isotope = isotope
+                branch_source = 'ENSDF'
+                xundl_isotope = xundl_by_zai.get(source_zai)
+                if (process_missing and use_xundl and len(isotope) == 0
+                        and xundl_isotope is not None and len(xundl_isotope)):
+                    branch_isotope = xundl_isotope
+                    branch_source = 'XUNDL'
+                    Q = float(xundl_isotope.attrib['Q'])
+                    beta_frac = float(xundl_isotope.attrib.get('beta_frac', beta_frac))
+
                 betaIstp = BetaIstp(Z, A, I, Q, HL, name, xbins=self.xbins)
 
                 # Adding missing branches below
-                if len(isotope) < 1:
+                if len(branch_isotope) < 1:
                     betaIstp.missing = True
-                    for i in range(missingBranch):
-                        misfrac = beta_frac/missingBranch
-                        misE0 = betaIstp.Q/missingBranch*(i+1)
-                        betaIstp.EditBranch(misE0, E0=misE0, fraction=misfrac)
+                    if process_missing:
+                        for i in range(missingBranch):
+                            misfrac = beta_frac/missingBranch
+                            misE0 = betaIstp.Q/missingBranch*(i+1)
+                            betaIstp.EditBranch(misE0, E0=misE0, fraction=misfrac)
+                        # The configured fallback is now usable summation data;
+                        # retain its provenance separately from the missing flag.
+                        betaIstp.missing = False
+                        betaIstp.synthetic_missing = True
                     self.istplist[ZAI] = betaIstp
                     continue
 
@@ -845,15 +914,30 @@ class BetaEngine:
                 # unknown.  Share the remaining beta-decay fraction equally
                 # among those branches.  When reported fractions exceed one,
                 # retain the existing normalization behavior instead.
-                fractions = [float(branch.attrib['fraction']) for branch in isotope]
+                fractions = [float(branch.attrib['fraction']) for branch in branch_isotope]
                 fracsum = sum(fractions)
                 missing_fraction_count = sum(fraction == 0 for fraction in fractions)
                 inferred_fraction = 0
-                if fracsum <= beta_frac and missing_fraction_count:
+                if process_missing and fracsum <= beta_frac and missing_fraction_count:
                     inferred_fraction = (beta_frac - fracsum) / missing_fraction_count
 
+                xundl_replacements = {}
+                xundl_scale = 1.0
+                if (process_missing and use_xundl and branch_source == 'ENSDF' and xundl_isotope is not None
+                        and fracsum <= beta_frac and missing_fraction_count):
+                    xundl_replacements = _match_xundl_zero_branches(
+                        branch_isotope, xundl_isotope, Q,
+                        float(xundl_isotope.attrib['Q']))
+                    if xundl_replacements:
+                        xundl_sum = sum(float(xundl_isotope[index].attrib['fraction'])
+                                         for index in xundl_replacements.values())
+                        if xundl_sum > 0:
+                            xundl_scale = (beta_frac - fracsum) / xundl_sum
+                        else:
+                            xundl_replacements = {}
+
                 # actually assign values from database to branches
-                for branch in isotope:
+                for branch_index, branch in enumerate(branch_isotope):
                     E0 = float(branch.attrib['end_point_E'])
                     if E0<=0:
                         continue
@@ -883,8 +967,14 @@ class BetaEngine:
                     # the unreported remainder to zero-fraction branches.
                     fraction = float(branch.attrib['fraction'])
                     sigma_frac = float(branch.attrib['sigma_frac'])
+                    fraction_source = branch_source
                     if fracsum > beta_frac and fracsum > 0:
                         fraction *= beta_frac/fracsum
+                    elif branch_index in xundl_replacements:
+                        xundl_branch = xundl_isotope[xundl_replacements[branch_index]]
+                        fraction = float(xundl_branch.attrib['fraction']) * xundl_scale
+                        sigma_frac = float(xundl_branch.attrib['sigma_frac']) * xundl_scale
+                        fraction_source = 'XUNDL'
                     elif fraction == 0:
                         fraction = inferred_fraction
 
@@ -894,6 +984,7 @@ class BetaEngine:
                                             custom_func=self.custom_func,
                                             numass=self.numass,
                                             mixing=self.mixing)
+                    betaBranch.fraction_source = fraction_source
                     betaIstp.AddBranch(betaBranch)
 
                 if betaIstp.branches:
