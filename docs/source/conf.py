@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 project = 'CONFLUX'
 copyright = '2024, Xianyi Zhang'
 author = 'Xianyi Zhang'
-release = '0.7'
+release = '1.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
