@@ -20,14 +20,13 @@ if __name__  == "__main__":
     # for each missing isotopes. The branches are set to be rate = 1/3 fraction 
     # each with a 1/3*Q, 2/3*Q, and Q value as the end point energy, by setting
     # `missingBranch = 3`, which is also the default value.
-    betaSpectraDB = BetaEngine(xbins = e)
-    betaSpectraDB.LoadBetaDB(missingBranch=3)
+    betaSpectraDB = BetaEngine(xbins=e, process_missing=True)
     betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
     
     # calculate the specrtra with an alternative example where only one branch
     # is set for missing isotopes
-    betaSpectraDB1 = BetaEngine(xbins = e)
-    betaSpectraDB1.LoadBetaDB(missingBranch=1)
+    betaSpectraDB1 = BetaEngine(xbins=e)
+    betaSpectraDB1.LoadBetaDB(missingBranch=1, process_missing=True)
     betaSpectraDB1.CalcBetaSpectra(nu_spectrum=True)
     
     # Load the fission products of 235U with thermal neutron fission "Ei = 0"
@@ -37,7 +36,7 @@ if __name__  == "__main__":
     # calculate the covariance matrix automatically for you.
     U235.LoadCorrelation()
     # Calculate the neutrino spectrum by calculating spectrum 
-    U235.CalcBetaSpectra(betaSpectraDB=betaSpectraDB, processMissing=True)
+    U235.CalcBetaSpectra(betaSpectraDB=betaSpectraDB)
     # Summing all fissile isotope spectra. In this case, only one fission of 
     # 235U.
     # Picking the 3-branch missing addition in the neutrino spectrum calculation
@@ -52,7 +51,7 @@ if __name__  == "__main__":
     U2351 = FissionIstp(92,235, Ei= 0)
     U2351.LoadFissionDB()
     U2351.LoadCorrelation()
-    U2351.CalcBetaSpectra(betaSpectraDB=betaSpectraDB1, processMissing=True)
+    U2351.CalcBetaSpectra(betaSpectraDB=betaSpectraDB1)
     SummationEngine1 = SumEngine(betaSpectraDB=betaSpectraDB1)
     SummationEngine1.AddFissionIstp(U2351, "U235_1", count = 1)
     SummationEngine1.CalcReactorSpectrum()
@@ -62,12 +61,14 @@ if __name__  == "__main__":
     uncertainty1 = SummationEngine1.uncertainty
   
     # U235 spectrum with no missing info added
-    # in this case, picking beta spectrum db as betaSpectraDB1 or betaSpectraDB doesn't matter anymore
+    # Missing-data handling is selected when constructing BetaEngine.
     U2352 = FissionIstp(92,235, Ei= 0)
     U2352.LoadFissionDB()
     U2352.LoadCorrelation()
-    U2352.CalcBetaSpectra(betaSpectraDB=betaSpectraDB1, processMissing=False)
-    SummationEngine1 = SumEngine(betaSpectraDB=betaSpectraDB1)
+    betaSpectraDB2 = BetaEngine(xbins=e, process_missing=False)
+    betaSpectraDB2.CalcBetaSpectra(nu_spectrum=True)
+    U2352.CalcBetaSpectra(betaSpectraDB=betaSpectraDB2)
+    SummationEngine1 = SumEngine(betaSpectraDB=betaSpectraDB2)
     SummationEngine1.AddFissionIstp(U2352, "U235_2", count = 1)
     SummationEngine1.CalcReactorSpectrum()
     spectrum2 = SummationEngine1.spectrum

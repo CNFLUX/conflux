@@ -370,7 +370,7 @@ class FissionIstp(Spectrum):
         
         :param betaSpectraDB: the input beta engine that already calculated beta spectra from a given beta database
         :type betaSpectraDB: :class:`conflux.BetaEngine.BetaEngine`
-        :param processMissing: Determine whether to include assummed spectrum calculated for missing branches in the beta database, defaults to False
+        :param processMissing: Retained for API compatibility. Missing-data treatment is selected when constructing ``betaSpectraDB``.
         :type processMissing: bool, optional
         :param time: The time stamp (unit: second) of the IFP calculation. If time < 0, or the optional input is ignored, the engine will calculate neutrino spectra with CFP
         :type time: float, optional
@@ -399,7 +399,9 @@ class FissionIstp(Spectrum):
             # print("spectrum test", sum(betaSpectraDB.istplist[FPZAI].spectrum))
             # print("uncertainty test", sum(betaSpectraDB.istplist[FPZAI].uncertainty))
             
-            if thisistp.missing and not processMissing: continue
+            # Missing-data handling is selected when the BetaEngine is built.
+            # Summation only uses the decay information that engine loaded.
+            if thisistp.missing: continue
                         
             # Pull the beta spectrum and uncertainties; add the product of beta spectra and yield
             # to the total spectrum.
@@ -425,9 +427,8 @@ class FissionIstp(Spectrum):
         for i in tqdm(self.betaFPYlist, desc="Calculating uncertainties of "+str(len(self.betaFPYlist))+ " fission products", disable=silent):
             for j in self.betaFPYlist:
 
-                if (processMissing==False and
-                    (betaSpectraDB.istplist[i].missing
-                     or betaSpectraDB.istplist[j].missing)):
+                if (betaSpectraDB.istplist[i].missing
+                    or betaSpectraDB.istplist[j].missing):
                     continue
 
                 # Pull the yields, yield errors, beta spectra, and beta spectral uncertainty

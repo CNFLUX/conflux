@@ -31,13 +31,13 @@ if __name__ == "__main__":
 
     #Initialize the beta engine with the energy range I've defined above, and calculate the beta spectra
     #in the given branch Erange.
-    BetaEngineDB = BetaEngine(xbins = e)
+    BetaEngineDB = BetaEngine(xbins=e, process_missing=True, use_xundl=True)
     BetaEngineDB.CalcBetaSpectra(branchErange=[0,10])
 
     #Next, I use this BetaEngine to calculate the Spectra for U235. By default, the calculation will
     #Only look at Cumulative fission products. However, one can also calculate the independant fission
     #products at a given time stamp (default unit: second) by passing positive values to the "time" variables.
-    U235.CalcBetaSpectra(BetaEngineDB, processMissing=True, time=0)
+    U235.CalcBetaSpectra(BetaEngineDB, time=0)
 
     #Lastly, I will go ahead and plot each individual beta branch in this fission isotope
     fig = plt.plot()

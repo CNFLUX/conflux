@@ -10,9 +10,10 @@ from conflux.BetaPlusEngine import BetaPlusEngine
 
 xbins = np.arange(0, 15, 0.01)
 
-# Calculate beta spectra of all beta unstable isotopes
-betaSpectraDB = BetaEngine(xbins=xbins)
-filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
+# Calculate beta spectra, completing missing ENSDF information with XUNDL when
+# a safe match is available and using the default completion otherwise.
+betaSpectraDB = BetaEngine(xbins=xbins, process_missing=True, use_xundl=True)
+filename = f"{CONFLUX_DB}/default_neutrino_spectra_xundl.csv"
 betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
 betaSpectraDB.SaveToFile(filename)
 print(f"File {filename} created.")
