@@ -18,7 +18,7 @@ if __name__  == "__main__":
     # Calculate beta spectra of all beta unstable isotopes
     betaSpectraDB = BetaEngine(xbins=xbins, process_missing=True, use_xundl=True)
     # trying to load the default neutrino spectra. If not found, calculate the data
-    filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
+    filename = f"{CONFLUX_DB}/default_neutrino_spectra_xundl.csv"
     try:
         with open(filename, "r") as file:
             betaSpectraDB.LoadFile(filename)
