@@ -82,7 +82,7 @@ class FissionIstp(Spectrum):
         :type A: int
         :param Ei: The incident neutron energy to ignite fission
         :type Ei: float
-        :param DB: filename or names of default databases, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :param DB: filename or name of a bundled database (``ENDF``, ``JEFF``, or ``JEFF40``)
         :type DB: string, optional
         :param IFPY: Determine whether to calculate independent fission product yields, defaults to False
         :type IFPY: bool, optional
@@ -98,8 +98,8 @@ class FissionIstp(Spectrum):
         """Whether to calculate independent fission product yields"""
         self.FPYlist = {}
         """Dictionary of cumulative or independent fission yields {"FPZAI", FPNuclide}"""
-        self._DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy'}
-        """Dictionary of the two fission databases included in CONFLUX (can be downloaded using the file in the aux folder)"""
+        self._DBtitle = {'ENDF':'nfy', 'JEFF':'nfpy', 'JEFF40':'nfpy'}
+        """Filename prefixes for the fission-yield databases included in CONFLUX."""
 
         self.LoadFissionDB(Ei=self.Ei, DB=DB)
 
@@ -110,7 +110,7 @@ class FissionIstp(Spectrum):
         
         :param Ei: The incident neutron energy to ignite fission
         :type Ei: float
-        :param DB: filename or names of default fission product databases, defaults to 'ENDF', alternative default DB is 'JEFF'
+        :param DB: filename or name of a bundled fission-product-yield database
         :type DB: string, optional
         
         """
@@ -125,6 +125,13 @@ class FissionIstp(Spectrum):
         # if there is no specified fissionDB, look for the default one
         if DBname == None or not os.path.exists(DBname):
             DBpath = f"{CONFLUX_DB}/fissionDB/{DB}/"
+            # A user may have CONFLUX_DB pointed at an older external data
+            # installation.  Retain that preference, but use the bundled data
+            # if that installation does not yet contain the requested library.
+            if not os.path.isdir(DBpath) and DB in self._DBtitle:
+                bundled_path = os.path.join(os.path.dirname(__file__), "data", "fissionDB", DB)
+                if os.path.isdir(bundled_path):
+                    DBpath = bundled_path + "/"
             if DBname != None and DBname not in list(self._DBtitle.keys()):
                 print(f'Custom DB: {DBname} NOT found!')
             print('Reading default FPY DB from folder: '+DBpath+'...')

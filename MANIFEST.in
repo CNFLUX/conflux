@@ -26,6 +26,7 @@ include conflux/data/betaDB/*.csv
 include conflux/data/fissionDB/*.py
 include conflux/data/fissionDB/ENDF/*.py
 include conflux/data/fissionDB/JEFF/*.py
+include conflux/data/fissionDB/JEFF40/*.py
 
 # Beta decay databases
 include conflux/data/betaDB/*.xml
@@ -33,6 +34,7 @@ include conflux/data/betaDB/*.xml
 # Fission product yield databases (XML only, no covariances)
 include conflux/data/fissionDB/ENDF/*.xml
 include conflux/data/fissionDB/JEFF/*.xml
+include conflux/data/fissionDB/JEFF40/*.xml
 
 # Default neutrino spectra
 include conflux/data/*.csv

@@ -79,6 +79,7 @@ conflux = [
     "data/fissionDB/*.py",
     "data/fissionDB/ENDF/*.py",
     "data/fissionDB/JEFF/*.py",
+    "data/fissionDB/JEFF40/*.py",
 
     # Beta decay databases
     "data/betaDB/*.xml",
@@ -87,6 +88,7 @@ conflux = [
     # Fission product yield databases (XML only, no covariances)
     "data/fissionDB/ENDF/*.xml",
     "data/fissionDB/JEFF/*.xml",
+    "data/fissionDB/JEFF40/*.xml",
 
     # Default neutrino spectra
     "data/*.csv",
