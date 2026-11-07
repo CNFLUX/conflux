@@ -18,6 +18,12 @@ betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
 betaSpectraDB.SaveToFile(filename)
 print(f"File {filename} created.")
 
+betaSpectraDB_xundl = BetaEngine(xbins=xbins, process_missing=True, use_xundl=True)
+filename = f"{CONFLUX_DB}/default_neutrino_spectra_xundl.csv"
+betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+betaSpectraDB.SaveToFile(filename)
+print(f"File {filename} created.")
+
 # Calculate beta spectra of all beta unstable isotopes
 betaplusSpectraDB = BetaPlusEngine(xbins=xbins, process_missing=True)
 filename2 = f"{CONFLUX_DB}/default_ec_neutrino_spectra.csv"
