@@ -66,6 +66,50 @@ Users can import CONFLUX libraries in their own python scripts for neutrino flux
 - `conflux.SumEngine` sums neutrino/beta spectra with respect to fission fraction and non-fissile contributions in a reactor model\
 - `conflux.ConversionEngine` converts beta spectra of fissile isotopes to the corresponding neutrino spectra using best fit virtual beta branches
  
+### Beta transition shapes
+
+The beta databases encode spin change and parity change in `dJpi`: `2-` means
+deltaJ = 2 with a parity change, while `3` means deltaJ = 3 without one. Both
+beta engines retain this assignment on each branch and expose `deltaJ`,
+`parity_change`, `forbidden_order`, `unique`, and `shape_model`.
+
+Unique forbidden transitions use the BSG unique shape with `L=deltaJ`; thus
+first-forbidden unique transitions use `L=2`. Allowed transitions use `L=0`.
+Nonunique forbidden and unknown assignments use an allowed Gamow–Teller shape
+approximation, labelled `shape_model="allowed_approximation"`. Their exact shapes
+require nuclear matrix elements or a user-supplied `custom_func`, labelled
+`shape_model="custom"`. The existing `dJpi` database format is unchanged.
+
+For comma-separated assignments the engines select the least forbidden known
+candidate, preferring nonunique at equal order, and retain `transition_candidates`
+and `transition_ambiguous`. Any unknown candidate makes the selection unresolved.
+
+Use `dJpi` as the single transition input for branch construction and editing:
+
+```python
+isotope.EditBranch(endpoint, dJpi="0-")  # first-forbidden nonunique, deltaJ = 0
+isotope.EditBranch(endpoint, dJpi="1-")  # first-forbidden nonunique, deltaJ = 1
+isotope.EditBranch(endpoint, dJpi="2-")  # first-forbidden unique
+isotope.EditBranch(endpoint, dJpi="3")   # second-forbidden unique
+isotope.EditBranch(endpoint, dJpi="")    # unknown assignment
+```
+
+`branch.dJpi = "2-"` also updates transition parameters directly. Forbidden
+order, parity change, uniqueness, and the spectral shape are derived automatically.
+`forbidden_order` is a nonnegative integer or `None` for unknown assignments.
+Conversion spectra use the same `dJpi` input. Low-level spectral functions accept
+only `L=0` for allowed shapes or `L>=2` for unique shapes.
+
+Regression tests can be run from the repository root with
+`python -m unittest discover -s tests`. Compiled BSG tests run when a library is
+present in `miniBSG/build/lib`, or specified by `CONFLUX_TEST_BSG_LIBRARY`.
+
+Endpoint-energy uncertainty calculations batch independent Monte Carlo samples
+across energy bins in both beta engines. Existing `CalcBetaSpectra` calls use
+batching automatically, retaining 30 samples per bin and the original random
+draw order. `SpectEndpointUncertMC` accepts either a scalar energy or an array.
+Custom spectral functions retain per-energy calls for compatibility.
+
 ### Examples
 
 A large list of example python scripts are saved in `<conflux>/examples/`. Users can run the examples or write calculation programs based off the examples for most common reactor neutrino production modeling. 

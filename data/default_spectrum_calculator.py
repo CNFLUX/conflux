@@ -12,20 +12,20 @@ xbins = np.arange(0, 15, 0.01)
 
 # Calculate beta spectra, completing missing ENSDF information with XUNDL when
 # a safe match is available and using the default completion otherwise.
-betaSpectraDB = BetaEngine(xbins=xbins, process_missing=True, use_xundl=False)
-filename = f"{CONFLUX_DB}/default_neutrino_spectra.csv"
-betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
-betaSpectraDB.SaveToFile(filename)
-print(f"File {filename} created.")
+# betaSpectraDB = BetaEngine(xbins=xbins, process_missing=True, use_xundl=False)
+# filename = f"{CONFLUX_DB}/default_neutrino_spectra2.csv"
+# betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
+# betaSpectraDB.SaveToFile(filename)
+# print(f"File {filename} created.")
 
 betaSpectraDB_xundl = BetaEngine(xbins=xbins, process_missing=True, use_xundl=True)
-filename = f"{CONFLUX_DB}/default_neutrino_spectra_xundl.csv"
-betaSpectraDB.CalcBetaSpectra(nu_spectrum=True)
-betaSpectraDB.SaveToFile(filename)
+filename = f"{CONFLUX_DB}/default_neutrino_spectra_xundl2.csv"
+betaSpectraDB_xundl.CalcBetaSpectra(nu_spectrum=True)
+betaSpectraDB_xundl.SaveToFile(filename)
 print(f"File {filename} created.")
 
 # Calculate beta spectra of all beta unstable isotopes
-betaplusSpectraDB = BetaPlusEngine(xbins=xbins, process_missing=True)
+betaplusSpectraDB = BetaPlusEngine(xbins=xbins)
 filename2 = f"{CONFLUX_DB}/default_ec_neutrino_spectra.csv"
 betaplusSpectraDB.CalcBetaSpectra(nu_spectrum=True)
 betaplusSpectraDB.SaveToFile(filename2)

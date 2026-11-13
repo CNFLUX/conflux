@@ -14,6 +14,7 @@ from scipy.linalg import expm
 
 """CONFLUX modules."""
 from conflux.config import CONFLUX_DB
+from conflux.BetaTransition import BranchTransitionMixin, validate_spectral_L
 from conflux.Basic import Spectrum, integrate_trapezoid
 from conflux.bsg.Constants import (ELECTRON_MASS_MEV, 
                                    NATURAL_LENGTH, 
@@ -32,7 +33,7 @@ from conflux.bsg.SpectralFunctions import (phase_space,
                                            shape_factor_gamow_teller,
                                            shape_factor_unique_forbidden)
 from conflux.bsg.FiniteSize import getL0Constants
-from conflux.bsg.Functions import getEltonNuclearRadius
+from conflux.bsg.Functions import getEltonNuclearRadius, evaluate_bsg_spectrum
 from conflux.bsg.Screening import screening_potential
 
 import matplotlib.pyplot as plt
@@ -73,7 +74,7 @@ def _p_nu_spectrum(p, isNu, numass = 0):
                     'A': A,
                     'W0': Spectrum endpoint W
                     'R': nuclear radius,
-                    'L': forbiddenness transition,
+                    'L': 0 for allowed shapes, deltaJ for unique forbidden shapes,
                     'c': 1.0,
                     'b': bAc*A,
                     'd': 0.0,
@@ -89,30 +90,13 @@ def _p_nu_spectrum(p, isNu, numass = 0):
     :rtype: float
     """
 
+    validate_spectral_L(p['L'])
     np.seterr(divide='ignore', invalid='ignore', over='ignore')
     
     # flipping the sign of Z to calculate beta+ fermi function.
-    p["Z"] *= -1
+    p = dict(p, Z=-abs(p["Z"]))
     if libBSG is not None:
-        # determine which inputs are arrays
-        array_n = 0
-        isarray = {k: hasattr(p[k], '__iter__') for k in {'We', 'W0'}}
-        for k,b in isarray.items():
-            if b:
-                n = len(p[k])
-                assert array_n == 0 or n == array_n
-                array_n = n
-        if not array_n:
-            res = libBSG.BSG_beta_spectrum(p["We"], p["W0"], p["A"], p["Z"], p["R"], p['L'], isNu)
-        else:
-            res = np.zeros(array_n)
-            for i in range(array_n):
-                res[i] = libBSG.BSG_beta_spectrum(
-                    p['We'][i] if isarray['We'] else p['We'],
-                    p['W0'][i] if isarray['W0'] else p['W0'],
-                    p['A'], p['Z'], p['R'], p['L'], isNu)
-
-        return res
+        return evaluate_bsg_spectrum(libBSG, p, isNu)
 
     result = (
         phase_space(p["We"], numass=numass, **p)
@@ -148,7 +132,7 @@ def electron(ebeta, p, numass=0):
                     'A': A,
                     'W0': Spectrum endpoint electron total energy (m_e + KE)/m_e
                     'R': nuclear radius,
-                    'L': forbiddenness transition,
+                    'L': 0 for allowed shapes, deltaJ for unique forbidden shapes,
                     'c': 1.0,
                     'b': bAc*A,
                     'd': 0.0,
@@ -179,7 +163,7 @@ def neutrino(enu, p, numass=0):
                     'A': A,
                     'W0': Spectrum endpoint electron total energy (m_e + KE)/m_e
                     'R': nuclear radius,
-                    'L': forbiddenness transition,
+                    'L': 0 for allowed shapes, deltaJ for unique forbidden shapes,
                     'c': 1.0,
                     'b': bAc*A,
                     'd': 0.0,
@@ -197,7 +181,7 @@ def neutrino(enu, p, numass=0):
     p['We'] = np.clip(p['W0']- enu/ELECTRON_MASS_MEV, 1., None)
     return _p_nu_spectrum(p, True, numass)
 
-class BetaBranch(Spectrum):
+class BetaBranch(BranchTransitionMixin, Spectrum):
     """Beta decay branch with spectrum"""
     
     Z: int
@@ -222,8 +206,8 @@ class BetaBranch(Spectrum):
     """The EC fraction of this branch to the entire decay."""
     sigma_ecfrac: float
     """The uncertainty of the EC fraction."""
-    forbiddenness: int
-    """Type of forbiddenness """
+    forbidden_order: int
+    """Read-only forbidden order, derived from dJpi; None for unknown assignments."""
     numass: float
     """neutrino mass (MeV), by default 0"""
     mixing: float
@@ -237,7 +221,7 @@ class BetaBranch(Spectrum):
     
     def __init__(self, Z, A, I, Q, E0, sigma_E0, bfrac, sigma_bfrac,
                  ecfrac, sigma_ecfrac,
-                forbiddenness=0, bAc=4.7, xbins = np.arange(0, 20, 0.1),
+                dJpi="0", bAc=4.7, xbins = np.arange(0, 20, 0.1),
                 numass = 0, mixing = 0, custom_func=None):
         
         Spectrum.__init__(self, xbins)
@@ -258,7 +242,7 @@ class BetaBranch(Spectrum):
         self.fraction = bfrac+ecfrac
         self.sigma_frac = sigma_bfrac+sigma_ecfrac
 
-        self.forbiddenness = forbiddenness
+        self.dJpi = dJpi
         
         self.bAc = bAc
         
@@ -274,7 +258,7 @@ class BetaBranch(Spectrum):
             'A': self.A,
             'W0': self.E0/ELECTRON_MASS_MEV + 1,
             'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
-            'L': self.forbiddenness,
+            **self.transition_parameters(),
             'c': 1.0,
             'b': self.bAc * self.A,
             'd': 0.0,
@@ -291,15 +275,17 @@ class BetaBranch(Spectrum):
         print("Branch E0 = " + str(self.E0)+ "+\-" + str(self.sigma_E0)
             + ", bfrac = " + str(self.bfrac) + "+\-"+str(self.sigma_bfrac)
             + ", ecfrac = " + str(self.ecfrac) + "+\-"+str(self.sigma_ecfrac)
-            + f", forbiddenness = {self.forbiddenness}")
+            + f", dJpi = {self.dJpi}, forbidden order = {self.forbidden_order}")
         
     def UpdateParams(self):
+        self.fraction = self.bfrac + self.ecfrac
+        self.sigma_frac = self.sigma_bfrac + self.sigma_ecfrac
         self.Parameters= {
             'Z': self.Z,
             'A': self.A,
             'W0': self.E0/ELECTRON_MASS_MEV + 1,
             'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
-            'L': self.forbiddenness,
+            **self.transition_parameters(),
             'c': 1.0,
             'b': self.bAc*self.A,
             'd': 0.0,
@@ -346,7 +332,7 @@ class BetaBranch(Spectrum):
             'A': self.A,
             'W0': (self.E0-ELECTRON_MASS_MEV)/ELECTRON_MASS_MEV ,
             'R': getEltonNuclearRadius(self.A) * 1e-15 / NATURAL_LENGTH,
-            'L': self.forbiddenness,
+            **self.transition_parameters(),
             'c': 1.0,
             'b': self.bAc*self.A,
             'd': 0.0,
@@ -373,18 +359,32 @@ class BetaBranch(Spectrum):
         as a function of energy using Monte Carlo sampling.
         
         :param e: The energy of beta/neutrino (MeV).
-        :type e: float
+        :type e: float or numpy.ndarray
         :param nu_spectrum: Determine whether to calculate neutrino spectrum, defaults to False
         :type nu_spectrum: bool, optional
         :param samples: Set the size of MC samples, defaults to 30
         :type samples: int, optional
-        :return: The uncertainty of spectrum amplitude at the input energy
-        :rtype: float
+        :return: The uncertainty at each input energy; array inputs batch independent samples
+        :rtype: float or numpy.ndarray
         """
 
-        if self.sigma_E0 == 0: return 0.
+        energies = np.asarray(e)
+        batched = energies.ndim > 0
+        if self.sigma_E0 == 0:
+            return np.zeros(energies.shape) if batched else 0.
 
-        E0range = np.random.normal(self.E0, self.sigma_E0, samples)
+        # Custom functions may accept scalar energies only. Preserve their
+        # existing call pattern rather than requiring multidimensional inputs.
+        if batched and self.custom_func is not None:
+            return np.array([self.SpectEndpointUncertMC(x, nu_spectrum, samples)
+                             for x in energies.flat]).reshape(energies.shape)
+
+        # Each energy receives its own samples, in the same order as the old
+        # per-bin loop. The last dimension is reduced to obtain each bin's std.
+        E0range = np.random.normal(self.E0, self.sigma_E0,
+                                   size=energies.shape + (samples,))
+        if batched:
+            e = energies[..., np.newaxis]
         newParameters = deepcopy(self.Parameters)
         newParameters['W0'] = E0range/ELECTRON_MASS_MEV -2*ELECTRON_MASS_MEV
 
@@ -399,7 +399,8 @@ class BetaBranch(Spectrum):
             function = lambda e: ((1-self.mixing)*self.custom_func(e, newParameters)
                                   +self.mixing*self.custom_func(e, newParameters, numass=self.numass))
 
-        return np.std(function(e))
+        values = function(e)
+        return np.std(values, axis=-1) if batched else np.std(values)
 
     def CalcNormalizedSpectrum(self, nu_spectrum=False):
         """
@@ -410,7 +411,7 @@ class BetaBranch(Spectrum):
         """
 
         self.spectrum = self.BetaSpectrum(self.xbins, nu_spectrum)
-        self.uncertainty = np.array([self.SpectEndpointUncertMC(x, nu_spectrum) for x in self.xbins])
+        self.uncertainty = self.SpectEndpointUncertMC(self.xbins, nu_spectrum)
 
         # Normalization spectrum (calculate full range if not already covered)
         if self.xbins[0] <= 0 and self.xbins[-1] >= self.E0:
@@ -569,78 +570,54 @@ class BetaIstp(Spectrum):
 
 
     def EditBranch(self, defaultE0, **kwargs):
-        """
-        Add or edit branches to the isotope with analyzer's assumptions.
-        
-        :param defaultE0: Existing end point energy of the missing branch
-        :type defaultE0: float
-        :param **kwargs: AAdditional keyword arguments.
+        """Add or edit a branch, deriving transition metadata from ``dJpi``.
 
         Keyword Args:
-            sigma_E0 (float): The uncertainty of the end-point energy.
-            fraction (float): The fraction that this branch contributes to the total isotopic spectrum.
-            sigma_bfrac (float): The uncertainty of fraction.
-            forbiddenness (int): The type of forbidden/allowed transition.
-            bAc (float): weak magnetism correction.
-            custom_func (method): customized beta function, needs to be structured similarly as :meth:`neutrino` or :meth:`electron`, defaults to None.
+            E0 (float): New endpoint energy; otherwise use defaultE0.
+            sigma_E0 (float): Endpoint energy uncertainty.
+            beta_fraction (float): Positron branch fraction.
+            EC_fraction (float): Electron capture branch fraction.
+            sigma_bfrac (float): Positron fraction uncertainty.
+            sigma_ecfrac (float): Electron capture fraction uncertainty.
+            dJpi (str): Spin change and parity change, e.g. "2-" or "3".
+            bAc (float): Weak magnetism correction.
+            custom_func (callable): Custom spectral shape, or None for the default.
+            numass (float): Neutrino mass.
+            mixing (float): Neutrino mass mixing fraction.
         """
-        # if sigma_E0 > E0:
-        #     sigma_E0 = E0
-        branchexist = defaultE0 in self.branches.keys()
+        aliases = {'beta_fraction': 'bfrac', 'EC_fraction': 'ecfrac'}
+        fields = ('sigma_E0', 'bfrac', 'sigma_bfrac', 'ecfrac', 'sigma_ecfrac',
+                  'dJpi', 'bAc', 'custom_func', 'numass', 'mixing')
+        changes = {aliases.get(key, key): value for key, value in kwargs.items()}
+        unknown = changes.keys() - set(fields) - {'E0'}
+        if unknown:
+            raise TypeError('Unsupported branch edits: ' + ', '.join(sorted(unknown))
+                            + '; use dJpi to edit the transition')
+        if 'dJpi' in changes and not isinstance(changes['dJpi'], str):
+            raise TypeError('dJpi must be a string such as "2-"')
 
-        # setting up default values
-        sigma_E0 = self.branches[defaultE0].sigma_E0 if branchexist else 0
-        beta_fraction = self.branches[defaultE0].bfrac if branchexist else 0
-        sigma_bfrac = self.branches[defaultE0].sigma_bfrac if branchexist else 0
-        ec_fraction = self.branches[defaultE0].ecfrac if branchexist else 0
-        sigma_ecfrac = self.branches[defaultE0].sigma_ecfrac if branchexist else 0
+        current = self.branches.get(defaultE0)
+        E0 = changes.pop('E0', defaultE0)
+        if E0 != defaultE0 and E0 in self.branches:
+            raise ValueError(f'A branch already exists at endpoint {E0}')
+        if current is not None and E0 == defaultE0:
+            for key, value in changes.items():
+                setattr(current, key, value)
+            current.UpdateParams()
+            return
 
-        forbiddenness = self.branches[defaultE0].forbiddenness if branchexist else 0
-        bAc = 4.7
-        custom_func = self.branches[defaultE0].custom_func if branchexist else None
-
-        for key, value in kwargs.items():
-            if key == 'E0': 
-                # when E0 is given, replace the default E0
-                if branchexist: 
-                    del self.branches[defaultE0]
-                    branchexist = False
-                defaultE0 = value
-            if key == 'sigma_E0':
-                sigma_E0 = value
-            if key == 'beta_fraction':
-                beta_fraction = value
-            if key == 'EC_fraction':
-                ec_fraction = value
-            if key == 'forbiddenness':
-                forbiddenness = value
-            if key == 'bAc':
-                bAc = value
-            if key == 'custom_func':
-                custom_func = custom_func
-
-            if not branchexist:
-                # TODO need to remove  the original E0 when a new E0 is given
-                self.branches[defaultE0] = BetaBranch(self.Z, 
-                                                      self.A, 
-                                                      self.I, 
-                                                      self.Q, 
-                                                      defaultE0, 
-                                                      sigma_E0, 
-                                                      beta_fraction, 
-                                                      sigma_bfrac,
-                                                      ec_fraction,
-                                                      sigma_ecfrac,
-                                                      forbiddenness,
-                                                      bAc=bAc, 
-                                                      xbins=self.xbins,
-                                                      custom_func=custom_func,
-                                                      numass=self.numass,
-                                                      mixing=self.mixing)
-
-            elif hasattr(self.branches[defaultE0], key):
-                setattr(self.branches[defaultE0], key, value)
-                self.branches[defaultE0].UpdateParams()
+        defaults = {'sigma_E0': 0, 'bfrac': 0, 'sigma_bfrac': 0,
+                    'ecfrac': 0, 'sigma_ecfrac': 0, 'dJpi': '0', 'bAc': 4.7,
+                    'custom_func': None,
+                    'numass': self.numass, 'mixing': self.mixing}
+        parameters = ({key: getattr(current, key) for key in fields}
+                      if current is not None else defaults)
+        parameters.update(changes)
+        replacement = BetaBranch(self.Z, self.A, self.I, self.Q, E0=E0,
+                                 xbins=self.xbins, **parameters)
+        if current is not None:
+            del self.branches[defaultE0]
+        self.branches[E0] = replacement
 
     def MaxBranch(self):
         """
@@ -965,25 +942,8 @@ class BetaPlusEngine:
                     if E0<=0:
                         continue
                     sigma_E0 = float(branch.attrib['sigma_E0'])
-                    spin_par_changes = [n.strip() for n in branch.attrib['dJpi'].split(',')]
-                    # spin_par_changes = str(branch.attrib['dJpi'])
-
-                    # converting spin change to forbidden rransition types
-                    # if spin_par_change contain '-', it means parity changed
-                    ftypes = [['0', '1'], ['0-', '1-', '2-'], ['2', '3'],
-                              ['3-', '4-'], ['4', '5']]
-                    firstftypes = [-10, -11, 10]
-                    forbiddenness = 6
-                    for i in range(len(ftypes)):
-                        for j in range(len(spin_par_changes)):
-                            if (spin_par_changes[j] in ftypes[i] and 
-                                i < abs(forbiddenness)):
-                                forbiddenness = -i
-                                if i == 1:
-                                    # TODO need to add specific type for the first order non-unique transition
-                                    forbiddenness = firstftypes[i]
-                                elif spin_par_changes[j] == ftypes[i][-1]:
-                                    forbiddenness = i
+                    # Decode deltaJ and parity in the branch; spectral L is separate.
+                    dJpi = branch.attrib.get('dJpi', '')
 
                     # assign fraction values to branches
                     # normalize if greater than one
@@ -1003,7 +963,7 @@ class BetaPlusEngine:
                                             sigma_bfrac, 
                                             ec_fraction,
                                             sigma_ecfrac,
-                                            forbiddenness,
+                                            dJpi=dJpi,
                                             xbins=self.xbins,
                                             custom_func=self.custom_func,
                                             numass=self.numass,

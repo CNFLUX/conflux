@@ -3,6 +3,23 @@ from scipy.interpolate import interp1d
 
 from conflux.bsg.Constants import *
 
+def evaluate_bsg_spectrum(library, parameters, isNu):
+    """Evaluate the scalar BSG API on broadcast electron/endpoint energies.
+
+    Array shapes include the energy-bin/sample matrix used for endpoint Monte
+    Carlo. Scalar inputs still return a scalar, while arrays retain their shape.
+    """
+    W, W0 = np.broadcast_arrays(parameters['We'], parameters['W0'])
+    args = (parameters['A'], parameters['Z'], parameters['R'], parameters['L'], isNu)
+    if W.ndim == 0:
+        return library.BSG_beta_spectrum(float(W), float(W0), *args)
+    result = np.fromiter(
+        (library.BSG_beta_spectrum(float(w), float(w0), *args)
+         for w, w0 in zip(W.flat, W0.flat)),
+        dtype=float, count=W.size,
+    )
+    return result.reshape(W.shape)
+
 def stableA(Z):
     """Get estimate for stable mass number as a function of Z"""
 
@@ -26,60 +43,6 @@ def getEltonNuclearRadius(A, natUnits=False):
         """ hbar * c / m_e, in fm"""
         R /= NATURAL_LENGTH/1e-15
     return R
-
-def getDJpi(Jpi):
-    """Turn string of possible spin-parities into
-    (double of spin, parity)
-
-    :param Jpi: string, spin-parities
-
-    """
-    parity = 1
-    DJ = 0
-    if '-' in Jpi:
-        parity = -1
-        DJ = Jpi.split('-')[0]
-    else:
-        DJ = Jpi.split('+')[0]
-    try:
-        if '/2' in Jpi:
-            DJ = int(DJ.split('/2')[0])
-        else:
-            DJ = 2 * int(DJ)
-    except ValueError:
-        print(Jpi)
-        print(parity)
-        print(DJ)
-        raise
-        return (np.nan, np.nan)
-    return (DJ, parity)
-
-
-def determineForbiddenness(mJpi, dJpi):
-    """Determine degree of forbiddenness and uniqueness
-    returns (deltaJ[int], forbiddenness[int], unique[bool])
-
-    :param mJpi: string, mother spin and parity
-    :param dJpi: string, daughter spin and parity
-
-    """
-    mDJpi = getDJpi(mJpi)
-    dDJpi = getDJpi(dJpi)
-
-    unique = False
-
-    deltaJ = mDJpi[1] * dDJpi[1] * abs((abs(mDJpi[0]) - abs(dDJpi[0]))) / 2
-    try:
-        forbiddenness = int(max(abs(deltaJ) - 1, 0))
-    except ValueError:
-        print(mJpi, dJpi, mDJpi, dDJpi, deltaJ)
-        raise
-    if np.sign(mDJpi[1] * dDJpi[1]) != (-1) ** (forbiddenness):
-        forbiddenness += 1
-    if abs(deltaJ) == forbiddenness + 1:
-        unique = True
-    return (deltaJ, forbiddenness, unique)
-
 
 def rebin(x1, x2, y2):
     """Rough rebinning to downsample y2 to grid of x1

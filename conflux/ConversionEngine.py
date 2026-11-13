@@ -237,7 +237,7 @@ class VirtualBranch(Spectrum):
                 
                 # tallying forbidden branches of a beta decay isotope
                 for e0, branch in betaIstp.branches.items():
-                    if branch.forbiddenness != 0:
+                    if branch.forbidden_order != 0:
                         FB_sum += branch.frac*betaFP.y
                 
         # Calculate the average
@@ -248,7 +248,7 @@ class VirtualBranch(Spectrum):
 
     # define the theoretical beta spectrum shape
     def BetaSpectrum(self, x, E0, contribute, Zavg=None, Aavg=None,
-                    nu_spectrum=False, forbiddenness=0, bAc=4.7, norm=True):
+                    nu_spectrum=False, dJpi="0", bAc=4.7, norm=True):
         """
         Calculate the theoretical beta/neutrino spectrum shape.
         
@@ -264,8 +264,8 @@ class VirtualBranch(Spectrum):
         :type Aavg: int, optional
         :param nu_spectrum: whether to calculate neutrino (True) or beta (False) spectrum, defaults to False
         :type nu_spectrum: bool, optional
-        :param forbiddenness: type of forbidden/allowed transitions , defaults to 0
-        :type forbiddenness: int, optional
+        :param dJpi: Spin change and parity change, defaults to "0" (allowed)
+        :type dJpi: str, optional
         :param bAc: Weak magnetism correction factor, defaults to 4.7
         :type bAc: float, optional
         :param norm: Whether to normalize the beta spectrum integral to 1, defaults to True
@@ -278,7 +278,7 @@ class VirtualBranch(Spectrum):
             Aavg = self.Aavg
         virtualbeta = BetaBranch(Zavg, Aavg, I=0, Q=E0, E0=E0, sigma_E0=0,
                                 frac=contribute, sigma_frac=0,
-                                forbiddenness=forbiddenness, bAc=bAc)
+                                dJpi=dJpi, bAc=bAc)
 
         binwidths = abs(x[1]-x[0])
         new_spect = virtualbeta.BetaSpectrum(x, nu_spectrum)
@@ -387,12 +387,12 @@ class VirtualBranch(Spectrum):
                                 ((1-fbratio)*
                                  (self.BetaSpectrum(x, e, 1, Zavg=Zavg,
                                                     Aavg=Aavg,
-                                                    forbiddenness=0,
+                                                    dJpi="0",
                                                     bAc=wm))
                                 + fbratio*(self.BetaSpectrum(x, e, 1, 
                                                              Zavg=Zavg, 
                                                              Aavg=Aavg,
-                                                             forbiddenness=1,
+                                                             dJpi="2-",
                                                              bAc=wm))))
                     # Scale the bin widths of the energy scale from keV to MeV.
                     if(1000 > betadata.x[1]-betadata.x[0] > 1):
@@ -595,11 +595,11 @@ class VirtualBranch(Spectrum):
                 vb = BetaBranch(self.Zlist[s], self.Alist[s],
                                 frac=1-self.fblist[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
-                                forbiddenness=0, bAc=self.wmlist[s])
+                                dJpi="0", bAc=self.wmlist[s])
                 vb_fb = BetaBranch(self.Zlist[s], self.Alist[s],
                                 frac=self.fblist[s], I=0, Q = self.E0[s],
                                 E0=self.E0[s], sigma_E0=0, sigma_frac=0,
-                                forbiddenness=1, bAc=self.wmlist[s])
+                                dJpi="2-", bAc=self.wmlist[s])
                 newspect = vb.frac * ((1-self.fblist[s])
                                         * vb.BetaSpectrum(x, nu_spectrum)
                                     + self.fblist[s]

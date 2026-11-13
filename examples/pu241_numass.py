@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     testlist = [942410]
     testEngine = BetaEngine(xbins=x, inputlist=testlist, numass=8e-3, mixing=0.5)
-    testEngine.istplist[942410].EditBranch(0.021, forbiddenness = 1)
+    testEngine.istplist[942410].EditBranch(0.021, dJpi = "2-")
     testEngine.CalcBetaSpectra(nu_spectrum=False, GSF=False)
 
     y = testEngine.istplist[942410].spectrum
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     testEngine.istplist[942410].Display()
 
     testEngine0 = BetaEngine(xbins=x, inputlist=testlist)
-    testEngine0.istplist[942410].EditBranch(0.021, forbiddenness = 1)
+    testEngine0.istplist[942410].EditBranch(0.021, dJpi = "2-")
     testEngine0.CalcBetaSpectra(nu_spectrum=False, GSF=False)
 
 

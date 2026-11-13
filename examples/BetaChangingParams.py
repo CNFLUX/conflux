@@ -69,27 +69,15 @@ if __name__ == "__main__":
     EndSpec = Cs141.spectrum
     EndUnc = Cs141.uncertainty
     
-    # #So, I just added a branch with a different endpoint energy, let me do something else. I can also edit
-    # #The forbiddenness of a branch. First, I will remove the branch that I added above, then iterate through
-    # #All branches and change their forbiddenness to 1. After, since I've edited a few branches and removed one,
-    # #I will recalculate the covariances for my spectrum and then save the resulting spectrum
-    
-    
-    # finally, I'm going to recalculate the beta spectrum without any spectral shape corrections
-    # Only calculating it with the fermi function
-
-    # First, I will go ahead and undo all of the changes to the forbiddenness values for the 
-    # Beta Branches, and then edit the branches so that they take in a custom beta spectra
-    # function as I've defined above (The fermi function mutliplied by the phase space, so without
-    # any theoretical corrections)
+    # Compare the original spectrum with first-forbidden unique shapes.
     BetaDB3 = BetaEngine(inputlist = [551410], xbins = e)
     BetaDB3.LoadBetaDB()
     Cs141_3 =BetaDB3.istplist[551410]
     
     # switch all allowed transitions to forbidden transitions
     for i in Cs141_3.branches:
-        if Cs141_3.branches[i].forbiddenness == 0:
-            Cs141_3.EditBranch(defaultE0 = i, forbiddenness = 1) 
+        if Cs141_3.branches[i].forbidden_order == 0:
+            Cs141_3.EditBranch(defaultE0 = i, dJpi = "2-")
         
     # recalculate the beta spectra 
     BetaDB3.CalcBetaSpectra(nu_spectrum=True)    

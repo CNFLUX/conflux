@@ -5,6 +5,7 @@
 #include <gsl/gsl_sf_gamma.h>
 
 #include <cmath>
+#include <limits>
 #include <vector>
 using std::vector;
 #include <map>
@@ -107,16 +108,17 @@ array<double,7>& get_aPos(int Z) {
 double BSG_FermiFunction(double W, double Z, double R) {
     // normalization changed to match python version
     double g = sqrt(1 - ALPHA*ALPHA*Z*Z);
-    return FermiFunction(W, Z, R, BETA_MINUS) * 2/(g+1);
+    return FermiFunction(W, fabs(Z), R, Z < 0 ? BETA_PLUS : BETA_MINUS) * 2/(g+1);
 }
 
 double BSG_L0Correction(double W, int Z, double R) {
-    return L0Correction(W, Z, R, BETA_MINUS, nullptr, get_aNeg(Z).data());
+    int betaType = Z < 0 ? BETA_PLUS : BETA_MINUS;
+    Z = abs(Z);
+    return L0Correction(W, Z, R, betaType, get_aPos(Z).data(), get_aNeg(Z).data());
 }
 
 double BSG_AtomicScreeningCorrection(double W, int Z) {
-    if(Z == 1) return 1.;
-    return AtomicScreeningCorrection(W, Z, BETA_MINUS);
+    return AtomicScreeningCorrection(W, abs(Z), Z < 0 ? BETA_PLUS : BETA_MINUS);
 }
 
 double  BSG_RecoilCorrection(double W, double W0, int A) {
@@ -124,11 +126,11 @@ double  BSG_RecoilCorrection(double W, double W0, int A) {
 }
 
 double BSG_QCorrection(double W, double W0, int Z, int A) {
-    return QCorrection(W, W0, Z, A, BETA_MINUS, GAMOW_TELLER, 0);
+    return QCorrection(W, W0, abs(Z), A, Z < 0 ? BETA_PLUS : BETA_MINUS, GAMOW_TELLER, 0);
 }
 
 double BSG_RadiativeCorrection(double W, double W0, int Z, double R) {
-    return RadiativeCorrection(W, W0, Z, R, BETA_MINUS, 1.27, 4.706);
+    return RadiativeCorrection(W, W0, abs(Z), R, Z < 0 ? BETA_PLUS : BETA_MINUS, 1.27, 4.706);
 }
 
 double BSG_NeutrinoRadiativeCorrection(double Wv) {
@@ -172,17 +174,17 @@ double lambda_k(double W, int Z, double R, int k) {
 
 /* Unique forbidden shape factor
 
-    :param L: int Spin change
+    :param L: int Spin change deltaJ >= 2, for unique forbidden transitions only.
     :param W: Electron energy in units of me c^2
     :param W0: Electron endpoint energy in units of me c^2
     :param Z: Proton number of the final nuclear state
 */
 double shape_factor_unique_forbidden(double W, int L, double W0, int Z, double R) {
+    if(L < 2) return std::numeric_limits<double>::quiet_NaN();
     if(!(W>1)) return 1;
 
     double pe = sqrt(W*W - 1.);
     double pnu = W0 - W;
-    L = abs(L);
     double C = 0;
     for(int k = 1; k <= L; ++k)
         C += lambda_k(W, Z, R, k) * pow(pe, 2*(k-1)) * pow(pnu, 2*(L-k)) / gsl_sf_fact(2*k-1) / gsl_sf_fact(2*(L-k)+1);
@@ -199,6 +201,9 @@ double  BSG_beta_spectrum(
     int L,
     bool isNu
 ) {
+    // Python decodes transition metadata: L=0 is an allowed shape (including
+    // explicit approximations); L>=2 is the spin change of a unique transition.
+    if(L < 0 || L == 1) return std::numeric_limits<double>::quiet_NaN();
     if(W - 1 < 1e-5) return 0;
     double c = py_phase_space(W, W0);
     if(!c) return c;

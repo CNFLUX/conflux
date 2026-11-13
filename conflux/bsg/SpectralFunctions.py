@@ -3,6 +3,7 @@ from scipy.special import gamma, loggamma, spence
 from scipy.special import factorial, factorial2
 
 from conflux.bsg.CoulombFunctions import lambda_k
+from conflux.BetaTransition import validate_spectral_L
 
 from conflux.bsg.Constants import *
 from conflux.bsg.FiniteSize import getL0Constants
@@ -381,16 +382,18 @@ def shape_factor_gamow_teller(W, Z, W0, R, A, b, c, d, Lambda, **kwargs):
 def shape_factor_unique_forbidden(W, L, W0, Z, R, **kwargs):
     """Unique forbidden shape factor
 
-    :param L: int Spin change
+    :param L: int Spin change deltaJ >= 2, for unique forbidden transitions only.
     :param W: Electron energy in units of me c^2
     :param W0: Electron endpoint energy in units of me c^2
     :param Z: Proton number of the final nuclear state
 
     """
+    L = validate_spectral_L(L)
+    if L == 0:
+        raise ValueError('Unique forbidden shape requires deltaJ >= 2')
     C = 0.
     pe = np.sqrt(W**2.0 - 1.)
     pnu = W0-W
-    L = abs(L)
     for k in range(1, L+1, 1):
         C += lambda_k(W, Z, R, k) * pe**(2*(k-1))*pnu**(2*(L-k))/factorial(2*k-1)/factorial(2*(L-k)+1)
     return factorial(2*L-1)*C
