@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "conflux"
-version = "1.2.0"
+version = "1.2.1"
 description = "A package to calculate neutrino flux from beta decaying sources"
 readme = "README.md"
 requires-python = ">=3.6"
@@ -51,8 +51,10 @@ conflux-setup = "conflux.cli_setup:main"
 conflux-update-endf = "update_endf_database:main"
 
 [tool.setuptools]
-packages = ["conflux"]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["conflux*"]
 
 [tool.setuptools.package-data]
 conflux = [
