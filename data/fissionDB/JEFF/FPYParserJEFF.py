@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Sat Apr 17 10:51:51 2021
@@ -7,10 +7,12 @@ Created on Sat Apr 17 10:51:51 2021
 """
 
 # universal modules
-import sys
+import argparse
+from pathlib import Path
+import re
+import tempfile
 from xml.dom import minidom
 import fortranformat as ff
-from os import listdir
 
 # In[0]: Prepare the class to write the output xml file
 class XMLedit:
@@ -59,14 +61,24 @@ class XMLedit:
         CONT.setAttribute('DY', str(data[3]))
         self.LIST.appendChild(CONT)
 
-    def saveXML(self):
+    def saveXML(self, output_dir=None):
+        for head in self.DB.childNodes:
+            if len(head.childNodes) != int(head.getAttribute('LE')):
+                raise ValueError('Parsed energy-table count does not match HEAD LE')
+            for table in head.childNodes:
+                if len(table.childNodes) != int(table.getAttribute('NFPi')):
+                    raise ValueError('Parsed product count does not match LIST NFPi')
         xml_str = self.root.toprettyxml(indent ="\t")
-        with open(self.outputName+".xml", "w") as f:
+        destination = Path(output_dir or '.') / (self.outputName + '.xml')
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with destination.open("w") as f:
             f.write(xml_str)
+        return destination
 
 # In[1]: the method that reads ENDF fission production yield (FPY) data base
-def ENDF6FPYreader(filename):
+def ENDF6FPYreader(filename, output_dir=None):
     record_reader = ff.FortranRecordReader('(A66,I4,I2,I3,I5)')
+    data_reader = ff.FortranRecordReader('(6E11.0)')
     DBname = filename.split('/')
     DBname_short = DBname[-1].split('.')
     xmloutput = XMLedit(DBname_short[0])
@@ -88,7 +100,6 @@ def ENDF6FPYreader(filename):
             TEXT, MAT, MF, MT, NS = record_reader.read(line)
             # independent fission products
             if (MT == 454):
-                data_reader = ff.FortranRecordReader('(6E11.0)')
                 data = data_reader.read(TEXT)
 
                 # reading the HEAD of independent fission products
@@ -220,12 +231,57 @@ def ENDF6FPYreader(filename):
 
                 linenum += 1
 
-    xmloutput.saveXML()
+    return xmloutput.saveXML(output_dir)
+
+
+def parse_fission_yield_library(filename, output_dir=None):
+    """Split an ENDF library by MAT and use the existing per-material reader.
+
+    Accepts combined JEFF .txt libraries as well as single-material .dat files.
+    Output names follow CONFLUX's nfpy_<MAT>_<Z>-<element>-<A>[M] convention.
+    Both MF=8/MT=454 (IFP) and MT=459 (CFP) are retained by the reader.
+    """
+    materials = {}
+    for line in Path(filename).read_text().splitlines(keepends=True):
+        if not line.strip():
+            continue
+        if len(line.rstrip('\r\n')) < 75:
+            raise ValueError('ENDF record shorter than 75 columns')
+        mat = int(line[66:70])
+        if mat > 0:
+            materials.setdefault(mat, []).append(line)
+
+    outputs = []
+    with tempfile.TemporaryDirectory(prefix='conflux-fpy-') as temporary:
+        for mat, lines in materials.items():
+            if not any(int(line[70:72]) == 8 and int(line[72:75]) in (454, 459)
+                       for line in lines):
+                continue
+            description = [line for line in lines
+                           if int(line[70:72]) == 1 and int(line[72:75]) == 451]
+            if len(description) < 5:
+                raise ValueError(f'MAT {mat}: missing MF=1/MT=451 isotope metadata')
+            isotope = re.match(r'\s*(\d+)-\s*([A-Za-z]+)\s*-\s*(\d+)', description[4][:66])
+            if isotope is None:
+                raise ValueError(f'MAT {mat}: unrecognized isotope description')
+            z, element, a = isotope.groups()
+            state = int(description[1][33:44])  # LISO, not LIS or LFI
+            suffix = '' if state == 0 else ('M' if state == 1 else f'M{state}')
+            basename = f'nfpy_{mat}_{int(z)}-{element}-{int(a)}{suffix}'
+            source = Path(temporary) / (basename + '.dat')
+            source.write_text(''.join(lines))
+            outputs.append(ENDF6FPYreader(str(source), output_dir=output_dir))
+    if not outputs:
+        raise ValueError(f'No MF=8 fission-yield materials found in {filename}')
+    return outputs
 
 if __name__ == "__main__":
-    dirName = sys.argv[1]
-    fileList = listdir(dirName)
-    #print(fileList)
-    for filename in fileList:
-        if filename.split('.')[-1] == 'dat':
-            ENDF6FPYreader(dirName+filename)
+    parser = argparse.ArgumentParser(description='Parse JEFF ENDF-6 fission yields into CONFLUX XML.')
+    parser.add_argument('input', type=Path, help='Combined library file or directory of .dat files')
+    parser.add_argument('--output-dir', type=Path, default=Path('.'), help='XML destination (default: current directory)')
+    args = parser.parse_args()
+    sources = sorted(args.input.glob('*.dat')) if args.input.is_dir() else [args.input]
+    outputs = []
+    for source in sources:
+        outputs.extend(parse_fission_yield_library(source, output_dir=args.output_dir))
+    print(f'Saved {len(outputs)} XML files to {args.output_dir.resolve()}')
